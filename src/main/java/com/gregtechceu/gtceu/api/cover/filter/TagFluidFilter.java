@@ -7,8 +7,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
@@ -19,24 +17,18 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
  */
 public class TagFluidFilter extends TagFilter<FluidStack, FluidFilter> implements FluidFilter {
 
-    public static final Codec<TagFluidFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.fieldOf("tag").forGetter(val -> val.oreDictFilterExpression))
-            .apply(instance, TagFluidFilter::loadFilter));
     private final Object2BooleanMap<Fluid> cache = new Object2BooleanOpenHashMap<>();
 
-    protected TagFluidFilter() {}
-
-    public static TagFluidFilter loadFilter(ItemStack itemStack) {
-        return itemStack.get(GTDataComponents.TAG_FLUID_FILTER);
+    protected TagFluidFilter(String oreDict) {
+        this.oreDictFilterExpression = oreDict;
+        OreDictExprFilter.parseExpression(this.matchRules, this.oreDictFilterExpression);
     }
 
-    private static TagFluidFilter loadFilter(String oreDict) {
-        var handler = new TagFluidFilter();
-        // handler.itemWriter = itemWriter; // TODO fix
-        handler.oreDictFilterExpression = oreDict;
-        handler.matchRules.clear();
-        handler.cache.clear();
-        OreDictExprFilter.parseExpression(handler.matchRules, handler.oreDictFilterExpression);
+    public static TagFluidFilter loadFilter(ItemStack itemStack) {
+        var expr = itemStack.getOrDefault(GTDataComponents.TAG_FILTER_EXPRESSION, "");
+        var handler = new TagFluidFilter(expr);
+        handler.itemWriter = filter -> itemStack.set(GTDataComponents.TAG_FILTER_EXPRESSION,
+                ((TagFluidFilter) filter).oreDictFilterExpression);
         return handler;
     }
 
