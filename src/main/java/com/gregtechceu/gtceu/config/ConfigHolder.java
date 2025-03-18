@@ -151,10 +151,12 @@ public class ConfigHolder {
         @Configurable
         @Configurable.Comment({ "Whether to hide facades of all blocks in JEI and creative search menu.",
                 "Default: true" })
+        // todo: implement or purge
         public boolean hideFacadesInRecipeViewer = true;
 
         @Configurable
         @Configurable.Comment({ "Whether to hide filled cells in JEI and creative search menu.", "Default: true" })
+        // todo: implement or purge
         public boolean hideFilledCellsInRecipeViewer = true;
 
         @Configurable
@@ -165,6 +167,7 @@ public class ConfigHolder {
         @Configurable.Comment({
                 "Whether Gregtech should remove smelting recipes from the vanilla furnace for ingots requiring the Electric Blast Furnace.",
                 "Default: true" })
+        // todo: implement or purge
         public boolean removeSmeltingForEBFMetals = true;
 
         @Configurable
@@ -230,6 +233,7 @@ public class ConfigHolder {
             @Configurable
             @Configurable.Comment("The map scale at which displayed ores will stop scaling.")
             @Configurable.DecimalRange(min = 0.1, max = 16)
+            // todo: implement or purge
             public float oreScaleStop = 1;
 
             @Configurable
@@ -505,6 +509,7 @@ public class ConfigHolder {
         @Configurable
         @Configurable.Comment({ "Makes nearly every GCYM Multiblock require blocks which set their maximum voltages.",
                 "Default: false" })
+        // todo: implement or purge
         public boolean enableTieredCasings = false;
         @Configurable
         @Configurable.Comment({ "Minimum distance between Long Distance Item Pipe Endpoints", "Default: 50" })
@@ -700,8 +705,8 @@ public class ConfigHolder {
         public boolean universalHazards = true;
         @Configurable
         @Configurable.Comment({ "Whether environmental hazards like pollution or radiation are active",
-                "Default: true" })
-        public boolean environmentalHazards = true;
+                "Default: false" })
+        public boolean environmentalHazards = false;
         @Configurable
         @Configurable.Comment({ "How much environmental hazards decay per chunk, per tick.",
                 "Default: 0.001" })
