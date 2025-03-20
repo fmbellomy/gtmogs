@@ -520,6 +520,9 @@ public class ForgeCommonEventListener {
             if (mapping.getKey().equals(GTCEu.id("steam_miner"))) {
                 mapping.remap(GTMachines.STEAM_MINER.first().getItem());
             }
+            if (mapping.getKey().equals(GTCEu.id("tungstensteel_fluid_cell"))) {
+                mapping.remap(GTItems.FLUID_CELL_LARGE_TUNGSTEN_STEEL.get().asItem());
+            }
             if (mapping.getKey().equals(GTCEu.id("avanced_nanomuscle_chestplate"))) {
                 mapping.remap(GTItems.NANO_CHESTPLATE_ADVANCED.get());
             }
