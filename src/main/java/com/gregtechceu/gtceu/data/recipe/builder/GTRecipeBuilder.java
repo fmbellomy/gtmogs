@@ -51,6 +51,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import dev.ftb.mods.ftbquests.quest.QuestObjectBase;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
@@ -1134,6 +1135,27 @@ public class GTRecipeBuilder {
             return this;
         }
         return addCondition(new GameStageCondition(isReverse, stageName));
+    }
+
+    public GTRecipeBuilder ftbQuest(String questId, boolean isReverse) {
+        if (!GTCEu.Mods.isFTBQuestsLoaded()) {
+            GTCEu.LOGGER.error("FTBQuests is not loaded!");
+            return this;
+        }
+        if (questId.isEmpty()) {
+            GTCEu.LOGGER.error("Quest ID cannot be empty for recipe {}", this.id);
+            return this;
+        }
+        long qID = QuestObjectBase.parseCodeString(questId);
+        if (qID == 0L) {
+            GTCEu.LOGGER.error("Quest {} not found for recipe {}", questId, this.id);
+            return this;
+        }
+        return addCondition(new FTBQuestCondition(isReverse, qID));
+    }
+
+    public GTRecipeBuilder ftbQuest(String questId) {
+        return ftbQuest(questId, false);
     }
 
     private boolean applyResearchProperty(ResearchData.ResearchEntry researchEntry) {

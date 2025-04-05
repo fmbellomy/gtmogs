@@ -49,10 +49,15 @@ public final class GTRecipeConditions {
                     new RecipeConditionType<>(EnvironmentalHazardCondition::new, EnvironmentalHazardCondition.CODEC));
     public static final RecipeConditionType<DaytimeCondition> DAYTIME = GTRegistries.RECIPE_CONDITIONS
             .register("daytime", new RecipeConditionType<>(DaytimeCondition::new, DaytimeCondition.CODEC));
-
+    public static RecipeConditionType<FTBQuestCondition> FTB_QUEST;
     public static RecipeConditionType<GameStageCondition> GAMESTAGE;
 
     public static void init() {
+        if (GTCEu.Mods.isFTBQuestsLoaded()) {
+            FTB_QUEST = GTRegistries.RECIPE_CONDITIONS
+                    .register("ftb_quest", new RecipeConditionType<>(FTBQuestCondition::new, FTBQuestCondition.CODEC));
+        }
+
         if (GTCEu.Mods.isGameStagesLoaded()) {
             GAMESTAGE = GTRegistries.RECIPE_CONDITIONS
                     .register("game_stage",
