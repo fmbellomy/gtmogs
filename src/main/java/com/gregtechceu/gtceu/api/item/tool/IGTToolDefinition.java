@@ -1,9 +1,13 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
+import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -19,7 +23,9 @@ public interface IGTToolDefinition {
     /**
      * Tool Component/Behaviours
      */
-    List<IToolBehavior> getBehaviors();
+    List<IToolBehavior<?>> getBehaviors();
+
+    Tool getTool();
 
     boolean isToolEffective(BlockState state);
 
@@ -93,9 +99,9 @@ public interface IGTToolDefinition {
         return true;
     }
 
-    boolean canApplyEnchantment(ItemStack stack, Enchantment enchantment);
+    TagKey<Item>[] getValidEnchantmentTags();
 
-    Object2IntMap<Enchantment> getDefaultEnchantments(ItemStack stack);
+    Object2IntMap<ResourceKey<Enchantment>> getDefaultEnchantments();
 
     /**
      * Misc

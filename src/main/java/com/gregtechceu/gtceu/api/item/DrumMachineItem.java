@@ -1,17 +1,17 @@
 package com.gregtechceu.gtceu.api.item;
 
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.FluidPipeProperties;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.misc.forge.ThermalFluidHandlerItemStack;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -42,8 +42,8 @@ public class DrumMachineItem extends MetaMachineItem {
             property = null;
         }
 
-        if (cap == ForgeCapabilities.FLUID_HANDLER_ITEM && property != null) {
-            return ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(cap, LazyOptional.of(
+        if (cap == Capabilities.FLUID_HANDLER_ITEM && property != null) {
+            return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, LazyOptional.of(
                     () -> new ThermalFluidHandlerItemStack(
                             itemStack,
                             Math.toIntExact(GTMachineUtils.DRUM_CAPACITY.get(getDefinition())),

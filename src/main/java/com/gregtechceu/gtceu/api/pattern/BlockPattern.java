@@ -29,9 +29,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -40,7 +40,6 @@ import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.BiFunction;
@@ -321,7 +320,7 @@ public class BlockPattern {
                             IItemHandler handler = null;
                             if (!player.isCreative()) {
                                 var foundHandler = getMatchStackWithHandler(candidates,
-                                        player.getCapability(ForgeCapabilities.ITEM_HANDLER));
+                                        player.getCapability(Capabilities.ITEM_HANDLER));
                                 if (foundHandler != null) {
                                     foundSlot = foundHandler.getFirst();
                                     handler = foundHandler.getSecond();
@@ -671,7 +670,7 @@ public class BlockPattern {
             if (stack.isEmpty()) continue;
 
             @NotNull
-            LazyOptional<IItemHandler> stackCap = stack.getCapability(ForgeCapabilities.ITEM_HANDLER);
+            LazyOptional<IItemHandler> stackCap = stack.getCapability(Capabilities.ITEM_HANDLER);
             if (stackCap.isPresent()) {
                 var rt = getMatchStackWithHandler(candidates, stackCap);
                 if (rt != null) {

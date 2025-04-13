@@ -1,7 +1,8 @@
 package com.gregtechceu.gtceu.common.entity;
 
+import Type;
 import com.gregtechceu.gtceu.common.data.GTEntityTypes;
-import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.data.item.GTItems;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;

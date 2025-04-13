@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.block.ICoilType;
 import com.gregtechceu.gtceu.api.block.IFilterType;
-import com.gregtechceu.gtceu.api.data.chemical.material.IMaterialRegistryManager;
+import com.gregtechceu.gtceu.api.material.material.IMaterialRegistryManager;
 import com.gregtechceu.gtceu.api.machine.multiblock.IBatteryData;
 import com.gregtechceu.gtceu.api.registry.GTRegistry;
 import com.gregtechceu.gtceu.common.block.BatteryBlock;
@@ -14,8 +14,8 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.eventbus.api.GenericEvent;
-import net.minecraftforge.fml.event.IModBusEvent;
+import net.neoforged.bus.api.GenericEvent;
+import net.neoforged.fml.event.IModBusEvent;
 
 import lombok.Getter;
 import org.jetbrains.annotations.ApiStatus;

@@ -9,7 +9,6 @@ import dev.latvian.mods.kubejs.recipe.RecipeJS;
 import dev.latvian.mods.kubejs.recipe.ReplacementMatch;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;

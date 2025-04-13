@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.misc;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-
 import java.util.Arrays;
 import java.util.function.LongSupplier;
 

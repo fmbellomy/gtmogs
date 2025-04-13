@@ -12,7 +12,7 @@ import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.event.EventHooks;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,7 +72,7 @@ public abstract class GTExplosiveEntity extends PrimedTnt {
                 radius,
                 false,
                 dropBlocks ? Explosion.BlockInteraction.DESTROY_WITH_DECAY : Explosion.BlockInteraction.DESTROY);
-        if (!ForgeEventFactory.onExplosionStart(level, explosion)) {
+        if (!EventHooks.onExplosionStart(level, explosion)) {
             explosion.explode();
             explosion.finalizeExplosion(false);
         }

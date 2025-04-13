@@ -24,7 +24,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.ApiStatus;
-
 import java.util.*;
 import java.util.function.Supplier;
 

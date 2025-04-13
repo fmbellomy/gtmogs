@@ -15,7 +15,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.ItemStack;
-
 import java.util.List;
 
 public interface IMufflerMachine extends IMultiPart, IEnvironmentalHazardEmitter {

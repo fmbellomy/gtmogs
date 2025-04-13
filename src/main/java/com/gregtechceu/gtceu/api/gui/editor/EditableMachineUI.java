@@ -3,6 +3,8 @@ package com.gregtechceu.gtceu.api.gui.editor;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.common.CommonInit;
 import com.lowdragmc.lowdraglib.gui.editor.configurator.IConfigurableWidget;
 import com.lowdragmc.lowdraglib.gui.editor.data.Resources;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -17,7 +19,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.function.BiConsumer;
@@ -65,7 +66,7 @@ public class EditableMachineUI implements IEditableUI<WidgetGroup, MetaMachine> 
             var nbt = getCustomUI();
             var group = new WidgetGroup();
             IConfigurableWidget.deserializeNBT(group, nbt.getCompound("root"),
-                    Resources.fromNBT(nbt.getCompound("resources")), false);
+                    Resources.fromNBT(nbt.getCompound("resources")), false, GTRegistries.builtinRegistry());
             group.setSelfPosition(new Position(0, 0));
             return group;
         }
@@ -84,11 +85,12 @@ public class EditableMachineUI implements IEditableUI<WidgetGroup, MetaMachine> 
                 this.customUICache = new CompoundTag();
             } else {
                 try {
-                    var resource = resourceManager.getResourceOrThrow(new ResourceLocation(uiPath.getNamespace(),
-                            "ui/machine/%s.mui".formatted(uiPath.getPath())));
+                    var resource = resourceManager
+                            .getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(uiPath.getNamespace(),
+                                    "ui/machine/%s.mui".formatted(uiPath.getPath())));
                     try (InputStream inputStream = resource.open()) {
                         try (DataInputStream dataInputStream = new DataInputStream(inputStream);) {
-                            this.customUICache = NbtIo.read(dataInputStream, NbtAccounter.UNLIMITED);
+                            this.customUICache = NbtIo.read(dataInputStream, NbtAccounter.unlimitedHeap());
                         }
                     }
                 } catch (Exception e) {

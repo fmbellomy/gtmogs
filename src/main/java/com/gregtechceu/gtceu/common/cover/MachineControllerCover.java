@@ -35,7 +35,6 @@ import net.minecraft.world.level.block.Block;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

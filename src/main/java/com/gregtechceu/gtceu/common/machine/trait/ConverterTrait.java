@@ -13,8 +13,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraftforge.energy.IEnergyStorage;
-
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import lombok.Getter;
 
 public class ConverterTrait extends NotifiableEnergyContainer {

@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.integration.xei.widgets;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
@@ -19,7 +19,6 @@ import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 

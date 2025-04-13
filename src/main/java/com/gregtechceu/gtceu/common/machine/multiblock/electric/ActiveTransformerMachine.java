@@ -30,13 +30,14 @@ import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.pattern.Predicates.abilities;
+
+import Widget;
 
 public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
                                       implements IControllable, IExplosionMachine, IFancyUIMachine, IDisplayUIMachine {

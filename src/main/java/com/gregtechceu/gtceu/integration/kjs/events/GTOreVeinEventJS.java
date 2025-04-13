@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTOres;
 
 import net.minecraft.resources.ResourceLocation;
-
 import dev.latvian.mods.kubejs.event.EventJS;
 
 import java.util.Set;

@@ -3,13 +3,12 @@ package com.gregtechceu.gtceu.integration.ae2.utils;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Objects;
 
 import static com.gregtechceu.gtceu.utils.GTMath.split;

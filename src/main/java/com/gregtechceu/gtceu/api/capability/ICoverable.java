@@ -22,10 +22,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -205,7 +204,7 @@ public interface ICoverable extends ITickSubscription, IAppearance {
 
     @Nullable
     static Direction rayTraceCoverableSide(ICoverable coverable, Player player) {
-        BlockHitResult rayTrace = (BlockHitResult) player.pick(player.getBlockReach(), 0, false);
+        BlockHitResult rayTrace = (BlockHitResult) player.pick(player.blockInteractionRange(), 0, false);
         if (rayTrace.getType() == HitResult.Type.MISS) {
             return null;
         }

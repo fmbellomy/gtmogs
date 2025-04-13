@@ -27,9 +27,9 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -192,12 +192,12 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
 
     private int getUsesLeft(ItemStack stack) {
         if (usesFluid) {
-            IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null)
+            IFluidHandlerItem fluidHandlerItem = stack.getCapability(Capabilities.FLUID_HANDLER_ITEM, null)
                     .resolve().orElse(null);
             if (fluidHandlerItem == null)
                 return 0;
 
-            net.minecraftforge.fluids.FluidStack fluid = fluidHandlerItem.drain(Integer.MAX_VALUE,
+            net.neoforged.neoforge.fluids.FluidStack fluid = fluidHandlerItem.drain(Integer.MAX_VALUE,
                     IFluidHandler.FluidAction.SIMULATE);
             return fluid.isEmpty() ? 0 : fluid.getAmount();
         }
@@ -215,11 +215,11 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
 
     private void setUsesLeft(Player player, @NotNull ItemStack stack, int usesLeft) {
         if (usesFluid) {
-            IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null)
+            IFluidHandlerItem fluidHandlerItem = stack.getCapability(Capabilities.FLUID_HANDLER_ITEM, null)
                     .resolve().orElse(null);
             if (fluidHandlerItem != null) {
 
-                net.minecraftforge.fluids.FluidStack fluid = fluidHandlerItem.drain(Integer.MAX_VALUE,
+                net.neoforged.neoforge.fluids.FluidStack fluid = fluidHandlerItem.drain(Integer.MAX_VALUE,
                         IFluidHandler.FluidAction.SIMULATE);
                 if (!fluid.isEmpty()) {
                     fluidHandlerItem.drain(fluid.getAmount() - usesLeft, IFluidHandler.FluidAction.EXECUTE);
@@ -240,12 +240,12 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
     @Override
     public float getDurabilityForDisplay(ItemStack stack) {
         if (usesFluid) {
-            IFluidHandlerItem fluidHandlerItem = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM, null)
+            IFluidHandlerItem fluidHandlerItem = stack.getCapability(Capabilities.FLUID_HANDLER_ITEM, null)
                     .resolve().orElse(null);
             if (fluidHandlerItem == null)
                 return 0.0f;
 
-            net.minecraftforge.fluids.FluidStack fluid = fluidHandlerItem.getFluidInTank(0);
+            net.neoforged.neoforge.fluids.FluidStack fluid = fluidHandlerItem.getFluidInTank(0);
             return fluid.isEmpty() ? 0.0f : (float) fluid.getAmount() / (float) fluidHandlerItem.getTankCapacity(0);
         } else if (hasMultipleUses) {
             return (float) getUsesLeft(stack) / (float) maxUses;

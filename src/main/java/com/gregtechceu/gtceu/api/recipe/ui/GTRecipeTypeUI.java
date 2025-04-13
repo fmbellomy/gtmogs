@@ -50,7 +50,6 @@ import lombok.Setter;
 import me.shedaniel.rei.api.client.view.ViewSearchBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;

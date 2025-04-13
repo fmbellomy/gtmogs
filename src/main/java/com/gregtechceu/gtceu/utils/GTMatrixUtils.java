@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.utils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
-import net.minecraftforge.client.model.SimpleModelState;
+import net.neoforged.neoforge.client.model.SimpleModelState;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
@@ -12,7 +12,6 @@ import com.mojang.math.Transformation;
 import org.jetbrains.annotations.Contract;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
 import java.security.InvalidParameterException;
 
 import javax.annotation.ParametersAreNonnullByDefault;

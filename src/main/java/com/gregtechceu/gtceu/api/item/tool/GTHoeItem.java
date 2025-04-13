@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
@@ -26,7 +26,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
 
 import com.google.common.collect.Multimap;
 import lombok.Getter;
@@ -47,7 +47,7 @@ public class GTHoeItem extends HoeItem implements IGTTool {
 
     protected GTHoeItem(GTToolType toolType, MaterialToolTier tier, Material material, IGTToolDefinition toolStats,
                         Properties properties) {
-        super(tier, 0, 0, properties);
+        super(tier, properties);
         this.toolType = toolType;
         this.material = material;
         this.electricTier = toolType.electricTier;
@@ -64,18 +64,8 @@ public class GTHoeItem extends HoeItem implements IGTTool {
     }
 
     @Override
-    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return definition$initCapabilities(stack, nbt);
-    }
-
-    @Override
     public ItemStack getDefaultInstance() {
         return get();
-    }
-
-    @Override
-    public boolean hasCraftingRemainingItem() {
-        return super.hasCraftingRemainingItem();
     }
 
     @Override

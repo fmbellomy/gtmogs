@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.integration.xei.handlers.item;
 import com.gregtechceu.gtceu.integration.xei.entry.item.ItemStackList;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.NotNull;
 

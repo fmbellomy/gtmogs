@@ -17,7 +17,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-
 import java.util.Collection;
 
 public class GTClientCache extends WorldCache implements IClientCache {

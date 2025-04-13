@@ -1,17 +1,10 @@
 tasks.register('slimJar', Jar) {
-    archiveClassifier = "dev-slim"
+    archiveClassifier = "slim"
     from sourceSets.main.output
-}
-
-obfuscation {
-    reobfuscate(tasks.named('slimJar'), sourceSets.main) {
-        archiveClassifier = "slim"
-    }
 }
 
 // Add slim and sources jar to components.java
 java {
-    artifacts.archives(reobfSlimJar)
     withSourcesJar()
 }
 
@@ -23,14 +16,11 @@ sourcesJar {
     from delombok
 }
 
-jar.archiveClassifier = "dev"
-
 base {
     archivesName = "${project.name}-${libs.versions.minecraft.get()}"
 }
 
 afterEvaluate {
-    reobfJar.archiveClassifier = ""
     tasks.withType(org.gradle.jvm.tasks.Jar).configureEach {
         destinationDirectory = file('build/libs/')
         manifest.attributes([

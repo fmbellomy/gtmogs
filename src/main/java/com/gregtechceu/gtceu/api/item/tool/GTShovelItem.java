@@ -1,14 +1,13 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -17,26 +16,19 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CampfireBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 
-import com.google.common.collect.Multimap;
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -54,7 +46,7 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
 
     protected GTShovelItem(GTToolType toolType, MaterialToolTier tier, Material material, IGTToolDefinition toolStats,
                            Properties properties) {
-        super(tier, 0, 0, properties);
+        super(tier, properties);
         this.toolType = toolType;
         this.material = material;
         this.electricTier = toolType.electricTier;
@@ -71,18 +63,8 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
     }
 
     @Override
-    public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        return definition$initCapabilities(stack, nbt);
-    }
-
-    @Override
     public ItemStack getDefaultInstance() {
         return get();
-    }
-
-    @Override
-    public boolean hasCraftingRemainingItem() {
-        return super.hasCraftingRemainingItem();
     }
 
     @Override
@@ -99,7 +81,7 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
             return InteractionResult.PASS;
         } else {
             Player player = context.getPlayer();
-            BlockState modifiedState = blockstate.getToolModifiedState(context, ToolActions.SHOVEL_FLATTEN, false);
+            BlockState modifiedState = blockstate.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
             BlockState resultState = null;
             if (modifiedState != null && level.isEmptyBlock(blockpos.above())) {
                 level.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -120,7 +102,7 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
                     level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(player, resultState));
                     if (player != null) {
                         context.getItemInHand().hurtAndBreak(1, player,
-                                (breaker) -> breaker.broadcastBreakEvent(context.getHand()));
+                                context.getHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
                     }
                 }
 
@@ -187,13 +169,9 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
-        definition$appendHoverText(stack, level, tooltipComponents, isAdvanced);
-    }
-
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return definition$canApplyAtEnchantingTable(stack, enchantment);
+        definition$appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 
     public int getEnchantmentValue(ItemStack stack) {
@@ -206,8 +184,8 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        return definition$getDefaultAttributeModifiers(slot, stack);
+    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+        return definition$getDefaultAttributeModifiers(stack);
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
@@ -232,26 +210,5 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
 
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return definition$shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
-    }
-
-    public boolean isDamaged(ItemStack stack) {
-        return definition$isDamaged(stack);
-    }
-
-    public int getDamage(ItemStack stack) {
-        return definition$getDamage(stack);
-    }
-
-    public int getMaxDamage(ItemStack stack) {
-        return definition$getMaxDamage(stack);
-    }
-
-    public void setDamage(ItemStack stack, int damage) {
-        definition$setDamage(stack, damage);
-    }
-
-    @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
-        return this.definition$isCorrectToolForDrops(stack, state);
     }
 }

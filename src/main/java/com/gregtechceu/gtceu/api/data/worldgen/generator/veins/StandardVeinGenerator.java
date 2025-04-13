@@ -1,13 +1,14 @@
 package com.gregtechceu.gtceu.api.data.worldgen.generator.veins;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.data.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.data.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.data.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.data.worldgen.ores.OreVeinUtil;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -29,7 +30,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.mutable.MutableInt;
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -39,21 +39,21 @@ import java.util.stream.Collectors;
 
 public class StandardVeinGenerator extends VeinGenerator {
 
-    public static final Codec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder
-            .create(instance -> instance.group(
+    public static final MapCodec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder
+            .mapCodec(instance -> instance.group(
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("block").forGetter(ext -> ext.block.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("deep_block").forGetter(ext -> ext.deepBlock.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block")
                             .forGetter(ext -> ext.netherBlock.get()))
                     .apply(instance, StandardVeinGenerator::new));
 
-    public static final Codec<StandardVeinGenerator> CODEC_LIST = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
                     .fieldOf("targets").forGetter(ext -> ext.blocks))
             .apply(instance, StandardVeinGenerator::new));
 
-    public static final Codec<StandardVeinGenerator> CODEC = Codec.either(CODEC_SEPARATE, CODEC_LIST)
-            .xmap(either -> either.map(Function.identity(), Function.identity()), Either::left);
+    public static final MapCodec<StandardVeinGenerator> CODEC = Codec.mapEither(CODEC_SEPARATE, CODEC_LIST)
+            .xmap(Either::unwrap, Either::left);
 
     public NonNullSupplier<? extends Block> block;
     public NonNullSupplier<? extends Block> deepBlock;
@@ -135,7 +135,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Codec<? extends VeinGenerator> codec() {
+    public MapCodec<? extends VeinGenerator> codec() {
         return CODEC;
     }
 

@@ -13,7 +13,6 @@ import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-
 import dev.latvian.mods.kubejs.client.LangEventJS;
 import lombok.Setter;
 import lombok.experimental.Accessors;

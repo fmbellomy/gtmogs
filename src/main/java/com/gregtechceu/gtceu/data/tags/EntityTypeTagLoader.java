@@ -6,7 +6,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
-
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
 public class EntityTypeTagLoader {

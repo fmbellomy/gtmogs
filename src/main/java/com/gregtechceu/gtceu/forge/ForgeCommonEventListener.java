@@ -1,29 +1,20 @@
 package com.gregtechceu.gtceu.forge;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.block.MaterialBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
-import com.gregtechceu.gtceu.api.capability.compat.EUToFEProvider;
-import com.gregtechceu.gtceu.api.capability.forge.GTCapability;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.HazardProperty;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.data.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.item.DrumMachineItem;
-import com.gregtechceu.gtceu.api.item.IComponentItem;
-import com.gregtechceu.gtceu.api.item.TagPrefixItem;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
+import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
-import com.gregtechceu.gtceu.api.misc.forge.FilteredFluidHandlerItemStack;
-import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
@@ -32,19 +23,18 @@ import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
 import com.gregtechceu.gtceu.common.commands.GTCommands;
 import com.gregtechceu.gtceu.common.commands.HazardCommands;
 import com.gregtechceu.gtceu.common.commands.MedicalConditionCommands;
-import com.gregtechceu.gtceu.common.data.*;
-import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
-import com.gregtechceu.gtceu.common.item.ToggleEnergyConsumerBehavior;
+import com.gregtechceu.gtceu.common.item.behavior.ToggleEnergyConsumerBehavior;
 import com.gregtechceu.gtceu.common.item.armor.IJetpack;
-import com.gregtechceu.gtceu.common.item.armor.QuarkTechSuite;
-import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
-import com.gregtechceu.gtceu.common.network.packets.*;
+import com.gregtechceu.gtceu.common.item.armor.IStepAssist;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncBedrockOreVeins;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncFluidVeins;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncOreVeins;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketAddHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketRemoveHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketSyncLevelHazards;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.loader.BedrockFluidLoader;
 import com.gregtechceu.gtceu.data.loader.BedrockOreLoader;
 import com.gregtechceu.gtceu.data.loader.GTOreLoader;
@@ -55,9 +45,7 @@ import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
 import com.gregtechceu.gtceu.utils.TaskHandler;
 
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
@@ -65,6 +53,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -72,43 +61,36 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.*;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.ChunkWatchEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.fluids.capability.templates.FluidHandlerItemStack;
-import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.MissingMappingsEvent;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.OnDatapackSyncEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ChunkWatchEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.bus.api.Event;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-import com.tterrag.registrate.util.entry.BlockEntry;
-import com.tterrag.registrate.util.entry.ItemEntry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import static com.gregtechceu.gtceu.utils.FormattingUtil.toLowerCaseUnder;
 
 /**
  * @author KilaBash
@@ -163,7 +145,7 @@ public class ForgeCommonEventListener {
                 @Override
                 public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap,
                                                                   @Nullable Direction side) {
-                    return ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
+                    return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
                 }
             });
         } else if (itemStack.is(Items.GLASS_BOTTLE)) {
@@ -184,7 +166,7 @@ public class ForgeCommonEventListener {
                 @Override
                 public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap,
                                                                   @Nullable Direction side) {
-                    return ForgeCapabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
+                    return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
                 }
             });
 
@@ -223,12 +205,12 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
-    public static void tickPlayerInventoryHazards(TickEvent.PlayerTickEvent event) {
-        if (event.side == LogicalSide.CLIENT || event.phase != TickEvent.Phase.END) {
+    public static void tickPlayerInventoryHazards(PlayerTickEvent.Post event) {
+        if (event.getEntity().level().isClientSide) {
             return;
         }
 
-        Player player = event.player;
+        Player player = event.getEntity();
         IMedicalConditionTracker tracker = GTCapabilityHelper.getMedicalConditionTracker(player);
         if (tracker == null) {
             return;
@@ -240,7 +222,7 @@ public class ForgeCommonEventListener {
             return;
         }
 
-        IItemHandler inventory = player.getCapability(ForgeCapabilities.ITEM_HANDLER, null).resolve().orElse(null);
+        IItemHandler inventory = player.getCapability(Capabilities.ItemHandler.ENTITY, null);
         if (inventory == null) {
             return;
         }
@@ -283,6 +265,20 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
+    public static void onBlockStartBreak(BlockEvent.BreakEvent event) {
+        if (ToolHelper.isAoeBreakingBlocks.get()) {
+            return;
+        }
+
+        ItemStack toolStack = event.getPlayer().getItemInHand(event.getPlayer().getUsedItemHand());
+        if (toolStack.getItem() instanceof IGTTool tool) {
+            if (tool.definition$onBlockStartBreak(toolStack, event.getPos(), event.getPlayer())) {
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
         var blockState = event.getLevel().getBlockState(event.getPos());
         if (blockState.hasBlockEntity() && blockState.getBlock() instanceof MetaMachineBlock block &&
@@ -320,8 +316,8 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
-    public static void levelTick(TickEvent.LevelTickEvent event) {
-        if (event.phase == TickEvent.Phase.END && event.level instanceof ServerLevel serverLevel) {
+    public static void levelTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel serverLevel) {
             TaskHandler.onTickUpdate(serverLevel);
             if (ConfigHolder.INSTANCE.gameplay.environmentalHazards) {
                 EnvironmentalHazardSavedData.getOrCreate(serverLevel).tick();
@@ -373,14 +369,14 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void onPlayerJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer) {
-            GTNetwork.NETWORK.sendToPlayer(new SPacketSendWorldID(), serverPlayer);
+            PacketDistributor.sendToPlayer(serverPlayer, new SPacketSendWorldID());
 
             if (!ConfigHolder.INSTANCE.gameplay.environmentalHazards)
                 return;
 
             ServerLevel level = serverPlayer.serverLevel();
             var data = EnvironmentalHazardSavedData.getOrCreate(level);
-            GTNetwork.NETWORK.sendToPlayer(new SPacketSyncLevelHazards(data.getHazardZones()), serverPlayer);
+            PacketDistributor.sendToPlayer(serverPlayer, new SPacketSyncLevelHazards(data.getHazardZones()));
         }
     }
 
@@ -389,17 +385,18 @@ public class ForgeCommonEventListener {
         ServerPlayer player = event.getPlayer();
         if (player == null) {
             // if player == null, the /reload command was ran. sync to all players.
-            GTNetwork.NETWORK.sendToAll(new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()));
-            GTNetwork.NETWORK.sendToAll(new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
-            GTNetwork.NETWORK
-                    .sendToAll(new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()));
+            PacketDistributor.sendToAllPlayers(new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()));
+            PacketDistributor
+                    .sendToAllPlayers(new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
+            PacketDistributor
+                    .sendToAllPlayers(new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()));
         } else {
             // else it's a player logging in. sync to only that player.
-            GTNetwork.NETWORK.sendToPlayer(new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()), player);
-            GTNetwork.NETWORK.sendToPlayer(new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()),
-                    player);
-            GTNetwork.NETWORK.sendToPlayer(
-                    new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()), player);
+            PacketDistributor.sendToPlayer(player, new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()));
+            PacketDistributor.sendToPlayer(player,
+                    new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
+            PacketDistributor.sendToPlayer(player,
+                    new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()));
         }
     }
 
@@ -429,15 +426,15 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
-    public static void stepAssistHandler(LivingEvent.LivingTickEvent event) {
-        float MAGIC_STEP_HEIGHT = 1.0023f;
-        if (event.getEntity() == null || !(event.getEntity() instanceof Player player)) return;
+    public static void stepAssistHandler(PlayerTickEvent.Pre event) {
+        Player player = event.getEntity();
         if (!player.isCrouching() && player.getItemBySlot(EquipmentSlot.FEET).is(CustomTags.STEP_BOOTS)) {
-            if (player.getStepHeight() < MAGIC_STEP_HEIGHT) {
-                player.setMaxUpStep(MAGIC_STEP_HEIGHT);
+            if (player.maxUpStep() < IStepAssist.MAGIC_STEP_HEIGHT) {
+                player.getAttribute(Attributes.STEP_HEIGHT)
+                        .addOrUpdateTransientModifier(IStepAssist.STEP_ASSIST_MODIFIER);
             }
-        } else if (player.getStepHeight() == MAGIC_STEP_HEIGHT) {
-            player.setMaxUpStep(0.6f);
+        } else if (player.maxUpStep() == IStepAssist.MAGIC_STEP_HEIGHT) {
+            player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(IStepAssist.STEP_ASSIST_MODIFIER);
         }
     }
 
@@ -455,7 +452,7 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
-    public static void onEntitySpawn(MobSpawnEvent.FinalizeSpawn event) {
+    public static void onEntitySpawn(FinalizeSpawnEvent event) {
         Mob entity = event.getEntity();
         Difficulty difficulty = entity.level().getDifficulty();
         if (difficulty == Difficulty.HARD && entity.getRandom().nextFloat() <= 0.03f) {
@@ -476,8 +473,8 @@ public class ForgeCommonEventListener {
 
         ServerLevel newLevel = event.getEntity().getServer().getLevel(event.getTo());
         var data = EnvironmentalHazardSavedData.getOrCreate(newLevel);
-        GTNetwork.NETWORK.sendToPlayer(new SPacketSyncLevelHazards(data.getHazardZones()),
-                (ServerPlayer) event.getEntity());
+        PacketDistributor.sendToPlayer((ServerPlayer) event.getEntity(),
+                new SPacketSyncLevelHazards(data.getHazardZones()));
     }
 
     @SubscribeEvent
@@ -488,7 +485,7 @@ public class ForgeCommonEventListener {
 
         var zone = data.getZoneByPos(pos);
         if (zone != null) {
-            GTNetwork.NETWORK.sendToPlayer(new SPacketAddHazardZone(pos, zone), player);
+            PacketDistributor.sendToPlayer(player, new SPacketAddHazardZone(pos, zone));
         }
     }
 
@@ -500,167 +497,7 @@ public class ForgeCommonEventListener {
 
         var zone = data.getZoneByPos(pos);
         if (zone != null) {
-            GTNetwork.NETWORK.sendToPlayer(new SPacketRemoveHazardZone(pos), player);
-        }
-    }
-
-    @SubscribeEvent
-    public static void remapIds(MissingMappingsEvent event) {
-        event.getMappings(Registries.BLOCK, GTCEu.MOD_ID).forEach(mapping -> {
-            if (mapping.getKey().equals(GTCEu.id("tungstensteel_coil_block"))) {
-                mapping.remap(GTBlocks.COIL_RTMALLOY.get());
-            }
-            if (mapping.getKey().equals(GTCEu.id("steam_miner"))) {
-                mapping.remap(GTMachines.STEAM_MINER.first().getBlock());
-            }
-        });
-        event.getMappings(Registries.ITEM, GTCEu.MOD_ID).forEach(mapping -> {
-            if (mapping.getKey().equals(GTCEu.id("tungstensteel_coil_block"))) {
-                mapping.remap(GTBlocks.COIL_RTMALLOY.get().asItem());
-            }
-            if (mapping.getKey().equals(GTCEu.id("steam_miner"))) {
-                mapping.remap(GTMachines.STEAM_MINER.first().getItem());
-            }
-            if (mapping.getKey().equals(GTCEu.id("tungstensteel_fluid_cell"))) {
-                mapping.remap(GTItems.FLUID_CELL_LARGE_TUNGSTEN_STEEL.get().asItem());
-            }
-            if (mapping.getKey().equals(GTCEu.id("avanced_nanomuscle_chestplate"))) {
-                mapping.remap(GTItems.NANO_CHESTPLATE_ADVANCED.get());
-            }
-            String path = mapping.getKey().getPath();
-            if (path.matches("[lhi]v_.+_wirecutter")) {
-                String suffix = "_wirecutter";
-                String typeString = path.substring(0, 2) + suffix; // [lhi]v_wirecutter -- tooltype name
-                String matString = path.substring(3, path.length() - suffix.length()); // material name
-
-                GTToolType type = GTToolType.getTypes().get(typeString);
-                Material material = GTMaterials.get(matString);
-                if (type == null || material.isNull()) {
-                    mapping.warn();
-                    return;
-                }
-                var tool = GTMaterialItems.TOOL_ITEMS.get(material, type);
-                if (tool == null) {
-                    mapping.warn();
-                    return;
-                }
-                mapping.remap(tool.asItem());
-            }
-        });
-        event.getMappings(Registries.BLOCK_ENTITY_TYPE, GTCEu.MOD_ID).forEach(mapping -> {
-            if (mapping.getKey().equals(GTCEu.id("steam_miner"))) {
-                mapping.remap(GTMachines.STEAM_MINER.first().getBlockEntityType());
-            }
-        });
-
-        event.getMappings(Registries.BLOCK, "gregiceng").forEach(mapping -> {
-            String path = mapping.getKey().getPath();
-            switch (path) {
-                case "stocking_bus", "adv_stocking_bus" -> mapping
-                        .remap(GTAEMachines.STOCKING_IMPORT_BUS_ME.getBlock());
-                case "stocking_hatch", "adv_stocking_hatch" -> mapping
-                        .remap(GTAEMachines.STOCKING_IMPORT_HATCH_ME.getBlock());
-                case "crafting_io_buffer" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER.getBlock());
-                case "crafting_io_slave" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER_PROXY.getBlock());
-            }
-            if (path.contains("input_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("input_buffer", "dual_input_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_IMPORT_HATCH[GTValues.LuV].getBlock());
-                }
-            } else if (path.contains("output_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("output_buffer", "dual_output_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_EXPORT_HATCH[GTValues.LuV].getBlock());
-                }
-            }
-        });
-        event.getMappings(Registries.BLOCK_ENTITY_TYPE, "gregiceng").forEach(mapping -> {
-            String path = mapping.getKey().getPath();
-            switch (path) {
-                case "stocking_bus", "adv_stocking_bus" -> mapping
-                        .remap(GTAEMachines.STOCKING_IMPORT_BUS_ME.getBlockEntityType());
-                case "stocking_hatch", "adv_stocking_hatch" -> mapping
-                        .remap(GTAEMachines.STOCKING_IMPORT_HATCH_ME.getBlockEntityType());
-                case "crafting_io_buffer" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER.getBlockEntityType());
-                case "crafting_io_slave" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER_PROXY.getBlockEntityType());
-            }
-            if (path.contains("input_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("input_buffer", "dual_input_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_IMPORT_HATCH[GTValues.LuV].getBlockEntityType());
-                }
-            } else if (path.contains("output_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("output_buffer", "dual_output_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_EXPORT_HATCH[GTValues.LuV].getBlockEntityType());
-                }
-            }
-        });
-        event.getMappings(Registries.ITEM, "gregiceng").forEach(mapping -> {
-            String path = mapping.getKey().getPath();
-            switch (path) {
-                case "stocking_bus", "adv_stocking_bus" -> mapping.remap(GTAEMachines.STOCKING_IMPORT_BUS_ME.getItem());
-                case "stocking_hatch", "adv_stocking_hatch" -> mapping
-                        .remap(GTAEMachines.STOCKING_IMPORT_HATCH_ME.getItem());
-                case "crafting_io_buffer" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER.getItem());
-                case "crafting_io_slave" -> mapping.remap(GTAEMachines.ME_PATTERN_BUFFER_PROXY.getItem());
-            }
-            if (path.contains("input_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("input_buffer", "dual_input_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_IMPORT_HATCH[GTValues.LuV].getItem());
-                }
-            } else if (path.contains("output_buffer")) {
-                ResourceLocation newName = GTCEu.id(path.replace("output_buffer", "dual_output_hatch"));
-                if (mapping.getRegistry().containsKey(newName)) {
-                    mapping.remap(mapping.getRegistry().getValue(newName));
-                } else {
-                    mapping.remap(GTMachines.DUAL_EXPORT_HATCH[GTValues.LuV].getItem());
-                }
-            }
-        });
-
-        for (TagPrefix prefix : TagPrefix.values()) {
-            String first = prefix.invertedName ? toLowerCaseUnder(prefix.name) : "(.+?)";
-            String last = prefix.invertedName ? "(.+?)" : toLowerCaseUnder(prefix.name);
-            Pattern idPattern = Pattern.compile(first + "_" + last);
-            event.getMappings(Registries.BLOCK, GTCEu.MOD_ID).forEach(mapping -> {
-                Matcher matcher = idPattern.matcher(mapping.getKey().getPath());
-                if (matcher.matches()) {
-                    BlockEntry<? extends MaterialBlock> block = GTMaterialBlocks.MATERIAL_BLOCKS.get(prefix,
-                            GTCEuAPI.materialManager.getRegistry(GTCEu.MOD_ID).get(matcher.group(1)));
-                    if (block != null && block.isPresent()) {
-                        mapping.remap(block.get());
-                    }
-                }
-            });
-            event.getMappings(Registries.ITEM, GTCEu.MOD_ID).forEach(mapping -> {
-                Matcher matcher = idPattern.matcher(mapping.getKey().getPath());
-                if (matcher.matches()) {
-                    BlockEntry<? extends MaterialBlock> block = GTMaterialBlocks.MATERIAL_BLOCKS.get(prefix,
-                            GTCEuAPI.materialManager.getRegistry(GTCEu.MOD_ID).get(matcher.group(1)));
-                    if (block != null && block.isPresent()) {
-                        mapping.remap(block.asItem());
-                    } else {
-                        ItemEntry<? extends TagPrefixItem> item = GTMaterialItems.MATERIAL_ITEMS.get(prefix,
-                                GTCEuAPI.materialManager.getRegistry(GTCEu.MOD_ID).get(matcher.group(1)));
-                        if (item != null && item.isPresent()) {
-                            mapping.remap(item.asItem());
-                        }
-                    }
-                }
-            });
+            PacketDistributor.sendToPlayer(player, new SPacketRemoveHazardZone(pos));
         }
     }
 }

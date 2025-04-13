@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.core.mixins.TagValueAccessor;
 import com.gregtechceu.gtceu.utils.IngredientEquality;
 
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.IntersectionIngredient;
+import net.neoforged.neoforge.common.crafting.IntersectionIngredient;
 
 import java.util.ArrayList;
 import java.util.List;

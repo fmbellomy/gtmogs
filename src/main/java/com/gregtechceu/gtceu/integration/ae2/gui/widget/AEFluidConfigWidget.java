@@ -9,7 +9,7 @@ import appeng.api.stacks.GenericStack;
 
 /**
  * @Author GlodBlock
- * @Description Display {@link net.minecraftforge.fluids.FluidStack} config
+ * @Description Display {@link net.neoforged.neoforge.fluids.FluidStack} config
  * @Date 2023/4/21-1:45
  */
 public class AEFluidConfigWidget extends ConfigWidget {

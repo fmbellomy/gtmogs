@@ -21,7 +21,6 @@ import snownee.jade.api.view.IClientExtensionProvider;
 import snownee.jade.api.view.IServerExtensionProvider;
 import snownee.jade.api.view.ItemView;
 import snownee.jade.api.view.ViewGroup;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

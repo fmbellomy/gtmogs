@@ -21,7 +21,6 @@ import net.minecraft.world.level.ItemLike;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.function.Consumer;
 
 /**

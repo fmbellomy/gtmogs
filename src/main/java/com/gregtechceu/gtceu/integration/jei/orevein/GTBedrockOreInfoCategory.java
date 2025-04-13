@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.integration.jei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.client.ClientProxy;
-import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.client.ClientInit;
+import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
@@ -36,7 +36,7 @@ public class GTBedrockOreInfoCategory extends ModularUIRecipeCategory<GTBedrockO
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
-        registry.addRecipes(RECIPE_TYPE, ClientProxy.CLIENT_BEDROCK_ORE_VEINS.values().stream()
+        registry.addRecipes(RECIPE_TYPE, ClientInit.CLIENT_BEDROCK_ORE_VEINS.values().stream()
                 .map(GTBedrockOreInfoWrapper::new)
                 .toList());
     }

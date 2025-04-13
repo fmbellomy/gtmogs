@@ -6,10 +6,10 @@ import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.PipeBlockItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.api.item.tool.IToolGridHighlight;
+import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.pipenet.IPipeType;
-import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
+import com.gregtechceu.gtceu.common.item.behavior.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
 
@@ -29,8 +29,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -39,7 +39,6 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
-
 import java.util.Set;
 import java.util.function.Function;
 
@@ -65,15 +64,15 @@ public class BlockHighlightRenderer {
 
             // draw tool grid highlight
             if ((!toolType.isEmpty()) || (held.isEmpty() && player.isShiftKeyDown())) {
-                IToolGridHighlight gridHighlight = null;
-                if (blockEntity instanceof IToolGridHighlight highLight) {
+                IToolGridHighLight gridHighlight = null;
+                if (blockEntity instanceof IToolGridHighLight highLight) {
                     gridHighlight = highLight;
-                } else if (level.getBlockState(blockPos).getBlock() instanceof IToolGridHighlight highLight) {
+                } else if (level.getBlockState(blockPos).getBlock() instanceof IToolGridHighLight highLight) {
                     gridHighlight = highLight;
                 } else if (toolType.contains(GTToolType.WRENCH)) {
                     var behavior = CustomBlockRotations.getCustomRotation(level.getBlockState(blockPos).getBlock());
                     if (behavior != null && behavior.showGrid()) {
-                        gridHighlight = new IToolGridHighlight() {
+                        gridHighlight = new IToolGridHighLight() {
 
                             @Override
                             public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state,
@@ -94,7 +93,7 @@ public class BlockHighlightRenderer {
                 if (gridHighlight.shouldRenderGrid(player, blockPos, state, held, toolType)) {
                     var buffer = multiBufferSource.getBuffer(RenderType.lines());
                     RenderSystem.lineWidth(3);
-                    final IToolGridHighlight finalGridHighlight = gridHighlight;
+                    final IToolGridHighLight finalGridHighlight = gridHighlight;
                     drawGridOverlays(poseStack, buffer, target,
                             side -> finalGridHighlight.sideTips(player, blockPos, state, toolType, side));
                 } else {

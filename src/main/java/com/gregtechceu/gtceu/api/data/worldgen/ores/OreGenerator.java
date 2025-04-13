@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.data.worldgen.ores;
 
+import VeinConfiguration;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.data.worldgen.IWorldGenLayer;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;

@@ -6,7 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import dev.latvian.mods.kubejs.util.ConsoleJS;
 import dev.latvian.mods.rhino.Context;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Arrays;
 
 import javax.annotation.ParametersAreNonnullByDefault;

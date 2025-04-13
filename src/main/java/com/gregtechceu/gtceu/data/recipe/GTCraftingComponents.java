@@ -2,19 +2,19 @@ package com.gregtechceu.gtceu.data.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.common.data.GTBlocks;
-import com.gregtechceu.gtceu.common.data.GTItems;
-import com.gregtechceu.gtceu.common.data.GTMachines;
+import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.item.GTItems;
+import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.data.recipe.event.CraftingComponentModificationEvent;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuServerEvents;
 import com.gregtechceu.gtceu.integration.kjs.events.CraftingComponentsEventJS;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.Tags;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
-import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
 public class GTCraftingComponents {
 
@@ -748,7 +748,7 @@ public class GTCraftingComponents {
                 .add(UV, spring, Europium)
                 .add(UHV, spring, Europium);
 
-        MinecraftForge.EVENT_BUS.post(new CraftingComponentModificationEvent());
+        NeoForge.EVENT_BUS.post(new CraftingComponentModificationEvent());
         if (GTCEu.Mods.isKubeJSLoaded()) {
             KJSCallWrapper.craftingComponentModification();
         }

@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.api.data.worldgen;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;

@@ -12,7 +12,6 @@ import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.resources.ResourceLocation;
-
 import dev.latvian.mods.kubejs.client.LangEventJS;
 import lombok.Setter;
 import lombok.experimental.Accessors;

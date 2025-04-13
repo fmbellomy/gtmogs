@@ -25,7 +25,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 public class MetaMachineConfigCopyBehaviour implements IInteractionItem, IAddInformation {

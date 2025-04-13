@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.capability;
 
 import net.minecraft.core.Direction;
-
 import java.math.BigInteger;
 
 public interface IEnergyContainer extends IEnergyInfoProvider {

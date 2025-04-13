@@ -3,9 +3,9 @@ package com.gregtechceu.gtceu.integration.kjs.builders.block;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.block.ActiveBlock;
 import com.gregtechceu.gtceu.api.block.SimpleCoilType;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;

@@ -9,7 +9,6 @@ import com.lowdragmc.lowdraglib.syncdata.payload.FriendlyBufPayload;
 import com.lowdragmc.lowdraglib.syncdata.payload.ITypedPayload;
 
 import net.minecraft.network.FriendlyByteBuf;
-
 import io.netty.buffer.Unpooled;
 
 /**

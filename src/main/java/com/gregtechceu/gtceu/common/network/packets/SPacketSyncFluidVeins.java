@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.common.network.packets;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.client.ClientProxy;
+import com.gregtechceu.gtceu.client.ClientInit;
 
 import com.lowdragmc.lowdraglib.networking.IHandlerContext;
 import com.lowdragmc.lowdraglib.networking.IPacket;
@@ -57,7 +57,7 @@ public class SPacketSyncFluidVeins implements IPacket {
 
     @Override
     public void execute(IHandlerContext handler) {
-        ClientProxy.CLIENT_FLUID_VEINS.clear();
-        ClientProxy.CLIENT_FLUID_VEINS.putAll(veins);
+        ClientInit.CLIENT_FLUID_VEINS.clear();
+        ClientInit.CLIENT_FLUID_VEINS.putAll(veins);
     }
 }

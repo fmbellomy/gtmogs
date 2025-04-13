@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.xei.widgets;
 
 import com.gregtechceu.gtceu.api.data.DimensionMarker;
-import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
+import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.data.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.data.worldgen.bedrockfluid.BedrockFluidDefinition;
@@ -11,7 +11,7 @@ import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.client.ClientProxy;
+import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
@@ -32,8 +32,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.heightproviders.UniformHeight;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.fluids.FluidStack;
-
+import net.neoforged.neoforge.fluids.FluidStack;
 import lombok.Getter;
 
 import java.util.Comparator;
@@ -244,17 +243,17 @@ public class GTOreVeinWidget extends WidgetGroup {
     }
 
     public static String getOreName(GTOreDefinition oreDefinition) {
-        ResourceLocation id = ClientProxy.CLIENT_ORE_VEINS.inverse().get(oreDefinition);
+        ResourceLocation id = ClientInit.CLIENT_ORE_VEINS.inverse().get(oreDefinition);
         return id.getPath();
     }
 
     public static String getFluidName(BedrockFluidDefinition fluid) {
-        ResourceLocation id = ClientProxy.CLIENT_FLUID_VEINS.inverse().get(fluid);
+        ResourceLocation id = ClientInit.CLIENT_FLUID_VEINS.inverse().get(fluid);
         return id.getPath();
     }
 
     public static String getBedrockOreName(BedrockOreDefinition oreDefinition) {
-        ResourceLocation id = ClientProxy.CLIENT_BEDROCK_ORE_VEINS.inverse().get(oreDefinition);
+        ResourceLocation id = ClientInit.CLIENT_BEDROCK_ORE_VEINS.inverse().get(oreDefinition);
         return id.getPath();
     }
 }

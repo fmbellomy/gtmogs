@@ -3,8 +3,8 @@ package com.gregtechceu.gtceu.client.util;
 import com.lowdragmc.shimmer.client.postprocessing.PostProcessing;
 
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.function.Consumer;
 

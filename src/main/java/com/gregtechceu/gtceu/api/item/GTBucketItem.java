@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.item;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.fluids.GTFluid;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.fluid.GTFluid;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -22,14 +22,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -104,7 +102,7 @@ public class GTBucketItem extends BucketItem {
         boolean flag = blockstate.canBeReplaced(this.getFluid());
         boolean flag1 = blockstate.isAir() || flag || block instanceof LiquidBlockContainer &&
                 ((LiquidBlockContainer) block).canPlaceLiquid(pLevel, pPos, blockstate, this.getFluid());
-        Optional<net.minecraftforge.fluids.FluidStack> containedFluidStack = Optional
+        Optional<net.neoforged.neoforge.fluids.FluidStack> containedFluidStack = Optional
                 .ofNullable(container).flatMap(FluidUtil::getFluidContained);
         if (!flag1) {
             return pResult != null && this.emptyContents(pPlayer, pLevel,

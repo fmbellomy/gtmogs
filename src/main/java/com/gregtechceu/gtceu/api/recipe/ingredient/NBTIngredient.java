@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.api.recipe.ingredient;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.StrictNBTIngredient;
+import net.neoforged.neoforge.common.crafting.StrictNBTIngredient;
 
 /**
  * @author KilaBash

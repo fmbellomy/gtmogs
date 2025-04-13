@@ -31,7 +31,8 @@ public class ToggleButtonWidget extends SwitchWidget {
 
     public ToggleButtonWidget(int xPosition, int yPosition, int width, int height, IGuiTexture buttonTexture,
                               BooleanSupplier isPressedCondition, BooleanConsumer setPressedExecutor) {
-        super(xPosition, yPosition, width, height, null);
+        super(xPosition, yPosition, width, height,
+                (clickData, aBoolean) -> setPressedExecutor.accept(aBoolean.booleanValue()));
         texture = buttonTexture;
         if (buttonTexture instanceof ResourceTexture resourceTexture) {
             setTexture(resourceTexture.getSubTexture(0, 0, 1, 0.5), resourceTexture.getSubTexture(0, 0.5, 1, 0.5));
@@ -40,10 +41,6 @@ public class ToggleButtonWidget extends SwitchWidget {
         }
 
         setSupplier(isPressedCondition::getAsBoolean);
-        setOnPressCallback((cd, bool) -> {
-            setPressedExecutor.accept(bool.booleanValue());
-            this.updateHoverTooltips();
-        });
     }
 
     public ToggleButtonWidget setShouldUseBaseBackground() {

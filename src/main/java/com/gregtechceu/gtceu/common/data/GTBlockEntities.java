@@ -2,6 +2,8 @@ package com.gregtechceu.gtceu.common.data;
 
 import com.gregtechceu.gtceu.common.blockentity.*;
 
+import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 import com.tterrag.registrate.util.entry.BlockEntityEntry;

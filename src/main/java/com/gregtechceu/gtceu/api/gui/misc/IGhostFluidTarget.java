@@ -7,9 +7,9 @@ import com.lowdragmc.lowdraglib.gui.ingredient.Target;
 
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import com.google.common.collect.Lists;
 import dev.emi.emi.api.stack.EmiStack;
@@ -63,17 +63,20 @@ public interface IGhostFluidTarget extends IGhostIngredientTarget {
 
     default Object convertIngredient(Object ingredient) {
         if (GTCEu.Mods.isREILoaded() && ingredient instanceof dev.architectury.fluid.FluidStack fluidStack) {
-            ingredient = new FluidStack(fluidStack.getFluid(), (int) fluidStack.getAmount(), fluidStack.getTag());
+            ingredient = new FluidStack(fluidStack.getFluid().builtInRegistryHolder(),
+                    (int) fluidStack.getAmount(), fluidStack.getPatch());
         }
 
         if (GTCEu.Mods.isEMILoaded() && ingredient instanceof EmiStack fluidEmiStack) {
             Fluid fluid = fluidEmiStack.getKeyOfType(Fluid.class);
             ingredient = fluid == null ? FluidStack.EMPTY :
-                    new FluidStack(fluid, (int) fluidEmiStack.getAmount(), fluidEmiStack.getNbt());
+                    new FluidStack(fluid.builtInRegistryHolder(),
+                            (int) fluidEmiStack.getAmount(), fluidEmiStack.getComponentChanges());
         }
 
-        if (GTCEu.Mods.isJEILoaded() && ingredient instanceof net.minecraftforge.fluids.FluidStack fluidStack) {
-            ingredient = new FluidStack(fluidStack.getFluid(), fluidStack.getAmount(), fluidStack.getTag());
+        if (GTCEu.Mods.isJEILoaded() && ingredient instanceof FluidStack fluidStack) {
+            ingredient = new FluidStack(fluidStack.getFluidHolder(),
+                    fluidStack.getAmount(), fluidStack.getComponentsPatch());
         }
         return ingredient;
     }

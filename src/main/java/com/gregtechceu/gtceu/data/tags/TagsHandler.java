@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.data.tags;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.MarkerMaterials.Color;
+import com.gregtechceu.gtceu.api.material.material.MarkerMaterials.Color;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -10,9 +10,9 @@ import net.minecraft.world.level.material.Fluid;
 
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
-import static com.gregtechceu.gtceu.api.data.chemical.material.ItemMaterialData.registerMaterialInfoItems;
+import static com.gregtechceu.gtceu.api.material.material.ItemMaterialData.registerMaterialInfoItems;
 import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
-import static com.gregtechceu.gtceu.common.data.GTMaterials.*;
+import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
 /**
  * @author KilaBash

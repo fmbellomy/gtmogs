@@ -20,7 +20,6 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
@@ -172,7 +171,7 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
     }
 
     /**
-     * get parts' Appearance. same as IForgeBlock.getAppearance() / IFabricBlock.getAppearance()
+     * get parts' Appearance. same as IBlockExtension.getAppearance() / IFabricBlock.getAppearance()
      */
     @Nullable
     default BlockState getPartAppearance(IMultiPart part, Direction side, BlockState sourceState, BlockPos sourcePos) {

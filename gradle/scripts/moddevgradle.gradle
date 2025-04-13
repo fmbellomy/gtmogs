@@ -1,12 +1,6 @@
-mixin {
-    var refmap = add sourceSets.main, "gtceu.refmap.json"
-    slimJar.from refmap
-    config 'gtceu.mixins.json'
-}
-
-legacyForge {
-    // Specify Forge version
-    version = libs.versions.minecraftForge.get()
+neoForge {
+    // Specify NeoForge version
+    version = libs.versions.neoForge.get()
 
     parchment {
         minecraftVersion = libs.versions.minecraft.get()
@@ -34,7 +28,7 @@ legacyForge {
             sourceSet = sourceSets.extra
             ideName = "Client 1"
 
-            systemProperty('forge.enabledGameTestNamespaces', project.mod_id)
+            systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
         client2 {
@@ -43,7 +37,7 @@ legacyForge {
             ideName = "Client 2"
 
             programArguments.addAll('--username', 'YoungOnion')
-            systemProperty('forge.enabledGameTestNamespaces', project.mod_id)
+            systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
         // Client with GTM + Jade, EMI, AE2
@@ -52,7 +46,7 @@ legacyForge {
             sourceSet = sourceSets.main
             ideName = "Clean Client"
 
-            systemProperty('forge.enabledGameTestNamespaces', project.mod_id)
+            systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
         server {
@@ -62,7 +56,7 @@ legacyForge {
 
             gameDirectory.set(file('run/server'))
             programArgument '--nogui'
-            systemProperty('forge.enabledGameTestNamespaces', project.mod_id)
+            systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -74,7 +68,7 @@ legacyForge {
             ideName = "Game Tests"
 
             gameDirectory.set(file('run/gametest'))
-            systemProperty('forge.enabledGameTestNamespaces', project.mod_id)
+            systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
         data {

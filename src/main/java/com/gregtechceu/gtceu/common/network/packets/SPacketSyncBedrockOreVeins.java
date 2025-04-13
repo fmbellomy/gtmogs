@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.common.network.packets;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.data.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.client.ClientProxy;
+import com.gregtechceu.gtceu.client.ClientInit;
 
 import com.lowdragmc.lowdraglib.networking.IHandlerContext;
 import com.lowdragmc.lowdraglib.networking.IPacket;
@@ -57,7 +57,7 @@ public class SPacketSyncBedrockOreVeins implements IPacket {
 
     @Override
     public void execute(IHandlerContext handler) {
-        ClientProxy.CLIENT_BEDROCK_ORE_VEINS.clear();
-        ClientProxy.CLIENT_BEDROCK_ORE_VEINS.putAll(veins);
+        ClientInit.CLIENT_BEDROCK_ORE_VEINS.clear();
+        ClientInit.CLIENT_BEDROCK_ORE_VEINS.putAll(veins);
     }
 }

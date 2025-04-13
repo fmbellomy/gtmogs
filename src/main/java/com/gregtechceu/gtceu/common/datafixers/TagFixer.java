@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-
 import java.util.Locale;
 
 public class TagFixer {

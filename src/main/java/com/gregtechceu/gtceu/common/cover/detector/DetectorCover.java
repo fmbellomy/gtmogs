@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -77,9 +78,9 @@ public abstract class DetectorCover extends CoverBehavior implements IControllab
     }
 
     @Override
-    public InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
-        InteractionResult superResult = super.onScrewdriverClick(playerIn, hand, hitResult);
-        if (superResult != InteractionResult.PASS) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+        ItemInteractionResult superResult = super.onScrewdriverClick(playerIn, hand, hitResult);
+        if (superResult.consumesAction()) {
             return superResult;
         }
 
@@ -91,7 +92,7 @@ public abstract class DetectorCover extends CoverBehavior implements IControllab
             playerIn.sendSystemMessage(Component.translatable(translationKey));
         }
 
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Override

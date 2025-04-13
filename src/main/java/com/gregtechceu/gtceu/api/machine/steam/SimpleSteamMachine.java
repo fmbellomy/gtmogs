@@ -30,12 +30,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidType;
 
 import com.google.common.collect.Tables;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
 import javax.annotation.ParametersAreNonnullByDefault;

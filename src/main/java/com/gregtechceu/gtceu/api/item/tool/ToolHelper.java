@@ -4,13 +4,14 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
-import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.ToolProperty;
+import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
+import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
+import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
@@ -18,11 +19,11 @@ import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.common.data.GTItems;
-import com.gregtechceu.gtceu.common.data.GTMaterialItems;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.data.item.GTItems;
+import com.gregtechceu.gtceu.data.item.GTMaterialItems;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
-import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
+import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
 import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
@@ -45,7 +46,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.DigDurabilityEnchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
@@ -58,17 +58,15 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.IForgeShearable;
-import net.minecraftforge.common.TierSortingRegistry;
-import net.minecraftforge.event.ForgeEventFactory;
+import net.neoforged.neoforge.common.CommonHooks;
+import net.neoforged.neoforge.common.IShearable;
+import net.neoforged.neoforge.event.EventHooks;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -78,53 +76,6 @@ import java.util.function.Supplier;
  * @implNote ToolHelper
  */
 public class ToolHelper {
-
-    public static final String TOOL_TAG_KEY = "GT.Tool";
-    public static final String BEHAVIOURS_TAG_KEY = "GT.Behaviours";
-
-    // Base item keys
-
-    // Electric item keys
-    public static final String MAX_CHARGE_KEY = "MaxCharge";
-    public static final String CHARGE_KEY = "Charge";
-
-    // Vanilla keys
-    public static final String UNBREAKABLE_KEY = "Unbreakable";
-    public static final String HIDE_FLAGS = "HideFlags";
-
-    // Misc keys
-    public static final String DISALLOW_CONTAINER_ITEM_KEY = "DisallowContainerItem";
-    public static final String TINT_COLOR_KEY = "TintColor";
-
-    // Keys that resides in tool tag
-    public static final String DURABILITY_KEY = ItemStack.TAG_DAMAGE;
-    public static final String MAX_DURABILITY_KEY = "MaxDamage";
-    public static final String TOOL_SPEED_KEY = "ToolSpeed";
-    public static final String ATTACK_DAMAGE_KEY = "AttackDamage";
-    public static final String ATTACK_SPEED_KEY = "AttackSpeed";
-    public static final String ENCHANTABILITY_KEY = "Enchantability";
-    public static final String HARVEST_LEVEL_KEY = "HarvestLevel";
-    public static final String LAST_CRAFTING_USE_KEY = "LastCraftingUse";
-
-    // Keys that resides in behaviours tag
-
-    // AoE
-    public static final String MAX_AOE_COLUMN_KEY = "MaxAoEColumn";
-    public static final String MAX_AOE_ROW_KEY = "MaxAoERow";
-    public static final String MAX_AOE_LAYER_KEY = "MaxAoELayer";
-    public static final String AOE_COLUMN_KEY = "AoEColumn";
-    public static final String AOE_ROW_KEY = "AoERow";
-    public static final String AOE_LAYER_KEY = "AoELayer";
-
-    // Others
-    public static final String HARVEST_ICE_KEY = "HarvestIce";
-    public static final String TORCH_PLACING_KEY = "TorchPlacing";
-    public static final String TORCH_PLACING_CACHE_SLOT_KEY = "TorchPlacing$Slot";
-    public static final String TREE_FELLING_KEY = "TreeFelling";
-    public static final String DISABLE_TREE_FELLING_KEY = "DisableTreeFelling";
-    public static final String DISABLE_SHIELDS_KEY = "DisableShields";
-    public static final String RELOCATE_MINED_BLOCKS_KEY = "RelocateMinedBlocks";
-    public static final String RELOCATE_MOB_DROPS_KEY = "RelocateMobDrops";
 
     // Crafting Symbols
     private static final BiMap<Character, GTToolType> symbols = HashBiMap.create();
@@ -157,16 +108,12 @@ public class ToolHelper {
         symbols.put(symbol, tool);
     }
 
-    public static CompoundTag getToolTag(ItemStack stack) {
-        return stack.getOrCreateTagElement(TOOL_TAG_KEY);
+    public static ToolBehaviors getBehaviorsComponent(ItemStack stack) {
+        return stack.getOrDefault(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY);
     }
 
-    public static CompoundTag getBehaviorsTag(ItemStack stack) {
-        return stack.getOrCreateTagElement(BEHAVIOURS_TAG_KEY);
-    }
-
-    public static boolean hasBehaviorsTag(ItemStack stack) {
-        return stack.getTagElement(BEHAVIOURS_TAG_KEY) != null;
+    public static boolean hasBehaviorsComponent(ItemStack stack) {
+        return stack.has(GTDataComponents.TOOL_BEHAVIORS);
     }
 
     public static ItemStack get(GTToolType toolType, Material material) {
@@ -500,11 +447,11 @@ public class ToolHelper {
     }
 
     public static boolean onBlockBreakEvent(Level level, GameType gameType, ServerPlayer player, BlockPos pos) {
-        return ForgeHooks.onBlockBreakEvent(level, gameType, player, pos) != -1;
+        return CommonHooks.onBlockBreakEvent(level, gameType, player, pos) != -1;
     }
 
     public static void onPlayerDestroyItem(Player player, ItemStack stack, InteractionHand hand) {
-        ForgeEventFactory.onPlayerDestroyItem(player, stack, hand);
+        EventHooks.onPlayerDestroyItem(player, stack, hand);
     }
 
     public static double getPlayerBlockReach(@NotNull Player player) {
@@ -683,7 +630,7 @@ public class ToolHelper {
         if (!player.isCreative()) {
             Level world = player.serverLevel();
             BlockState state = world.getBlockState(pos);
-            if (state.getBlock() instanceof IForgeShearable shearable) {
+            if (state.getBlock() instanceof IShearable shearable) {
                 if (shearable.isShearable(tool, world, pos)) {
                     List<ItemStack> shearedDrops = shearable.onSheared(player, tool, world, pos,
                             tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE));

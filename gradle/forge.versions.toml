@@ -1,85 +1,92 @@
 [versions]
-ldlib = "1.0.34"
-registrate = "MC1.20-1.3.11"
-configuration = "2.2.0"
+ldlib = "1.0.35.a"
+registrate = "MC1.21-1.3.0+67"
+configuration = "3.1.0-neoforge"
 mixinExtras = "0.2.0"
 
-jei = "15.20.0.105"
-rei = "12.1.785"
-emi = "1.1.13+1.20.1"
-ae2 = "15.0.18"
-kubejs = "2001.6.4-build.120"
-rhino = "2001.2.3-build.6"
-architectury = "9.2.14"
-clothconfig = "11.1.136"
-theoneprobe = "1.20.1-10.0.1-3"
-curios = "5.9.1+1.20.1"
-kotlinforforge = "4.11.0"
+jei = "19.21.0.247"
+rei = "16.0.799"
+emi = "1.1.21+1.21.1"
+ae2 = "19.2.8"
+kubejs = "2101.7.2-build.231"
+rhino = "2101.2.7-build.74"
+architectury = "13.0.8"
+clothconfig = "15.0.140"
+theoneprobe = "1.21_neo-12.0.4-6"
+curios = "9.4.2+1.21.1"
+kotlinforforge = "5.7.0"
 shimmer = "1.20.1-0.2.4"
-journeyMapApi = "1.20-1.9-SNAPSHOT"
-ftblibrary = "2001.2.4"
-ftbteams = "2001.3.0"
-ftbquests= "2001.4.11"
-ftbchunks = "2001.3.4"
+journeyMapApi = "2.0.0-1.21.1-SNAPSHOT"
+ftblibrary = "2101.1.12"
+ftbteams = "2101.1.2"
+ftbquests = "2101.1.8"
+ftbchunks = "2101.1.8"
+resourcefullib = "3.0.12"
+gamestages = "17.0.1"
+bookshelf = "21.1.56"
+ae2wtlib = "19.2.2"
+argonauts = "1.2.4"
+# FIXME for some reason their maven only has versions up to 1.1.10?
+heracles = "1.1.10"
 
 ## modrinth maven ##
-jade = "11.6.3"
-embeddium = "0.3.19+mc1.20.1"
-oculus = "1.20.1-1.7.0"
+jade = "15.10.0+neoforge"
+sodium = "mc1.21.1-0.6.13-neoforge"
+iris = "1.8.8+1.21.1-neoforge"
 
 ## cursemaven ##
-worldStripper = "4578579"
-javd = "4803995"
-trenzalore = "4848244"
-xaerosWorldMap = "5658224"
-xaerosMinimap = "5773012"
-journeyMap = "5789363"
-resourcefullib = "5659871"
-argonauts = "5263580"
-heracles = "5406935"
-ae2wtlib = "5217955"
-spark = "4738952"
-observable = "5643037"
-gamestages = "15.0.2"
-bookshelf = "20.2.13"
-ftblibrary-cm = "5567591"
-ftbteams-cm = "5267190"
-ftbquests-cm = "6167056"
-ftbchunks-cm = "5956390"
+worldStripper = "5592921"
+javd = "5711894"
+trenzalore = "5623160"
+xaerosWorldMap = "6212662"
+xaerosMinimap = "6306189"
+journeyMap = "6383889"
+spark = "6225208"
+observable = "5733591"
+ftblibrary-cm = "6304123"
+ftbteams-cm = "6119437"
+ftbquests-cm = "6371007"
+ftbchunks-cm = "6295696"
 
 
 [libraries]
-ldlib               = { module = "com.lowdragmc.ldlib:ldlib-forge-1.20.1", version.ref = "ldlib" }
+ldlib               = { module = "com.lowdragmc.ldlib:ldlib-neoforge-1.21.1", version.ref = "ldlib" }
 registrate          = { module = "com.tterrag.registrate:Registrate", version.ref = "registrate" }
-configuration       = { module = "dev.toma.configuration:configuration-forge-1.20.1", version.ref = "configuration" }
-mixinExtras-common  = { module = "io.github.llamalad7:mixinextras-common", version.ref = "mixinExtras" }
-mixinExtras-forge   = { module = "io.github.llamalad7:mixinextras-forge", version.ref = "mixinExtras" }
+configuration       = { module = "dev.toma.configuration:configuration-1.21.1", version.ref = "configuration" }
 
-jei-common-api      = { module = "mezz.jei:jei-1.20.1-common-api", version.ref = "jei" }
-jei-forge-api       = { module = "mezz.jei:jei-1.20.1-forge-api", version.ref = "jei" }
-jei-forge-impl      = { module = "mezz.jei:jei-1.20.1-forge", version.ref = "jei" }
-rei-plugin          = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin-forge", version.ref = "rei" }
-rei-api             = { module = "me.shedaniel:RoughlyEnoughItems-api-forge", version.ref = "rei" }
-rei-forge           = { module = "me.shedaniel:RoughlyEnoughItems-forge", version.ref = "rei" }
-emi                 = { module = "dev.emi:emi-forge", version.ref = "emi" }
+jei-common-api      = { module = "mezz.jei:jei-1.21.1-common-api", version.ref = "jei" }
+jei-neoforge-api    = { module = "mezz.jei:jei-1.21.1-neoforge-api", version.ref = "jei" }
+jei-neoforge-impl   = { module = "mezz.jei:jei-1.21.1-neoforge", version.ref = "jei" }
+rei-plugin          = { module = "me.shedaniel:RoughlyEnoughItems-default-plugin-neoforge", version.ref = "rei" }
+rei-api             = { module = "me.shedaniel:RoughlyEnoughItems-api-neoforge", version.ref = "rei" }
+rei-neoforge        = { module = "me.shedaniel:RoughlyEnoughItems-neoforge", version.ref = "rei" }
+emi                 = { module = "dev.emi:emi-neoforge", version.ref = "emi" }
 
-ae2                 = { module = "appeng:appliedenergistics2-forge", version.ref = "ae2" }
-kubejs              = { module = "dev.latvian.mods:kubejs-forge", version.ref = "kubejs" }
-rhino               = { module = "dev.latvian.mods:rhino-forge", version.ref = "rhino" }
-architectury        = { module = "dev.architectury:architectury-forge", version.ref = "architectury" }
-clothconfig         = { module = "me.shedaniel.cloth:cloth-config-forge", version.ref = "clothconfig" }
+ae2                 = { module = "org.appliedenergistics:appliedenergistics2", version.ref = "ae2" }
+kubejs              = { module = "dev.latvian.mods:kubejs-neoforge", version.ref = "kubejs" }
+rhino               = { module = "dev.latvian.mods:rhino", version.ref = "rhino" }
+architectury        = { module = "dev.architectury:architectury-neoforge", version.ref = "architectury" }
+clothconfig         = { module = "me.shedaniel.cloth:cloth-config-neoforge", version.ref = "clothconfig" }
 theoneprobe         = { module = "mcjty.theoneprobe:theoneprobe", version.ref = "theoneprobe" }
-curios              = { module = "top.theillusivec4.curios:curios-forge", version.ref = "curios" }
+curios              = { module = "top.theillusivec4.curios:curios-neoforge", version.ref = "curios" }
 kotlinforforge      = { module = "thedarkcolour:kotlinforforge", version.ref = "kotlinforforge" }
-journeymap-api      = { module = "info.journeymap:journeymap-api", version.ref = "journeyMapApi" }
+journeymap-api      = { module = "info.journeymap:journeymap-api-neoforge", version.ref = "journeyMapApi" }
 shimmer             = { module = "com.lowdragmc.shimmer:Shimmer-forge", version.ref = "shimmer" }
-ftblibrary          = { module = "dev.ftb.mods:ftb-library-forge", version.ref = "ftblibrary" }
-ftbteams            = { module = "dev.ftb.mods:ftb-teams-forge", version.ref = "ftbteams" }
-ftbquests           = { module = "dev.ftb.mods:ftb-quests-forge", version.ref = "ftbquests" }
-ftbchunks           = { module = "dev.ftb.mods:ftb-chunks-forge", version.ref = "ftbchunks" }
+ftblibrary          = { module = "dev.ftb.mods:ftb-library-neoforge", version.ref = "ftblibrary" }
+ftbteams            = { module = "dev.ftb.mods:ftb-teams-neoforge", version.ref = "ftbteams" }
+ftbquests           = { module = "dev.ftb.mods:ftb-quests-neoforge", version.ref = "ftbquests" }
+ftbchunks           = { module = "dev.ftb.mods:ftb-chunks-neoforge", version.ref = "ftbchunks" }
+resourcefullib      = { module = "com.teamresourceful.resourcefullib:resourcefullib-neoforge-1.21", version.ref = "resourcefullib" }
+gamestages          = { module = "net.darkhax.gamestages:GameStages-Forge-1.20.3", version.ref = "gamestages" }
+bookshelf           = { module = "net.darkhax.bookshelf:bookshelf-neoforge-1.21.1", version.ref = "bookshelf" }
+ae2wtlib            = { module = "de.mari_023:ae2wtlib", version.ref = "ae2wtlib" }
+# TODO update these once there's 1.21 versions
+argonauts           = { module = "earth.terrarium.argonauts:argonauts-neoforge-1.20.4", version.ref = "argonauts" }
+heracles            = { module = "earth.terrarium.heracles:heracles-forge-1.20.1", version.ref = "heracles" }
+
 jade                = { module = "maven.modrinth:jade", version.ref = "jade" }
-embeddium           = { module = "maven.modrinth:embeddium", version.ref = "embeddium" }
-oculus              = { module = "maven.modrinth:oculus", version.ref = "oculus" }
+sodium              = { module = "maven.modrinth:sodium", version.ref = "sodium" }
+iris                = { module = "maven.modrinth:iris", version.ref = "iris" }
 
 worldstripper       = { module = "curse.maven:worldStripper-250603", version.ref = "worldStripper" }
 javd                = { module = "curse.maven:javd-370890", version.ref = "javd" }
@@ -87,14 +94,8 @@ trenzalore          = { module = "curse.maven:trenzalore-870210", version.ref = 
 xaerosworldmap      = { module = "curse.maven:xaeros-world-map-317780", version.ref = "xaerosWorldMap" }
 xaerosminimap       = { module = "curse.maven:xaeros-minimap-263420", version.ref = "xaerosMinimap" }
 journeymap-forge    = { module = "curse.maven:journeymap-32274", version.ref = "journeyMap" }
-resourcefullib      = { module = "curse.maven:resourceful-lib-570073", version.ref = "resourcefullib" }
-argonauts           = { module = "curse.maven:argonauts-845833", version.ref = "argonauts" }
-heracles            = { module = "curse.maven:heracles-845831", version.ref = "heracles" }
-ae2wtlib            = { module = "curse.maven:ae2wtlib-459929", version.ref = "ae2wtlib" }
 spark               = { module = "curse.maven:spark-361579", version.ref = "spark" }
 observable          = { module = "curse.maven:observable-509575", version.ref = "observable" }
-gamestages          = { module = "net.darkhax.gamestages:GameStages-Forge-1.20.1", version.ref = "gamestages" }
-bookshelf           = { module = "net.darkhax.bookshelf:Bookshelf-Forge-1.20.1", version.ref = "bookshelf" }
 ## cursemaven as a backup ##
 ftblibrary-cm       = { module = "curse.maven:ftb-library-forge-404465", version.ref = "ftblibrary-cm" }
 ftbteams-cm         = { module = "curse.maven:ftb-teams-forge-404468", version.ref = "ftbteams-cm" }
@@ -102,8 +103,8 @@ ftbquests-cm        = { module = "curse.maven:ftb-quests-forge-289412", version.
 ftbchunks-cm        = { module = "curse.maven:ftb-chunks-forge-314906", version.ref = "ftbchunks-cm" }
 
 [bundles]
-jei = ["jei-common-api", "jei-forge-api", "jei-forge-impl"]
-rei = ["rei-plugin", "rei-forge"]
-rei-runtime = ["rei-forge", "architectury", "clothconfig"]
+jei = ["jei-common-api", "jei-neoforge-api", "jei-neoforge-impl"]
+rei = ["rei-plugin", "rei-neoforge"]
+rei-runtime = ["rei-neoforge", "architectury", "clothconfig"]
 kjs = ["kubejs", "rhino", "architectury"]
 

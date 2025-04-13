@@ -26,7 +26,6 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.HitResult;
 
 import org.jetbrains.annotations.Nullable;
-
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;

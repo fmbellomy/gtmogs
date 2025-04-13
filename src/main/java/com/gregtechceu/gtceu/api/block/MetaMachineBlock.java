@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.*;
-import com.gregtechceu.gtceu.common.data.GTItems;
+import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -19,23 +19,26 @@ import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,6 +47,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -56,7 +60,6 @@ import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
@@ -130,9 +133,9 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
                 }
             }
             if (machine instanceof IDropSaveMachine dropSaveMachine) {
-                CompoundTag tag = pStack.getTag();
+                CustomData tag = pStack.get(DataComponents.BLOCK_ENTITY_DATA);
                 if (tag != null) {
-                    dropSaveMachine.loadFromItem(tag);
+                    dropSaveMachine.loadFromItem(tag.copyTag());
                 }
             }
             if (machine instanceof IMachineLife machineLife) {
@@ -189,16 +192,19 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
-        ItemStack itemStack = super.getCloneItemStack(level, pos, state);
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos,
+                                       Player player) {
+        ItemStack itemStack = super.getCloneItemStack(state, target, level, pos, player);
         if (getMachine(level, pos) instanceof IDropSaveMachine dropSaveMachine && dropSaveMachine.savePickClone()) {
-            dropSaveMachine.saveToItem(itemStack.getOrCreateTag());
+            CompoundTag tag = itemStack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY).copyTag();
+            dropSaveMachine.saveToItem(tag);
+            itemStack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
         }
         return itemStack;
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip,
+    public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext level, List<Component> tooltip,
                                 TooltipFlag flag) {
         definition.getTooltipBuilder().accept(stack, tooltip);
         String mainKey = String.format("%s.machine.%s.tooltip", definition.getId().getNamespace(),
@@ -238,7 +244,12 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
             if (machine instanceof IDropSaveMachine dropSaveMachine && dropSaveMachine.saveBreak()) {
                 for (ItemStack drop : drops) {
                     if (drop.getItem() instanceof MetaMachineItem item && item.getBlock() == this) {
-                        dropSaveMachine.saveToItem(drop.getOrCreateTag());
+                        CompoundTag tag = drop.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY)
+                                .copyTag();
+                        dropSaveMachine.saveToItem(tag);
+                        tag.remove("id");
+                        BlockEntity.addEntityType(tag, tileEntity.getType());
+                        drop.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
                         // break here to not dupe contents if a machine drops multiple of itself for whatever reason.
                         break;
                     }
@@ -278,48 +289,42 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
-                                 BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
         var machine = getMachine(world, pos);
-        ItemStack itemStack = player.getItemInHand(hand);
         boolean shouldOpenUi = true;
 
-        if (machine != null && machine.getOwnerUUID() == null && player instanceof ServerPlayer sPlayer) {
-            machine.setOwnerUUID(sPlayer.getUUID());
-            machine.markDirty();
-        }
-
-        Set<GTToolType> types = ToolHelper.getToolTypes(itemStack);
-        if (machine != null && (!types.isEmpty() && ToolHelper.canUse(itemStack)) ||
-                (types.isEmpty() && player.isShiftKeyDown())) {
-            var result = machine.onToolClick(types, itemStack, new UseOnContext(player, hand, hit));
-            if (result.getSecond() == InteractionResult.CONSUME && player instanceof ServerPlayer serverPlayer) {
+        Set<GTToolType> types = ToolHelper.getToolTypes(stack);
+        if (machine != null && !types.isEmpty() && ToolHelper.canUse(stack)) {
+            var result = machine.onToolClick(types, stack,
+                    new UseOnContext(player, hand, hit));
+            if (result.getSecond() == ItemInteractionResult.CONSUME && player instanceof ServerPlayer serverPlayer) {
                 ToolHelper.playToolSound(result.getFirst(), serverPlayer);
 
                 if (!serverPlayer.isCreative()) {
-                    ToolHelper.damageItem(itemStack, serverPlayer, 1);
+                    ToolHelper.damageItem(stack, serverPlayer, 1);
                 }
             }
-            if (result.getSecond() != InteractionResult.PASS) return result.getSecond();
+            if (result.getSecond().result() != InteractionResult.PASS) return result.getSecond();
         }
 
-        if (itemStack.is(GTItems.PORTABLE_SCANNER.get())) {
-            return itemStack.getItem().use(world, player, hand).getResult();
+        if (stack.is(GTItems.PORTABLE_SCANNER.get())) {
+            return getFromInteractionResult(stack.getItem().use(world, player, hand).getResult());
         }
 
-        if (itemStack.getItem() instanceof IGTTool gtToolItem) {
+        if (stack.getItem() instanceof IGTTool gtToolItem) {
             shouldOpenUi = gtToolItem.definition$shouldOpenUIAfterUse(new UseOnContext(player, hand, hit));
         }
 
         if (machine instanceof IInteractedMachine interactedMachine) {
             var result = interactedMachine.onUse(state, world, pos, player, hand, hit);
-            if (result != InteractionResult.PASS) return result;
+            if (result.result() != InteractionResult.PASS) return result;
         }
         if (shouldOpenUi && machine instanceof IUIMachine uiMachine &&
                 MachineOwner.canOpenOwnerMachine(player, machine)) {
             return uiMachine.tryToOpenUI(player, hand, hit);
         }
-        return shouldOpenUi ? InteractionResult.PASS : InteractionResult.CONSUME;
+        return shouldOpenUi ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : ItemInteractionResult.CONSUME;
     }
 
     public boolean canConnectRedstone(BlockGetter level, BlockPos pos, Direction side) {
@@ -364,9 +369,13 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         return super.getBlockAppearance(state, level, pos, side, sourceState, sourcePos);
     }
 
-    @Override
-    public boolean isValidSpawn(BlockState state, BlockGetter level, BlockPos pos, SpawnPlacements.Type type,
-                                EntityType<?> entityType) {
-        return false;
+    public static ItemInteractionResult getFromInteractionResult(InteractionResult result) {
+        return switch (result) {
+            case SUCCESS, SUCCESS_NO_ITEM_USED -> ItemInteractionResult.SUCCESS;
+            case CONSUME -> ItemInteractionResult.CONSUME;
+            case CONSUME_PARTIAL -> ItemInteractionResult.CONSUME_PARTIAL;
+            case PASS -> ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            case FAIL -> ItemInteractionResult.FAIL;
+        };
     }
 }

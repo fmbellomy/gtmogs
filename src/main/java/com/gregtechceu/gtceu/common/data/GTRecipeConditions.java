@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.recipe.condition.*;
 
-import net.minecraftforge.fml.ModLoader;
+import net.neoforged.fml.ModLoader;
 
 /**
  * @author KilaBash
@@ -71,7 +71,7 @@ public final class GTRecipeConditions {
                             new RecipeConditionType<>(HeraclesQuestCondition::new, HeraclesQuestCondition.CODEC));
         }
         // noinspection unchecked
-        ModLoader.get().postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.RECIPE_CONDITIONS,
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.RECIPE_CONDITIONS,
                 (Class<RecipeConditionType<?>>) (Class<?>) RecipeConditionType.class));
         GTRegistries.RECIPE_CONDITIONS.freeze();
     }

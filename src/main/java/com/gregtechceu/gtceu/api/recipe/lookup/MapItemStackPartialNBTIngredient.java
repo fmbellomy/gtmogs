@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.api.recipe.lookup;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.crafting.PartialNBTIngredient;
+import net.neoforged.neoforge.common.crafting.PartialNBTIngredient;
 
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;

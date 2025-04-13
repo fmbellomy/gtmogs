@@ -26,7 +26,6 @@ import net.minecraft.network.chat.Style;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;

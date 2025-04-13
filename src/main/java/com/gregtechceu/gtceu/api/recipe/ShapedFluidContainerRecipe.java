@@ -17,7 +17,6 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 // TODO shapeless fluid container recipes

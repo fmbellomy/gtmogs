@@ -15,10 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.RenderTypeHelper;
-
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.RenderTypeHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class PrimitiveBlastFurnaceRenderer extends WorkableCasingMachineRenderer {

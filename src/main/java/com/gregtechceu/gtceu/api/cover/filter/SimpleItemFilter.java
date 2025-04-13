@@ -13,9 +13,12 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -29,6 +32,12 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public class SimpleItemFilter implements ItemFilter {
 
+    public static final Codec<SimpleItemFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+            Codec.BOOL.fieldOf("is_blacklist").forGetter(val -> val.isBlackList),
+            Codec.BOOL.fieldOf("ignore_components").forGetter(val -> val.ignoreNbt),
+            ItemStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList()))
+            .apply(instance, SimpleItemFilter::new));
+
     @Getter
     protected boolean isBlackList;
     @Getter
@@ -36,8 +45,8 @@ public class SimpleItemFilter implements ItemFilter {
     @Getter
     protected ItemStack[] matches = new ItemStack[9];
 
-    protected Consumer<ItemFilter> itemWriter = filter -> {};
-    protected Consumer<ItemFilter> onUpdated = filter -> itemWriter.accept(filter);
+    protected Consumer<SimpleItemFilter> itemWriter = filter -> {};
+    protected Consumer<SimpleItemFilter> onUpdated = filter -> itemWriter.accept(filter);
 
     @Getter
     protected int maxStackSize;
@@ -47,19 +56,15 @@ public class SimpleItemFilter implements ItemFilter {
         maxStackSize = 1;
     }
 
-    public static SimpleItemFilter loadFilter(ItemStack itemStack) {
-        return loadFilter(itemStack.getOrCreateTag(), filter -> itemStack.setTag(filter.saveFilter()));
+    protected SimpleItemFilter(boolean isBlackList, boolean ignoreNbt, List<ItemStack> matches) {
+        this.isBlackList = isBlackList;
+        this.ignoreNbt = ignoreNbt;
+        this.matches = matches.toArray(ItemStack[]::new);
     }
 
-    private static SimpleItemFilter loadFilter(CompoundTag tag, Consumer<ItemFilter> itemWriter) {
-        var handler = new SimpleItemFilter();
-        handler.itemWriter = itemWriter;
-        handler.isBlackList = tag.getBoolean("isBlackList");
-        handler.ignoreNbt = tag.getBoolean("matchNbt");
-        var list = tag.getList("matches", Tag.TAG_COMPOUND);
-        for (int i = 0; i < list.size(); i++) {
-            handler.matches[i] = ItemStack.of((CompoundTag) list.get(i));
-        }
+    public static SimpleItemFilter loadFilter(ItemStack itemStack) {
+        SimpleItemFilter handler = itemStack.getOrDefault(GTDataComponents.SIMPLE_ITEM_FILTER, new SimpleItemFilter());
+        handler.itemWriter = filter -> itemStack.set(GTDataComponents.SIMPLE_ITEM_FILTER, filter);
         return handler;
     }
 
@@ -74,21 +79,6 @@ public class SimpleItemFilter implements ItemFilter {
     @Override
     public boolean isBlank() {
         return !isBlackList && !ignoreNbt && Arrays.stream(matches).allMatch(ItemStack::isEmpty);
-    }
-
-    public CompoundTag saveFilter() {
-        if (isBlank()) {
-            return null;
-        }
-        var tag = new CompoundTag();
-        tag.putBoolean("isBlackList", isBlackList);
-        tag.putBoolean("matchNbt", ignoreNbt);
-        var list = new ListTag();
-        for (var match : matches) {
-            list.add(match.save(new CompoundTag()));
-        }
-        tag.put("matches", list);
-        return tag;
     }
 
     public void setBlackList(boolean blackList) {
@@ -159,9 +149,9 @@ public class SimpleItemFilter implements ItemFilter {
         int totalCount = 0;
 
         for (var candidate : matches) {
-            if (ignoreNbt && ItemStack.isSameItem(candidate, itemStack)) {
+            if (ignoreNbt && ItemStack.isSameItemSameComponents(candidate, itemStack)) {
                 totalCount += candidate.getCount();
-            } else if (ItemStack.isSameItemSameTags(candidate, itemStack)) {
+            } else if (ItemTransferHelper.canItemStacksStack(candidate, itemStack)) {
                 totalCount += candidate.getCount();
             }
         }
@@ -175,5 +165,23 @@ public class SimpleItemFilter implements ItemFilter {
         for (ItemStack match : matches) {
             match.setCount(Math.min(match.getCount(), maxStackSize));
         }
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SimpleItemFilter that)) return false;
+
+        return isBlackList == that.isBlackList && ignoreNbt == that.ignoreNbt && maxStackSize == that.maxStackSize &&
+                Arrays.equals(matches, that.matches);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Boolean.hashCode(isBlackList);
+        result = 31 * result + Boolean.hashCode(ignoreNbt);
+        result = 31 * result + Arrays.hashCode(matches);
+        result = 31 * result + maxStackSize;
+        return result;
     }
 }

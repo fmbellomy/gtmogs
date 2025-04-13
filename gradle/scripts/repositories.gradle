@@ -4,7 +4,7 @@ repositories {
 
     maven { // KubeJS and Rhino
         name = "Saps.dev Maven"
-        url = "https://maven.saps.dev/minecraft"
+        url = "https://maven.saps.dev/releases/"
     }
 
     maven { // JEI
@@ -14,20 +14,24 @@ repositories {
 
     maven { // JEI mirror, AE2
         name = "ModMaven"
-        url = "https://modmaven.dev"
+        url = "https://modmaven.dev/"
     }
 
     maven { // LDLib, Shimmer
         name = "FirstDarkDev Maven"
-        url = "https://maven.firstdarkdev.xyz/snapshots"
+        url = "https://maven.firstdarkdev.xyz/snapshots/"
     }
 
+    exclusiveContent { // Configuration
+        forRepository { maven { url = "https://api.repsy.io/mvn/toma/public/" } }
+        filter { includeGroup('dev.toma.configuration') }
+    }
     exclusiveContent { // FTB mods
-        forRepository { maven { url = "https://maven.ftb.dev/releases" } }
+        forRepository { maven { url = "https://maven.ftb.dev/releases/" } }
         filter { includeGroup("dev.ftb.mods") }
     }
     exclusiveContent { // TOP
-        forRepository { maven { url = "https://maven.k-4u.nl" } }
+        forRepository { maven { url = "https://maven.k-4u.nl/" } }
         filter { includeGroup('mcjty.theoneprobe') }
     }
     exclusiveContent { // JourneyMap API
@@ -35,11 +39,11 @@ repositories {
         filter { includeGroup("info.journeymap") }
     }
     exclusiveContent { // Modrinth Maven
-        forRepository { maven { url = "https://api.modrinth.com/maven" } }
+        forRepository { maven { url = "https://api.modrinth.com/maven/" } }
         filter { includeGroup("maven.modrinth") }
     }
     exclusiveContent { // Curseforge Maven
-        forRepository { maven { url = "https://cursemaven.com" } }
+        forRepository { maven { url = "https://cursemaven.com/" } }
         filter { includeGroup("curse.maven") }
     }
     exclusiveContent { // terraformers - EMI
@@ -54,7 +58,7 @@ repositories {
         }
     }
     exclusiveContent { // tterrag - registrate
-        forRepository { maven { url = "https://maven.tterrag.com/" } }
+        forRepository { maven { url = "https://mvn.devos.one/snapshots/" } }
         filter { includeGroup("com.tterrag.registrate") }
     }
     exclusiveContent { // Curios
@@ -64,5 +68,16 @@ repositories {
     exclusiveContent { // KotlinForForge
         forRepository { maven { url = "https://thedarkcolour.github.io/KotlinForForge/" } }
         filter { includeGroup("thedarkcolour") }
+    }
+    exclusiveContent { // Argonauts, Heracles
+        forRepository { maven { url = "https://maven.teamresourceful.com/repository/maven-public/" } }
+        filter {
+            includeGroupAndSubgroups("com.teamresourceful")
+            includeGroupAndSubgroups("earth.terrarium")
+        }
+    }
+    exclusiveContent { // This one lib that KJS 1.21 uses for whatever reason?
+        forRepository { maven { url = "https://jitpack.io/" } }
+        filter { includeGroup("com.github.rtyley") }
     }
 }

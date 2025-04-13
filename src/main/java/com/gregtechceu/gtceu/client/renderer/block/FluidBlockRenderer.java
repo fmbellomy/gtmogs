@@ -5,14 +5,13 @@ import com.gregtechceu.gtceu.client.util.RenderUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.Data;
 import lombok.Getter;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;

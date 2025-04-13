@@ -25,7 +25,6 @@ import net.minecraft.world.phys.HitResult;
 import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Set;
 

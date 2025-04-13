@@ -6,16 +6,15 @@ import com.gregtechceu.gtceu.api.block.MaterialPipeBlock;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.capability.IToolable;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.api.item.tool.IToolGridHighlight;
+import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.pipenet.*;
-import com.gregtechceu.gtceu.common.data.GTMaterialBlocks;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
-import com.gregtechceu.gtceu.common.datafixers.TagFixer;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
@@ -33,10 +32,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -68,7 +66,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeType<NodeDataType>, NodeDataType>
                                      extends BlockEntity implements IPipeNode<PipeType, NodeDataType>, IEnhancedManaged,
-                                     IAsyncAutoSyncBlockEntity, IAutoPersistBlockEntity, IToolGridHighlight, IToolable {
+                                     IAsyncAutoSyncBlockEntity, IAutoPersistBlockEntity, IToolGridHighLight, IToolable {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(PipeBlockEntity.class);
     @Getter
@@ -103,6 +101,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     @RequireRerender
     @DescSynced
     @Persisted
+    @Getter
     @Setter
     @NotNull
     private Material frameMaterial = GTMaterials.NULL;
@@ -143,7 +142,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
 
     @Override
     public long getOffsetTimer() {
-        return level == null ? offset : (level.getServer().getTickCount() + offset);
+        return level == null ? offset : (level.getGameTime() + offset);
     }
 
     @Override
@@ -167,16 +166,6 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
             connections = connections & (connections - 1);
         }
         return count;
-    }
-
-    @Override
-    public @NotNull Material getFrameMaterial() {
-        // backwards compat
-        // noinspection ConstantValue
-        if (frameMaterial == null) {
-            frameMaterial = GTMaterials.NULL;
-        }
-        return frameMaterial;
     }
 
     @Override
@@ -384,11 +373,11 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     }
 
     @Override
-    public Pair<GTToolType, InteractionResult> onToolClick(Set<GTToolType> toolTypes, ItemStack itemStack,
-                                                           UseOnContext context) {
+    public Pair<GTToolType, ItemInteractionResult> onToolClick(Set<GTToolType> toolTypes, ItemStack itemStack,
+                                                               UseOnContext context) {
         // the side hit from the machine grid
         var playerIn = context.getPlayer();
-        if (playerIn == null) return Pair.of(null, InteractionResult.PASS);
+        if (playerIn == null) return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
 
         var hand = context.getHand();
         var hitResult = new BlockHitResult(context.getClickLocation(), context.getClickedFace(),
@@ -420,13 +409,13 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
                 this.setConnection(gridSide, !isOpen, false);
             }
             playerIn.swing(hand);
-            return Pair.of(getPipeTuneTool(), InteractionResult.CONSUME);
+            return Pair.of(getPipeTuneTool(), ItemInteractionResult.CONSUME);
         } else if (toolTypes.contains(GTToolType.CROWBAR)) {
             if (coverBehavior != null) {
                 if (!isRemote()) {
                     getCoverContainer().removeCover(gridSide, playerIn);
                     playerIn.swing(hand);
-                    return Pair.of(GTToolType.CROWBAR, InteractionResult.CONSUME);
+                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
                 }
             } else {
                 if (!frameMaterial.isNull()) {
@@ -434,12 +423,12 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
                             GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, frameMaterial).asStack());
                     frameMaterial = GTMaterials.NULL;
                     playerIn.swing(hand);
-                    return Pair.of(GTToolType.CROWBAR, InteractionResult.CONSUME);
+                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
                 }
             }
         }
 
-        return Pair.of(null, InteractionResult.PASS);
+        return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
     }
 
     public GTToolType getPipeTuneTool() {
@@ -469,11 +458,5 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
 
     public static boolean isConnected(int connections, Direction side) {
         return (connections & (1 << side.ordinal())) > 0;
-    }
-
-    @Override
-    public void load(CompoundTag tag) {
-        TagFixer.fixFluidTags(tag);
-        super.load(tag);
     }
 }

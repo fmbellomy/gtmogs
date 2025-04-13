@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.gui.misc.PacketProspecting;
 import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.gui.texture.ProspectingTexture;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
-import com.gregtechceu.gtceu.common.item.ProspectorScannerBehavior;
+import com.gregtechceu.gtceu.common.item.behavior.ProspectorScannerBehavior;
 import com.gregtechceu.gtceu.integration.map.WaypointManager;
 import com.gregtechceu.gtceu.integration.map.cache.client.GTClientCache;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
@@ -20,7 +20,7 @@ import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
@@ -28,8 +28,8 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -76,11 +76,11 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
                 .setYScrollBarWidth(2).setYBarStyle(null, ColorPattern.T_WHITE.rectTexture().setRadius(1)));
         group.addWidget(new SearchComponentWidget<>(6, 6, group.getSize().width - 12, 18, this));
         addWidget(group);
-        addNewItem("[all]", "all resources", IGuiTexture.EMPTY, -1);
+        addNewItem("[all]", Component.literal("all resources"), IGuiTexture.EMPTY, -1);
     }
 
     @Override
-    public void writeInitialData(FriendlyByteBuf buffer) {
+    public void writeInitialData(RegistryFriendlyByteBuf buffer) {
         super.writeInitialData(buffer);
         buffer.writeVarInt(playerChunkX = gui.entityPlayer.chunkPosition().x);
         buffer.writeVarInt(playerChunkZ = gui.entityPlayer.chunkPosition().z);
@@ -90,7 +90,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void readInitialData(FriendlyByteBuf buffer) {
+    public void readInitialData(RegistryFriendlyByteBuf buffer) {
         super.readInitialData(buffer);
         texture = new ProspectingTexture(
                 buffer.readVarInt(),
@@ -115,7 +115,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
             for (int z = 0; z < mode.cellSize; z++) {
                 for (var item : data[x][z]) {
                     newItems.add(item);
-                    addNewItem(mode.getUniqueID(item), mode.getDescriptionId(item), mode.getItemIcon(item),
+                    addNewItem(mode.getUniqueID(item), mode.getDescription(item), mode.getItemIcon(item),
                             mode.getItemColor(item));
                 }
             }
@@ -123,14 +123,15 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
         items.addAll(newItems);
     }
 
-    private void addNewItem(String uniqueID, String renderingName, IGuiTexture icon, int color) {
+    private void addNewItem(String uniqueID, MutableComponent renderingName, IGuiTexture icon, int color) {
         if (!selectedMap.containsKey(uniqueID)) {
             var index = itemList.widgets.size();
             var selectableWidgetGroup = new SelectableWidgetGroup(0, index * 15, itemList.getSize().width - 4, 15);
             var size = selectableWidgetGroup.getSize();
             selectableWidgetGroup.addWidget(new ImageWidget(0, 0, 15, 15, icon));
-            selectableWidgetGroup.addWidget(new ImageWidget(15, 0, size.width - 15, 15,
-                    new TextTexture(renderingName).setWidth(size.width - 15).setType(TextTexture.TextType.LEFT_HIDE)));
+            selectableWidgetGroup
+                    .addWidget(new ImageWidget(15, 0, size.width - 15, 15, new TextTexture(renderingName.getString())
+                            .setWidth(size.width - 15).setType(TextTexture.TextType.LEFT_HIDE)));
             selectableWidgetGroup.setOnSelected(s -> {
                 if (isRemote()) {
                     texture.setSelected(uniqueID);
@@ -177,7 +178,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
         if (id == -1) {
             addPacketToQueue(PacketProspecting.readPacketData(mode, buffer));
         } else {
@@ -303,7 +304,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
         if (!texture.getSelected().equals(ProspectingTexture.SELECTED_ALL)) {
             for (var item : items) {
                 if (!texture.getSelected().equals(mode.getUniqueID(item))) continue;
-                var name = Component.translatable(mode.getDescriptionId(item)).getString();
+                var name = mode.getDescription(item).getString();
                 var color = mode.getItemColor(item);
                 return new WaypointItem(blockPos, name, color);
             }
@@ -313,7 +314,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
         var hoveredItem = texture.data[cX * mode.cellSize + (offsetX * mode.cellSize / 16)][cZ * mode.cellSize +
                 (offsetZ * mode.cellSize / 16)];
         if (hoveredItem != null && hoveredItem.length != 0) {
-            var name = Component.translatable(mode.getDescriptionId(hoveredItem[0])).getString();
+            var name = mode.getDescription(hoveredItem[0]).getString();
             var color = mode.getItemColor(hoveredItem[0]);
             return new WaypointItem(blockPos, name, color);
         }
@@ -335,7 +336,7 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
 
     @Override
     public String resultDisplay(Object value) {
-        return mode.getDescriptionId(value);
+        return mode.getDescription(value).getString();
     }
 
     @Override

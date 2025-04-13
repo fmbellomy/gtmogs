@@ -12,7 +12,6 @@ import com.gregtechceu.gtceu.integration.map.xaeros.XaerosRenderer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-
 import lombok.Getter;
 
 import java.util.HashMap;

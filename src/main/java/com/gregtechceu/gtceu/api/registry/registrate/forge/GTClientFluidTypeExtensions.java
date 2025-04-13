@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.GTCEu;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 
 import lombok.Getter;
 import lombok.Setter;

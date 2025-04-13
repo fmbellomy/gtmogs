@@ -18,7 +18,7 @@ version = "${mod_version}" + (isSnapshot ? "-SNAPSHOT" : "")
 boolean isCI = System.getenv("CI") != null
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(17)
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
 }
 
 sourceSets {
@@ -39,10 +39,6 @@ sourceSets {
         compileClasspath += main.output
         runtimeClasspath += main.output + main.runtimeClasspath
     }
-}
-
-obfuscation {
-    createRemappingConfiguration(configurations.extraRuntimeOnly)
 }
 
 apply from: "$rootDir/gradle/scripts/jars.gradle"

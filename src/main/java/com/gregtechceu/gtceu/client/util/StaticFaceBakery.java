@@ -14,9 +14,9 @@ import net.minecraft.core.BlockMath;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.model.ForgeFaceData;
-import net.minecraftforge.client.model.QuadTransformers;
+import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.neoforge.client.model.ExtraFaceData;
+import net.neoforged.neoforge.client.model.QuadTransformers;
 
 import com.mojang.math.Transformation;
 import org.joml.*;
@@ -124,10 +124,10 @@ public class StaticFaceBakery {
             recalculateWinding(aint, direction);
         }
 
-        ForgeHooksClient.fillNormal(aint, direction);
-        ForgeFaceData data = face.getFaceData();
+        ClientHooks.fillNormal(aint, direction);
+        ExtraFaceData data = face.getFaceData();
         BakedQuad quad = new BakedQuad(aint, face.tintIndex, direction, sprite, shade, data.ambientOcclusion());
-        if (!ForgeFaceData.DEFAULT.equals(data)) {
+        if (!ExtraFaceData.DEFAULT.equals(data)) {
             QuadTransformers.applyingLightmap(data.blockLight(), data.skyLight()).processInPlace(quad);
             QuadTransformers.applyingColor(data.color()).processInPlace(quad);
         }

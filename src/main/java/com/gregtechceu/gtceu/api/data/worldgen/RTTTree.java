@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.data.worldgen;
 
 import net.minecraft.core.BlockPos;
-
 import lombok.Getter;
 
 import java.util.ArrayList;

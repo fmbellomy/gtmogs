@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineFeature;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.Direction;
-
 import appeng.api.networking.IGridNodeListener;
 import appeng.api.util.AECableType;
 import appeng.me.helpers.IGridConnectedBlockEntity;

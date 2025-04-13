@@ -10,9 +10,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.fluids.FluidStack;
-
+import net.neoforged.neoforge.common.crafting.CraftingHelper;
+import net.neoforged.neoforge.fluids.FluidStack;
+import JsonElement;
+import JsonObject;
 import com.google.common.collect.Lists;
 import com.google.gson.*;
 import com.mojang.serialization.Codec;

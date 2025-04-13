@@ -1,17 +1,17 @@
 package com.gregtechceu.gtceu.api.capability;
 
-import com.gregtechceu.gtceu.api.capability.forge.GTCapability;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMaintenanceMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
+import com.gregtechceu.gtceu.data.attachment.GTAttachmentTypes;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,12 +25,12 @@ public class GTCapabilityHelper {
 
     @Nullable
     public static IElectricItem getElectricItem(ItemStack itemStack) {
-        return itemStack.getCapability(GTCapability.CAPABILITY_ELECTRIC_ITEM).resolve().orElse(null);
+        return itemStack.getCapability(GTCapability.CAPABILITY_ELECTRIC_ITEM);
     }
 
     @Nullable
     public static IEnergyStorage getForgeEnergyItem(ItemStack itemStack) {
-        return itemStack.getCapability(ForgeCapabilities.ENERGY).resolve().orElse(null);
+        return itemStack.getCapability(Capabilities.EnergyStorage.ITEM);
     }
 
     @Nullable
@@ -73,7 +73,8 @@ public class GTCapabilityHelper {
         if (level.getBlockState(pos).hasBlockEntity()) {
             var blockEntity = level.getBlockEntity(pos);
             if (blockEntity != null) {
-                return blockEntity.getCapability(ForgeCapabilities.ENERGY, side).orElse(null);
+                return blockEntity.getLevel().getCapability(Capabilities.EnergyStorage.BLOCK, blockEntity.getBlockPos(),
+                        blockEntity.getBlockState(), blockEntity, side);
             }
         }
         return null;
@@ -111,19 +112,12 @@ public class GTCapabilityHelper {
     }
 
     @Nullable
-    private static <T> T getBlockEntityCapability(Capability<T> capability, Level level, BlockPos pos,
+    private static <T> T getBlockEntityCapability(BlockCapability<T, Direction> capability, Level level, BlockPos pos,
                                                   @Nullable Direction side) {
-        if (level.getBlockState(pos).hasBlockEntity()) {
-            var blockEntity = level.getBlockEntity(pos);
-            if (blockEntity != null) {
-                return blockEntity.getCapability(capability, side).resolve().orElse(null);
-            }
-        }
-        return null;
+        return level.getCapability(capability, pos, side);
     }
 
-    @Nullable
-    public static IMedicalConditionTracker getMedicalConditionTracker(@NotNull Entity entity) {
-        return entity.getCapability(GTCapability.CAPABILITY_MEDICAL_CONDITION_TRACKER, null).resolve().orElse(null);
+    public static IMedicalConditionTracker getMedicalConditionTracker(@NotNull Player entity) {
+        return entity.getData(GTAttachmentTypes.MEDICAL_CONDITION_TRACKER);
     }
 }

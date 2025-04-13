@@ -4,9 +4,8 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import com.mojang.blaze3d.systems.RenderSystem;
 
 import static com.gregtechceu.gtceu.common.block.LampBlock.isBloomEnabled;

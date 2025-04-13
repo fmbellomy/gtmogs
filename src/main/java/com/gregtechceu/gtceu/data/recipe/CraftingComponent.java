@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.data.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.stack.MaterialEntry;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -12,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.GTValues.V;

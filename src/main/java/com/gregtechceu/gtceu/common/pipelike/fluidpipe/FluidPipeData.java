@@ -1,10 +1,9 @@
 package com.gregtechceu.gtceu.common.pipelike.fluidpipe;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.FluidPipeProperties;
+import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
 import com.gregtechceu.gtceu.api.pipenet.IAttachData;
 
 import net.minecraft.core.Direction;
-
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

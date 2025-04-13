@@ -2,104 +2,98 @@ dependencies {
     compileOnly(libs.jetbrains.annotations)
 
     // LDLib
-    jarJar(modApi(forge.ldlib.get()))
+    jarJar(api(forge.ldlib.get()))
 
     // Registrate
-    jarJar(modApi(forge.registrate.get()))
+    jarJar(api(forge.registrate.get()))
 
     // Configuration
-    jarJar(modApi(forge.configuration.get()))
-
-    // Mixin (& Extras)
-    annotationProcessor(variantOf(libs.mixin) { classifier("processor") })
-    annotationProcessor(forge.mixinExtras.common)
-    api(forge.mixinExtras.common)
-    jarJar(forge.mixinExtras.forge)
+    jarJar(api(forge.configuration.get()))
 
     // Recipe Viewers
-    modCompileOnly(forge.bundles.jei)
-    modCompileOnly(forge.bundles.rei)
-    modCompileOnly(forge.emi)
+    compileOnly(forge.bundles.jei)
+    compileOnly(forge.bundles.rei)
+    compileOnly(forge.emi)
 
     // WAILA-likes
-    modCompileOnly(forge.theoneprobe)
-    modCompileOnly(forge.jade)
+    compileOnly(forge.theoneprobe)
+    compileOnly(forge.jade)
 
     // Curios
-    modCompileOnly(variantOf(forge.curios) { classifier("api") })
+    compileOnly(variantOf(forge.curios) { classifier("api") })
 
     // AE2
-    modCompileOnly(forge.ae2)
-    modCompileOnly(forge.ae2wtlib)
+    compileOnly(forge.ae2)
+    compileOnly(forge.ae2wtlib)
 
     // KJS
-    modCompileOnly(forge.kubejs)
-    modCompileOnly(forge.architectury)
-    modCompileOnly(forge.rhino)
+    compileOnly(forge.kubejs)
+    compileOnly(forge.architectury)
+    compileOnly(forge.rhino)
 
     // Shimmer
-    modCompileOnly(forge.shimmer)
-    modCompileOnly(forge.embeddium)
-    modCompileOnly(forge.oculus)
+    compileOnly(forge.shimmer)
+    compileOnly(forge.sodium)
+    compileOnly(forge.iris)
 
     // JAVD
-    modCompileOnly(forge.javd)
+    compileOnly(forge.javd)
 
     // Teams
-    modCompileOnly(forge.ftblibrary)
-    modCompileOnly(forge.ftbteams)
-    modCompileOnly(forge.ftbquests)
-    modCompileOnly(forge.resourcefullib)
-    modCompileOnly(forge.argonauts)
-    modCompileOnly(forge.heracles)
+    compileOnly(forge.ftblibrary)
+    compileOnly(forge.ftbteams)
+    compileOnly(forge.ftbquests)
+    compileOnly(forge.resourcefullib)
+    compileOnly(forge.argonauts)
+    compileOnly(forge.heracles)
 
     // Maps
-    modCompileOnly(forge.ftbchunks)
-    modCompileOnly(forge.xaerosminimap)
-    modCompileOnly(forge.xaerosworldmap)
-    modCompileOnly(forge.journeymap.api)
-    modCompileOnly(forge.journeymap.forge)
+    compileOnly(forge.ftbchunks)
+    compileOnly(forge.xaerosminimap)
+    compileOnly(forge.xaerosworldmap)
+    compileOnly(forge.journeymap.api)
+    compileOnly(forge.journeymap.forge)
 
     // GameStages
-    modCompileOnly(forge.gamestages)
+    compileOnly(forge.gamestages)
 
-    // Standard runtime mods //
-    modRuntimeOnly(forge.jade)
-    modRuntimeOnly(forge.ae2)
-    modRuntimeOnly(forge.kotlinforforge)
+    // Standard runtime s //
+    runtimeOnly(forge.jade)
+    runtimeOnly(forge.ae2)
+    runtimeOnly(forge.kotlinforforge)
 
     // Runtime Recipe Viewers - uncomment whichever one you want to use //
-    modRuntimeOnly(forge.emi)
-//    modRuntimeOnly(forge.jei.forge.impl)
-//    modRuntimeOnly(forge.bundles.rei.runtime)
+    runtimeOnly(forge.emi)
+//    runtimeOnly(forge.jei.forge.impl)
+//    runtimeOnly(forge.bundles.rei.runtime)
 
     //////////////////////////////////////////////////////
-    // Runtime mods for dev testing with unclean client //
+    // Runtime s for dev testing with unclean client //
     //////////////////////////////////////////////////////
-    modExtraRuntimeOnly(forge.javd)
-    modExtraRuntimeOnly(forge.trenzalore)
-    modExtraRuntimeOnly(forge.curios)
-//    modExtraRuntimeOnly(forge.worldstripper)
+    extraRuntimeOnly(forge.javd)
+    extraRuntimeOnly(forge.trenzalore)
+    extraRuntimeOnly(forge.curios)
+//    extraRuntimeOnly(forge.worldstripper)
 
-    modExtraRuntimeOnly(forge.bundles.kjs)
+    extraRuntimeOnly(forge.bundles.kjs)
 
-    modExtraRuntimeOnly(forge.ftblibrary)
-    modExtraRuntimeOnly(forge.ftbteams)
-    modExtraRuntimeOnly(forge.ftbquests)
+    extraRuntimeOnly(forge.ftblibrary)
+    extraRuntimeOnly(forge.ftbteams)
+    extraRuntimeOnly(forge.ftbquests)
 
-    modExtraRuntimeOnly(forge.heracles)
-    modExtraRuntimeOnly(forge.resourcefullib)
+    extraRuntimeOnly(forge.heracles)
+    extraRuntimeOnly(forge.resourcefullib)
 
-//    modExtraRuntimeOnly(forge.xaerosminimap)
-//    modExtraRuntimeOnly(forge.xaerosworldmap)
-//    modExtraRuntimeOnly(forge.journeymap.forge)
-//    modExtraRuntimeOnly(forge.ftbchunks)
+//    extraRuntimeOnly(forge.xaerosminimap)
+//    extraRuntimeOnly(forge.xaerosworldmap)
+//    extraRuntimeOnly(forge.journeymap.forge)
+//    extraRuntimeOnly(forge.ftbchunks)
 
-    modExtraRuntimeOnly(forge.gamestages)
-    modExtraRuntimeOnly(forge.bookshelf)
+    extraRuntimeOnly(forge.gamestages)
+    extraRuntimeOnly(forge.bookshelf)
 
-    modExtraRuntimeOnly(forge.spark)
-    modExtraRuntimeOnly(forge.observable)
+    extraRuntimeOnly(forge.spark)
+    extraRuntimeOnly(forge.observable)
     //////////////////////////
 
     testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")

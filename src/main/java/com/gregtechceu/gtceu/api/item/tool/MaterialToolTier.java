@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.data.chemical.material.properties.ToolProperty;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
 
 import net.minecraft.tags.TagKey;
@@ -11,7 +11,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author KilaBash
@@ -48,8 +47,8 @@ public class MaterialToolTier implements Tier {
     }
 
     @Override
-    public int getLevel() {
-        return property.getHarvestLevel();
+    public TagKey<Block> getIncorrectBlocksForDrops() {
+        return CustomTags.INCORRECT_TOOL_TIERS[property.getHarvestLevel()];
     }
 
     @Override
@@ -61,10 +60,5 @@ public class MaterialToolTier implements Tier {
     @NotNull
     public Ingredient getRepairIngredient() {
         return Ingredient.EMPTY;
-    }
-
-    @Override
-    public @Nullable TagKey<Block> getTag() {
-        return CustomTags.TOOL_TIERS[getLevel()];
     }
 }

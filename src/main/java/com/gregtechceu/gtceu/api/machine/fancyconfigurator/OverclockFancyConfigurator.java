@@ -17,7 +17,6 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

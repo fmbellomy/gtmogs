@@ -13,14 +13,15 @@ import com.lowdragmc.lowdraglib.gui.ingredient.Target;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.IItemHandlerModifiable;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -130,7 +131,7 @@ public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTar
             Item item = emiStack.getKeyOfType(Item.class);
             if (item != null) {
                 ingredient = new ItemStack(item, (int) emiStack.getAmount());
-                ((ItemStack) ingredient).setTag(emiStack.getNbt());
+                ((ItemStack) ingredient).applyComponents(emiStack.getComponentChanges());
             }
         } else if (GTCEu.Mods.isJEILoaded() && ingredient instanceof ITypedIngredient<?> jeiStack) {
             ingredient = jeiStack.getItemStack().orElse(null);
@@ -154,7 +155,7 @@ public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTar
                     Item item = emiStack.getKeyOfType(Item.class);
                     if (item != null) {
                         ingredient = new ItemStack(item, (int) emiStack.getAmount());
-                        ((ItemStack) ingredient).setTag(emiStack.getNbt());
+                        ((ItemStack) ingredient).applyComponents(emiStack.getComponentChanges());
                     }
                 } else if (GTCEu.Mods.isJEILoaded() && ingredient instanceof ITypedIngredient<?> jeiStack) {
                     ingredient = jeiStack.getItemStack().orElse(null);
@@ -165,7 +166,7 @@ public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTar
                     ClickType clickType = shiftDown ? ClickType.QUICK_MOVE : ClickType.PICKUP;
                     slotClickPhantom(slotReference, 0, clickType, stack);
                     writeClientAction(1, buffer -> {
-                        buffer.writeItem(stack);
+                        ItemStack.OPTIONAL_STREAM_CODEC.encode(buffer, stack);
                         buffer.writeVarInt(0);
                         buffer.writeBoolean(shiftDown);
                     });
@@ -175,9 +176,9 @@ public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTar
     }
 
     @Override
-    public void handleClientAction(int id, FriendlyByteBuf buffer) {
+    public void handleClientAction(int id, RegistryFriendlyByteBuf buffer) {
         if (slotReference != null && id == 1) {
-            ItemStack stackHeld = buffer.readItem();
+            ItemStack stackHeld = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
             int mouseButton = buffer.readVarInt();
             boolean shiftKeyDown = buffer.readBoolean();
             ClickType clickType = shiftKeyDown ? ClickType.QUICK_MOVE : ClickType.PICKUP;

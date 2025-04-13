@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import net.minecraft.MethodsReturnNonnullByDefault;
 
 import org.jetbrains.annotations.NotNull;
-
 import java.util.function.Predicate;
 
 import javax.annotation.ParametersAreNonnullByDefault;

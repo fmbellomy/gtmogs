@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.utils;
 
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import it.unimi.dsi.fastutil.Hash;
 import org.jetbrains.annotations.Nullable;

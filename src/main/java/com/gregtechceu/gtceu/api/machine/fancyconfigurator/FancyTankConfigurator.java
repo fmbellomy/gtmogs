@@ -10,7 +10,6 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import net.minecraft.network.chat.Component;
-
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

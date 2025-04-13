@@ -13,7 +13,6 @@ import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-
 import java.util.List;
 
 /**

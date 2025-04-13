@@ -8,7 +8,6 @@ import com.lowdragmc.lowdraglib.networking.IPacket;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.ChunkPos;
-
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 

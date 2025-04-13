@@ -10,7 +10,7 @@ import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.GsonHelper;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;

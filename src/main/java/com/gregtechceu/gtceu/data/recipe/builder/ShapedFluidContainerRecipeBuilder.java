@@ -8,7 +8,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.function.Consumer;
 
 public class ShapedFluidContainerRecipeBuilder extends ShapedRecipeBuilder {

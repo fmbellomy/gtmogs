@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.common.machine.owner;
 import com.gregtechceu.gtceu.GTCEu;
 
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import earth.terrarium.argonauts.api.client.guild.GuildClientApi;
 import earth.terrarium.argonauts.api.guild.Guild;
@@ -11,7 +11,6 @@ import earth.terrarium.argonauts.api.guild.GuildApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
-
 import java.util.*;
 
 @SuppressWarnings({ "UnstableApiUsage", "removal", "deprecation" })

@@ -18,7 +18,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import org.jetbrains.annotations.Nullable;
-
 import java.util.HashMap;
 import java.util.Objects;
 

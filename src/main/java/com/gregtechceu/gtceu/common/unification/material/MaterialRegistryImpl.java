@@ -1,9 +1,9 @@
 package com.gregtechceu.gtceu.common.unification.material;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.chemical.material.Material;
-import com.gregtechceu.gtceu.api.data.chemical.material.registry.MaterialRegistry;
-import com.gregtechceu.gtceu.common.data.GTMaterials;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 
 import org.jetbrains.annotations.NotNull;
 

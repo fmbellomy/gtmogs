@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
-
 import java.util.List;
 import java.util.SortedSet;
 
@@ -74,7 +73,7 @@ public interface IMultiPart extends IMachineFeature, IFancyUIMachine {
     }
 
     /**
-     * get part's Appearance. same as IForgeBlock.getAppearance() / IFabricBlock.getAppearance()
+     * get part's Appearance. same as IBlockExtension.getAppearance() / IFabricBlock.getAppearance()
      */
     @Nullable
     default BlockState getFormedAppearance(BlockState sourceState, BlockPos sourcePos, Direction side) {
