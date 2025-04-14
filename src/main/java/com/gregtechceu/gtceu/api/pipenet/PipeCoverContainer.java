@@ -26,7 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
-import net.neoforged.neoforge.items.wrapper.EmptyHandler;
+import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
@@ -158,7 +158,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
     public IItemHandlerModifiable getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
         if (pipeTile instanceof ItemPipeBlockEntity itemPipe) {
             return getLevel() instanceof ServerLevel ? itemPipe.getHandler(side, useCoverCapability) :
-                    (IItemHandlerModifiable) EmptyHandler.INSTANCE;
+                    (IItemHandlerModifiable) EmptyItemHandler.INSTANCE;
         } else {
             return null;
         }
@@ -221,7 +221,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
     @SuppressWarnings("unused")
     private CoverBehavior deserializeCoverUid(CompoundTag uid) {
-        var definitionId = new ResourceLocation(uid.getString("id"));
+        var definitionId = ResourceLocation.parse(uid.getString("id"));
         var side = GTUtil.DIRECTIONS[uid.getInt("side")];
         var definition = GTRegistries.COVERS.get(definitionId);
         if (definition != null) {

@@ -5,10 +5,10 @@ import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.utils.GTStringUtils;
 
 import net.minecraft.network.chat.Component;
@@ -42,7 +42,7 @@ public enum FormingPressLogic implements GTRecipeType.ICustomRecipeLogic {
                     .inputItems(item.copyWithCount(1))
                     .outputItems(output)
                     .duration(40).EUt(4)
-                    .buildRawRecipe();
+                    .build();
         }
     }
 
@@ -128,7 +128,7 @@ public enum FormingPressLogic implements GTRecipeType.ICustomRecipeLogic {
                 .outputItems(named)
                 .duration(40)
                 .EUt(4)
-                .buildRawRecipe();
+                .build();
         // for EMI to detect it's a synthetic recipe (not ever in JSON)
         recipe.setId(recipe.getId().withPrefix("/"));
         GTRecipeTypes.FORMING_PRESS_RECIPES.addToMainCategory(recipe);

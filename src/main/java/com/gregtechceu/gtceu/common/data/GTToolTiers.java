@@ -2,9 +2,9 @@ package com.gregtechceu.gtceu.common.data;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Tier;
@@ -20,7 +20,7 @@ public class GTToolTiers {
     private static Tier NEUTRONIUM;
 
     public static void init() {
-        var netherite = new ResourceLocation("netherite");
+        var netherite = ResourceLocation.withDefaultNamespace("netherite");
         var duranium = GTCEu.id("duranium");
         var neutronium = GTCEu.id("neutronium");
         DURANIUM = TierSortingRegistry.registerTier(

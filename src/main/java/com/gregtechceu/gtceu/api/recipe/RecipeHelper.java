@@ -1,12 +1,13 @@
 package com.gregtechceu.gtceu.api.recipe;
 
-import ActionResult;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.network.chat.Component;
@@ -119,7 +120,7 @@ public class RecipeHelper {
     public static List<FluidStack> getInputFluids(GTRecipe recipe) {
         return recipe.getInputContents(FluidRecipeCapability.CAP).stream()
                 .map(content -> FluidRecipeCapability.CAP.of(content.getContent()))
-                .map(ingredient -> ingredient.getStacks()[0])
+                .map(ingredient -> ingredient.getFluids()[0])
                 .collect(Collectors.toList());
     }
 
@@ -158,7 +159,7 @@ public class RecipeHelper {
     public static List<FluidStack> getOutputFluids(GTRecipe recipe) {
         return recipe.getOutputContents(FluidRecipeCapability.CAP).stream()
                 .map(content -> FluidRecipeCapability.CAP.of(content.getContent()))
-                .map(ingredient -> ingredient.getStacks()[0])
+                .map(ingredient -> ingredient.getFluids()[0])
                 .collect(Collectors.toList());
     }
 
@@ -171,7 +172,7 @@ public class RecipeHelper {
     public static List<FluidStack> getOutputFluids(GTRecipeBuilder builder) {
         return builder.output.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList()).stream()
                 .map(content -> FluidRecipeCapability.CAP.of(content.getContent()))
-                .map(ingredient -> ingredient.getStacks()[0])
+                .map(ingredient -> ingredient.getFluids()[0])
                 .collect(Collectors.toList());
     }
 

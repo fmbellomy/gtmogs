@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.api.transfer.fluid;
 
 import com.gregtechceu.gtceu.GTCEu;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -10,6 +11,8 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
@@ -133,12 +136,12 @@ public class FluidHandlerList implements IFluidHandlerModifiable, INBTSerializab
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         var tag = new CompoundTag();
         var list = new ListTag();
         for (IFluidHandler handler : handlers) {
             if (handler instanceof INBTSerializable<?> serializable) {
-                list.add(serializable.serializeNBT());
+                list.add(serializable.serializeNBT(provider));
             } else {
                 GTCEu.LOGGER.warn("[FluidHandlerList] internal tank doesn't support serialization");
             }
@@ -149,11 +152,11 @@ public class FluidHandlerList implements IFluidHandlerModifiable, INBTSerializab
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         var list = nbt.getList("tanks", nbt.getByte("type"));
         for (int i = 0; i < list.size(); i++) {
             if (handlers[i] instanceof INBTSerializable serializable) {
-                serializable.deserializeNBT(list.get(i));
+                serializable.deserializeNBT(provider, list.get(i));
             } else {
                 GTCEu.LOGGER.warn("[FluidHandlerList] internal tank doesn't support serialization");
             }

@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.recipe;
 import com.gregtechceu.gtceu.GTCEu;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 
 import com.google.gson.JsonArray;
@@ -57,7 +58,7 @@ public final class ResearchData implements Iterable<ResearchData.ResearchEntry> 
         return json;
     }
 
-    public static ResearchData fromNetwork(FriendlyByteBuf buf) {
+    public static ResearchData fromNetwork(RegistryFriendlyByteBuf buf) {
         List<ResearchEntry> entries = new ArrayList<>();
         int size = buf.readVarInt();
         for (int i = 0; i < size; ++i) {
@@ -66,7 +67,7 @@ public final class ResearchData implements Iterable<ResearchData.ResearchEntry> 
         return new ResearchData(entries);
     }
 
-    public void toNetwork(FriendlyByteBuf buf) {
+    public void toNetwork(RegistryFriendlyByteBuf buf) {
         buf.writeVarInt(this.entries.size());
         this.entries.forEach(entry -> entry.toNetwork(buf));
     }
@@ -101,26 +102,25 @@ public final class ResearchData implements Iterable<ResearchData.ResearchEntry> 
 
         public static ResearchEntry fromJson(JsonObject tag) {
             return new ResearchEntry(tag.get("researchId").getAsString(), ItemStack.CODEC
-                    .parse(JsonOps.INSTANCE, tag.get("dataItem")).getOrThrow(false, GTCEu.LOGGER::error));
+                    .parse(JsonOps.INSTANCE, tag.get("dataItem")).getOrThrow());
         }
 
         public JsonObject toJson() {
             JsonObject json = new JsonObject();
             json.addProperty("researchId", researchId);
-            json.add("dataItem",
-                    ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, dataItem).getOrThrow(false, GTCEu.LOGGER::error));
+            json.add("dataItem", ItemStack.CODEC.encodeStart(JsonOps.INSTANCE, dataItem).getOrThrow());
             return json;
         }
 
-        public static ResearchEntry fromNetwork(FriendlyByteBuf buf) {
+        public static ResearchEntry fromNetwork(RegistryFriendlyByteBuf buf) {
             String researchId = buf.readUtf();
-            ItemStack dataItem = buf.readItem();
+            ItemStack dataItem = ItemStack.STREAM_CODEC.decode(buf);
             return new ResearchEntry(researchId, dataItem);
         }
 
-        public void toNetwork(FriendlyByteBuf buf) {
+        public void toNetwork(RegistryFriendlyByteBuf buf) {
             buf.writeUtf(this.researchId);
-            buf.writeItem(this.dataItem);
+            ItemStack.STREAM_CODEC.encode(buf, this.dataItem);
         }
     }
 }

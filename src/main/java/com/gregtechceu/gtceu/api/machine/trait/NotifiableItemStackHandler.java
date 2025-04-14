@@ -5,10 +5,10 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.recipe.DummyCraftingContainer;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.DummyCraftingInput;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
@@ -16,28 +16,28 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
+import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionHolder;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
-import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientAction;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
-/**
- * @author KilaBash
- * @date 2023/2/20
- * @implNote NotifiableItemStackHandler
- */
-public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ingredient>
+@ParametersAreNonnullByDefault
+@ExtensionMethod(SizedIngredientExtensions.class)
+public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<SizedIngredient>
                                         implements ICapabilityTrait, IItemHandlerModifiable {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
@@ -88,13 +88,13 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
     }
 
     @Override
-    public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, boolean simulate) {
+    public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left, boolean simulate) {
         return handleRecipe(io, recipe, left, simulate, handlerIO, storage);
     }
 
     // TODO: See if implementable in outside callers and unstatic; or move to different common class if not
     // Notable caller is ItemRecipeHandler, used for MinerLogic
-    public static List<Ingredient> handleRecipe(IO io, GTRecipe recipe, List<Ingredient> left, boolean simulate,
+    public static List<SizedIngredient> handleRecipe(IO io, GTRecipe recipe, List<SizedIngredient> left, boolean simulate,
                                                 IO handlerIO, CustomItemStackHandler storage) {
         if (io != handlerIO) return left;
         if (io != IO.IN && io != IO.OUT) return left.isEmpty() ? null : left;
@@ -104,12 +104,13 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
         ItemStack[] visited = new ItemStack[storage.getSlots()];
         for (var it = left.listIterator(); it.hasNext();) {
             var ingredient = it.next();
-            if (ingredient.isEmpty()) {
+            if (ingredient.ingredient().hasNoItems()) {
                 it.remove();
                 continue;
             }
 
-            if (io == IO.OUT && ingredient instanceof IntProviderIngredient provider) {
+            if (io == IO.OUT &&
+                    ingredient.ingredient().getCustomIngredient() instanceof IntProviderIngredient provider) {
                 provider.setItemStacks(null);
                 provider.setSampledCount(null);
             }
@@ -121,7 +122,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
             }
 
             int amount;
-            if (ingredient instanceof SizedIngredient si) amount = si.getAmount();
+            if (ingredient instanceof SizedIngredient si) amount = si.count();
             else amount = items[0].getCount();
 
             for (int slot = 0; slot < storage.getSlots(); ++slot) {
@@ -160,11 +161,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
             }
             // Modify ingredient if we didn't finish it off
             if (amount > 0) {
-                if (ingredient instanceof SizedIngredient si) {
-                    si.setAmount(amount);
-                } else {
-                    items[0].setCount(amount);
-                }
+                it.set(ingredient.copyWithCount(amount));
             }
         }
         return left.isEmpty() ? null : left;
@@ -174,13 +171,13 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
     private static ItemStack getActioned(CustomItemStackHandler storage, int index, List<?> actions) {
         if (!GTCEu.Mods.isKubeJSLoaded()) return null;
         // noinspection unchecked
-        var actioned = KJSCallWrapper.applyIngredientAction(storage, index, (List<IngredientAction>) actions);
+        var actioned = KJSCallWrapper.applyIngredientAction(storage, index, (List<IngredientActionHolder>) actions);
         if (!actioned.isEmpty()) return actioned;
         return null;
     }
 
     @Override
-    public RecipeCapability<Ingredient> getCapability() {
+    public RecipeCapability<SizedIngredient> getCapability() {
         return ItemRecipeCapability.CAP;
     }
 
@@ -304,17 +301,17 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Ing
     public static class KJSCallWrapper {
 
         public static ItemStack applyIngredientAction(CustomItemStackHandler storage, int index,
-                                                      List<IngredientAction> ingredientActions) {
+                                                      List<IngredientActionHolder> ingredientActions) {
             var stack = storage.getStackInSlot(index);
 
             if (stack.isEmpty()) {
                 return ItemStack.EMPTY;
             }
 
-            DummyCraftingContainer container = new DummyCraftingContainer(storage);
+            DummyCraftingInput container = new DummyCraftingInput(storage);
             for (var action : ingredientActions) {
-                if (action.checkFilter(index, stack)) {
-                    return action.transform(stack.copy(), index, container);
+                if (action.filter().checkFilter(index, stack)) {
+                    return action.action().transform(stack.copy(), index, container);
                 }
             }
 

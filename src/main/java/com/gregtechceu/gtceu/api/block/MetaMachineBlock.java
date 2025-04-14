@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.block;
 
-import com.gregtechceu.gtceu.api.data.RotationState;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
@@ -332,19 +332,16 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
     }
 
     @Override
-    @SuppressWarnings("deprecation") // This is fine to override, just not to be called.
     public int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return getMachine(level, pos).getOutputSignal(direction);
     }
 
     @Override
-    @SuppressWarnings("deprecation") // This is fine to override, just not to be called.
     public int getDirectSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return getMachine(level, pos).getOutputDirectSignal(direction);
     }
 
     @Override
-    @SuppressWarnings("deprecation") // This is fine to override, just not to be called.
     public int getAnalogOutputSignal(BlockState state, Level level, BlockPos pos) {
         return getMachine(level, pos).getAnalogOutputSignal();
     }
@@ -359,6 +356,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
     }
 
+    @Nullable
     @Override
     public BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
                                          BlockState sourceState, BlockPos sourcePos) {

@@ -4,11 +4,11 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -26,7 +26,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Tuple;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -42,7 +41,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -428,7 +426,7 @@ public class GTUtil {
             return false;
         }
 
-        ResourceLocation javdVoidBiome = new ResourceLocation("javd", "void");
+        ResourceLocation javdVoidBiome = ResourceLocation.fromNamespaceAndPath("javd", "void");
         if (GTCEu.Mods.isJAVDLoaded() &&
                 world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome).equals(javdVoidBiome)) {
             return !world.isDay();
@@ -463,7 +461,7 @@ public class GTUtil {
 
     public static ItemStack loadItemStack(CompoundTag compoundTag) {
         try {
-            Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(compoundTag.getString("id")));
+            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(compoundTag.getString("id")));
             int count = compoundTag.getInt("Count");
             ItemStack stack = new ItemStack(item, count);
             if (compoundTag.contains("tag", Tag.TAG_COMPOUND)) {

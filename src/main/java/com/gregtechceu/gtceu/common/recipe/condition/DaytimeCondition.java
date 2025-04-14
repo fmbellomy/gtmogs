@@ -1,11 +1,12 @@
 package com.gregtechceu.gtceu.common.recipe.condition;
 
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
-import com.gregtechceu.gtceu.common.data.GTRecipeConditions;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 
@@ -19,8 +20,8 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 public class DaytimeCondition extends RecipeCondition {
 
-    public static final Codec<DaytimeCondition> CODEC = RecordCodecBuilder
-            .create(instance -> RecipeCondition.isReverse(instance)
+    public static final MapCodec<DaytimeCondition> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> RecipeCondition.isReverse(instance)
                     .apply(instance, DaytimeCondition::new));
 
     public DaytimeCondition(boolean isReverse) {

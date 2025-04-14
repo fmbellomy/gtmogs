@@ -5,10 +5,10 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
@@ -21,12 +21,12 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.dust;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.dustSmall;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.dustTiny;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.turbineBlade;
-import static com.gregtechceu.gtceu.common.data.GTRecipeCategories.MACERATOR_RECYCLING;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.MACERATOR_RECIPES;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.dust;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.dustSmall;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.dustTiny;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.turbineBlade;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeCategories.MACERATOR_RECYCLING;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.MACERATOR_RECIPES;
 
 public enum MaceratorLogic implements GTRecipeType.ICustomRecipeLogic {
 
@@ -90,7 +90,7 @@ public enum MaceratorLogic implements GTRecipeType.ICustomRecipeLogic {
             builder.outputItems(tag, mat, leftAmount);
         }
 
-        return builder.buildRawRecipe();
+        return builder.build();
     }
 
     @Override

@@ -30,10 +30,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.item.GTItems.BIO_CHAFF;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.*;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 public class WoodMachineRecipes {
 
@@ -947,7 +947,7 @@ public class WoodMachineRecipes {
 
     public static void hardWoodRecipes(Consumer<ResourceLocation> registry) {
         if (ConfigHolder.INSTANCE.recipes.nerfWoodCrafting) {
-            registry.accept(new ResourceLocation("minecraft:stick"));
+            registry.accept(ResourceLocation.withDefaultNamespace("stick"));
         }
         for (WoodTypeEntry entry : getDefaultEntries()) {
             hardWoodTypeRecipes(registry, entry);

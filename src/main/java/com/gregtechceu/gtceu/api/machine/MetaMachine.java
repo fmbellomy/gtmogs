@@ -7,23 +7,24 @@ import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.IPaintable;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IControllable;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.capability.IToolable;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.data.RotationState;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyTooltip;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.machine.feature.*;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
 import com.gregtechceu.gtceu.api.misc.IOFilteredInvWrapper;
 import com.gregtechceu.gtceu.api.misc.IOFluidHandlerList;
-import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
+import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.common.cover.FluidFilterCover;
 import com.gregtechceu.gtceu.common.cover.ItemFilterCover;
@@ -45,13 +46,14 @@ import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -78,8 +80,6 @@ import java.util.*;
 import java.util.function.Predicate;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import static com.gregtechceu.gtceu.api.item.tool.ToolHelper.getBehaviorsTag;
 
 /**
  * @author KilaBash
@@ -228,6 +228,12 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         }
     }
 
+    public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {
+    }
+
+    public void collectImplicitComponents(DataComponentMap.Builder components) {
+    }
+
     //////////////////////////////////////
     // ***** Tickable Manager ****//
     //////////////////////////////////////
@@ -317,11 +323,11 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
      *         animations will be played
      */
     @Override
-    public final Pair<GTToolType, InteractionResult> onToolClick(Set<@NotNull GTToolType> toolType, ItemStack itemStack,
-                                                                 UseOnContext context) {
+    public final Pair<GTToolType, ItemInteractionResult> onToolClick(Set<@NotNull GTToolType> toolType, ItemStack itemStack,
+                                                                     UseOnContext context) {
         // the side hit from the machine grid
         var playerIn = context.getPlayer();
-        if (playerIn == null) return Pair.of(null, InteractionResult.PASS);
+        if (playerIn == null) return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
 
         var hand = context.getHand();
         var hitResult = new BlockHitResult(context.getClickLocation(), context.getClickedFace(),
@@ -351,16 +357,16 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 if (!isRemote()) {
                     getCoverContainer().removeCover(gridSide, playerIn);
                 }
-                return Pair.of(GTToolType.CROWBAR, InteractionResult.CONSUME);
+                return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
             }
             return Pair.of(GTToolType.CROWBAR, onCrowbarClick(playerIn, hand, gridSide, hitResult));
         } else if (toolType.contains(GTToolType.HARD_HAMMER)) {
             return Pair.of(GTToolType.HARD_HAMMER, onHardHammerClick(playerIn, hand, gridSide, hitResult));
         }
-        return Pair.of(null, InteractionResult.PASS);
+        return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
     }
 
-    protected InteractionResult onHardHammerClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onHardHammerClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                   BlockHitResult hitResult) {
         if (this instanceof IMufflableMachine mufflableMachine) {
             if (!isRemote()) {
@@ -369,38 +375,39 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                         "gtceu.machine.muffle.on" : "gtceu.machine.muffle.off"));
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    protected InteractionResult onCrowbarClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onCrowbarClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                BlockHitResult hitResult) {
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    protected InteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                               BlockHitResult hitResult) {
         if (gridSide == getFrontFacing() && allowExtendedFacing()) {
             setUpwardsFacing(playerIn.isShiftKeyDown() ? getUpwardsFacing().getCounterClockWise() :
                     getUpwardsFacing().getClockWise());
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         if (playerIn.isShiftKeyDown()) {
             if (gridSide == getFrontFacing() || !isFacingValid(gridSide)) {
-                return InteractionResult.FAIL;
+                return ItemInteractionResult.FAIL;
             }
             if (!isRemote()) {
                 setFrontFacing(gridSide);
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         } else {
             if (isRemote())
-                return InteractionResult.CONSUME;
+                return ItemInteractionResult.CONSUME;
             var itemStack = playerIn.getItemInHand(hand);
-            var tagCompound = getBehaviorsTag(itemStack);
+            var tagCompound = ToolHelper.getBehaviorsComponent(itemStack);
+            tagCompound.getBehavior(ToolBehaviorType)
             ToolModeSwitchBehavior.WrenchModeType type = ToolModeSwitchBehavior.WrenchModeType.values()[tagCompound
                     .getByte("Mode")];
 
@@ -419,11 +426,11 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 }
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
     }
 
-    protected InteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                   BlockHitResult hitResult) {
         var controllable = GTCapabilityHelper.getControllable(getLevel(), getPos(), gridSide);
         if (controllable != null) {
@@ -438,17 +445,16 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 }
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    protected InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                    BlockHitResult hitResult) {
         var itemStack = playerIn.getItemInHand(hand);
-        var tagCompound = getBehaviorsTag(itemStack);
         if (isRemote())
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         if (playerIn.isShiftKeyDown()) {
             boolean flag = false;
             if (this instanceof IAutoOutputItem autoOutputItem) {
@@ -474,7 +480,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
             }
             if (flag) {
                 playerIn.swing(hand);
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
         } else {
             boolean flag = false;
@@ -493,10 +499,10 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
             }
             if (flag) {
                 playerIn.swing(hand);
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     //////////////////////////////////////

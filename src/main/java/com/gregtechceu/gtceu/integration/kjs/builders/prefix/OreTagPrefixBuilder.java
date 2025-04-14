@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.prefix;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.core.mixins.BlockBehaviourAccessor;
 import com.gregtechceu.gtceu.integration.kjs.built.KJSTagPrefix;

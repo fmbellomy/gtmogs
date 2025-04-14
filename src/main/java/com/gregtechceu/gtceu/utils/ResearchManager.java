@@ -6,15 +6,18 @@ import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IDataItem;
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
@@ -128,10 +131,10 @@ public final class ResearchManager {
 
     public static void createDefaultResearchRecipe(@NotNull GTRecipeType recipeType, @NotNull String researchId,
                                                    @NotNull ItemStack researchItem, @NotNull ItemStack dataItem,
-                                                   int duration, int EUt, int CWUt, Consumer<FinishedRecipe> provider) {
+                                                   int duration, int EUt, int CWUt, RecipeOutput provider) {
         if (!ConfigHolder.INSTANCE.machines.enableResearch) return;
 
-        CompoundTag compound = dataItem.getOrCreateTag();
+        CompoundTag compound = dataItem.getComponentsPatch();
         writeResearchToNBT(compound, researchId, recipeType);
 
         if (CWUt > 0) {
@@ -178,31 +181,31 @@ public final class ResearchManager {
         }
 
         private GTRecipe createDataRecipe(@NotNull ItemStack first, @NotNull ItemStack second) {
-            CompoundTag compound = second.getTag();
-            if (compound == null) return null;
+            DataComponentPatch patch = second.getComponentsPatch();
+            if (patch.isEmpty()) return null;
 
             // Both must be data items
             if (!isStackDataItem(first, true)) return null;
             if (!isStackDataItem(second, true)) return null;
 
             ItemStack output = first.copy();
-            output.setTag(compound.copy());
+            output.applyComponents(patch);
             return GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(GTStringUtils.itemStackToString(output))
                     .inputItems(first)
                     .notConsumable(second)
                     .outputItems(output)
                     .duration(DURATION).EUt(EUT)
-                    .buildRawRecipe();
+                    .build();
         }
 
         @Override
         public void buildRepresentativeRecipes() {
             ItemStack copiedStick = GTItems.TOOL_DATA_STICK.asStack();
-            copiedStick.setHoverName(Component.translatable("gtceu.scanner.copy_stick_from"));
+            copiedStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_from"));
             ItemStack emptyStick = GTItems.TOOL_DATA_STICK.asStack();
-            emptyStick.setHoverName(Component.translatable("gtceu.scanner.copy_stick_empty"));
+            emptyStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_empty"));
             ItemStack resultStick = GTItems.TOOL_DATA_STICK.asStack();
-            resultStick.setHoverName(Component.translatable("gtceu.scanner.copy_stick_to"));
+            resultStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_to"));
 
             GTRecipe recipe = GTRecipeTypes.SCANNER_RECIPES
                     .recipeBuilder("copy_" + GTStringUtils.itemStackToString(copiedStick))
@@ -210,7 +213,7 @@ public final class ResearchManager {
                     .notConsumable(copiedStick)
                     .outputItems(resultStick)
                     .duration(DURATION).EUt(EUT)
-                    .buildRawRecipe();
+                    .build();
             // for EMI to detect it's a synthetic recipe (not ever in JSON)
             recipe.setId(recipe.getId().withPrefix("/"));
             GTRecipeTypes.SCANNER_RECIPES.addToMainCategory(recipe);

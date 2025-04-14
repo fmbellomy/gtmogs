@@ -7,10 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -25,6 +22,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 public class GTTransferUtils {
@@ -37,7 +35,7 @@ public class GTTransferUtils {
      * @param facing Direction to get the FluidHandler from
      * @return LazyOpt of the IFluidHandler described above
      */
-    public static LazyOptional<IFluidHandler> getAdjacentFluidHandler(Level level, BlockPos pos, Direction facing) {
+    public static Optional<IFluidHandler> getAdjacentFluidHandler(Level level, BlockPos pos, Direction facing) {
         return FluidUtil.getFluidHandler(level, pos.relative(facing), facing.getOpposite());
     }
 
@@ -54,19 +52,12 @@ public class GTTransferUtils {
      * @param side  Side of block
      * @return LazyOpt of ItemHandler of given block
      */
-    public static LazyOptional<IItemHandler> getItemHandler(Level level, BlockPos pos, @Nullable Direction side) {
-        BlockState state = level.getBlockState(pos);
-        if (state.hasBlockEntity()) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity != null) {
-                return blockEntity.getCapability(Capabilities.ITEM_HANDLER, side);
-            }
-        }
-        return LazyOptional.empty();
+    public static Optional<IItemHandler> getItemHandler(Level level, BlockPos pos, @Nullable Direction side) {
+        return Optional.ofNullable(level.getCapability(Capabilities.ItemHandler.BLOCK, pos, side));
     }
 
     // Same as getAdjacentFluidHandler, but for ItemHandler
-    public static LazyOptional<IItemHandler> getAdjacentItemHandler(Level level, BlockPos pos, Direction facing) {
+    public static Optional<IItemHandler> getAdjacentItemHandler(Level level, BlockPos pos, Direction facing) {
         return getItemHandler(level, pos.relative(facing), facing.getOpposite());
     }
 
@@ -91,7 +82,7 @@ public class GTTransferUtils {
             FluidStack fluid = source.getFluidInTank(i);
             if (fluid.isEmpty() || !filter.test(fluid)) continue;
 
-            fluid = new FluidStack(fluid, toTransfer);
+            fluid = fluid.copyWithAmount(toTransfer);
             var transferred = FluidUtil.tryFluidTransfer(dest, source, fluid, true);
             toTransfer -= transferred.getAmount();
             if (toTransfer <= 0) break;
@@ -269,7 +260,7 @@ public class GTTransferUtils {
             ItemStack slotStack = handler.getStackInSlot(i);
             if (slotStack.isEmpty()) {
                 emptySlots.add(i);
-            } else if (ItemHandlerHelper.canItemStacksStack(stack, slotStack)) {
+            } else if (ItemStack.isSameItemSameComponents(stack, slotStack)) {
                 stack = handler.insertItem(i, stack, simulate);
                 if (stack.isEmpty()) {
                     return ItemStack.EMPTY;

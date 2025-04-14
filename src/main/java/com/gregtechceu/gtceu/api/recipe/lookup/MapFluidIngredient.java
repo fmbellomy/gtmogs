@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.recipe.lookup;
 
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.material.Fluid;

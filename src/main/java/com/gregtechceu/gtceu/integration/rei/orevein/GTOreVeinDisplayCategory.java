@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.rei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;

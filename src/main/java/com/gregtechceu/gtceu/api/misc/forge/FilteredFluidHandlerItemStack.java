@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.api.misc.forge;
 
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
@@ -18,7 +20,7 @@ public class FilteredFluidHandlerItemStack extends FluidHandlerItemStack {
      */
     public FilteredFluidHandlerItemStack(@NotNull ItemStack container, int capacity,
                                          Predicate<FluidStack> filter) {
-        super(container, capacity);
+        super(GTDataComponents.FLUID_CONTENT, container, capacity);
         this.filter = filter;
     }
 
@@ -37,8 +39,8 @@ public class FilteredFluidHandlerItemStack extends FluidHandlerItemStack {
     }
 
     private void removeTagWhenEmpty(FluidAction action) {
-        if (getFluid() == FluidStack.EMPTY && action.execute()) {
-            this.container.setTag(null);
+        if (getFluid().isEmpty() && action == FluidAction.EXECUTE) {
+            this.setContainerToEmpty();
         }
     }
 

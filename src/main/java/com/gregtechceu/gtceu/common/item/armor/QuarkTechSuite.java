@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +44,7 @@ import java.util.Map;
 
 public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
-    public static final Map<MobEffect, Integer> potionRemovalCost = new IdentityHashMap<>();
+    public static final Map<Holder<MobEffect>, Integer> potionRemovalCost = new IdentityHashMap<>();
     private float charge = 0.0F;
     private static final byte RUNNING_TIMER = 10; // .5 seconds
     private static final byte JUMPING_TIMER = 10; // .5 seconds

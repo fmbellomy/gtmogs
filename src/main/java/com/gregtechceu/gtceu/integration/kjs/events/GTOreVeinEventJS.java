@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.integration.kjs.events;
 
-import com.gregtechceu.gtceu.api.data.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.data.GTOres;
+import com.gregtechceu.gtceu.data.worldgen.GTOres;
 
 import net.minecraft.resources.ResourceLocation;
 import dev.latvian.mods.kubejs.event.EventJS;

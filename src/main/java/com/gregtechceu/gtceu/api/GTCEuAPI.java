@@ -12,9 +12,8 @@ import com.gregtechceu.gtceu.common.block.BatteryBlock;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.GenericEvent;
+import net.neoforged.bus.api.Event;
 import net.neoforged.fml.event.IModBusEvent;
 
 import lombok.Getter;
@@ -25,6 +24,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public class GTCEuAPI {
+
+    public static final int GT_DATA_VERSION = 1;
 
     /** Will always be available */
     public static GTCEu instance;
@@ -54,30 +55,23 @@ public class GTCEuAPI {
         else GTCEu.LOGGER.info("High-Tier is Disabled.");
     }
 
-    public static class RegisterEvent<K, V> extends GenericEvent<V> implements IModBusEvent {
+    public static class RegisterEvent extends Event implements IModBusEvent {
 
-        private final GTRegistry<K, V> registry;
+        @Getter
+        private final GTRegistry<?, ?> registry;
 
-        public RegisterEvent(GTRegistry<K, V> registry, Class<V> clazz) {
-            super(clazz);
+        public RegisterEvent(GTRegistry<?, ?> registry) {
             this.registry = registry;
         }
 
-        public void register(K key, V value) {
-            if (registry != null) registry.register(key, value);
+        public <K, V> void register(K key, V value) {
+            // noinspection unchecked
+            ((GTRegistry<K, V>) registry).register(key, value);
         }
 
-        public static class RL<V> extends RegisterEvent<ResourceLocation, V> {
-
-            public RL(GTRegistry<ResourceLocation, V> registry, Class<V> clazz) {
-                super(registry, clazz);
-            }
-        }
-
-        public static class String<V> extends RegisterEvent<java.lang.String, V> {
-
-            public String(GTRegistry<java.lang.String, V> registry, Class<V> clazz) {
-                super(registry, clazz);
+        public <K, V> void register(GTRegistry<K, V> registry, Runnable runnable) {
+            if (registry == this.registry) {
+                runnable.run();
             }
         }
     }

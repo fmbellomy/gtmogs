@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.item.component;
 
 import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
+import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
 import com.gregtechceu.gtceu.api.misc.forge.SimpleThermalFluidHandlerItemStack;
 import com.gregtechceu.gtceu.api.misc.forge.ThermalFluidHandlerItemStack;
 import com.gregtechceu.gtceu.client.TooltipsHandler;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -47,6 +49,12 @@ public class ThermalFluidStats implements IItemComponent, IComponentCapability, 
                                            boolean cryoProof, boolean plasmaProof, boolean allowPartialFill) {
         return new ThermalFluidStats(capacity, maxFluidTemperature, gasProof, acidProof, cryoProof, plasmaProof,
                 allowPartialFill);
+    }
+
+    public static ThermalFluidStats create(int capacity, @NotNull FluidPipeProperties properties,
+                                           boolean allowPartialFill) {
+        return new ThermalFluidStats(capacity, properties.getMaxFluidTemperature(), properties.isGasProof(),
+                properties.isAcidProof(), properties.isCryoProof(), properties.isPlasmaProof(), allowPartialFill);
     }
 
     @Override

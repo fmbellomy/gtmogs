@@ -39,7 +39,7 @@ public class ItemMaterialInfo {
      * Returns the first MaterialStack in the "materials" list
      */
     public MaterialStack getMaterial() {
-        return sortedMaterials.isEmpty() ? MaterialStack.EMPTY : sortedMaterials.get(0);
+        return sortedMaterials.isEmpty() ? MaterialStack.EMPTY : sortedMaterials.getFirst();
     }
 
     /**
@@ -81,6 +81,6 @@ public class ItemMaterialInfo {
 
     @Override
     public String toString() {
-        return sortedMaterials.isEmpty() ? "" : sortedMaterials.get(0).material().toCamelCaseString();
+        return sortedMaterials.isEmpty() ? "" : sortedMaterials.getFirst().material().toCamelCaseString();
     }
 }

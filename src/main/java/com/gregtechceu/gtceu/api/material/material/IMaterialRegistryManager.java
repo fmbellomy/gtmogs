@@ -2,6 +2,8 @@ package com.gregtechceu.gtceu.api.material.material;
 
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 
 import com.mojang.serialization.Codec;
@@ -100,6 +102,11 @@ public interface IMaterialRegistryManager {
                                 .orElseGet(() -> DataResult
                                         .error(() -> "Unknown registry key in material registry: " + id)),
                         obj -> DataResult.success(obj.getResourceLocation()));
+    }
+
+    default StreamCodec<ByteBuf, Material> streamCodec() {
+        return ResourceLocation.STREAM_CODEC.map(id -> this.getRegistry(id.getNamespace()).get(id.getPath()),
+                Material::getResourceLocation);
     }
 
     enum Phase {

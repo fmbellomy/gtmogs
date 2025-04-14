@@ -2,9 +2,9 @@ package com.gregtechceu.gtceu.api.item.armor;
 
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.*;
-import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
@@ -124,6 +124,7 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
         armorLogic.damageArmor(entity, stack, source, damage, slot);
     }
 
+    @SuppressWarnings("removal") // eh, it works for now.
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {

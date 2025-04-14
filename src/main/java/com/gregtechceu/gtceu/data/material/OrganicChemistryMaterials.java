@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
 import com.gregtechceu.gtceu.api.fluid.FluidBuilder;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.common.data.GTMedicalConditions;
+import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialFlags.*;
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet.FINE;

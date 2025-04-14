@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.common.machine.storage;
 
-import Widget;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.PhantomSlotWidget;
@@ -93,7 +92,7 @@ public class CreativeChestMachine extends QuantumChestMachine {
             }
 
             // If held item can stack with stored item, delete held item
-            if (!heldItem.isEmpty() && ItemHandlerHelper.canItemStacksStack(stored, heldItem)) {
+            if (!heldItem.isEmpty() && ItemStack.isSameItemSameComponents(stored, heldItem)) {
                 player.setItemInHand(hand, ItemStack.EMPTY);
                 return InteractionResult.SUCCESS;
             } else if (!heldItem.isEmpty()) { // If held item is different than stored item, update stored item

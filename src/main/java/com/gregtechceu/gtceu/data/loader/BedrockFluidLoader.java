@@ -1,12 +1,13 @@
 package com.gregtechceu.gtceu.data.loader;
 
+import com.google.gson.*;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
-import com.gregtechceu.gtceu.api.data.worldgen.bedrockfluid.BedrockFluidDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.data.GTBedrockFluids;
+import com.gregtechceu.gtceu.data.worldgen.GTBedrockFluids;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuServerEvents;
 import com.gregtechceu.gtceu.integration.kjs.events.GTFluidVeinEventJS;
 
@@ -16,13 +17,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.storage.loot.Deserializers;
 import net.neoforged.fml.ModLoader;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import org.apache.logging.log4j.LogManager;
@@ -32,7 +28,8 @@ import java.util.Map;
 
 public class BedrockFluidLoader extends SimpleJsonResourceReloadListener {
 
-    public static final Gson GSON_INSTANCE = Deserializers.createFunctionSerializer().create();
+    public static final Gson GSON_INSTANCE = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().setLenient()
+            .create();
     public static final String FOLDER = "gtceu/fluid_veins";
     protected static final Logger LOGGER = LogManager.getLogger();
 
@@ -49,10 +46,8 @@ public class BedrockFluidLoader extends SimpleJsonResourceReloadListener {
         GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry().clear();
 
         GTBedrockFluids.init();
-        AddonFinder.getAddons().forEach(IGTAddon::registerFluidVeins);
-        ModLoader.postEvent(
-                new GTCEuAPI.RegisterEvent<>(GTRegistries.BEDROCK_FLUID_DEFINITIONS, BedrockFluidDefinition.class));
-        if (GTCEu.Mods.isKubeJSLoaded()) {
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.BEDROCK_FLUID_DEFINITIONS));
+        if (GTCEu.isKubeJSLoaded()) {
             KJSCallWrapper.fireKJSEvent();
         }
         RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());

@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.PipeBlockItem;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
@@ -215,14 +215,14 @@ public abstract class PipeBlock<PipeType extends Enum<PipeType> & IPipeType<Node
                 return false;
             return canPipesConnect(selfTile, facing, (IPipeNode<PipeType, NodeDataType>) other);
         }
-        return canPipeConnectToBlock(selfTile, facing, other);
+        return canPipeConnectToBlock(selfTile, facing, selfTile.getPipeLevel(), selfTile.getPipePos().relative(facing));
     }
 
     public abstract boolean canPipesConnect(IPipeNode<PipeType, NodeDataType> selfTile, Direction side,
                                             IPipeNode<PipeType, NodeDataType> sideTile);
 
     public abstract boolean canPipeConnectToBlock(IPipeNode<PipeType, NodeDataType> selfTile, Direction side,
-                                                  @Nullable BlockEntity tile);
+                                                  Level level, BlockPos pos);
 
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer,

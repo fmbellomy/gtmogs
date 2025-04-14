@@ -10,7 +10,7 @@ import com.gregtechceu.gtceu.api.item.component.IDurabilityBar;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.utils.BreadthFirstBlockSearch;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 
@@ -73,7 +73,7 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
     private static final ImmutableMap<DyeColor, Block> CANDLE_MAP;
 
     private static ResourceLocation getId(String modid, DyeColor color, String postfix) {
-        return new ResourceLocation(modid, "%s_%s".formatted(color.getSerializedName(), postfix));
+        return ResourceLocation.fromNamespaceAndPath(modid, "%s_%s".formatted(color.getSerializedName(), postfix));
     }
 
     static {

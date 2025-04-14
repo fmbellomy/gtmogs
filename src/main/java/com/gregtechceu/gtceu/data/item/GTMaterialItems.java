@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
@@ -103,11 +103,12 @@ public class GTMaterialItems {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void generateTool(Material material, GTToolType toolType, GTRegistrate registrate) {
         var tier = material.getToolTier();
-        TOOL_ITEMS.put(material, toolType, (ItemProviderEntry<IGTTool>) (ItemProviderEntry<?>) registrate
+        TOOL_ITEMS.put(material, toolType, (ItemProviderEntry<Item, ? extends IGTTool>) registrate
                 .item(toolType.idFormat.formatted(tier.material.getName()),
-                        p -> toolType.constructor.apply(toolType, tier, material,
+                        p -> toolType.constructor.create(toolType, tier, material,
                                 toolType.toolDefinition, p).asItem())
                 .properties(p -> p.craftRemainder(Items.AIR))
                 .setData(ProviderType.LANG, NonNullBiConsumer.noop())

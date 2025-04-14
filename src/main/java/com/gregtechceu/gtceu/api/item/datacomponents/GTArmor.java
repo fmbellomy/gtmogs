@@ -2,6 +2,9 @@ package com.gregtechceu.gtceu.api.item.datacomponents;
 
 import com.gregtechceu.gtceu.utils.StreamCodecUtils;
 
+import lombok.AllArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -113,5 +116,44 @@ public record GTArmor(
     public GTArmor setConsumerTicks(byte consumerTicks) {
         return new GTArmor(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
                 nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+    }
+
+    public Mutable mutable() {
+        return new Mutable(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
+                nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+    }
+
+    @Accessors(chain = true, fluent = true)
+    @AllArgsConstructor
+    public static class Mutable {
+        @Setter
+        private boolean enabled;
+        @Setter
+        private boolean hover;
+        @Setter
+        private boolean canShare;
+        @Setter
+        private boolean nightVision;
+        @Setter
+        private boolean boostedJump;
+        @Setter
+        private boolean onGround;
+        @Setter
+        private byte toggleTimer;
+        @Setter
+        private short burnTimer;
+        @Setter
+        private int nightVisionTimer;
+        @Setter
+        private byte runningTimer;
+        @Setter
+        private byte boostedJumpTimer;
+        @Setter
+        private byte consumerTicks;
+
+        public GTArmor toImmutable() {
+            return new GTArmor(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
+                    nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+        }
     }
 }

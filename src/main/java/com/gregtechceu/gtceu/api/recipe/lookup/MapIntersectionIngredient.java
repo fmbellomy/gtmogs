@@ -1,11 +1,10 @@
 package com.gregtechceu.gtceu.api.recipe.lookup;
 
-import com.gregtechceu.gtceu.core.mixins.IngredientAccessor;
-import com.gregtechceu.gtceu.core.mixins.IntersectionIngredientAccessor;
 import com.gregtechceu.gtceu.core.mixins.ItemValueAccessor;
 import com.gregtechceu.gtceu.core.mixins.TagValueAccessor;
-import com.gregtechceu.gtceu.utils.IngredientEquality;
 
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.IntersectionIngredient;
 
@@ -19,19 +18,18 @@ public class MapIntersectionIngredient extends AbstractMapIngredient {
 
     public MapIntersectionIngredient(IntersectionIngredient ingredient) {
         this.intersectionIngredient = ingredient;
-        this.ingredients = new ArrayList<>(((IntersectionIngredientAccessor) ingredient).getChildren());
-        this.ingredients.sort(IngredientEquality.INGREDIENT_COMPARATOR);
+        this.ingredients = new ArrayList<>(ingredient.children());
     }
 
     @Override
     protected int hash() {
         int hash = 31;
         for (Ingredient ingredient : ingredients) {
-            for (Ingredient.Value value : ((IngredientAccessor) ingredient).getValues()) {
-                if (value instanceof Ingredient.TagValue tagValue) {
-                    hash *= 31 * ((TagValueAccessor) tagValue).getTag().location().hashCode();
+            for (Ingredient.Value value : ingredient.getValues()) {
+                if (value instanceof Ingredient.TagValue(TagKey<Item> tag)) {
+                    hash *= 31 * tag.location().hashCode();
                 } else {
-                    hash *= 31 * ((ItemValueAccessor) value).getItem().getItem().hashCode();
+                    hash *= 31 * ((Ingredient.ItemValue) value).item().getItem().hashCode();
                 }
             }
         }
@@ -48,7 +46,7 @@ public class MapIntersectionIngredient extends AbstractMapIngredient {
                     for (int i = 0; i < this.ingredients.size(); ++i) {
                         Ingredient ingredient1 = this.ingredients.get(i);
                         Ingredient ingredient2 = other.ingredients.get(i);
-                        if (!IngredientEquality.ingredientEquals(ingredient1, ingredient2)) {
+                        if (!ingredient1.equals(ingredient2)) {
                             return false;
                         }
                     }

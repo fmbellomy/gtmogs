@@ -2,14 +2,12 @@ package com.gregtechceu.gtceu.api.item;
 
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
 
+import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
-
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
 import java.util.List;
 
@@ -19,8 +17,12 @@ public interface IComponentItem extends ItemLike {
 
     void attachComponents(IItemComponent... components);
 
-    default <T> LazyOptional<T> getCapability(@NotNull final ItemStack itemStack, @NotNull final Capability<T> cap) {
-        return LazyOptional.empty();
+    default void attachCapabilities(RegisterCapabilitiesEvent event) {
+        for (IItemComponent component : getComponents()) {
+            if (component instanceof IComponentCapability componentCapability) {
+                componentCapability.attachCapabilities(event, this.asItem());
+            }
+        }
     }
 
     default void fillItemCategory(CreativeModeTab category, NonNullList<ItemStack> items) {}

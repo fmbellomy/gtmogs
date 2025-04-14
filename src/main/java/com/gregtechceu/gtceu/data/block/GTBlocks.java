@@ -10,15 +10,17 @@ import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.data.tag.TagUtil;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.item.*;
 import com.gregtechceu.gtceu.api.machine.multiblock.IBatteryData;
 import com.gregtechceu.gtceu.api.pipenet.longdistance.LongDistancePipeBlock;
 import com.gregtechceu.gtceu.common.block.*;
 import com.gregtechceu.gtceu.common.block.explosive.IndustrialTNTBlock;
 import com.gregtechceu.gtceu.common.block.explosive.PowderbarrelBlock;
-import com.gregtechceu.gtceu.common.data.GTConfiguredFeatures;
+import com.gregtechceu.gtceu.common.item.LaserPipeBlockItem;
+import com.gregtechceu.gtceu.common.item.OpticalPipeBlockItem;
+import com.gregtechceu.gtceu.data.worldgen.GTConfiguredFeatures;
 import com.gregtechceu.gtceu.common.data.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.data.GTModels;
@@ -30,7 +32,7 @@ import com.gregtechceu.gtceu.common.pipelike.optical.OpticalPipeType;
 import com.gregtechceu.gtceu.core.mixins.BlockPropertiesAccessor;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import net.minecraft.advancements.critereon.StatePropertiesPredicate;
@@ -40,20 +42,17 @@ import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.FoliageColor;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.grower.AbstractTreeGrower;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.grower.TreeGrower;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -79,7 +78,8 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -88,7 +88,6 @@ import static com.gregtechceu.gtceu.data.block.GCYMBlocks.*;
 import static com.gregtechceu.gtceu.common.data.GTModels.createModelBlockState;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
-import Block;
 
 /**
  * @author KilaBash
@@ -500,7 +499,6 @@ public class GTBlocks {
     }
 
     private static BlockEntry<Block> createBrickCasingBlock(String name, ResourceLocation texture) {
-        // return createCasingBlock(name, GlassBlock::new, texture, () -> Blocks.GLASS, type);
         NonNullFunction<BlockBehaviour.Properties, Block> supplier = Block::new;
         return REGISTRATE.block(name, supplier)
                 .initialProperties(() -> Blocks.IRON_BLOCK)
@@ -515,7 +513,7 @@ public class GTBlocks {
 
     private static BlockEntry<Block> createGlassCasingBlock(String name, ResourceLocation texture,
                                                             Supplier<Supplier<RenderType>> type) {
-        NonNullFunction<BlockBehaviour.Properties, Block> supplier = GlassBlock::new;
+        NonNullFunction<BlockBehaviour.Properties, Block> supplier = TransparentBlock::new;
         return REGISTRATE.block(name, supplier)
                 .initialProperties(() -> Blocks.GLASS)
                 .properties(p -> p.isValidSpawn((state, level, pos, ent) -> false))
@@ -707,19 +705,13 @@ public class GTBlocks {
             .tag(BlockTags.MINEABLE_WITH_AXE)
             .blockstate((ctx, prov) -> prov.simpleBlock(ctx.get(), prov.models().cubeBottomTop(ctx.getName(),
                     GTCEu.id("block/misc/industrial_tnt_side"),
-                    new ResourceLocation("minecraft", "block/tnt_bottom"),
-                    new ResourceLocation("minecraft", "block/tnt_top"))))
+                    ResourceLocation.withDefaultNamespace("block/tnt_bottom"),
+                    ResourceLocation.withDefaultNamespace("block/tnt_top"))))
             .simpleItem()
             .register();
 
     public static final BlockEntry<SaplingBlock> RUBBER_SAPLING = REGISTRATE
-            .block("rubber_sapling", properties -> new SaplingBlock(new AbstractTreeGrower() {
-
-                protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(@NotNull RandomSource random,
-                                                                                    boolean largeHive) {
-                    return GTConfiguredFeatures.RUBBER;
-                }
-            }, properties))
+            .block("rubber_sapling", GTBlocks::makeSaplingBlock)
             .initialProperties(() -> Blocks.OAK_SAPLING)
             .lang("Rubber Sapling")
             .blockstate(GTModels::createCrossBlockState)
@@ -730,6 +722,16 @@ public class GTBlocks {
             .tag(ItemTags.SAPLINGS)
             .build()
             .register();
+
+    private static SaplingBlock makeSaplingBlock(BlockBehaviour.Properties properties) {
+        TreeGrower treeGrower = new TreeGrower(
+                GTCEu.id("rubber").toString(),
+                Optional.empty(),
+                Optional.of(GTConfiguredFeatures.RUBBER),
+                Optional.empty()
+        );
+        return new SaplingBlock(treeGrower, properties);
+    }
 
     public static final BlockEntry<RubberLogBlock> RUBBER_LOG = REGISTRATE.block("rubber_log", RubberLogBlock::new)
             .properties(p -> p.strength(2.0F).sound(SoundType.WOOD))
@@ -913,7 +915,7 @@ public class GTBlocks {
 
     public static final BlockEntry<PressurePlateBlock> RUBBER_PRESSURE_PLATE = REGISTRATE
             .block("rubber_pressure_plate",
-                    (p) -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, p, RUBBER_SET))
+                    (p) -> new PressurePlateBlock(RUBBER_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_PRESSURE_PLATE)
             .lang("Rubber Pressure Plate")
             .tag(BlockTags.WOODEN_PRESSURE_PLATES, BlockTags.MINEABLE_WITH_AXE)
@@ -924,7 +926,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<TrapDoorBlock> RUBBER_TRAPDOOR = REGISTRATE
-            .block("rubber_trapdoor", (p) -> new TrapDoorBlock(p, RUBBER_SET))
+            .block("rubber_trapdoor", (p) -> new TrapDoorBlock(RUBBER_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_TRAPDOOR)
             .lang("Rubber Trapdoor")
             .blockstate((ctx, prov) -> prov.trapdoorBlock(ctx.get(), prov.blockTexture(ctx.get()), true))
@@ -935,7 +937,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<StairBlock> RUBBER_STAIRS = REGISTRATE
-            .block("rubber_stairs", (p) -> new StairBlock(RUBBER_PLANK::getDefaultState, p))
+            .block("rubber_stairs", (p) -> new StairBlock(RUBBER_PLANK.getDefaultState(), p))
             .initialProperties(() -> Blocks.SPRUCE_STAIRS)
             .lang("Rubber Stairs")
             .tag(BlockTags.STAIRS, BlockTags.MINEABLE_WITH_AXE)
@@ -945,7 +947,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<ButtonBlock> RUBBER_BUTTON = REGISTRATE
-            .block("rubber_button", (p) -> new ButtonBlock(p, RUBBER_SET, 30, true))
+            .block("rubber_button", (p) -> new ButtonBlock(RUBBER_SET, 30, p))
             .initialProperties(() -> Blocks.SPRUCE_BUTTON)
             .lang("Rubber Button")
             .tag(BlockTags.WOODEN_BUTTONS, BlockTags.MINEABLE_WITH_AXE)
@@ -957,7 +959,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<FenceGateBlock> RUBBER_FENCE_GATE = REGISTRATE
-            .block("rubber_fence_gate", (p) -> new FenceGateBlock(p, RUBBER_TYPE))
+            .block("rubber_fence_gate", (p) -> new FenceGateBlock(RUBBER_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_FENCE_GATE)
             .lang("Rubber Fence Gate")
             .tag(BlockTags.FENCE_GATES, BlockTags.MINEABLE_WITH_AXE)
@@ -968,7 +970,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<DoorBlock> RUBBER_DOOR = REGISTRATE
-            .block("rubber_door", (p) -> new DoorBlock(p, RUBBER_SET))
+            .block("rubber_door", (p) -> new DoorBlock(RUBBER_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_DOOR)
             .lang("Rubber Door")
             .loot((table, block) -> table.add(block, table.createDoorTable(block)))
@@ -1077,7 +1079,7 @@ public class GTBlocks {
             .register();
     public static final BlockEntry<PressurePlateBlock> TREATED_WOOD_PRESSURE_PLATE = REGISTRATE
             .block("treated_wood_pressure_plate",
-                    (p) -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING, p, TREATED_WOOD_SET))
+                    (p) -> new PressurePlateBlock(TREATED_WOOD_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_PRESSURE_PLATE)
             .lang("Treated Wood Pressure Plate")
             .tag(BlockTags.WOODEN_PRESSURE_PLATES, BlockTags.MINEABLE_WITH_AXE)
@@ -1088,7 +1090,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<TrapDoorBlock> TREATED_WOOD_TRAPDOOR = REGISTRATE
-            .block("treated_wood_trapdoor", (p) -> new TrapDoorBlock(p, RUBBER_SET))
+            .block("treated_wood_trapdoor", (p) -> new TrapDoorBlock(TREATED_WOOD_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_TRAPDOOR)
             .lang("Treated Wood Trapdoor")
             .blockstate((ctx, prov) -> prov.trapdoorBlock(ctx.get(), prov.blockTexture(ctx.get()), true))
@@ -1099,7 +1101,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<StairBlock> TREATED_WOOD_STAIRS = REGISTRATE
-            .block("treated_wood_stairs", (p) -> new StairBlock(TREATED_WOOD_PLANK::getDefaultState, p))
+            .block("treated_wood_stairs", (p) -> new StairBlock(TREATED_WOOD_PLANK.getDefaultState(), p))
             .initialProperties(() -> Blocks.SPRUCE_STAIRS)
             .lang("Treated Wood Stairs")
             .tag(BlockTags.STAIRS, BlockTags.MINEABLE_WITH_AXE)
@@ -1110,7 +1112,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<ButtonBlock> TREATED_WOOD_BUTTON = REGISTRATE
-            .block("treated_wood_button", (p) -> new ButtonBlock(p, TREATED_WOOD_SET, 30, true))
+            .block("treated_wood_button", (p) -> new ButtonBlock(TREATED_WOOD_SET, 30, p))
             .initialProperties(() -> Blocks.SPRUCE_BUTTON)
             .lang("Treated Wood Button")
             .tag(BlockTags.WOODEN_BUTTONS)
@@ -1122,7 +1124,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<FenceGateBlock> TREATED_WOOD_FENCE_GATE = REGISTRATE
-            .block("treated_wood_fence_gate", (p) -> new FenceGateBlock(p, TREATED_WOOD_TYPE))
+            .block("treated_wood_fence_gate", (p) -> new FenceGateBlock(TREATED_WOOD_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_FENCE_GATE)
             .lang("Treated Wood Fence Gate")
             .tag(BlockTags.FENCE_GATES)
@@ -1133,7 +1135,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<DoorBlock> TREATED_WOOD_DOOR = REGISTRATE
-            .block("treated_wood_door", (p) -> new DoorBlock(p, TREATED_WOOD_SET))
+            .block("treated_wood_door", (p) -> new DoorBlock(TREATED_WOOD_SET, p))
             .initialProperties(() -> Blocks.SPRUCE_DOOR)
             .lang("Treated Wood Door")
             .loot((table, block) -> table.add(block, table.createDoorTable(block)))
@@ -1216,10 +1218,11 @@ public class GTBlocks {
             .blockstate(GTModels.cubeAllModel("brittle_charcoal", GTCEu.id("block/misc/brittle_charcoal")))
             .item((b, p) -> new BlockItem(b, p) {
 
+                @ParametersAreNonnullByDefault
                 @Override
-                public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+                public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                             TooltipFlag isAdvanced) {
-                    super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+                    super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
                     tooltipComponents.add(1, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.0"));
                     tooltipComponents.add(2, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.1"));
                 }
@@ -1234,7 +1237,7 @@ public class GTBlocks {
             if (!strata.generateBlocks) continue;
             for (StoneBlockType type : StoneBlockType.values()) {
                 String blockId = type.blockId.formatted(strata.getSerializedName());
-                if (BuiltInRegistries.BLOCK.containsKey(new ResourceLocation(blockId))) continue;
+                if (BuiltInRegistries.BLOCK.containsKey(ResourceLocation.parse(blockId))) continue;
                 var entry = REGISTRATE.block(blockId, Block::new)
                         .initialProperties(() -> Blocks.STONE)
                         .properties(p -> p.strength(type.hardness, type.resistance).mapColor(strata.mapColor))
@@ -1265,10 +1268,10 @@ public class GTBlocks {
                                             "/" + type.id))));
                 }
                 if (type == StoneBlockType.STONE) {
-                    entry.tag(Tags.Blocks.STONE);
+                    entry.tag(Tags.Blocks.STONES);
                 }
                 if (type == StoneBlockType.COBBLE) {
-                    entry.tag(Tags.Blocks.COBBLESTONE);
+                    entry.tag(Tags.Blocks.COBBLESTONES);
                 }
                 builder.put(type, strata, entry.register());
             }
@@ -1449,7 +1452,7 @@ public class GTBlocks {
      * kinda nasty block property copy function because one doesn't exist.
      * 
      * @param props the props to copy
-     * @return a shallow copy of the block properties like {@link BlockBehaviour.Properties#copy(BlockBehaviour)} does
+     * @return a shallow copy of the block properties like {@link BlockBehaviour.Properties#ofFullCopy(BlockBehaviour)} does
      */
     public static BlockBehaviour.Properties copy(BlockBehaviour.Properties props, BlockBehaviour.Properties newProps) {
         if (props == null) {
@@ -1474,7 +1477,7 @@ public class GTBlocks {
         newProps.pushReaction(((BlockPropertiesAccessor) props).getPushReaction());
         if (((BlockPropertiesAccessor) props).isRequiresCorrectToolForDrops()) newProps.requiresCorrectToolForDrops();
         ((BlockPropertiesAccessor) newProps).setOffsetFunction(((BlockPropertiesAccessor) props).getOffsetFunction());
-        if (!((BlockPropertiesAccessor) props).isSpawnParticlesOnBreak()) newProps.noParticlesOnBreak();
+        if (!((BlockPropertiesAccessor) props).isSpawnTerrainParticles()) newProps.noTerrainParticles();
         ((BlockPropertiesAccessor) newProps)
                 .setRequiredFeatures(((BlockPropertiesAccessor) props).getRequiredFeatures());
         newProps.emissiveRendering(((BlockPropertiesAccessor) props).getEmissiveRendering());

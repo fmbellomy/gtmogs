@@ -6,6 +6,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.context.UseOnContext;
@@ -29,15 +30,16 @@ public interface IInteractionItem extends IItemComponent {
 
     default InteractionResultHolder<ItemStack> use(ItemStack item, Level level,
                                                    Player player, InteractionHand usedHand) {
-        if (item.getFoodProperties(player) != null) {
-            if (player.canEat(item.getFoodProperties(player).canAlwaysEat())) {
+        FoodProperties food = item.getFoodProperties(player);
+        if (food != null) {
+            if (player.canEat(food.canAlwaysEat())) {
                 player.startUsingItem(usedHand);
                 return InteractionResultHolder.consume(item);
             } else {
                 return InteractionResultHolder.fail(item);
             }
         } else {
-            return InteractionResultHolder.pass(player.getItemInHand(usedHand));
+            return InteractionResultHolder.pass(item);
         }
     }
 
@@ -62,7 +64,7 @@ public interface IInteractionItem extends IItemComponent {
         return false;
     }
 
-    default boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+    default boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         return false;
     }
 }

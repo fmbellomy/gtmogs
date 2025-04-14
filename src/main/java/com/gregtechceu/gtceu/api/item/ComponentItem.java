@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.capability.ElectricItem;
 import com.gregtechceu.gtceu.api.item.component.*;
-import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
@@ -20,10 +19,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
@@ -31,18 +27,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.util.LazyOptional;
 
-import com.google.common.collect.Multimap;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -64,13 +57,9 @@ public class ComponentItem extends Item
     @Getter
     protected List<IItemComponent> components;
 
-    protected ComponentItem(Properties properties) {
+    public ComponentItem(Properties properties) {
         super(properties);
         components = new ArrayList<>();
-    }
-
-    public static ComponentItem create(Item.Properties properties) {
-        return new ComponentItem(properties);
     }
 
     public void attachComponents(IItemComponent component) {
@@ -98,11 +87,11 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         for (IItemComponent component : components) {
             if (component instanceof IAddInformation addInformation) {
-                addInformation.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+                addInformation.appendHoverText(stack, context, tooltipComponents, isAdvanced);
             }
         }
     }
@@ -151,16 +140,16 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
+    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
         for (IItemComponent component : components) {
             if (component instanceof IItemAttributes itemAttributes) {
-                var result = itemAttributes.getAttributeModifiers(slot, stack);
-                if (result != null && !result.isEmpty()) {
+                var result = itemAttributes.getDefaultAttributeModifiers(stack);
+                if (result != null && !result.modifiers().isEmpty()) {
                     return result;
                 }
             }
         }
-        return super.getAttributeModifiers(slot, stack);
+        return super.getDefaultAttributeModifiers(stack);
     }
 
     @Override
@@ -184,20 +173,10 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        for (IItemComponent component : components) {
-            if (component instanceof IEnchantableItem enchantableItem) {
-                return enchantableItem.canApplyAtEnchantingTable(stack, enchantment);
-            }
-        }
-        return super.canApplyAtEnchantingTable(stack, enchantment);
-    }
-
-    @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         for (IItemComponent component : components) {
             if (component instanceof IInteractionItem interactionItem) {
-                var result = interactionItem.use(this, level, player, usedHand);
+                var result = interactionItem.use(player.getItemInHand(usedHand), level, player, usedHand);
                 if (result.getResult() != InteractionResult.PASS) {
                     return result;
                 }
@@ -240,15 +219,15 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         for (IItemComponent component : components) {
             if (component instanceof IInteractionItem interactionItem) {
                 // this will cancel the left click animation
-                return interactionItem.onEntitySwing(stack, entity);
+                return interactionItem.onEntitySwing(stack, entity, hand);
             }
         }
         // normal behavior
-        return super.onEntitySwing(stack, entity);
+        return super.onEntitySwing(stack, entity, hand);
     }
 
     @Override
@@ -365,19 +344,6 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(@NotNull final ItemStack itemStack, @NotNull final Capability<T> cap) {
-        for (IItemComponent component : components) {
-            if (component instanceof IComponentCapability componentCapability) {
-                var value = componentCapability.getCapability(itemStack, cap);
-                if (value.isPresent()) {
-                    return value;
-                }
-            }
-        }
-        return LazyOptional.empty();
-    }
-
-    @Override
     public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
         return burnTime;
     }
@@ -390,28 +356,6 @@ public class ComponentItem extends Item
             }
         }
         return super.getFoodProperties(stack, entity);
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public @Nullable FoodProperties getFoodProperties() {
-        // If item has `foodProperties` from super, return it.
-        if (super.isEdible()) return super.getFoodProperties();
-        // If item has `IEdibleItem` components, return food stats from default stack
-        if (isEdible()) return getFoodProperties(this.getDefaultInstance(), null);
-        // Not edible, so null.
-        return null;
-    }
-
-    @Override
-    public boolean isEdible() {
-        for (IItemComponent component : components) {
-            if (component instanceof IEdibleItem foodBehavior) {
-                return foodBehavior.isEdible();
-            }
-        }
-        return super.isEdible();
     }
 
     @Override

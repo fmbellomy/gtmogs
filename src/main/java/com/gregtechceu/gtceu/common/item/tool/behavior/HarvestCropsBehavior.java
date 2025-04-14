@@ -1,10 +1,11 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -28,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 
-public class HarvestCropsBehavior implements IToolBehavior {
+public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior> {
 
     public static final HarvestCropsBehavior INSTANCE = new HarvestCropsBehavior();
 
@@ -78,6 +79,11 @@ public class HarvestCropsBehavior implements IToolBehavior {
         }
 
         return harvested ? InteractionResult.SUCCESS : InteractionResult.PASS;
+    }
+
+    @Override
+    public ToolBehaviorType getType() {
+        return null;
     }
 
     private static boolean isBlockCrops(ItemStack stack, Level world, Player player, BlockPos pos,

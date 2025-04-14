@@ -2,15 +2,17 @@ package com.gregtechceu.gtceu.common.recipe.condition;
 
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
-import com.gregtechceu.gtceu.common.data.GTMedicalConditions;
-import com.gregtechceu.gtceu.common.data.GTRecipeConditions;
+import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.GsonHelper;
@@ -27,8 +29,8 @@ import org.jetbrains.annotations.NotNull;
 @AllArgsConstructor
 public class EnvironmentalHazardCondition extends RecipeCondition {
 
-    public static final Codec<EnvironmentalHazardCondition> CODEC = RecordCodecBuilder
-            .create(instance -> RecipeCondition.isReverse(instance)
+    public static final MapCodec<EnvironmentalHazardCondition> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> RecipeCondition.isReverse(instance)
                     .and(
                             MedicalCondition.CODEC.fieldOf("condition").forGetter(val -> val.condition))
                     .apply(instance, EnvironmentalHazardCondition::new));
@@ -82,13 +84,13 @@ public class EnvironmentalHazardCondition extends RecipeCondition {
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf) {
+    public void toNetwork(RegistryFriendlyByteBuf buf) {
         super.toNetwork(buf);
         buf.writeUtf(this.condition.name);
     }
 
     @Override
-    public RecipeCondition fromNetwork(FriendlyByteBuf buf) {
+    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         this.condition = MedicalCondition.CONDITIONS.get(buf.readUtf());
         return this;

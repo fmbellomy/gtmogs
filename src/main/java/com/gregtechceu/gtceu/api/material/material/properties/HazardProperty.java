@@ -1,19 +1,19 @@
 package com.gregtechceu.gtceu.api.material.material.properties;
 
-import HazardTrigger;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.GTBucketItem;
 import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -124,9 +124,7 @@ public class HazardProperty implements IMaterialProperty {
                 return correctArmorItems.containsAll(equipmentTypes);
             }
             Set<String> correctCurios = new HashSet<>();
-            ICuriosItemHandler curiosInventory = CuriosApi.getCuriosInventory(livingEntity)
-                    .resolve()
-                    .orElse(null);
+            ICuriosItemHandler curiosInventory = CuriosApi.getCuriosInventory(livingEntity).orElse(null);
             if (curiosInventory == null) {
                 return correctArmorItems.containsAll(equipmentTypes);
             }
@@ -150,13 +148,11 @@ public class HazardProperty implements IMaterialProperty {
                     if (!armor.isEmpty() && ((armor.getItem() instanceof ArmorComponentItem armorItem &&
                             armorItem.getArmorLogic().isPPE()) ||
                             armor.getTags().anyMatch(tag -> tag.equals(CustomTags.PPE_ARMOR)))) {
-                        armor.hurtAndBreak(amount, player, p -> p.broadcastBreakEvent(type.getSlot()));
+                        armor.hurtAndBreak(amount, player, type.getSlot());
                     }
                 }
-                if (GTCEu.Mods.isCuriosLoaded()) {
-                    ICuriosItemHandler curiosInventory = CuriosApi.getCuriosInventory(player)
-                            .resolve()
-                            .orElse(null);
+                if (GTCEu.Mods.isCuriosLoaded() && player.level() instanceof ServerLevel serverLevel) {
+                    ICuriosItemHandler curiosInventory = CuriosApi.getCuriosInventory(player).orElse(null);
                     if (curiosInventory != null) {
                         for (String curioItem : this.getCurioSlots()) {
                             curiosInventory.getStacksHandler(curioItem).ifPresent(handler -> {
@@ -166,7 +162,7 @@ public class HazardProperty implements IMaterialProperty {
                                     if (!armor.isEmpty() && ((armor.getItem() instanceof ArmorComponentItem armorItem &&
                                             armorItem.getArmorLogic().isPPE()) ||
                                             armor.getTags().anyMatch(tag -> tag.equals(CustomTags.PPE_ARMOR)))) {
-                                        armor.hurtAndBreak(amount, player, p -> {});
+                                        armor.hurtAndBreak(amount, serverLevel, player, item -> {});
                                     }
                                 }
                             });
@@ -186,7 +182,7 @@ public class HazardProperty implements IMaterialProperty {
             prefix = prefixItem.tagPrefix;
         } else if (item.getItem() instanceof BucketItem bucket) {
             if (ConfigHolder.INSTANCE.gameplay.universalHazards || bucket instanceof GTBucketItem) {
-                material = ChemicalHelper.getMaterial(bucket.getFluid());
+                material = ChemicalHelper.getMaterial(bucket.content);
                 isFluid = true;
             }
         } else if (ConfigHolder.INSTANCE.gameplay.universalHazards) {

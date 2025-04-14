@@ -5,24 +5,25 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
+import com.gregtechceu.gtceu.api.item.datacomponents.GTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
@@ -31,7 +32,10 @@ import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -39,13 +43,16 @@ import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
@@ -136,9 +143,9 @@ public class ToolHelper {
 
     public static void damageItem(@NotNull ItemStack stack, @Nullable LivingEntity user, int damage) {
         if (!(stack.getItem() instanceof IGTTool tool)) {
-            if (user != null) stack.hurtAndBreak(damage, user, p -> {});
+            if (user != null) stack.hurtAndBreak(damage, user, EquipmentSlot.MAINHAND);
         } else {
-            if (stack.getTag() != null && stack.getTag().getBoolean(UNBREAKABLE_KEY)) {
+            if (stack.has(DataComponents.UNBREAKABLE)) {
                 return;
             }
             if (!(user instanceof Player player) || !player.isCreative()) {
@@ -157,14 +164,10 @@ public class ToolHelper {
                                 "Electric tool does not have an attached electric item capability.");
                     }
                 }
-                int unbreakingLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.UNBREAKING, stack);
-                int negated = 0;
-                for (int k = 0; unbreakingLevel > 0 && k < damage; k++) {
-                    if (DigDurabilityEnchantment.shouldIgnoreDurabilityDrop(stack, unbreakingLevel, random)) {
-                        negated++;
-                    }
+                // don't process unbreaking if the entity is null as we get the level from there
+                if (user != null && user.level() instanceof ServerLevel serverLevel) {
+                    damage = EnchantmentHelper.processDurabilityChange(serverLevel, stack, damage);
                 }
-                damage -= negated;
                 if (damage <= 0) {
                     return;
                 }
@@ -199,17 +202,20 @@ public class ToolHelper {
         var entry = GTMaterialItems.TOOL_ITEMS.get(material, toolType);
         if (entry == null) return ItemStack.EMPTY;
         ItemStack stack = entry.get().getRaw();
-        stack.getOrCreateTag().putInt(HIDE_FLAGS, 2);
-        CompoundTag toolTag = getToolTag(stack);
-        toolTag.putInt(MAX_DURABILITY_KEY, maxDurability);
-        toolTag.putInt(HARVEST_LEVEL_KEY, harvestLevel);
-        toolTag.putFloat(TOOL_SPEED_KEY, toolSpeed);
-        toolTag.putFloat(ATTACK_DAMAGE_KEY, attackDamage);
+        stack.update(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(Collections.emptyList(), true),
+                val -> val.withTooltip(false));
+        stack.set(DataComponents.MAX_DAMAGE, maxDurability);
+        GTTool toolComponent = new GTTool(Optional.of(toolSpeed), Optional.of(attackDamage), Optional.empty(),
+                Optional.of(harvestLevel), Optional.empty());
+        stack.set(GTDataComponents.GT_TOOL, toolComponent);
         ToolProperty toolProperty = material.getProperty(PropertyKey.TOOL);
         if (toolProperty != null) {
             toolProperty.getEnchantments().forEach((enchantment, level) -> {
-                if (entry.get().definition$canApplyAtEnchantingTable(stack, enchantment)) {
-                    stack.enchant(enchantment, level);
+                Registry<Enchantment> registry = GTRegistries.builtinRegistry()
+                        .registryOrThrow(Registries.ENCHANTMENT);
+                Holder<Enchantment> enchant = registry.getHolderOrThrow(enchantment);
+                if (enchant.value().canEnchant(stack)) {
+                    stack.enchant(enchant, level);
                 }
             });
         }
@@ -447,7 +453,7 @@ public class ToolHelper {
     }
 
     public static boolean onBlockBreakEvent(Level level, GameType gameType, ServerPlayer player, BlockPos pos) {
-        return CommonHooks.onBlockBreakEvent(level, gameType, player, pos) != -1;
+        return !CommonHooks.fireBlockBreak(level, gameType, player, pos, level.getBlockState(pos)).isCanceled();
     }
 
     public static void onPlayerDestroyItem(Player player, ItemStack stack, InteractionHand hand) {

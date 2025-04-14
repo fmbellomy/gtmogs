@@ -3,16 +3,16 @@ package com.gregtechceu.gtceu.api.material.material;
 import com.gregtechceu.gtceu.api.material.material.stack.ItemMaterialInfo;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.recipe.misc.RecyclingRecipes;
 import com.gregtechceu.gtceu.data.recipe.misc.WoodMachineRecipes;
-import com.gregtechceu.gtceu.data.tags.TagsHandler;
+import com.gregtechceu.gtceu.data.datagen.tag.TagsHandler;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 import com.gregtechceu.gtceu.utils.memoization.MemoizedBlockSupplier;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -21,7 +21,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 import com.mojang.datafixers.util.Pair;
 import com.tterrag.registrate.util.entry.BlockEntry;
@@ -30,6 +29,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.ApiStatus;
 import java.util.*;
 import java.util.function.Consumer;
@@ -110,10 +110,11 @@ public class ItemMaterialData {
             } else if (item instanceof BlockEntry<?> blockEntry) {
                 MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
                         .add(blockEntry);
-            } else if (item instanceof RegistryObject<?> registryObject) {
+            } else if (item instanceof DeferredHolder<?, ?> registryObject) {
                 if (registryObject.getKey().isFor(Registries.BLOCK)) {
+                    //noinspection unchecked
                     MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
-                            .add((RegistryObject<Block>) registryObject);
+                            .add((DeferredHolder<Block, Block>) registryObject);
                 }
             } else if (item instanceof MemoizedBlockSupplier<? extends Block> supplier) {
                 MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
@@ -166,7 +167,7 @@ public class ItemMaterialData {
     }
 
     @ApiStatus.Internal
-    public static void resolveItemMaterialInfos(Consumer<FinishedRecipe> provider) {
+    public static void resolveItemMaterialInfos(RecipeOutput provider) {
         for (var entry : UNRESOLVED_ITEM_MATERIAL_INFO.entrySet()) {
             List<MaterialStack> stacks = new ArrayList<>();
             var stack = entry.getKey();

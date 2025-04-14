@@ -3,23 +3,23 @@ package com.gregtechceu.gtceu.data.machine;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.data.RotationState;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.CoilWorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
-import com.gregtechceu.gtceu.api.pattern.MultiblockShapeInfo;
-import com.gregtechceu.gtceu.api.pattern.Predicates;
-import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
+import com.gregtechceu.gtceu.api.multiblock.FactoryBlockPattern;
+import com.gregtechceu.gtceu.api.multiblock.MultiblockShapeInfo;
+import com.gregtechceu.gtceu.api.multiblock.Predicates;
+import com.gregtechceu.gtceu.api.multiblock.TraceabilityPredicate;
 import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeChemicalBathRenderer;
 import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeMixerRenderer;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.data.GTRecipeModifiers;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.DistillationTowerMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeChemicalBathMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeMixerMachine;
@@ -39,14 +39,14 @@ import java.util.List;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
-import static com.gregtechceu.gtceu.api.pattern.Predicates.*;
-import static com.gregtechceu.gtceu.api.pattern.util.RelativeDirection.*;
+import static com.gregtechceu.gtceu.api.multiblock.Predicates.*;
+import static com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection.*;
 import static com.gregtechceu.gtceu.data.block.GCYMBlocks.*;
-import static com.gregtechceu.gtceu.common.data.GCYMRecipeTypes.ALLOY_BLAST_RECIPES;
+import static com.gregtechceu.gtceu.data.recipe.GCYMRecipeTypes.ALLOY_BLAST_RECIPES;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
 import static com.gregtechceu.gtceu.data.machine.GTMachines.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.NaquadahAlloy;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.*;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 import static com.gregtechceu.gtceu.data.machine.GTMachineUtils.registerTieredMachines;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
@@ -80,7 +80,7 @@ public class GCYMMachines {
             .langValue("Large Maceration Tower")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.macerator")))
+                    MACERATOR_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(MACERATOR_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -108,7 +108,7 @@ public class GCYMMachines {
             .langValue("Large Chemical Bath")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.ore_washer"), Component.translatable("gtceu.chemical_bath")))
+                    ORE_WASHER_RECIPES.getName(), CHEMICAL_BATH_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(CHEMICAL_BATH_RECIPES, ORE_WASHER_RECIPES)
             .renderer(() -> new LargeChemicalBathRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
@@ -139,7 +139,7 @@ public class GCYMMachines {
             .langValue("Large Centrifugal Unit")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.centrifuge"), Component.translatable("gtceu.thermal_centrifuge")))
+                    CENTRIFUGE_RECIPES.getName(), THERMAL_CENTRIFUGE_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(CENTRIFUGE_RECIPES, THERMAL_CENTRIFUGE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -168,7 +168,7 @@ public class GCYMMachines {
             .langValue("Large Mixing Vessel")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.mixer")))
+                    MIXER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(MIXER_RECIPES)
             .renderer(() -> new LargeMixerRenderer(GTCEu.id("block/casings/gcym/reaction_safe_mixing_casing"),
@@ -200,7 +200,7 @@ public class GCYMMachines {
             .langValue("Large Electrolysis Chamber")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.electrolyzer")))
+                    ELECTROLYZER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(ELECTROLYZER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -226,8 +226,8 @@ public class GCYMMachines {
             .langValue("Large Electromagnet")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.electromagnetic_separator"),
-                    Component.translatable("gtceu.polarizer")))
+                    ELECTROMAGNETIC_SEPARATOR_RECIPES.getName(),
+                    POLARIZER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(ELECTROMAGNETIC_SEPARATOR_RECIPES, POLARIZER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -313,7 +313,7 @@ public class GCYMMachines {
             .langValue("Large Circuit Assembling Facility")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.circuit_assembler")))
+                    CIRCUIT_ASSEMBLER_RECIPES.getName()))
             .tooltips(Component.translatable("gtceu.multiblock.exact_hatch_1.tooltip"))
             .conditionalTooltip(GTMachineUtils.defaultEnvironmentRequirement(),
                     ConfigHolder.INSTANCE.gameplay.environmentalHazards)
@@ -349,7 +349,7 @@ public class GCYMMachines {
             .langValue("Large Arc Smelter")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.arc_furnace")))
+                    ARC_FURNACE_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(ARC_FURNACE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -379,7 +379,7 @@ public class GCYMMachines {
             .langValue("Large Engraving Laser")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.laser_engraver")))
+                    LASER_ENGRAVER_RECIPES.getName()))
             .conditionalTooltip(GTMachineUtils.defaultEnvironmentRequirement(),
                     ConfigHolder.INSTANCE.gameplay.environmentalHazards)
             .rotationState(RotationState.ALL)
@@ -411,7 +411,7 @@ public class GCYMMachines {
             .langValue("Large Sifting Funnel")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.sifter")))
+                    SIFTER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(SIFTER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -439,7 +439,7 @@ public class GCYMMachines {
             .multiblock("alloy_blast_smelter", CoilWorkableElectricMultiblockMachine::new)
             .langValue("Alloy Blast Smelter")
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.alloy_blast_smelter")))
+                    ALLOY_BLAST_RECIPES.getName()))
             .tooltips(Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.0"),
                     Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.1"),
                     Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.2"))
@@ -508,7 +508,7 @@ public class GCYMMachines {
             .langValue("Large Crystallization Chamber")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.autoclave")))
+                    AUTOCLAVE_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(AUTOCLAVE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -536,8 +536,8 @@ public class GCYMMachines {
             .langValue("Large Material Press")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_4.tooltip",
-                    Component.translatable("gtceu.bender"), Component.translatable("gtceu.compressor"),
-                    Component.translatable("gtceu.forge_hammer"), Component.translatable("gtceu.forming_press")))
+                    BENDER_RECIPES.getName(), COMPRESSOR_RECIPES.getName(),
+                    FORGE_HAMMER_RECIPES.getName(), FORMING_PRESS_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(BENDER_RECIPES, COMPRESSOR_RECIPES, FORGE_HAMMER_RECIPES, FORMING_PRESS_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -564,8 +564,8 @@ public class GCYMMachines {
             .langValue("Large Brewing Vat")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_3.tooltip",
-                    Component.translatable("gtceu.brewery"), Component.translatable("gtceu.fermenter"),
-                    Component.translatable("gtceu.fluid_heater")))
+                    BREWING_RECIPES.getName(), FERMENTING_RECIPES.getName(),
+                    FLUID_HEATER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(BREWING_RECIPES, FERMENTING_RECIPES, FLUID_HEATER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -596,7 +596,7 @@ public class GCYMMachines {
             .langValue("Large Cutting Saw")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.cutter"), Component.translatable("gtceu.lathe")))
+                    CUTTER_RECIPES.getName(), LATHE_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(CUTTER_RECIPES, LATHE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -625,7 +625,7 @@ public class GCYMMachines {
             .langValue("Large Fractionating Distillery")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.distillation_tower"), Component.translatable("gtceu.distillery")))
+                    DISTILLATION_RECIPES.getName(), DISTILLERY_RECIPES.getName()))
             .rotationState(RotationState.NON_Y_AXIS)
             .recipeTypes(DISTILLATION_RECIPES, DISTILLERY_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -716,7 +716,7 @@ public class GCYMMachines {
             .langValue("Large Extraction Machine")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_2.tooltip",
-                    Component.translatable("gtceu.extractor"), Component.translatable("gtceu.canner")))
+                    EXTRACTOR_RECIPES.getName(), CANNER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeTypes(EXTRACTOR_RECIPES, CANNER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -742,7 +742,7 @@ public class GCYMMachines {
             .langValue("Large Extrusion Machine")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.extruder")))
+                    EXTRUDER_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(EXTRUDER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -772,7 +772,7 @@ public class GCYMMachines {
             .langValue("Large Solidification Array")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.fluid_solidifier")))
+                    FLUID_SOLIDFICATION_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(FLUID_SOLIDFICATION_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -801,7 +801,7 @@ public class GCYMMachines {
             .langValue("Large Wire Factory")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.wiremill")))
+                    WIREMILL_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(WIREMILL_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
@@ -822,12 +822,12 @@ public class GCYMMachines {
                     GTCEu.id("block/multiblock/gcym/large_wiremill"))
             .register();
 
-    public final static MultiblockMachineDefinition MEGA_BLAST_FURNACE = REGISTRATE
-            .multiblock("mega_blast_furnace", CoilWorkableElectricMultiblockMachine::new)
+    public final static MultiblockMachineDefinition ROTARY_HEARTH_FURNACE = REGISTRATE
+            .multiblock("rotary_hearth_furnace", CoilWorkableElectricMultiblockMachine::new)
             .langValue("Rotary Hearth Furnace")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.electric_blast_furnace")))
+                    BLAST_RECIPES.getName()))
             .tooltips(Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.0"),
                     Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.1"),
                     Component.translatable("gtceu.machine.electric_blast_furnace.tooltip.2"))
@@ -1005,7 +1005,7 @@ public class GCYMMachines {
             .langValue("Bulk Blast Chiller")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    Component.translatable("gtceu.vacuum_freezer")))
+                    VACUUM_RECIPES.getName()))
             .rotationState(RotationState.ALL)
             .recipeType(VACUUM_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,

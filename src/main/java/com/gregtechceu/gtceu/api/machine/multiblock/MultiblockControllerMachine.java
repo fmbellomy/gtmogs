@@ -9,8 +9,8 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
-import com.gregtechceu.gtceu.api.pattern.MultiblockState;
-import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
+import com.gregtechceu.gtceu.api.multiblock.MultiblockState;
+import com.gregtechceu.gtceu.api.multiblock.MultiblockWorldSavedData;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -23,7 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -258,23 +258,23 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
     }
 
     @Override
-    protected InteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                              BlockHitResult hitResult) {
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                  BlockHitResult hitResult) {
         if (gridSide == getFrontFacing() && allowExtendedFacing()) {
             setUpwardsFacing(playerIn.isShiftKeyDown() ? getUpwardsFacing().getCounterClockWise() :
                     getUpwardsFacing().getClockWise());
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         if (playerIn.isShiftKeyDown()) {
             if (gridSide == getFrontFacing() || !isFacingValid(gridSide)) {
-                return InteractionResult.FAIL;
+                return ItemInteractionResult.FAIL;
             }
             if (!isRemote()) {
                 setFrontFacing(gridSide);
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
     }

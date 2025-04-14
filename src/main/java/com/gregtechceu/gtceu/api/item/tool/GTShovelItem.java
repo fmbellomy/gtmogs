@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -33,6 +34,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public class GTShovelItem extends ShovelItem implements IGTTool {
 
     @Getter
@@ -74,43 +79,7 @@ public class GTShovelItem extends ShovelItem implements IGTTool {
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        Level level = context.getLevel();
-        BlockPos blockpos = context.getClickedPos();
-        BlockState blockstate = level.getBlockState(blockpos);
-        if (context.getClickedFace() == Direction.DOWN) {
-            return InteractionResult.PASS;
-        } else {
-            Player player = context.getPlayer();
-            BlockState modifiedState = blockstate.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
-            BlockState resultState = null;
-            if (modifiedState != null && level.isEmptyBlock(blockpos.above())) {
-                level.playSound(player, blockpos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
-                resultState = modifiedState;
-            } else if (blockstate.getBlock() instanceof CampfireBlock &&
-                    blockstate.getValue(CampfireBlock.LIT)) {
-                        if (!level.isClientSide()) {
-                            level.levelEvent(null, 1009, blockpos, 0);
-                        }
-
-                        CampfireBlock.dowse(context.getPlayer(), level, blockpos, blockstate);
-                        resultState = blockstate.setValue(CampfireBlock.LIT, false);
-                    }
-
-            if (resultState != null) {
-                if (!level.isClientSide) {
-                    level.setBlock(blockpos, resultState, Block.UPDATE_ALL_IMMEDIATE);
-                    level.gameEvent(GameEvent.BLOCK_CHANGE, blockpos, GameEvent.Context.of(player, resultState));
-                    if (player != null) {
-                        context.getItemInHand().hurtAndBreak(1, player,
-                                context.getHand() == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
-                    }
-                }
-
-                return InteractionResult.sidedSuccess(level.isClientSide);
-            } else {
-                return InteractionResult.PASS;
-            }
-        }
+        return definition$onItemUse(context);
     }
 
     @Override

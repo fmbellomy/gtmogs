@@ -16,7 +16,9 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,18 +52,18 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
     }
 
     @Override
-    public void writeInitialData(FriendlyByteBuf buffer) {
+    public void writeInitialData(RegistryFriendlyByteBuf buffer) {
         this.currentTier = overclockMachine.getOverclockTier();
         buffer.writeVarInt(currentTier);
     }
 
     @Override
-    public void readInitialData(FriendlyByteBuf buffer) {
+    public void readInitialData(RegistryFriendlyByteBuf buffer) {
         this.currentTier = buffer.readVarInt();
     }
 
     @Override
-    public void detectAndSendChange(BiConsumer<Integer, Consumer<FriendlyByteBuf>> sender) {
+    public void detectAndSendChange(BiConsumer<Integer, Consumer<RegistryFriendlyByteBuf>> sender) {
         var newTier = overclockMachine.getOverclockTier();
         if (newTier != currentTier) {
             this.currentTier = newTier;
@@ -70,7 +72,7 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
     }
 
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buf) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buf) {
         if (id == 0) {
             this.currentTier = buf.readVarInt();
         }
@@ -104,7 +106,7 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
             }
 
             @Override
-            public void writeInitialData(FriendlyByteBuf buffer) {
+            public void writeInitialData(RegistryFriendlyByteBuf buffer) {
                 int min = overclockMachine.getMinOverclockTier();
                 int max = overclockMachine.getMaxOverclockTier();
                 buffer.writeVarInt(min);
@@ -115,7 +117,7 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
             }
 
             @Override
-            public void readInitialData(FriendlyByteBuf buffer) {
+            public void readInitialData(RegistryFriendlyByteBuf buffer) {
                 int min = buffer.readVarInt();
                 int max = buffer.readVarInt();
                 currentTier = buffer.readVarInt();
@@ -171,7 +173,7 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
             }
 
             @Override
-            public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+            public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
                 if (id == 0) {
                     int min = buffer.readVarInt();
                     int max = buffer.readVarInt();

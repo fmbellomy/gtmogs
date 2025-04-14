@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.*;
 import com.gregtechceu.gtceu.api.capability.compat.EnergyStorageList;
 import com.gregtechceu.gtceu.api.capability.GTCapability;
-import com.gregtechceu.gtceu.api.data.RotationState;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
@@ -227,7 +227,7 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
                         new LDItemEndpointMachine.ItemHandlerWrapper(transfer);
                     }
                 }
-                return machine.getItemTransferCap(side, true);
+                return machine.getItemHandlerCap(side, true);
             }
             return null;
         }, this.self());
@@ -247,7 +247,7 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
                         return new LDFluidEndpointMachine.FluidHandlerWrapper(transfer);
                     }
                 }
-                return machine.getFluidTransferCap(side, true);
+                return machine.getFluidHandlerCap(side, true);
             }
             return null;
         }, this.self());
@@ -307,11 +307,11 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
                     if (machine.getMetaMachine() instanceof IInWorldGridNodeHost nodeHost) {
                         return nodeHost;
                     }
-                    var list = getCapabilitiesFromTraits(machine.getMetaMachine().getTraits(), side,
+                    var list = getCapabilitiesFromTraits(machine.getMetaMachine().getTraits(), null,
                             IInWorldGridNodeHost.class);
                     if (!list.isEmpty()) {
                         // TODO wrap list in the future (or not.)
-                        return list.get(0);
+                        return list.getFirst();
                     }
                 }
                 return null;

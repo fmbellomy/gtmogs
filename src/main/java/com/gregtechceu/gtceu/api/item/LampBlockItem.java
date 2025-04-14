@@ -5,6 +5,8 @@ import com.gregtechceu.gtceu.common.block.LampBlock;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -15,10 +17,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-
-import static com.gregtechceu.gtceu.common.block.LampBlock.isBloomEnabled;
-import static com.gregtechceu.gtceu.common.block.LampBlock.isInverted;
-import static com.gregtechceu.gtceu.common.block.LampBlock.isLightEnabled;
 
 @ParametersAreNonnullByDefault
 public class LampBlockItem extends BlockItem implements IItemRendererProvider {
@@ -38,12 +36,12 @@ public class LampBlockItem extends BlockItem implements IItemRendererProvider {
     protected BlockState getPlacementState(BlockPlaceContext context) {
         BlockState returnValue = super.getPlacementState(context);
         ItemStack handItem = context.getItemInHand();
-        if (returnValue != null && handItem.hasTag()) {
-            var tag = handItem.getTag();
+        if (returnValue != null) {
+            LampData data = handItem.getOrDefault(GTDataComponents.LAMP_DATA, LampData.EMPTY);
             returnValue = returnValue
-                    .setValue(LampBlock.INVERTED, isInverted(tag))
-                    .setValue(LampBlock.BLOOM, isBloomEnabled(tag))
-                    .setValue(LampBlock.LIGHT, isLightEnabled(tag));
+                    .setValue(LampBlock.INVERTED, data.inverted())
+                    .setValue(LampBlock.BLOOM, data.bloom())
+                    .setValue(LampBlock.LIGHT, data.lit());
         }
         return returnValue;
     }
@@ -58,13 +56,19 @@ public class LampBlockItem extends BlockItem implements IItemRendererProvider {
     @Override
     public IRenderer getRenderer(ItemStack stack) {
         BlockState state = getBlock().defaultBlockState();
-        if (stack.hasTag()) {
-            var tag = stack.getTag();
-            state = state
-                    .setValue(LampBlock.INVERTED, isInverted(tag))
-                    .setValue(LampBlock.BLOOM, isBloomEnabled(tag))
-                    .setValue(LampBlock.LIGHT, isLightEnabled(tag));
-        }
+        LampData data = stack.getOrDefault(GTDataComponents.LAMP_DATA, LampData.EMPTY);
+        state = state.setValue(LampBlock.INVERTED, data.inverted())
+                .setValue(LampBlock.BLOOM, data.bloom())
+                .setValue(LampBlock.LIGHT, data.lit());
         return getBlock().getRenderer(state);
+    }
+
+    public record LampData(boolean inverted, boolean bloom, boolean lit) {
+
+        public static final LampData EMPTY = new LampData(false, false, false);
+        public static final Codec<LampData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.BOOL.fieldOf("inverted").forGetter(LampData::inverted),
+                Codec.BOOL.fieldOf("bloom").forGetter(LampData::bloom),
+                Codec.BOOL.fieldOf("lit").forGetter(LampData::lit)).apply(instance, LampData::new));
     }
 }

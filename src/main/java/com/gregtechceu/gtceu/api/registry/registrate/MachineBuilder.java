@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
-import com.gregtechceu.gtceu.api.data.RotationState;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
@@ -13,14 +13,14 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifierList;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.renderer.GTRendererProvider;
 import com.gregtechceu.gtceu.client.renderer.machine.*;
-import com.gregtechceu.gtceu.common.data.GTRecipeModifiers;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
@@ -171,7 +171,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
                              BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
                              BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
                              TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        super(new ResourceLocation(registrate.getModid(), name));
+        super(ResourceLocation.fromNamespaceAndPath(registrate.getModid(), name));
         this.registrate = registrate;
         this.name = name;
         this.machine = machine;
@@ -211,7 +211,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     }
 
     public MachineBuilder<DEFINITION> defaultModelRenderer() {
-        return modelRenderer(() -> new ResourceLocation(registrate.getModid(), "block/" + name));
+        return modelRenderer(() -> ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/" + name));
     }
 
     public MachineBuilder<DEFINITION> tieredHullRenderer(ResourceLocation model) {
@@ -220,12 +220,12 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
 
     public MachineBuilder<DEFINITION> overlayTieredHullRenderer(String name) {
         return renderer(() -> new OverlayTieredMachineRenderer(tier,
-                new ResourceLocation(registrate.getModid(), "block/machine/part/" + name)));
+                ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/machine/part/" + name)));
     }
 
     public MachineBuilder<DEFINITION> overlaySteamHullRenderer(String name) {
         return renderer(() -> new OverlaySteamMachineRenderer(
-                new ResourceLocation(registrate.getModid(), "block/machine/part/" + name)));
+                ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/machine/part/" + name)));
     }
 
     public MachineBuilder<DEFINITION> workableTieredHullRenderer(ResourceLocation workableModel) {
@@ -325,7 +325,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     }
 
     protected DEFINITION createDefinition() {
-        return definition.apply(new ResourceLocation(registrate.getModid(), name));
+        return definition.apply(ResourceLocation.fromNamespaceAndPath(registrate.getModid(), name));
     }
 
     @HideFromJS
@@ -376,7 +376,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
         definition.setRegressWhenWaiting(this.regressWhenWaiting);
 
         if (renderer == null) {
-            renderer = () -> new MachineRenderer(new ResourceLocation(registrate.getModid(), "block/machine/" + name));
+            renderer = () -> new MachineRenderer(ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/machine/" + name));
         }
         if (recipeTypes != null) {
             for (GTRecipeType type : recipeTypes) {

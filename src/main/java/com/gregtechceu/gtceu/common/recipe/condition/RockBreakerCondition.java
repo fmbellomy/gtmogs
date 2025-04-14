@@ -1,12 +1,13 @@
 package com.gregtechceu.gtceu.common.recipe.condition;
 
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
-import com.gregtechceu.gtceu.common.data.GTRecipeConditions;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -25,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 public class RockBreakerCondition extends RecipeCondition {
 
-    public static final Codec<RockBreakerCondition> CODEC = RecordCodecBuilder
-            .create(instance -> RecipeCondition.isReverse(instance)
+    public static final MapCodec<RockBreakerCondition> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> RecipeCondition.isReverse(instance)
                     .apply(instance, RockBreakerCondition::new));
 
     public final static RockBreakerCondition INSTANCE = new RockBreakerCondition();
@@ -47,8 +48,8 @@ public class RockBreakerCondition extends RecipeCondition {
 
     @Override
     public boolean testCondition(@NotNull GTRecipe recipe, @NotNull RecipeLogic recipeLogic) {
-        var fluidA = BuiltInRegistries.FLUID.get(new ResourceLocation(recipe.data.getString("fluidA")));
-        var fluidB = BuiltInRegistries.FLUID.get(new ResourceLocation(recipe.data.getString("fluidB")));
+        var fluidA = BuiltInRegistries.FLUID.get(ResourceLocation.parse(recipe.data.getString("fluidA")));
+        var fluidB = BuiltInRegistries.FLUID.get(ResourceLocation.parse(recipe.data.getString("fluidB")));
         boolean hasFluidA = false, hasFluidB = false;
         var level = recipeLogic.machine.self().getLevel();
         var pos = recipeLogic.machine.self().getPos();

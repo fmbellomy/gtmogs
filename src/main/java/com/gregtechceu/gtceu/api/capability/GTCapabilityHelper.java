@@ -9,7 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -35,37 +34,37 @@ public class GTCapabilityHelper {
 
     @Nullable
     public static IEnergyContainer getEnergyContainer(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, pos, side);
     }
 
     @Nullable
     public static IEnergyInfoProvider getEnergyInfoProvider(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_ENERGY_INFO_PROVIDER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_ENERGY_INFO_PROVIDER, pos, side);
     }
 
     @Nullable
     public static ICoverable getCoverable(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_COVERABLE, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_COVERABLE, pos, side);
     }
 
     @Nullable
     public static IToolable getToolable(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_TOOLABLE, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_TOOLABLE, pos, side);
     }
 
     @Nullable
     public static IWorkable getWorkable(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_WORKABLE, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_WORKABLE, pos, side);
     }
 
     @Nullable
     public static IControllable getControllable(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_CONTROLLABLE, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_CONTROLLABLE, pos, side);
     }
 
     @Nullable
     public static RecipeLogic getRecipeLogic(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_RECIPE_LOGIC, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_RECIPE_LOGIC, pos, side);
     }
 
     @Nullable
@@ -82,41 +81,37 @@ public class GTCapabilityHelper {
 
     @Nullable
     public static ICleanroomReceiver getCleanroomReceiver(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_CLEANROOM_RECEIVER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_CLEANROOM_RECEIVER, pos, side);
     }
 
     @Nullable
     public static IMaintenanceMachine getMaintenanceMachine(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_MAINTENANCE_MACHINE, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_MAINTENANCE_MACHINE, pos, side);
     }
 
     @Nullable
     public static ILaserContainer getLaser(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_LASER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_LASER, pos, side);
     }
 
     @Nullable
     public static IOpticalComputationProvider getOpticalComputationProvider(Level level, BlockPos pos,
                                                                             @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER, pos, side);
     }
 
     @Nullable
     public static IDataAccessHatch getDataAccess(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_DATA_ACCESS, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_DATA_ACCESS, pos, side);
     }
 
     @Nullable
     public static IHazardParticleContainer getHazardContainer(Level level, BlockPos pos, @Nullable Direction side) {
-        return getBlockEntityCapability(GTCapability.CAPABILITY_HAZARD_CONTAINER, level, pos, side);
+        return level.getCapability(GTCapability.CAPABILITY_HAZARD_CONTAINER, pos, side);
     }
 
+    @SuppressWarnings("DataFlowIssue") // it's nullable.
     @Nullable
-    private static <T> T getBlockEntityCapability(BlockCapability<T, Direction> capability, Level level, BlockPos pos,
-                                                  @Nullable Direction side) {
-        return level.getCapability(capability, pos, side);
-    }
-
     public static IMedicalConditionTracker getMedicalConditionTracker(@NotNull Player entity) {
         return entity.getData(GTAttachmentTypes.MEDICAL_CONDITION_TRACKER);
     }

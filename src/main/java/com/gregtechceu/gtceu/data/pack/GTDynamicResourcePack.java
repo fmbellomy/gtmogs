@@ -9,6 +9,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
@@ -20,6 +21,7 @@ import com.google.gson.JsonElement;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -49,18 +51,18 @@ public class GTDynamicResourcePack implements PackResources {
     @ApiStatus.Internal
     public static final ConcurrentMap<ResourceLocation, byte[]> DATA = new ConcurrentHashMap<>();
 
-    private final String name;
+    private final PackLocationInfo info;
 
     static {
-        CLIENT_DOMAINS.addAll(Sets.newHashSet(GTCEu.MOD_ID, "minecraft", "forge", "c"));
+        CLIENT_DOMAINS.addAll(Sets.newHashSet(GTCEu.MOD_ID, "minecraft", "neoforge", "c"));
     }
 
-    public GTDynamicResourcePack(String name) {
-        this(name, AddonFinder.getAddons().stream().map(IGTAddon::addonModId).collect(Collectors.toSet()));
+    public GTDynamicResourcePack(PackLocationInfo info) {
+        this(info, AddonFinder.getAddons().stream().map(IGTAddon::addonModId).collect(Collectors.toSet()));
     }
 
-    public GTDynamicResourcePack(String name, Collection<String> domains) {
-        this.name = name;
+    public GTDynamicResourcePack(PackLocationInfo info, Collection<String> domains) {
+        this.info = info;
         CLIENT_DOMAINS.addAll(domains);
     }
 
@@ -69,12 +71,13 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     public static void addBlockModel(ResourceLocation loc, JsonElement obj) {
+        byte[] modelBytes = obj.toString().getBytes(StandardCharsets.UTF_8);
         ResourceLocation l = getModelLocation(loc);
         if (ConfigHolder.INSTANCE.dev.dumpAssets) {
             Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/assets");
-            writeJson(l, null, parent, obj);
+            writeJson(l, null, parent, modelBytes);
         }
-        DATA.put(l, obj.toString().getBytes(StandardCharsets.UTF_8));
+        DATA.put(l, modelBytes);
     }
 
     public static void addBlockModel(ResourceLocation loc, Supplier<JsonElement> obj) {
@@ -82,12 +85,13 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     public static void addItemModel(ResourceLocation loc, JsonElement obj) {
+        byte[] modelBytes = obj.toString().getBytes(StandardCharsets.UTF_8);
         ResourceLocation l = getItemModelLocation(loc);
         if (ConfigHolder.INSTANCE.dev.dumpAssets) {
             Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/assets");
-            writeJson(l, null, parent, obj);
+            writeJson(l, null, parent, modelBytes);
         }
-        DATA.put(l, obj.toString().getBytes(StandardCharsets.UTF_8));
+        DATA.put(l, modelBytes);
     }
 
     public static void addItemModel(ResourceLocation loc, Supplier<JsonElement> obj) {
@@ -95,12 +99,13 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     public static void addBlockState(ResourceLocation loc, JsonElement stateJson) {
+        byte[] stateBytes = stateJson.toString().getBytes(StandardCharsets.UTF_8);
         ResourceLocation l = getBlockStateLocation(loc);
         if (ConfigHolder.INSTANCE.dev.dumpAssets) {
             Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/assets");
-            writeJson(l, null, parent, stateJson);
+            writeJson(l, null, parent, stateBytes);
         }
-        DATA.put(l, stateJson.toString().getBytes(StandardCharsets.UTF_8));
+        DATA.put(l, stateBytes);
     }
 
     public static void addBlockState(ResourceLocation loc, Supplier<JsonElement> generator) {
@@ -190,8 +195,8 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     @Override
-    public String packId() {
-        return this.name;
+    public @NotNull PackLocationInfo location() {
+        return info;
     }
 
     @Override
@@ -200,23 +205,26 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     public static ResourceLocation getBlockStateLocation(ResourceLocation blockId) {
-        return new ResourceLocation(blockId.getNamespace(),
+        return ResourceLocation.fromNamespaceAndPath(blockId.getNamespace(),
                 String.join("", "blockstates/", blockId.getPath(), ".json"));
     }
 
     public static ResourceLocation getModelLocation(ResourceLocation blockId) {
-        return new ResourceLocation(blockId.getNamespace(), String.join("", "models/", blockId.getPath(), ".json"));
+        return ResourceLocation.fromNamespaceAndPath(blockId.getNamespace(),
+                String.join("", "models/", blockId.getPath(), ".json"));
     }
 
     public static ResourceLocation getItemModelLocation(ResourceLocation itemId) {
-        return new ResourceLocation(itemId.getNamespace(), String.join("", "models/item/", itemId.getPath(), ".json"));
+        return ResourceLocation.fromNamespaceAndPath(itemId.getNamespace(),
+                String.join("", "models/item/", itemId.getPath(), ".json"));
     }
 
     public static ResourceLocation getTextureLocation(@Nullable String path, ResourceLocation tagId) {
         if (path == null) {
-            return new ResourceLocation(tagId.getNamespace(), String.join("", "textures/", tagId.getPath(), ".png"));
+            return ResourceLocation.fromNamespaceAndPath(tagId.getNamespace(),
+                    String.join("", "textures/", tagId.getPath(), ".png"));
         }
-        return new ResourceLocation(tagId.getNamespace(),
+        return ResourceLocation.fromNamespaceAndPath(tagId.getNamespace(),
                 String.join("", "textures/", path, "/", tagId.getPath(), ".png"));
     }
 }

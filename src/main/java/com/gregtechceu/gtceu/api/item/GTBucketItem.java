@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.fluid.GTFluid;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -23,15 +22,12 @@ import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
-import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
+import org.jetbrains.annotations.Nullable;
 
-import org.jetbrains.annotations.NotNull;
 import java.util.Optional;
 import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
 
 /**
  * @author KilaBash
@@ -44,7 +40,7 @@ public class GTBucketItem extends BucketItem {
     final String langKey;
 
     public GTBucketItem(Supplier<? extends Fluid> fluid, Properties properties, Material material, String langKey) {
-        super(fluid, properties);
+        super(fluid.get(), properties);
         this.material = material;
         this.langKey = langKey;
     }
@@ -52,15 +48,10 @@ public class GTBucketItem extends BucketItem {
     public static int color(ItemStack itemStack, int index) {
         if (itemStack.getItem() instanceof GTBucketItem item) {
             if (index == 1) {
-                return IClientFluidTypeExtensions.of(item.getFluid()).getTintColor();
+                return IClientFluidTypeExtensions.of(item.content).getTintColor();
             }
         }
         return -1;
-    }
-
-    public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @Nullable CompoundTag nbt) {
-        return this.getClass() == GTBucketItem.class ? new FluidBucketWrapper(stack) :
-                super.initCapabilities(stack, nbt);
     }
 
     @Override
@@ -88,31 +79,30 @@ public class GTBucketItem extends BucketItem {
                 return gtFluid.getBurnTime();
             }
         }
-        return -1;
+        return 0;
     }
 
     @Override
     public boolean emptyContents(@Nullable Player pPlayer, Level pLevel, BlockPos pPos,
                                  @Nullable BlockHitResult pResult,
                                  @Nullable ItemStack container) {
-        if (!(this.getFluid() instanceof FlowingFluid)) return false;
+        if (!(this.content instanceof FlowingFluid)) return false;
 
         BlockState blockstate = pLevel.getBlockState(pPos);
         Block block = blockstate.getBlock();
-        boolean flag = blockstate.canBeReplaced(this.getFluid());
-        boolean flag1 = blockstate.isAir() || flag || block instanceof LiquidBlockContainer &&
-                ((LiquidBlockContainer) block).canPlaceLiquid(pLevel, pPos, blockstate, this.getFluid());
-        Optional<net.neoforged.neoforge.fluids.FluidStack> containedFluidStack = Optional
-                .ofNullable(container).flatMap(FluidUtil::getFluidContained);
+        boolean flag = blockstate.canBeReplaced(this.content);
+        boolean flag1 = blockstate.isAir() || flag || block instanceof LiquidBlockContainer liquidBlockContainer &&
+                liquidBlockContainer.canPlaceLiquid(pPlayer, pLevel, pPos, blockstate, this.content);
+        Optional<FluidStack> containedFluidStack = Optional.ofNullable(container).flatMap(FluidUtil::getFluidContained);
         if (!flag1) {
             return pResult != null && this.emptyContents(pPlayer, pLevel,
                     pResult.getBlockPos().relative(pResult.getDirection()), null, container);
         } else if (containedFluidStack.isPresent() &&
-                this.getFluid().getFluidType().isVaporizedOnPlacement(pLevel, pPos, containedFluidStack.get())) {
-                    this.getFluid().getFluidType().onVaporize(pPlayer, pLevel, pPos, containedFluidStack.get());
+                this.content.getFluidType().isVaporizedOnPlacement(pLevel, pPos, containedFluidStack.get())) {
+                    this.content.getFluidType().onVaporize(pPlayer, pLevel, pPos, containedFluidStack.get());
                     return true;
                 } else
-            if (pLevel.dimensionType().ultraWarm() && this.getFluid().is(FluidTags.WATER)) {
+            if (pLevel.dimensionType().ultraWarm() && this.content.is(FluidTags.WATER)) {
                 int i = pPos.getX();
                 int j = pPos.getY();
                 int k = pPos.getZ();
@@ -125,10 +115,10 @@ public class GTBucketItem extends BucketItem {
                 }
 
                 return true;
-            } else if (block instanceof LiquidBlockContainer &&
-                    ((LiquidBlockContainer) block).canPlaceLiquid(pLevel, pPos, blockstate, getFluid())) {
-                        ((LiquidBlockContainer) block).placeLiquid(pLevel, pPos, blockstate,
-                                ((FlowingFluid) this.getFluid()).getSource(false));
+            } else if (block instanceof LiquidBlockContainer liquidBlockContainer &&
+                    liquidBlockContainer.canPlaceLiquid(pPlayer, pLevel, pPos, blockstate, content)) {
+                        liquidBlockContainer.placeLiquid(pLevel, pPos, blockstate,
+                                ((FlowingFluid) this.content).getSource(false));
                         this.playEmptySound(pPlayer, pLevel, pPos);
                         return true;
                     }

@@ -19,7 +19,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
 
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.rawOre;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.rawOre;
 import static com.gregtechceu.gtceu.data.machine.GTMachines.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.Iron;
 

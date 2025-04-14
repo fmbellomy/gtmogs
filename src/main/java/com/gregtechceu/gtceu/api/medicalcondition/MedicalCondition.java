@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.api.medicalcondition;
 
 import com.gregtechceu.gtceu.api.damagesource.DamageTypeData;
 import com.gregtechceu.gtceu.common.capability.MedicalConditionTracker;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.data.recipe.misc.AirScrubberRecipes;
 
 import net.minecraft.tags.DamageTypeTags;
@@ -23,8 +23,8 @@ import java.util.function.Consumer;
 public class MedicalCondition {
 
     public static final Map<String, MedicalCondition> CONDITIONS = new HashMap<>();
-    public static final Codec<MedicalCondition> CODEC = Codec.STRING.xmap(MedicalCondition.CONDITIONS::get,
-            MedicalCondition::getName);
+    public static final Codec<MedicalCondition> CODEC = Codec.stringResolver(MedicalCondition::getName,
+            MedicalCondition.CONDITIONS::get);
 
     @Getter
     public final String name;

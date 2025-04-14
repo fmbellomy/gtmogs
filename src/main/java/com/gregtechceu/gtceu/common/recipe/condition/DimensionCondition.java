@@ -1,20 +1,22 @@
 package com.gregtechceu.gtceu.common.recipe.condition;
 
-import com.gregtechceu.gtceu.api.data.DimensionMarker;
+import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.common.data.GTRecipeConditions;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -36,13 +38,13 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 public class DimensionCondition extends RecipeCondition {
 
-    public static final Codec<DimensionCondition> CODEC = RecordCodecBuilder
-            .create(instance -> RecipeCondition.isReverse(instance)
+    public static final MapCodec<DimensionCondition> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> RecipeCondition.isReverse(instance)
                     .and(ResourceLocation.CODEC.fieldOf("dimension").forGetter(val -> val.dimension))
                     .apply(instance, DimensionCondition::new));
 
     public final static DimensionCondition INSTANCE = new DimensionCondition();
-    private ResourceLocation dimension = new ResourceLocation("dummy");
+    private ResourceLocation dimension = ResourceLocation.withDefaultNamespace("dummy");
 
     public DimensionCondition(ResourceLocation dimension) {
         this.dimension = dimension;
@@ -110,21 +112,21 @@ public class DimensionCondition extends RecipeCondition {
     @Override
     public RecipeCondition deserialize(@NotNull JsonObject config) {
         super.deserialize(config);
-        dimension = new ResourceLocation(
+        dimension = ResourceLocation.parse(
                 GsonHelper.getAsString(config, "dimension", "dummy"));
         return this;
     }
 
     @Override
-    public RecipeCondition fromNetwork(FriendlyByteBuf buf) {
+    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
-        dimension = new ResourceLocation(buf.readUtf());
+        dimension = buf.readResourceLocation();
         return this;
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf) {
+    public void toNetwork(RegistryFriendlyByteBuf buf) {
         super.toNetwork(buf);
-        buf.writeUtf(dimension.toString());
+        buf.writeResourceLocation(dimension);
     }
 }

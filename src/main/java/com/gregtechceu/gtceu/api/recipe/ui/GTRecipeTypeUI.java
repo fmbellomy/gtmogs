@@ -12,9 +12,9 @@ import com.gregtechceu.gtceu.api.gui.editor.IEditableUI;
 import com.gregtechceu.gtceu.api.gui.widget.DualProgressWidget;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.integration.emi.recipe.GTRecipeEMICategory;
 import com.gregtechceu.gtceu.integration.jei.recipe.GTRecipeJEICategory;
@@ -109,7 +109,7 @@ public class GTRecipeTypeUI {
             } else {
                 try {
                     var resource = resourceManager
-                            .getResourceOrThrow(new ResourceLocation(recipeType.registryName.getNamespace(),
+                            .getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(recipeType.registryName.getNamespace(),
                                     "ui/recipe_type/%s.rtui".formatted(recipeType.registryName.getPath())));
                     try (InputStream inputStream = resource.open()) {
                         try (DataInputStream dataInputStream = new DataInputStream(inputStream)) {

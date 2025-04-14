@@ -1,28 +1,24 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
-import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.data.tag.TagUtil;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.common.CommonHooks;
-import net.neoforged.neoforge.common.crafting.IIngredientSerializer;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
+import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.VoidFluidHandler;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -30,63 +26,48 @@ import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 
-public class FluidContainerIngredient extends Ingredient {
+public class FluidContainerIngredient implements ICustomIngredient {
 
-    public static final ResourceLocation TYPE = GTCEu.id("fluid_container");
-
-    public static final Codec<FluidContainerIngredient> CODEC = FluidIngredient.CODEC.xmap(
-            FluidContainerIngredient::new, FluidContainerIngredient::getFluid);
+    public static final MapCodec<FluidContainerIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
+            .group(
+                    SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid").forGetter(FluidContainerIngredient::getFluid))
+            .apply(instance, FluidContainerIngredient::new));
 
     @Getter
-    private final FluidIngredient fluid;
+    private final SizedFluidIngredient fluid;
 
-    public FluidContainerIngredient(FluidIngredient fluid) {
-        super(Stream.empty());
+    public FluidContainerIngredient(SizedFluidIngredient fluid) {
         this.fluid = fluid;
     }
 
     public FluidContainerIngredient(FluidStack fluidStack) {
-        this(FluidIngredient.of(TagUtil.createFluidTag(BuiltInRegistries.FLUID.getKey(fluidStack.getFluid()).getPath()),
+        this(SizedFluidIngredient.of(
+                TagUtil.createFluidTag(BuiltInRegistries.FLUID.getKey(fluidStack.getFluid()).getPath()),
                 fluidStack.getAmount()));
     }
 
     public FluidContainerIngredient(TagKey<Fluid> tag, int amount) {
-        this(FluidIngredient.of(tag, amount, null));
+        this(SizedFluidIngredient.of(tag, amount));
     }
 
-    private ItemStack[] cachedStacks;
+    private Stream<ItemStack> cachedStacks;
 
     @Nonnull
     @Override
-    public ItemStack[] getItems() {
+    public Stream<ItemStack> getItems() {
         if (cachedStacks == null)
-            cachedStacks = Arrays.stream(this.fluid.getStacks())
-                    .map(FluidUtil::getFilledBucket)
-                    .filter(s -> !s.isEmpty())
-                    .toArray(ItemStack[]::new);
+            cachedStacks = Arrays.stream(this.fluid.getFluids())
+                    .map(stack -> stack.getFluid().getBucket().getDefaultInstance())
+                    .filter(s -> !s.isEmpty());
         return this.cachedStacks;
-    }
-
-    @Override
-    public JsonElement toJson() {
-        JsonObject json = new JsonObject();
-        json.addProperty("type", TYPE.toString());
-        json.add("fluid", fluid.toJson());
-        return json;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return this.fluid.isEmpty();
     }
 
     @Override
     public boolean test(@Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty())
             return false;
-        return FluidUtil.getFluidContained(stack).map(fluid::test).orElse(false) &&
-                FluidUtil.tryEmptyContainer(stack, VoidFluidHandler.INSTANCE, fluid.getAmount(), null, false)
-                        .isSuccess();
+        IFluidHandler handler = FluidUtil.getFluidHandler(stack).orElse(null);
+        return handler != null && this.extractFrom(handler, true);
     }
 
     @Override
@@ -94,42 +75,36 @@ public class FluidContainerIngredient extends Ingredient {
         return false;
     }
 
+    @Override
+    public IngredientType<?> getType() {
+        return GTIngredientTypes.FLUID_CONTAINER_INGREDIENT.get();
+    }
+
     public ItemStack getExtractedStack(ItemStack input) {
-        FluidActionResult result = FluidUtil.tryEmptyContainer(input, VoidFluidHandler.INSTANCE, fluid.getAmount(),
-                CommonHooks.getCraftingPlayer(), true);
+        FluidActionResult result = FluidUtil.tryEmptyContainer(input,
+                VoidFluidHandler.INSTANCE,
+                fluid.amount(),
+                CommonHooks.getCraftingPlayer(),
+                true);
         if (result.isSuccess()) {
             return result.getResult();
         }
         return input;
     }
 
-    @Override
-    @NotNull
-    public IIngredientSerializer<? extends Ingredient> getSerializer() {
-        return SERIALIZER;
+    public boolean extractFrom(IFluidHandler handler, boolean simulate) {
+        for (int tank = 0; tank < handler.getTanks(); tank++) {
+            FluidStack inTank = handler.getFluidInTank(tank);
+            if (fluid.test(inTank)) {
+                FluidStack toExtract = inTank.copyWithAmount(fluid.amount());
+                FluidStack extractedSim = handler.drain(toExtract, IFluidHandler.FluidAction.SIMULATE);
+                if (extractedSim.getAmount() >= fluid.amount()) {
+                    if (!simulate)
+                        handler.drain(toExtract, IFluidHandler.FluidAction.EXECUTE);
+                    return true;
+                }
+            }
+        }
+        return false;
     }
-
-    public static FluidContainerIngredient fromJson(JsonObject json) {
-        return SERIALIZER.parse(json);
-    }
-
-    public static final IIngredientSerializer<FluidContainerIngredient> SERIALIZER = new IIngredientSerializer<>() {
-
-        @Override
-        public @NotNull FluidContainerIngredient parse(FriendlyByteBuf buffer) {
-            FluidIngredient fluid = FluidIngredient.fromNetwork(buffer);
-            return new FluidContainerIngredient(fluid);
-        }
-
-        @Override
-        public @NotNull FluidContainerIngredient parse(JsonObject json) {
-            FluidIngredient fluid = FluidIngredient.fromJson(GsonHelper.getAsJsonObject(json, "fluid"));
-            return new FluidContainerIngredient(fluid);
-        }
-
-        @Override
-        public void write(FriendlyByteBuf buffer, FluidContainerIngredient ingredient) {
-            ingredient.fluid.toNetwork(buffer);
-        }
-    };
 }

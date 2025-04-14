@@ -13,7 +13,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
-import IManagedGridNode;
 import appeng.api.networking.*;
 import appeng.api.networking.security.IActionSource;
 import lombok.Getter;

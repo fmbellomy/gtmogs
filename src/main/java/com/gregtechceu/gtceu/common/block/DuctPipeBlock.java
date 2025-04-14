@@ -16,13 +16,14 @@ import com.gregtechceu.gtceu.common.pipelike.duct.DuctPipeType;
 import com.gregtechceu.gtceu.common.pipelike.duct.LevelDuctPipeNet;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -92,10 +93,10 @@ public class DuctPipeBlock extends PipeBlock<DuctPipeType, DuctPipeProperties, L
 
     @Override
     public boolean canPipeConnectToBlock(IPipeNode<DuctPipeType, DuctPipeProperties> selfTile, Direction side,
-                                         @Nullable BlockEntity tile) {
-        return tile != null &&
-                (tile.getCapability(GTCapability.CAPABILITY_HAZARD_CONTAINER, side.getOpposite()).isPresent() ||
-                        tile instanceof MetaMachineBlockEntity metaMachine &&
+                                         Level level, BlockPos pos) {
+        return level != null &&
+                (level.getCapability(GTCapability.CAPABILITY_HAZARD_CONTAINER, side.getOpposite()).isPresent() ||
+                        level instanceof MetaMachineBlockEntity metaMachine &&
                                 (metaMachine.getMetaMachine() instanceof IEnvironmentalHazardCleaner ||
                                         metaMachine.getMetaMachine() instanceof IEnvironmentalHazardEmitter));
     }

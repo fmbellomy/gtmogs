@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.common.machine.multiblock.part;
 
-import Widget;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;

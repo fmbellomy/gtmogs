@@ -1,57 +1,68 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.mojang.serialization.JsonOps;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.resources.RegistryOps;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
-public class SerializerFluidIngredient implements IContentSerializer<FluidIngredient> {
+@ExtensionMethod(SizedIngredientExtensions.class)
+public class SerializerFluidIngredient implements IContentSerializer<SizedFluidIngredient> {
+
+    public static final SizedFluidIngredient EMPTY = new SizedFluidIngredient(FluidIngredient.empty(), 1);
 
     public static SerializerFluidIngredient INSTANCE = new SerializerFluidIngredient();
 
     private SerializerFluidIngredient() {}
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf, FluidIngredient content) {
-        content.toNetwork(buf);
+    public void toNetwork(RegistryFriendlyByteBuf buf, SizedFluidIngredient content) {
+        SizedFluidIngredient.STREAM_CODEC.encode(buf, content);
     }
 
     @Override
-    public FluidIngredient fromNetwork(FriendlyByteBuf buf) {
-        return FluidIngredient.fromNetwork(buf);
+    public SizedFluidIngredient fromNetwork(RegistryFriendlyByteBuf buf) {
+        return SizedFluidIngredient.STREAM_CODEC.decode(buf);
     }
 
     @Override
-    public FluidIngredient fromJson(JsonElement json) {
-        return FluidIngredient.fromJson(json);
+    public SizedFluidIngredient fromJson(JsonElement json) {
+        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
+        return SizedFluidIngredient.NESTED_CODEC.parse(ops, json).getOrThrow();
     }
 
     @Override
-    public JsonElement toJson(FluidIngredient content) {
-        return content.toJson();
+    public JsonElement toJson(SizedFluidIngredient content) {
+        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
+        return SizedFluidIngredient.NESTED_CODEC.encodeStart(ops, content).getOrThrow();
     }
 
     @Override
-    public FluidIngredient of(Object o) {
-        if (o instanceof FluidIngredient ingredient) {
+    public SizedFluidIngredient of(Object o) {
+        if (o instanceof SizedFluidIngredient ingredient) {
             return ingredient.copy();
         }
         if (o instanceof FluidStack stack) {
-            return FluidIngredient.of(stack.copy());
+            return SizedFluidIngredient.of(stack.copy());
         }
-        return FluidIngredient.EMPTY;
+        return EMPTY;
     }
 
     @Override
-    public FluidIngredient defaultValue() {
-        return FluidIngredient.EMPTY;
+    public SizedFluidIngredient defaultValue() {
+        return EMPTY;
     }
 
     @Override
-    public Codec<FluidIngredient> codec() {
-        return FluidIngredient.CODEC;
+    public Codec<SizedFluidIngredient> codec() {
+        return SizedFluidIngredient.NESTED_CODEC;
     }
 }

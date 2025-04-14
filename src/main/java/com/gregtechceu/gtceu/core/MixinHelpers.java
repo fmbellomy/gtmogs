@@ -8,8 +8,8 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.FluidProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.data.tag.TagUtil;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.fluid.GTFluid;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorage;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
@@ -21,7 +21,7 @@ import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.core.mixins.BlockBehaviourAccessor;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -207,7 +207,7 @@ public class MixinHelpers {
             if (TagPrefix.ORES.containsKey(prefix)) {
                 final TagPrefix.OreType type = TagPrefix.ORES.get(prefix);
                 map.forEach((material, blockEntry) -> {
-                    ResourceLocation lootTableId = new ResourceLocation(blockEntry.getId().getNamespace(),
+                    ResourceLocation lootTableId = ResourceLocation.fromNamespaceAndPath(blockEntry.getId().getNamespace(),
                             "blocks/" + blockEntry.getId().getPath());
                     Block block = blockEntry.get();
 
@@ -264,7 +264,7 @@ public class MixinHelpers {
             MixinHelpers.addMaterialBlockLootTables(lootTables, prefix, map);
         });
         GTMaterialBlocks.SURFACE_ROCK_BLOCKS.forEach((material, blockEntry) -> {
-            ResourceLocation lootTableId = new ResourceLocation(blockEntry.getId().getNamespace(),
+            ResourceLocation lootTableId = ResourceLocation.fromNamespaceAndPath(blockEntry.getId().getNamespace(),
                     "blocks/" + blockEntry.getId().getPath());
             LootTable.Builder builder = BLOCK_LOOT
                     .createSingleItemTable(ChemicalHelper.get(TagPrefix.dustTiny, material).getItem(),
@@ -276,7 +276,7 @@ public class MixinHelpers {
         GTRegistries.MACHINES.forEach(machine -> {
             Block block = machine.getBlock();
             ResourceLocation id = machine.getId();
-            ResourceLocation lootTableId = new ResourceLocation(id.getNamespace(), "blocks/" + id.getPath());
+            ResourceLocation lootTableId = ResourceLocation.fromNamespaceAndPath(id.getNamespace(), "blocks/" + id.getPath());
             ((BlockBehaviourAccessor) block).setDrops(lootTableId);
             lootTables.put(lootTableId,
                     BLOCK_LOOT.createSingleItemTable(block).setParamSet(LootContextParamSets.BLOCK).build());
@@ -286,7 +286,7 @@ public class MixinHelpers {
     public static void addMaterialBlockLootTables(Map<ResourceLocation, LootTable> lootTables, TagPrefix prefix,
                                                   Map<Material, ? extends BlockEntry<? extends Block>> map) {
         map.forEach((material, blockEntry) -> {
-            ResourceLocation lootTableId = new ResourceLocation(blockEntry.getId().getNamespace(),
+            ResourceLocation lootTableId = ResourceLocation.fromNamespaceAndPath(blockEntry.getId().getNamespace(),
                     "blocks/" + blockEntry.getId().getPath());
             ((BlockBehaviourAccessor) blockEntry.get()).setDrops(lootTableId);
             lootTables.put(lootTableId,

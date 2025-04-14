@@ -8,7 +8,7 @@ import com.gregtechceu.gtceu.api.block.OreBlock;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.MaterialBlockItem;
 import com.gregtechceu.gtceu.api.item.MaterialPipeBlockItem;
 import com.gregtechceu.gtceu.api.item.SurfaceRockBlockItem;
@@ -31,6 +31,7 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
 import java.util.Map;
 
+@SuppressWarnings("removal")
 public class GTMaterialBlocks {
 
     // Reference Table Builders

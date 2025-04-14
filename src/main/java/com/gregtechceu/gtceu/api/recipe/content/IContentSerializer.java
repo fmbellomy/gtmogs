@@ -1,15 +1,15 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
-
-import com.lowdragmc.lowdraglib.LDLib;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -18,15 +18,16 @@ import com.mojang.serialization.JsonOps;
 
 public interface IContentSerializer<T> {
 
-    default void toNetwork(FriendlyByteBuf buf, T content) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        buf.writeUtf(codec().encodeStart(ops, content).getOrThrow(false, GTCEu.LOGGER::error).toString());
+    Gson GSON = new GsonBuilder().create();
+
+    default void toNetwork(RegistryFriendlyByteBuf buf, T content) {
+        buf.writeUtf(codec().encodeStart(
+                buf.registryAccess().createSerializationContext(JsonOps.INSTANCE), content).getOrThrow().toString());
     }
 
-    default T fromNetwork(FriendlyByteBuf buf) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        return codec().parse(ops, LDLib.GSON.fromJson(buf.readUtf(), JsonElement.class)).getOrThrow(false,
-                GTCEu.LOGGER::error);
+    default T fromNetwork(RegistryFriendlyByteBuf buf) {
+        return codec().parse(buf.registryAccess().createSerializationContext(JsonOps.INSTANCE),
+                GSON.fromJson(buf.readUtf(), JsonElement.class)).getOrThrow();
     }
 
     T fromJson(JsonElement json);
@@ -38,7 +39,7 @@ public interface IContentSerializer<T> {
     T defaultValue();
 
     @SuppressWarnings("unchecked")
-    default void toNetworkContent(FriendlyByteBuf buf, Content content) {
+    default void toNetworkContent(RegistryFriendlyByteBuf buf, Content content) {
         T inner = (T) content.getContent();
         toNetwork(buf, inner);
         buf.writeVarInt(content.chance);
@@ -46,7 +47,7 @@ public interface IContentSerializer<T> {
         buf.writeVarInt(content.tierChanceBoost);
     }
 
-    default Content fromNetworkContent(FriendlyByteBuf buf) {
+    default Content fromNetworkContent(RegistryFriendlyByteBuf buf) {
         T inner = fromNetwork(buf);
         int chance = buf.readVarInt();
         int maxChance = buf.readVarInt();
@@ -86,16 +87,16 @@ public interface IContentSerializer<T> {
         return new Content(inner, chance, maxChance, tierChanceBoost);
     }
 
-    default Tag toNbt(T content) {
-        return JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, this.toJson(content));
+    default Tag toNbt(T content, HolderLookup.Provider provider) {
+        return JsonOps.INSTANCE.convertTo(NbtOps.INSTANCE, this.toJson(content, provider));
     }
 
-    default Tag toNbtGeneric(Object content) {
-        return toNbt((T) content);
+    default Tag toNbtGeneric(Object content, HolderLookup.Provider provider) {
+        return toNbt((T) content, provider);
     }
 
-    default T fromNbt(Tag tag) {
+    default T fromNbt(Tag tag, HolderLookup.Provider provider) {
         var json = NbtOps.INSTANCE.convertTo(JsonOps.INSTANCE, tag);
-        return fromJson(json);
+        return fromJson(json, provider);
     }
 }

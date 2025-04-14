@@ -5,28 +5,27 @@ import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
-import com.gregtechceu.gtceu.api.capability.GTCapability;
-import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
-import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
+import com.gregtechceu.gtceu.api.multiblock.MultiblockWorldSavedData;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
-import com.gregtechceu.gtceu.common.capability.MedicalConditionTracker;
 import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
 import com.gregtechceu.gtceu.common.commands.GTCommands;
 import com.gregtechceu.gtceu.common.commands.HazardCommands;
 import com.gregtechceu.gtceu.common.commands.MedicalConditionCommands;
-import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
+import com.gregtechceu.gtceu.common.item.armor.QuarkTechSuite;
 import com.gregtechceu.gtceu.common.item.behavior.ToggleEnergyConsumerBehavior;
 import com.gregtechceu.gtceu.common.item.armor.IJetpack;
 import com.gregtechceu.gtceu.common.item.armor.IStepAssist;
+import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSendWorldID;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSyncBedrockOreVeins;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSyncFluidVeins;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSyncOreVeins;
@@ -38,31 +37,26 @@ import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.loader.BedrockFluidLoader;
 import com.gregtechceu.gtceu.data.loader.BedrockOreLoader;
 import com.gregtechceu.gtceu.data.loader.GTOreLoader;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 import com.gregtechceu.gtceu.integration.map.WaypointManager;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
 import com.gregtechceu.gtceu.utils.TaskHandler;
 
-import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.PotionItem;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.ChunkPos;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
@@ -70,6 +64,7 @@ import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.living.FinalizeSpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -78,131 +73,18 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
-import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
-
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author KilaBash
  * @date 2022/8/27
  * @implNote ForgeCommonEventListener
  */
-@Mod.EventBusSubscriber(modid = GTCEu.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeCommonEventListener {
-
-    @SubscribeEvent
-    public static void registerItemStackCapabilities(AttachCapabilitiesEvent<ItemStack> event) {
-        final ItemStack itemStack = event.getObject();
-        if (itemStack.getItem() instanceof IComponentItem componentItem) {
-            event.addCapability(GTCEu.id("capability"), new ICapabilityProvider() {
-
-                @NotNull
-                @Override
-                public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-                    return componentItem.getCapability(itemStack, cap);
-                }
-            });
-        } else if (itemStack.getItem() instanceof DrumMachineItem drumMachineItem) {
-            event.addCapability(GTCEu.id("fluid"), new ICapabilityProvider() {
-
-                @Override
-                public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability,
-                                                                  @Nullable Direction arg) {
-                    return drumMachineItem.getCapability(itemStack, capability);
-                }
-            });
-        } else if (itemStack.getItem() instanceof PotionItem) {
-            LazyOptional<IFluidHandlerItem> handler = LazyOptional.of(() -> {
-                var fluidHandler = new FluidHandlerItemStack.SwapEmpty(itemStack, new ItemStack(Items.GLASS_BOTTLE),
-                        PotionFluidHelper.BOTTLE_AMOUNT) {
-
-                    @Override
-                    protected void setFluid(FluidStack fluid) {
-                        // do nada
-                    }
-
-                    @Override
-                    public @NotNull FluidStack getFluid() {
-                        return PotionFluidHelper.getFluidFromPotionItem(itemStack, PotionFluidHelper.BOTTLE_AMOUNT);
-                    }
-                };
-                fluidHandler.fill(PotionFluidHelper.getFluidFromPotionItem(itemStack, PotionFluidHelper.BOTTLE_AMOUNT),
-                        IFluidHandler.FluidAction.EXECUTE);
-                return fluidHandler;
-            });
-            event.addCapability(GTCEu.id("potion_item_handler"), new ICapabilityProvider() {
-
-                @Override
-                public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap,
-                                                                  @Nullable Direction side) {
-                    return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
-                }
-            });
-        } else if (itemStack.is(Items.GLASS_BOTTLE)) {
-            LazyOptional<IFluidHandlerItem> handler = LazyOptional.of(() -> new FilteredFluidHandlerItemStack(itemStack,
-                    250, s -> s.getFluid().is(CustomTags.POTION_FLUIDS)) {
-
-                @Override
-                protected void setFluid(FluidStack fluid) {
-                    super.setFluid(fluid);
-                    if (!fluid.isEmpty()) {
-                        container = PotionUtils.setPotion(new ItemStack(Items.POTION),
-                                PotionUtils.getPotion(fluid.getTag()));
-                    }
-                }
-            });
-            event.addCapability(GTCEu.id("bottle_item_handler"), new ICapabilityProvider() {
-
-                @Override
-                public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap,
-                                                                  @Nullable Direction side) {
-                    return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, handler);
-                }
-            });
-
-        }
-    }
-
-    @SubscribeEvent
-    public static void registerEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
-        if (event.getObject() instanceof Player entity) {
-            final MedicalConditionTracker tracker = new MedicalConditionTracker(entity);
-            event.addCapability(GTCEu.id("medical_condition_tracker"), new ICapabilitySerializable<CompoundTag>() {
-
-                @Override
-                public CompoundTag serializeNBT() {
-                    return tracker.serializeNBT();
-                }
-
-                @Override
-                public void deserializeNBT(CompoundTag arg) {
-                    tracker.deserializeNBT(arg);
-                }
-
-                @Override
-                public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> capability,
-                                                                  @Nullable Direction arg) {
-                    return GTCapability.CAPABILITY_MEDICAL_CONDITION_TRACKER.orEmpty(capability,
-                            LazyOptional.of(() -> tracker));
-                }
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public static void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> event) {
-        event.addCapability(GTCEu.id("fe_capability"), new EUToFEProvider(event.getObject()));
-    }
 
     @SubscribeEvent
     public static void tickPlayerInventoryHazards(PlayerTickEvent.Post event) {
@@ -249,21 +131,22 @@ public class ForgeCommonEventListener {
     public static void onMobEffectEvent(MobEffectEvent.Applicable event) {
         if (event.getEntity() instanceof Player player) {
             ItemStack item = player.getItemBySlot(EquipmentSlot.HEAD);
-            if (item.is(GTItems.QUANTUM_HELMET.asItem()) && GTCapabilityHelper.getElectricItem(item) != null) {
-                IElectricItem helmet = GTCapabilityHelper.getElectricItem(item);
+            IElectricItem helmet = GTCapabilityHelper.getElectricItem(item);
+            if (item.is(GTItems.QUANTUM_HELMET.asItem()) && helmet != null) {
                 MobEffectInstance effect = event.getEffectInstance();
                 Integer cost = QuarkTechSuite.potionRemovalCost.get(effect.getEffect());
                 if (cost != null) {
                     cost = cost * (effect.getAmplifier() + 1);
                     if (helmet.canUse(cost)) {
                         helmet.discharge(cost, helmet.getTier(), true, false, false);
-                        event.setResult(Event.Result.DENY);
+                        event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
                     }
                 }
             }
         }
     }
 
+    /*
     @SubscribeEvent
     public static void onBlockStartBreak(BlockEvent.BreakEvent event) {
         if (ToolHelper.isAoeBreakingBlocks.get()) {
@@ -277,6 +160,8 @@ public class ForgeCommonEventListener {
             }
         }
     }
+
+     */
 
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {

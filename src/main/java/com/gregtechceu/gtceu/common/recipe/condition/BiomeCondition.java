@@ -1,15 +1,18 @@
 package com.gregtechceu.gtceu.common.recipe.condition;
 
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
-import com.gregtechceu.gtceu.common.data.GTRecipeConditions;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
+import com.mojang.serialization.MapCodec;
+import lombok.val;
 import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -30,13 +33,13 @@ import org.jetbrains.annotations.NotNull;
 @NoArgsConstructor
 public class BiomeCondition extends RecipeCondition {
 
-    public static final Codec<BiomeCondition> CODEC = RecordCodecBuilder
-            .create(instance -> RecipeCondition.isReverse(instance)
+    public static final MapCodec<BiomeCondition> CODEC = RecordCodecBuilder
+            .mapCodec(instance -> RecipeCondition.isReverse(instance)
                     .and(ResourceLocation.CODEC.fieldOf("biome").forGetter(val -> val.biome))
                     .apply(instance, BiomeCondition::new));
 
     public final static BiomeCondition INSTANCE = new BiomeCondition();
-    private ResourceLocation biome = new ResourceLocation("dummy");
+    private ResourceLocation biome = ResourceLocation.withDefaultNamespace("dummy");
 
     public BiomeCondition(boolean isReverse, ResourceLocation biome) {
         super(isReverse);
@@ -91,20 +94,20 @@ public class BiomeCondition extends RecipeCondition {
     @Override
     public RecipeCondition deserialize(@NotNull JsonObject config) {
         super.deserialize(config);
-        biome = new ResourceLocation(
+        biome = ResourceLocation.parse(
                 GsonHelper.getAsString(config, "biome", "dummy"));
         return this;
     }
 
     @Override
-    public RecipeCondition fromNetwork(FriendlyByteBuf buf) {
+    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
-        biome = new ResourceLocation(buf.readUtf());
+        biome = ResourceLocation.parse(buf.readUtf());
         return this;
     }
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf) {
+    public void toNetwork(RegistryFriendlyByteBuf buf) {
         super.toNetwork(buf);
         buf.writeUtf(biome.toString());
     }

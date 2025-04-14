@@ -27,7 +27,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -145,12 +145,12 @@ public abstract class SteamWorkableMachine extends SteamMachine
     }
 
     @Override
-    protected InteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                              BlockHitResult hitResult) {
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                  BlockHitResult hitResult) {
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
-            if (hasFrontFacing() && gridSide == getFrontFacing()) return InteractionResult.PASS;
+            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             setOutputFacing(gridSide);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
     }

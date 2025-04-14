@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -376,11 +376,11 @@ public class MultiblockDisplayText {
                     }
                     if (amount < maxDurationSec) {
                         String key = "gtceu.multiblock.output_line." + (fluid.chance < fluid.maxChance ? "2" : "0");
-                        textList.add(Component.translatable(key, stack.getDisplayName(), amount,
+                        textList.add(Component.translatable(key, stack.getHoverName(), amount,
                                 FormattingUtil.formatNumber2Places(maxDurationSec / amountD)));
                     } else {
                         String key = "gtceu.multiblock.output_line." + (fluid.chance < fluid.maxChance ? "3" : "1");
-                        textList.add(Component.translatable(key, stack.getDisplayName(), amount,
+                        textList.add(Component.translatable(key, stack.getHoverName(), amount,
                                 FormattingUtil.formatNumber2Places(amountD / maxDurationSec)));
                     }
                 }

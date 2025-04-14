@@ -5,12 +5,11 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.data.tag.TagUtil;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
 import com.gregtechceu.gtceu.core.mixins.PotionBrewingAccessor;
 
@@ -236,7 +235,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                 .outputFluids(toFluid)
                 .duration(400)
                 .EUt(VHA[MV])
-                .buildRawRecipe();
+                .build();
     }
 
     private static @NotNull GTRecipe vanillaPotionRecipe(PotionBrewing.Mix<Potion> mix, FluidStack fromFluid) {
@@ -247,7 +246,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                 .outputFluids(toFluid)
                 .duration(400)
                 .EUt(VHA[MV])
-                .buildRawRecipe();
+                .build();
     }
 
     private static boolean collect(RecipeHandlerList rhl, List<ItemStack> itemStacks, List<FluidStack> fluidStacks) {
@@ -295,7 +294,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     .duration(400)
                     // is this a good voltage?
                     .EUt(VHA[MV])
-                    .buildRawRecipe();
+                    .build();
             // for EMI to detect it's a synthetic recipe (not ever in JSON)
             recipe.setId(recipe.getId().withPrefix("/"));
             GTRecipeTypes.BREWING_RECIPES.addToMainCategory(recipe);
@@ -323,7 +322,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     .outputFluids(toFluid)
                     .duration(400)
                     .EUt(VHA[MV])
-                    .buildRawRecipe();
+                    .build();
             // for EMI to detect it's a synthetic recipe (not ever in JSON)
             recipe.setId(recipe.getId().withPrefix("/"));
             GTRecipeTypes.BREWING_RECIPES.addToMainCategory(recipe);

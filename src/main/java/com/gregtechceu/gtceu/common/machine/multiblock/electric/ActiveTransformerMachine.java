@@ -17,7 +17,7 @@ import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
-import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
+import com.gregtechceu.gtceu.api.multiblock.TraceabilityPredicate;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -26,7 +26,6 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +34,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import static com.gregtechceu.gtceu.api.pattern.Predicates.abilities;
+import static com.gregtechceu.gtceu.api.multiblock.Predicates.abilities;
 
-import Widget;
 
 public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
                                       implements IControllable, IExplosionMachine, IFancyUIMachine, IDisplayUIMachine {
@@ -164,7 +162,7 @@ public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
     }
 
     @Override
-    public void addDisplayText(List<Component> textList) {
+    public void addDisplayText(@NotNull List<Component> textList) {
         // super.addDisplayText(textList); idek what it does stop doing what you do for a minute pls
         // Assume That the Structure is ALWAYS formed, and has at least 1 In and 1 Out, there is never a case where this
         // does not occur.

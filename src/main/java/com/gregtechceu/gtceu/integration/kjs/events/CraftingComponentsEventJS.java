@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.kjs.events;
 
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.data.recipe.CraftingComponent;
+import com.gregtechceu.gtceu.api.recipe.component.CraftingComponent;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;

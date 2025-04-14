@@ -12,10 +12,10 @@ import com.gregtechceu.gtceu.api.material.material.event.MaterialRegistryEvent;
 import com.gregtechceu.gtceu.api.material.material.event.PostMaterialEvent;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.data.worldgen.WorldGenLayers;
-import com.gregtechceu.gtceu.api.data.worldgen.generator.IndicatorGenerators;
-import com.gregtechceu.gtceu.api.data.worldgen.generator.VeinGenerators;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.worldgen.WorldGenLayers;
+import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerators;
+import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerators;
 import com.gregtechceu.gtceu.api.gui.factory.CoverUIFactory;
 import com.gregtechceu.gtceu.api.gui.factory.GTUIEditorFactory;
 import com.gregtechceu.gtceu.api.gui.factory.MachineUIFactory;
@@ -23,8 +23,8 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidContainerIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntCircuitIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
 import com.gregtechceu.gtceu.common.data.*;
+import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.common.data.materials.GTFoods;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
@@ -34,7 +34,7 @@ import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.core.mixins.AbstractRegistrateAccessor;
-import com.gregtechceu.gtceu.data.GregTechDatagen;
+import com.gregtechceu.gtceu.data.datagen.GTRegistrateDatagen;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.lang.MaterialLangGenerator;
@@ -45,8 +45,10 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
 import com.gregtechceu.gtceu.data.pack.GTPackSource;
-import com.gregtechceu.gtceu.data.recipe.GTCraftingComponents;
+import com.gregtechceu.gtceu.data.recipe.*;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
+import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
+import com.gregtechceu.gtceu.data.worldgen.GTPlacerTypes;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
 import com.gregtechceu.gtceu.integration.kjs.events.MaterialModificationEventJS;
@@ -121,7 +123,7 @@ public class CommonInit {
         // fabric exclusive, squeeze this in here to register before stuff is used
         GTRegistration.REGISTRATE.registerRegistrate();
 
-        GregTechDatagen.init();
+        GTRegistrateDatagen.init();
         // Register all material manager registries, for materials with mod ids.
         GTCEuAPI.materialManager.getRegistries().forEach(registry -> {
             // Force the material lang generator to be at index 0, so that addons' lang generators can override it.

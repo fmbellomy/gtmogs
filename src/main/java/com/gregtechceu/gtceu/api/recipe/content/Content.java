@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.recipe.content;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.recipe.chance.boost.ChanceBoostFunction;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GradientUtil;
@@ -23,6 +22,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -126,11 +126,11 @@ public class Content {
 
     @OnlyIn(Dist.CLIENT)
     public void drawFluidAmount(GuiGraphics graphics, float x, float y, int width, int height) {
-        if (content instanceof FluidIngredient ingredient) {
+        if (content instanceof SizedFluidIngredient ingredient) {
             graphics.pose().pushPose();
             graphics.pose().translate(0, 0, 400);
             graphics.pose().scale(0.5f, 0.5f, 1);
-            int amount = ingredient.getAmount();
+            int amount = ingredient.amount();
             Font fontRenderer = Minecraft.getInstance().font;
             String s = FormattingUtil.formatBuckets(amount);
             if (fontRenderer.width(s) > 32)

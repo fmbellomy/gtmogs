@@ -9,8 +9,8 @@ import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.properties.*;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.data.tag.TagUtil;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.fluid.FluidBuilder;
 import com.gregtechceu.gtceu.api.fluid.FluidState;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
@@ -18,13 +18,14 @@ import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.item.tool.MaterialToolTier;
 import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.data.GTMedicalConditions;
+import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MaterialStackWrapper;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -41,6 +42,7 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
@@ -268,6 +270,14 @@ public class Material implements Comparable<Material> {
      */
     public TagKey<Fluid> getFluidTag() {
         return TagUtil.createFluidTag(this.getName());
+    }
+
+    public SizedFluidIngredient asFluidIngredient(int amount) {
+        return SizedFluidIngredient.of(getFluidTag(), amount);
+    }
+
+    public SizedFluidIngredient asSingleFluidIngredient(int amount) {
+        return SizedFluidIngredient.of(getFluid(), amount);
     }
 
     /**
@@ -540,6 +550,21 @@ public class Material implements Comparable<Material> {
 
     public boolean isNull() {
         return this == GTMaterials.NULL;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Material material))
+            return false;
+
+        return Objects.equals(this.getResourceLocation(), material.getResourceLocation());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(this.getResourceLocation());
     }
 
     @RemapPrefixForJS("kjs$")
@@ -1241,14 +1266,6 @@ public class Material implements Comparable<Material> {
 
         public Builder itemPipeProperties(int priority, float stacksPerSec) {
             properties.setProperty(PropertyKey.ITEM_PIPE, new ItemPipeProperties(priority, stacksPerSec));
-            return this;
-        }
-
-        @Deprecated
-        public Builder addDefaultEnchant(Enchantment enchant, int level) {
-            if (!properties.hasProperty(PropertyKey.TOOL)) // cannot assign default here
-                throw new IllegalArgumentException("Material cannot have an Enchant without Tools!");
-            properties.getProperty(PropertyKey.TOOL).addEnchantmentForTools(enchant, level);
             return this;
         }
 

@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.material.material.MarkerMaterials;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialFlag;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialFlags.*;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 
 /**
  * Material Registration.

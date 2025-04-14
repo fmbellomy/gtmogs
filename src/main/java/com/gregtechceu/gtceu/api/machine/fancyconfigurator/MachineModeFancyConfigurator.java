@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.machine.fancyconfigurator;
 
-import IGuiTexture;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.FancyMachineUIWidget;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyUIProvider;
@@ -14,8 +13,9 @@ import com.lowdragmc.lowdraglib.gui.widget.ImageWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +53,7 @@ public class MachineModeFancyConfigurator implements IFancyUIProvider {
                     () -> new GuiTextureGroup(
                             ResourceBorderTexture.BUTTON_COMMON.copy()
                                     .setColor(machine.getActiveRecipeType() == finalI ? ColorPattern.CYAN.color : -1),
-                            new TextTexture(machine.getRecipeTypes()[finalI].registryName.toLanguageKey()).setWidth(136)
+                            new TextTexture(machine.getRecipeTypes()[finalI].getTranslationKey()).setWidth(136)
                                     .setType(TextTexture.TextType.ROLL))));
 
         }
@@ -74,12 +74,12 @@ public class MachineModeFancyConfigurator implements IFancyUIProvider {
         }
 
         @Override
-        public void writeInitialData(FriendlyByteBuf buffer) {
+        public void writeInitialData(RegistryFriendlyByteBuf buffer) {
             buffer.writeVarInt(machine.getActiveRecipeType());
         }
 
         @Override
-        public void readInitialData(FriendlyByteBuf buffer) {
+        public void readInitialData(RegistryFriendlyByteBuf buffer) {
             machine.setActiveRecipeType(buffer.readVarInt());
         }
 
@@ -89,7 +89,7 @@ public class MachineModeFancyConfigurator implements IFancyUIProvider {
         }
 
         @Override
-        public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+        public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
             if (id == 0) {
                 machine.setActiveRecipeType(buffer.readVarInt());
             }

@@ -5,11 +5,11 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import java.util.function.Consumer;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.*;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.item.GTItems.FERTILIZER;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.DISTILLATION_RECIPES;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.DISTILLERY_RECIPES;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.DISTILLATION_RECIPES;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.DISTILLERY_RECIPES;
 
 public class DistillationRecipes {
 

@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.machine.multiblock;
 
-import Widget;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.IParallelHatch;
@@ -27,6 +26,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +82,7 @@ public class WorkableElectricMultiblockMachine extends WorkableMultiblockMachine
     //////////////////////////////////////
 
     @Override
-    public void addDisplayText(List<Component> textList) {
+    public void addDisplayText(@NotNull List<Component> textList) {
         int numParallels;
         boolean exact = false;
         if (recipeLogic.isActive() && recipeLogic.getLastRecipe() != null) {

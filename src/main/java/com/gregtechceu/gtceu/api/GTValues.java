@@ -34,12 +34,6 @@ public class GTValues {
     public static final int L = 144;
     public static final RandomSource RNG = RandomSource.createThreadSafe();
 
-    /**
-     * The Item WildCard Tag. Even shorter than the "-1" of the past
-     */
-
-    // public static final short W = OreDictionary.WILDCARD_VALUE;
-
     /** Current time on the Client. Will always be zero on the server. */
     public static long CLIENT_TIME = 0;
 
@@ -113,7 +107,6 @@ public class GTValues {
             MODID_SODIUM = "sodium",
             MODID_RUBIDIUM = "rubidium",
             MODID_EMBEDDIUM = "embeddium",
-            MODID_CREATE = "create",
             MODID_CURIOS = "curios",
             MODID_AE2WTLIB = "ae2wtlib",
             MODID_SHIMMER = "shimmer",

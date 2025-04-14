@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe.components;
 
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredient;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.valueproviders.IntProvider;

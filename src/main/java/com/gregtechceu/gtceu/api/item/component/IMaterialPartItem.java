@@ -32,7 +32,7 @@ public interface IMaterialPartItem extends IItemComponent, IDurabilityBar, IAddI
         if (stats == null) {
             return defaultMaterial;
         }
-        if (stats.material == null || !stats.material.hasProperty(PropertyKey.INGOT)) {
+        if (stats.material.isNull() || !stats.material.hasProperty(PropertyKey.INGOT)) {
             return defaultMaterial;
         }
         return stats.material;

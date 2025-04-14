@@ -59,8 +59,8 @@ public class MetaMachineItem extends BlockItem implements IItemRendererProvider 
             Block block = level.getBlockState(possiblePipe).getBlock();
             if (block instanceof PipeBlock<?, ?, ?>) {
                 IPipeNode pipeTile = ((PipeBlock<?, ?, ?>) block).getPipeTile(level, possiblePipe);
-                if (pipeTile != null && ((PipeBlock<?, ?, ?>) block).canPipeConnectToBlock(pipeTile, side.getOpposite(),
-                        level.getBlockEntity(pos))) {
+                if (pipeTile != null && ((PipeBlock<?, ?, ?>) block).canPipeConnectToBlock(pipeTile,
+                        side.getOpposite(), level, pos)) {
                     pipeTile.setConnection(side, true, false);
                 }
             }

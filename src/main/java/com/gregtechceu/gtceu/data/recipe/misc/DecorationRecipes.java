@@ -1,13 +1,13 @@
 package com.gregtechceu.gtceu.data.recipe.misc;
 
-import com.gregtechceu.gtceu.common.data.GTRecipeCategories;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeCategories;
 
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.world.item.DyeColor;
 import java.util.function.Consumer;
 
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.block;
-import static com.gregtechceu.gtceu.api.data.tag.TagPrefix.plate;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.block;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.plate;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.LARGE_METAL_SHEETS;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.METAL_SHEETS;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.STUDS;
@@ -15,8 +15,8 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.CHEMICAL_DYES;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.Concrete;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.Iron;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.Rubber;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.ASSEMBLER_RECIPES;
-import static com.gregtechceu.gtceu.common.data.GTRecipeTypes.CHEMICAL_BATH_RECIPES;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.ASSEMBLER_RECIPES;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.CHEMICAL_BATH_RECIPES;
 
 public class DecorationRecipes {
 

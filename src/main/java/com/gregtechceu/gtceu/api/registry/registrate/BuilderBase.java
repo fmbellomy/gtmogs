@@ -1,11 +1,9 @@
 package com.gregtechceu.gtceu.api.registry.registrate;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
+import dev.latvian.mods.kubejs.generator.KubeDataGenerator;
 import net.minecraft.resources.ResourceLocation;
-
-import dev.latvian.mods.kubejs.client.LangEventJS;
-import dev.latvian.mods.kubejs.generator.AssetJsonGenerator;
-import dev.latvian.mods.kubejs.generator.DataJsonGenerator;
-
 import java.util.function.Supplier;
 
 public abstract class BuilderBase<T> implements Supplier<T> {
@@ -17,11 +15,11 @@ public abstract class BuilderBase<T> implements Supplier<T> {
         this.id = id;
     }
 
-    public void generateDataJsons(DataJsonGenerator generator) {}
+    public void generateDataJsons(KubeDataGenerator generator) {}
 
-    public void generateAssetJsons(AssetJsonGenerator generator) {}
+    public void generateAssetJsons(KubeAssetGenerator generator) {}
 
-    public void generateLang(LangEventJS lang) {}
+    public void generateLang(LangKubeEvent lang) {}
 
     public abstract T register();
 

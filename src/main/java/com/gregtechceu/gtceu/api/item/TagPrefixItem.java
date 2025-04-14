@@ -5,10 +5,10 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.DustProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.client.renderer.item.TagPrefixItemRenderer;
-import com.gregtechceu.gtceu.common.data.GTDamageTypes;
+import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.item.ItemColor;
@@ -69,9 +69,9 @@ public class TagPrefixItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
-        super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+        super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         if (this.tagPrefix.tooltip() != null) {
             this.tagPrefix.tooltip().accept(material, tooltipComponents);
         }
@@ -123,7 +123,7 @@ public class TagPrefixItem extends Item {
         DustProperty property = material.isNull() ? null : material.getProperty(PropertyKey.DUST);
         if (property != null)
             return (int) (property.getBurnTime() * tagPrefix.getMaterialAmount(material) / GTValues.M);
-        return -1;
+        return 0;
     }
 
     // TODO BEACON PAYMENT
