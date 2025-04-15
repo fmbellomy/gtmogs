@@ -187,7 +187,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                     }
                 }
                 if (isEqual) continue;
-                //@formatter:off
+                //spotless::off
                 if (ingredient instanceof IntCircuitIngredient) {
                     list.add(0, ingredient);
                 } else if (ingredient instanceof SizedIngredient sized &&
@@ -199,7 +199,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                 } else {
                     list.add(ingredient);
                 }
-                //@formatter:on
+                //spotless::on
             } else if (item instanceof ItemStack stack) {
                 boolean isEqual = false;
                 for (Object obj : list) {
@@ -504,7 +504,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                     GTRecipeWidget.setConsumedChance(content,
                             recipe.getChanceLogicForCapability(this, io, isTickSlot(index, io, recipe)),
                             tooltips, recipeTier, chanceTier, recipeType.getChanceFunction());
-                    //@formatter:off
+                    //spotless::off
                     if (this.of(content.content) instanceof IntProviderIngredient ingredient) {
                         IntProvider countProvider = ingredient.getCountProvider();
                         tooltips.add(Component.translatable("gtceu.gui.content.count_range",
@@ -517,7 +517,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                                 countProvider.getMinValue(), countProvider.getMaxValue())
                                 .withStyle(ChatFormatting.GOLD));
                     }
-                    //@formatter:on
+                    //spotless::on
                     if (isTickSlot(index, io, recipe)) {
                         tooltips.add(Component.translatable("gtceu.gui.content.per_tick"));
                     }

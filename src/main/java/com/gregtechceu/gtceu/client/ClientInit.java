@@ -2,12 +2,15 @@ package com.gregtechceu.gtceu.client;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.item.IComponentItem;
+import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.client.particle.HazardParticle;
 import com.gregtechceu.gtceu.client.particle.MufflerParticle;
 import com.gregtechceu.gtceu.client.renderer.entity.GTExplosiveRenderer;
+import com.gregtechceu.gtceu.client.renderer.item.GTItemBarRenderer;
 import com.gregtechceu.gtceu.common.CommonInit;
 import com.gregtechceu.gtceu.common.data.GTBlockEntities;
 import com.gregtechceu.gtceu.common.data.GTEntityTypes;
@@ -25,10 +28,10 @@ import com.gregtechceu.gtceu.utils.input.KeyBind;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraft.world.item.Item;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 
@@ -73,9 +76,19 @@ public class ClientInit extends CommonInit {
         KeyBind.onRegisterKeyBinds(event);
     }
 
+
     @SubscribeEvent
-    public void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("hud", new HudGuiOverlay());
+    public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
+        for (Item item : BuiltInRegistries.ITEM) {
+            if (item instanceof IGTTool || item instanceof IComponentItem) {
+                event.register(item, GTItemBarRenderer.INSTANCE);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onRegisterGuiOverlays(RegisterGuiLayersEvent event) {
+        event.registerAboveAll(GTCEu.id("hud"), new HudGuiOverlay());
     }
 
     @SubscribeEvent

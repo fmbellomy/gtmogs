@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.common.machine.storage.CreativeTankMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;
@@ -15,8 +16,10 @@ import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TransformTexture;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
@@ -82,15 +85,15 @@ public class QuantumTankRenderer extends TieredHullMachineRenderer {
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         if (CREATIVE_FLUID_ITEM == null) CREATIVE_FLUID_ITEM = GTMachines.CREATIVE_FLUID.getItem();
         model = getItemBakedModel();
-        if (model != null && stack.hasTag()) {
+        if (model != null && stack.has(GTDataComponents.SINGLE_FLUID_STORAGE)) {
             poseStack.pushPose();
             model.getTransforms().getTransform(transformType).apply(leftHand, poseStack);
             poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-            FluidStack stored = FluidStack.loadFluidStackFromNBT(stack.getOrCreateTagElement("stored"));
-            long storedAmount = stack.getOrCreateTag().getLong("storedAmount");
-            if (storedAmount == 0 && !stored.isEmpty()) storedAmount = stored.getAmount();
-            long maxAmount = stack.getOrCreateTag().getLong("maxAmount");
+            var storage = stack.get(GTDataComponents.SINGLE_FLUID_STORAGE);
+            FluidStack stored = storage.stored();
+            long storedAmount = storage.amount();
+            long maxAmount = storage.maxAmount();
             // Don't need to handle locked fluids here since they don't get saved to the item
             renderTank(poseStack, buffer, Direction.NORTH, stored, storedAmount, maxAmount, FluidStack.EMPTY,
                     stack.is(CREATIVE_FLUID_ITEM));
@@ -180,7 +183,7 @@ public class QuantumTankRenderer extends TieredHullMachineRenderer {
             text = new TextTexture(amount).setDropShadow(false);
         }
         text.draw(GuiGraphicsAccessor.create(Minecraft.getInstance(), poseStack,
-                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder())),
+                MultiBufferSource.immediate(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE))),
                 0, 0, 0, 24, 64, 28);
         RenderSystem.enableDepthTest();
         poseStack.popPose();

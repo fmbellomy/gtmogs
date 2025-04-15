@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.client.renderer;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -12,8 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.common.util.TriState;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,16 +37,16 @@ public class BlockStateModelRenderer implements IRenderer {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public boolean useAO() {
-        return true;
+    public TriState useAO() {
+        return TriState.DEFAULT;
     }
 
     @Override
     @OnlyIn(Dist.CLIENT)
     public List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                       @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+                                       RandomSource rand) {
         if (models.containsKey(state)) {
-            return models.get(state).renderModel(level, pos, state, side, rand, data, renderType);
+            return models.get(state).renderModel(level, pos, state, side, rand);
         }
         return Collections.emptyList();
     }

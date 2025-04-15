@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
+import com.google.common.base.Preconditions;
 import com.gregtechceu.gtceu.utils.codec.CodecUtils;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -11,19 +12,28 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Optional;
 
-public record SingleFluidStorage(FluidStack stored, long amount) {
+public record SingleFluidStorage(FluidStack stored, long amount, long maxAmount) {
 
+    public SingleFluidStorage {
+        Preconditions.checkArgument(amount <= maxAmount, "amount must be <= maxAmount!");
+    }
+
+    public SingleFluidStorage(FluidStack stored, long amount) {
+        this(stored, amount, Long.MAX_VALUE);
+    }
 
     public static final Codec<FluidStack> OPTIONAL_SINGLE_FLUID_CODEC = ExtraCodecs.optionalEmptyMap(FluidStack.fixedAmountCodec(1))
             .xmap(stack -> stack.orElse(FluidStack.EMPTY),
                     stack -> stack.isEmpty() ? Optional.empty() : Optional.of(stack));
     public static final Codec<SingleFluidStorage> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             OPTIONAL_SINGLE_FLUID_CODEC.fieldOf("stored").forGetter(SingleFluidStorage::stored),
-            CodecUtils.NON_NEGATIVE_LONG.fieldOf("amount").forGetter(SingleFluidStorage::amount)
+            CodecUtils.NON_NEGATIVE_LONG.fieldOf("amount").forGetter(SingleFluidStorage::amount),
+            CodecUtils.NON_NEGATIVE_LONG.fieldOf("max_amount").forGetter(SingleFluidStorage::maxAmount)
     ).apply(instance, SingleFluidStorage::new));
     public static final StreamCodec<RegistryFriendlyByteBuf, SingleFluidStorage> STREAM_CODEC = StreamCodec.composite(
             FluidStack.OPTIONAL_STREAM_CODEC, SingleFluidStorage::stored,
             ByteBufCodecs.VAR_LONG, SingleFluidStorage::amount,
+            ByteBufCodecs.VAR_LONG, SingleFluidStorage::maxAmount,
             SingleFluidStorage::new
     );
 
@@ -39,15 +49,17 @@ public record SingleFluidStorage(FluidStack stored, long amount) {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof SingleFluidStorage(FluidStack otherStored, long otherAmount))) return false;
+        if (!(o instanceof SingleFluidStorage(FluidStack otherStored, long otherAmount, long otherMax))) return false;
 
-        return amount() == otherAmount && FluidStack.isSameFluidSameComponents(stored, otherStored);
+        return amount() == otherAmount && maxAmount() == otherMax &&
+                FluidStack.isSameFluidSameComponents(stored, otherStored);
     }
 
     @Override
     public int hashCode() {
         int result = FluidStack.hashFluidAndComponents(stored());
         result = 31 * result + Long.hashCode(amount());
+        result = 31 * result + Long.hashCode(maxAmount());
         return result;
     }
 

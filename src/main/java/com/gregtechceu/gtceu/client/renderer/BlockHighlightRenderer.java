@@ -16,6 +16,7 @@ import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
 import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -115,8 +116,9 @@ public class BlockHighlightRenderer {
                         poseStack.translate(-8, -8, 0);
                         texture.copy()
                                 .draw(GuiGraphicsAccessor.create(Minecraft.getInstance(), poseStack,
-                                        MultiBufferSource.immediate(Tesselator.getInstance().getBuilder())), 0, 0, 4, 4,
-                                        8, 8);
+                                        MultiBufferSource
+                                                .immediate(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE))),
+                                        0, 0, 4, 4, 8, 8);
                         RenderSystem.disableBlend();
                         RenderSystem.enableDepthTest();
                     }
@@ -335,7 +337,7 @@ public class BlockHighlightRenderer {
         poseStack.translate(-8, -8, 0);
 
         var graphics = GuiGraphicsAccessor.create(Minecraft.getInstance(), poseStack,
-                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder()));
+                MultiBufferSource.immediate(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE)));
         if (leftBlocked != null) {
             leftBlocked.copy().scale(0.9f).setColor(hoverLeft ? -1 : 0x44ffffff).draw(graphics, 0, 0, 0, 6, 4, 4);
         }
@@ -365,13 +367,11 @@ public class BlockHighlightRenderer {
     private static void drawLine(Matrix4f mat, VertexConsumer buffer, Vector3f from, Vector3f to) {
         var normal = new Vector3f(from).sub(to);
 
-        buffer.vertex(mat, from.x, from.y, from.z)
-                .color(rColour, gColour, bColour, 1f)
-                .normal(normal.x, normal.y, normal.z)
-                .endVertex();
-        buffer.vertex(mat, to.x, to.y, to.z)
-                .color(rColour, gColour, bColour, 1f)
-                .normal(normal.x, normal.y, normal.z)
-                .endVertex();
+        buffer.addVertex(mat, from.x, from.y, from.z)
+                .setColor(rColour, gColour, bColour, 1f)
+                .setNormal(normal.x, normal.y, normal.z);
+        buffer.addVertex(mat, to.x, to.y, to.z)
+                .setColor(rColour, gColour, bColour, 1f)
+                .setNormal(normal.x, normal.y, normal.z);
     }
 }

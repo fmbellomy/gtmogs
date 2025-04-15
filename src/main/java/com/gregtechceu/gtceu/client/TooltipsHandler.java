@@ -54,7 +54,7 @@ public class TooltipsHandler {
             }
         }
         if (stack.getItem() instanceof BucketItem bucket) {
-            var fluid = bucket.getFluid();
+            var fluid = bucket.content;
             if (!(fluid instanceof EmptyFluid)) {
                 appendFluidTooltips(new FluidStack(fluid, FluidType.BUCKET_VOLUME), tooltips::add, flag);
             }

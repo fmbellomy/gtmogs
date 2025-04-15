@@ -18,6 +18,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtension
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import java.util.*;
@@ -92,22 +93,23 @@ public class RenderUtil {
                 pos);
     }
 
-    public static void vertex(Matrix4f pose, VertexConsumer vertexConsumer, float x, float y, float z, int r, int g,
-                              int b, int a, float u, float v, int overlayCoords, int lightOverlay, float v0, float v1,
-                              float v2) {
+    public static void vertex(Matrix4f pose, VertexConsumer vertexConsumer,
+                              float x, float y, float z,
+                              int r, int g, int b, int a,
+                              float u, float v, int overlayCoords, int lightOverlay,
+                              float v0, float v1, float v2) {
         /*
          * For future reference:
          * The order of the vertex calls is important.
          * Change it, and it'll break and complain that you didn't fill all elements (even though you did).
          */
         vertexConsumer
-                .vertex(pose, x, y, z)
-                .color(r, g, b, a)
-                .uv(u, v)
-                .overlayCoords(overlayCoords)
-                .uv2(lightOverlay)
-                .normal(v0, v1, v2)
-                .endVertex();
+                .addVertex(pose, x, y, z)
+                .setColor(r, g, b, a)
+                .setUv(u, v)
+                .setOverlay(overlayCoords)
+                .setLight(lightOverlay)
+                .setNormal(v0, v1, v2);
     }
 
     public static Vector3f transformVertex(Vector3f vertex, Direction direction, float offsetX, float offsetY,
@@ -135,14 +137,14 @@ public class RenderUtil {
         }
 
         var fluidContent = contents.stream()
-                .filter(content -> content.content instanceof FluidIngredient ingredient && !ingredient.isEmpty())
+                .filter(content -> content.content instanceof SizedFluidIngredient ingredient && !ingredient.ingredient().hasNoFluids())
                 .findAny();
         if (fluidContent.isEmpty()) {
             return null;
         }
-        var ingredient = (FluidIngredient) fluidContent.get().content;
+        var ingredient = (SizedFluidIngredient) fluidContent.get().content;
 
-        var stacks = ingredient.getStacks();
+        var stacks = ingredient.getFluids();
         if (stacks.length == 0) {
             return null;
         }
