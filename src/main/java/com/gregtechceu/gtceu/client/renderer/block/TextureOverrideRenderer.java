@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.client.renderer.block;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.client.model.SpriteOverrider;
 
-import com.lowdragmc.lowdraglib.LDLib;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -84,10 +83,9 @@ public class TextureOverrideRenderer extends CTMModelRenderer {
                 model = ModelFactory.ITEM_MODEL_GENERATOR.generateBlockModel(new SpriteOverrider(override), blockModel);
             }
             itemModel = model.bake(
-                    ModelFactory.getModeBaker(),
+                    ModelFactory.getModelBaker(),
                     new SpriteOverrider(override),
-                    BlockModelRotation.X0_Y0,
-                    modelLocation);
+                    BlockModelRotation.X0_Y0);
         }
         return itemModel;
     }
@@ -97,19 +95,17 @@ public class TextureOverrideRenderer extends CTMModelRenderer {
     @OnlyIn(Dist.CLIENT)
     public BakedModel getRotatedModel(Direction frontFacing) {
         return blockModels.computeIfAbsent(frontFacing, facing -> getModel().bake(
-                ModelFactory.getModeBaker(),
+                ModelFactory.getModelBaker(),
                 new SpriteOverrider(override),
-                ModelFactory.getRotation(facing),
-                modelLocation));
+                ModelFactory.getRotation(facing)));
     }
 
     @OnlyIn(Dist.CLIENT)
     public BakedModel getRotatedModel(ModelState modelState) {
         return bakedModelCache.computeIfAbsent(modelState, state -> getModel().bake(
-                ModelFactory.getModeBaker(),
+                ModelFactory.getModelBaker(),
                 new SpriteOverrider(override),
-                modelState,
-                modelLocation));
+                modelState));
     }
 
     @SuppressWarnings("deprecation")
@@ -131,7 +127,7 @@ public class TextureOverrideRenderer extends CTMModelRenderer {
     @Override
     public void updateModelWithoutReloadingResource(ResourceLocation modelLocation) {
         super.updateModelWithoutReloadingResource(modelLocation);
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             if (bakedModelCache != null) {
                 bakedModelCache.clear();
             }

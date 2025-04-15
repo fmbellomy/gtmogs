@@ -9,6 +9,7 @@ import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
@@ -20,24 +21,24 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import javax.annotation.ParametersAreNullableByDefault;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/2/24
- * @implNote IMachineRenderer
- */
+@ParametersAreNullableByDefault
 public interface ICoverableRenderer extends IRenderer {
 
     @Override
     @OnlyIn(Dist.CLIENT)
     default List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                        RandomSource rand) {
+                                        @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         var blockEntity = level == null ? null : level.getBlockEntity(pos);
         if (blockEntity != null) {
+            //noinspection DataFlowIssue
             var coverable = GTCapabilityHelper.getCoverable(blockEntity.getLevel(), blockEntity.getBlockPos(), null);
             if (coverable != null) {
                 var quads = new LinkedList<BakedQuad>();
@@ -47,7 +48,7 @@ public interface ICoverableRenderer extends IRenderer {
                 return quads;
             }
         }
-        return IRenderer.super.renderModel(level, pos, state, side, rand);
+        return IRenderer.super.renderModel(level, pos, state, side, rand, data, renderType);
     }
 
     @OnlyIn(Dist.CLIENT)

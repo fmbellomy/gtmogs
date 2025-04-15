@@ -13,6 +13,7 @@ import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -30,6 +31,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.common.util.TriState;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -65,8 +68,8 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
     }
 
     @Override
-    public boolean useAO() {
-        return true;
+    public TriState useAO() {
+        return TriState.DEFAULT;
     }
 
     @Override
@@ -78,7 +81,7 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                       RandomSource rand) {
+                                       @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         if (level == null) {
             return pipeModel.bakeQuads(side, PipeModel.ITEM_CONNECTIONS, 0);
         } else if (level.getBlockEntity(pos) instanceof IPipeNode<?, ?> pipeNode) {

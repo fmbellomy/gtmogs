@@ -61,7 +61,7 @@ public class FusionReactorRenderer extends WorkableCasingMachineRenderer {
         } else {
             alpha = delta / FADEOUT;
             lastColor = color(Mth.floor(alpha * 255), red(lastColor), green(lastColor), blue(lastColor));
-            delta -= Minecraft.getInstance().getDeltaFrameTime();
+            delta -= Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
         }
 
         final var lerpFactor = Math.abs((Math.abs(machine.getOffsetTimer() % 50) + partialTicks) - 25) / 25;

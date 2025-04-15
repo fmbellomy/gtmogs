@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.cover.filter;
 
-import com.gregtechceu.gtceu.data.datagen.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 
 import com.gregtechceu.gtceu.utils.TagExprFilter;
 import net.minecraft.world.item.ItemStack;

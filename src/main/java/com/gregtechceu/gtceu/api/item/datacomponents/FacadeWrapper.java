@@ -17,9 +17,9 @@ public record FacadeWrapper(BlockState state) {
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof FacadeWrapper that))
+        if (!(o instanceof FacadeWrapper(BlockState thatState)))
             return false;
 
-        return state == that.state;
+        return state == thatState;
     }
 }

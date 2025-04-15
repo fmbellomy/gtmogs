@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
-import com.gregtechceu.gtceu.utils.StreamCodecUtils;
+import com.gregtechceu.gtceu.utils.codec.StreamCodecUtils;
 
 import lombok.AllArgsConstructor;
 import lombok.Setter;

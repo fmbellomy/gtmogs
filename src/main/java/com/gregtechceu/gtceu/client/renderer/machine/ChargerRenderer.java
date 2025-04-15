@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 import com.gregtechceu.gtceu.common.machine.electric.ChargerMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -51,23 +52,23 @@ public class ChargerRenderer extends TieredHullMachineRenderer {
             return;
         }
         switch (state) {
-            case IDLE -> quads.add(StaticFaceBakery.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_IDLE),
+            case IDLE -> quads.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_IDLE),
                     modelState, -1, 0, false, true));
             case RUNNING -> {
-                quads.add(StaticFaceBakery.bakeFace(modelFacing,
+                quads.add(FaceQuad.bakeFace(modelFacing,
                         ModelFactory.getBlockSprite(CHARGER_RUNNING),
                         modelState, -1, 0, true, true));
                 if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
-                    quads.add(StaticFaceBakery.bakeFace(modelFacing,
+                    quads.add(FaceQuad.bakeFace(modelFacing,
                             ModelFactory.getBlockSprite(CHARGER_RUNNING_EMISSIVE),
                             modelState, -101, 15, true, false));
                 }
             }
             case FINISHED -> {
-                quads.add(StaticFaceBakery.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_FINISHED),
+                quads.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_FINISHED),
                         modelState, -1, 0, true, true));
                 if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
-                    quads.add(StaticFaceBakery.bakeFace(modelFacing,
+                    quads.add(FaceQuad.bakeFace(modelFacing,
                             ModelFactory.getBlockSprite(CHARGER_FINISHED_EMISSIVE),
                             modelState, -101, 15, true, false));
                 }

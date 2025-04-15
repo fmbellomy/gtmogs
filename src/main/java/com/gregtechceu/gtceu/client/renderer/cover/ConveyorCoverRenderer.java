@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 import com.gregtechceu.gtceu.common.cover.ConveyorCover;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -51,9 +52,8 @@ public class ConveyorCoverRenderer implements ICoverRenderer {
                             BlockAndTintGetter level, ModelState modelState) {
         if (side == coverBehavior.attachedSide && coverBehavior instanceof ConveyorCover conveyor &&
                 modelFacing != null) {
-            quads.add(
-                    StaticFaceBakery.bakeFace(modelFacing, ModelFactory.getBlockSprite(CONVEYOR_OVERLAY), modelState));
-            quads.add(StaticFaceBakery.bakeFace(modelFacing,
+            quads.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CONVEYOR_OVERLAY), modelState));
+            quads.add(FaceQuad.bakeFace(modelFacing,
                     ModelFactory
                             .getBlockSprite(conveyor.getIo() == IO.OUT ? CONVEYOR_OVERLAY_OUT : CONVEYOR_OVERLAY_IN),
                     modelState, -101, 15));

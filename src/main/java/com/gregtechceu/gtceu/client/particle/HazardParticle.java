@@ -1,8 +1,5 @@
 package com.gregtechceu.gtceu.client.particle;
 
-import Particle;
-import ParticleRenderType;
-import SpriteSet;
 import com.gregtechceu.gtceu.common.particle.HazardParticleOptions;
 
 import net.minecraft.MethodsReturnNonnullByDefault;

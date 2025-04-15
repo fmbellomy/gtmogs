@@ -12,19 +12,18 @@ import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 
 /**
  * @author KilaBash
  * @date 2022/8/27
  * @implNote ForgeCommonEventListener
  */
-@Mod.EventBusSubscriber(modid = GTCEu.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
 public class ForgeClientEventListener {
 
@@ -34,14 +33,14 @@ public class ForgeClientEventListener {
             // to render the preview after block entities, before the translucent. so it can be seen through the
             // transparent blocks.
             MultiblockInWorldPreviewRenderer.renderInWorldPreview(event.getPoseStack(), event.getCamera(),
-                    event.getPartialTick());
+                    event.getPartialTick().getGameTimeDeltaTicks());
         }
     }
 
     @SubscribeEvent
     public static void onBlockHighlightEvent(RenderHighlightEvent.Block event) {
         BlockHighlightRenderer.renderBlockHighlight(event.getPoseStack(), event.getCamera(), event.getTarget(),
-                event.getMultiBufferSource(), event.getPartialTick());
+                event.getMultiBufferSource(), event.getDeltaTracker().getGameTimeDeltaTicks());
     }
 
     @SubscribeEvent
@@ -50,13 +49,11 @@ public class ForgeClientEventListener {
     }
 
     @SubscribeEvent
-    public static void onClientTickEvent(TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
-            TooltipHelper.onClientTick();
-            MultiblockInWorldPreviewRenderer.onClientTick();
-            EnvironmentalHazardClientHandler.INSTANCE.onClientTick();
-            GTValues.CLIENT_TIME++;
-        }
+    public static void onClientTickEvent(ClientTickEvent.Post event) {
+        TooltipHelper.onClientTick();
+        MultiblockInWorldPreviewRenderer.onClientTick();
+        EnvironmentalHazardClientHandler.INSTANCE.onClientTick();
+        GTValues.CLIENT_TIME++;
     }
 
     @SubscribeEvent

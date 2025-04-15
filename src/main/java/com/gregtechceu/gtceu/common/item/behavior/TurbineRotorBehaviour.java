@@ -80,9 +80,9 @@ public class TurbineRotorBehaviour implements IMaterialPartItem, ISubItemHandler
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Level level,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
                                 List<Component> tooltipComponents, TooltipFlag isAdvanced) {
-        IMaterialPartItem.super.appendHoverText(stack, level, tooltipComponents, isAdvanced);
+        IMaterialPartItem.super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         tooltipComponents
                 .add(Component.translatable("metaitem.tool.tooltip.rotor.efficiency", getRotorEfficiency(stack)));
         tooltipComponents.add(Component.translatable("metaitem.tool.tooltip.rotor.power", getRotorPower(stack)));

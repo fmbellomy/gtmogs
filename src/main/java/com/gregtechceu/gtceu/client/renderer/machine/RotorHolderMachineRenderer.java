@@ -46,17 +46,17 @@ public class RotorHolderMachineRenderer extends TieredHullMachineRenderer {
             return;
         }
         quads.add(
-                StaticFaceBakery.bakeFace(modelFacing, ModelFactory.getBlockSprite(ROTOR_HOLDER_OVERLAY), modelState));
+                FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(ROTOR_HOLDER_OVERLAY), modelState));
         if (machine instanceof IRotorHolderMachine rotorHolderMachine && rotorHolderMachine.isFormed()) {
-            quads.add(StaticFaceBakery.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing,
+            quads.add(FaceQuad.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing,
                     ModelFactory.getBlockSprite(BASE_RING), modelState, -101, 0, true, false));
-            quads.add(StaticFaceBakery.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing, ModelFactory.getBlockSprite(BASE_BG),
+            quads.add(FaceQuad.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing, ModelFactory.getBlockSprite(BASE_BG),
                     modelState, -101, 0, true, false));
             var material = rotorHolderMachine.getRotorMaterial();
             if (material.isNull()) {
                 return;
             }
-            quads.add(StaticFaceBakery.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing,
+            quads.add(FaceQuad.bakeFace(ROTOR_TEXTURE_SHAPE, modelFacing,
                     ModelFactory.getBlockSprite(rotorHolderMachine.isRotorSpinning() ? SPINNING : IDLE),
                     modelState, 2,
                     material.hasProperty(PropertyKey.ORE) && material.getProperty(PropertyKey.ORE).isEmissive() ? 12 :

@@ -30,7 +30,7 @@ public class SteamMinerRenderer extends WorkableSteamMachineRenderer {
                               Direction frontFacing, @Nullable Direction side, RandomSource rand,
                               @Nullable Direction modelFacing, ModelState modelState) {
         super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState);
-        if (side == Direction.DOWN) quads.add(StaticFaceBakery.bakeFace(modelFacing,
+        if (side == Direction.DOWN) quads.add(FaceQuad.bakeFace(modelFacing,
                 ModelFactory.getBlockSprite(MinerRenderer.PIPE_IN_OVERLAY), modelState));
     }
 }

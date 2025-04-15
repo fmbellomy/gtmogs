@@ -5,8 +5,10 @@ import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.client.renderer.block.CTMModelRenderer;
 import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BlockModelRotation;
@@ -18,6 +20,9 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -39,16 +44,15 @@ public class PumpHatchPartRenderer extends CTMModelRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                       RandomSource rand) {
+                                       @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         if (state.getBlock() instanceof MetaMachineBlock machineBlock && side == machineBlock.getFrontFacing(state)) {
-            var quads = new ArrayList<>(super.renderModel(level, pos, state, side, rand));
-            quads.add(StaticFaceBakery.bakeFace(side, ModelFactory.getBlockSprite(PIPE_OUT)));
-            quads.add(StaticFaceBakery.bakeFace(
-                    side, ModelFactory.getBlockSprite(FLUID_HATCH),
+            var quads = new ArrayList<>(super.renderModel(level, pos, state, side, rand, data, renderType));
+            quads.add(FaceQuad.bakeFace(side, ModelFactory.getBlockSprite(PIPE_OUT)));
+            quads.add(FaceQuad.bakeFace(side, ModelFactory.getBlockSprite(FLUID_HATCH),
                     BlockModelRotation.X0_Y0, -101, 15));
             return quads;
         }
-        return super.renderModel(level, pos, state, side, rand);
+        return super.renderModel(level, pos, state, side, rand, data, renderType);
     }
 
     @Override

@@ -26,9 +26,9 @@ public class LampItemOverlayRenderer {
 
     public static void renderOverlay(GuiGraphics graphics, ItemStack stack, int xPosition,
                                      int yPosition) {
-        if (stack.hasTag()) {
-            var tag = stack.getTag();
-            var overlayType = getOverlayType(isLightEnabled(tag), isBloomEnabled(tag));
+        if (stack.has(GTDataComponents.LAMP_DATA)) {
+            var lampData = stack.get(GTDataComponents.LAMP_DATA);
+            var overlayType = getOverlayType(lampData.lit(), lampData.bloom());
             if (overlayType == OverlayType.NONE) {
                 return;
             }

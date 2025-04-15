@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 import com.gregtechceu.gtceu.common.block.BoilerFireboxType;
 import com.gregtechceu.gtceu.utils.GTMatrixUtils;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -51,20 +52,20 @@ public class LargeBoilerRenderer extends WorkableCasingMachineRenderer implement
         // the rest of the owl
         if (machine.self().getPos().relative(relativeDown).get(relativeDown.getAxis()) !=
                 part.self().getPos().get(relativeDown.getAxis())) {
-            quads.add(StaticFaceBakery.bakeFace(multiFacing, ModelFactory.getBlockSprite(baseCasing), multiState));
+            quads.add(FaceQuad.bakeFace(multiFacing, ModelFactory.getBlockSprite(baseCasing), multiState));
             return;
         }
         // firebox
         if (side == relativeDown) {
             quads.add(
-                    StaticFaceBakery.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.bottom()), multiState));
+                    FaceQuad.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.bottom()), multiState));
         } else if (side == RelativeDirection.UP.getRelativeFacing(multiFacing, multiUpward, flipped)) {
-            quads.add(StaticFaceBakery.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.top()), multiState));
+            quads.add(FaceQuad.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.top()), multiState));
         } else {
-            quads.add(StaticFaceBakery.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.side()), multiState));
+            quads.add(FaceQuad.bakeFace(multiFacing, ModelFactory.getBlockSprite(firebox.side()), multiState));
             if (machine instanceof IRecipeLogicMachine recipeLogicMachine &&
                     recipeLogicMachine.getRecipeLogic().isWorking()) {
-                quads.add(StaticFaceBakery.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, multiFacing,
+                quads.add(FaceQuad.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, multiFacing,
                         ModelFactory.getBlockSprite(BLOOM_OVERLAY), multiState, -101, 15, true, false));
             }
         }

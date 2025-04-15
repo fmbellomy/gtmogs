@@ -139,7 +139,7 @@ public class WorkableOverlayModel {
             if (predicate != null) {
                 var texture = predicate.getSprite(isActive, isWorkingEnabled);
                 if (texture != null) {
-                    var quad = StaticFaceBakery.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
+                    var quad = FaceQuad.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
                             modelState, -1, 0, true, true);
                     if (quad.getDirection() == side) {
                         quads.add(quad);
@@ -149,13 +149,13 @@ public class WorkableOverlayModel {
                 texture = predicate.getEmissiveSprite(isActive, isWorkingEnabled);
                 if (texture != null) {
                     if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
-                        var quad = StaticFaceBakery.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
+                        var quad = FaceQuad.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
                                 modelState, -101, 15, true, false);
                         if (quad.getDirection() == side) {
                             quads.add(quad);
                         }
                     } else {
-                        var quad = StaticFaceBakery.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
+                        var quad = FaceQuad.bakeFace(StaticFaceBakery.SLIGHTLY_OVER_BLOCK, renderSide, texture,
                                 modelState, -1, 0, true, true);
                         if (quad.getDirection() == side) {
                             quads.add(quad);

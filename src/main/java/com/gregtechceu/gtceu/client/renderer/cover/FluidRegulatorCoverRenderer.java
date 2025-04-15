@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 import com.gregtechceu.gtceu.common.cover.PumpCover;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -47,7 +48,7 @@ public class FluidRegulatorCoverRenderer implements ICoverRenderer {
                             @NotNull CoverBehavior coverBehavior, Direction modelFacing, BlockPos pos,
                             BlockAndTintGetter level, ModelState modelState) {
         if (side == coverBehavior.attachedSide && coverBehavior instanceof PumpCover pump && modelFacing != null) {
-            quads.add(StaticFaceBakery.bakeFace(modelFacing,
+            quads.add(FaceQuad.bakeFace(modelFacing,
                     ModelFactory.getBlockSprite(pump.getIo() == IO.OUT ? PUMP_OVERLAY_OUT : PUMP_OVERLAY_IN),
                     modelState));
         }

@@ -8,14 +8,17 @@ import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.common.machine.storage.CreativeChestMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TransformTexture;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
@@ -76,18 +79,18 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         if (CREATIVE_CHEST_ITEM == null) CREATIVE_CHEST_ITEM = GTMachines.CREATIVE_ITEM.getItem();
         model = getItemBakedModel();
-        if (model != null && stack.hasTag()) {
+        if (model != null && stack.has(GTDataComponents.SINGLE_ITEM_STORAGE)) {
             poseStack.pushPose();
             model.getTransforms().getTransform(transformType).apply(leftHand, poseStack);
             poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-            ItemStack itemStack = ItemStack.of(stack.getOrCreateTagElement("stored"));
-            long storedAmount = stack.getOrCreateTag().getLong("storedAmount");
-            float tick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getFrameTime();
+            var storage = stack.get(GTDataComponents.SINGLE_ITEM_STORAGE);
+            ItemStack itemStack = storage.stored();
+            long storedAmount = storage.amount();
+            float tick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
             // Don't need to handle locked items here since they don't get saved to the item
             renderChest(poseStack, buffer, Direction.NORTH, itemStack, storedAmount, tick,
-                    ItemStack.EMPTY,
-                    stack.is(CREATIVE_CHEST_ITEM));
+                    ItemStack.EMPTY, stack.is(CREATIVE_CHEST_ITEM));
 
             poseStack.popPose();
         }
@@ -160,7 +163,7 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
             text = new TextTexture(amount).setDropShadow(false);
         }
         text.draw(GuiGraphicsAccessor.create(Minecraft.getInstance(), poseStack,
-                MultiBufferSource.immediate(Tesselator.getInstance().getBuilder())),
+                MultiBufferSource.immediate(new ByteBufferBuilder(RenderType.TRANSIENT_BUFFER_SIZE))),
                 0, 0, 0, 24, 64, 28);
         RenderSystem.enableDepthTest();
         poseStack.popPose();

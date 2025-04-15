@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.client.util.DrawUtil;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
@@ -50,8 +51,7 @@ public final class ToolChargeBarRenderer {
     public static void renderBarsTool(GuiGraphics graphics, IGTTool tool, ItemStack stack, int xPosition,
                                       int yPosition) {
         boolean renderedDurability = false;
-        CompoundTag tag = stack.getOrCreateTag();
-        if (!tag.getBoolean(ToolHelper.UNBREAKABLE_KEY)) {
+        if (!stack.has(DataComponents.UNBREAKABLE)) {
             renderedDurability = renderDurabilityBar(graphics, stack.getBarWidth(), xPosition,
                     yPosition);
         }
