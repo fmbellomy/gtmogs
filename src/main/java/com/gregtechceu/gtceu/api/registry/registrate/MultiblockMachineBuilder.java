@@ -23,6 +23,7 @@ import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,7 +44,6 @@ import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-import dev.latvian.mods.kubejs.client.LangEventJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
@@ -384,7 +384,7 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public void generateLang(LangEventJS lang) {
+    public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
         if (langValue() != null) {
             lang.add(GTCEu.MOD_ID, value.getDescriptionId(), value.getLangValue());

@@ -11,7 +11,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Arrays;
 import java.util.List;
@@ -151,6 +150,7 @@ public class FluidHandlerList implements IFluidHandlerModifiable, INBTSerializab
         return tag;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {
         var list = nbt.getList("tanks", nbt.getByte("type"));

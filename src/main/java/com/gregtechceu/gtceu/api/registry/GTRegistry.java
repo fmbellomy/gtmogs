@@ -6,6 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
@@ -59,7 +61,7 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
             throw new IllegalStateException("Registry is already frozen!");
         }
 
-        if (!checkActiveModContainerIsGregtech()) {
+        if (!checkActiveModContainerIsOwner()) {
             return;
         }
 
@@ -71,7 +73,7 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
             throw new IllegalStateException("Registry is already unfrozen!");
         }
 
-        if (!checkActiveModContainerIsGregtech()) {
+        if (!checkActiveModContainerIsOwner()) {
             return;
         }
 
@@ -79,11 +81,11 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean checkActiveModContainerIsGregtech() {
+    private boolean checkActiveModContainerIsOwner() {
         ModContainer container = ModLoadingContext.get().getActiveContainer();
         return container != null && (container.getModId().equals(this.registryName.getNamespace()) ||
                 container.getModId().equals(GTCEu.MOD_ID) ||
-                container.getModId().equals("minecraft")); // check for minecraft modid in case of datagen or a mishap
+                container.getModId().equals("minecraft")); // check for minecraft in case of datagen or a mishap
     }
 
     public <T extends V> T register(K key, T value) {
@@ -173,6 +175,8 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
 
     public abstract Codec<V> codec();
 
+    public abstract StreamCodec<RegistryFriendlyByteBuf, V> streamCodec();
+
     // ************************ Built-in Registry ************************//
 
     public static class String<V> extends GTRegistry<java.lang.String, V> {
@@ -221,6 +225,21 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
                                     .orElseGet(() -> DataResult.error(
                                             () -> "Unknown registry element in " + this.registryName + ": " + obj)));
         }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, V> streamCodec() {
+            return new StreamCodec<>() {
+
+                public V decode(@NotNull RegistryFriendlyByteBuf buf) {
+                    java.lang.String id = buf.readUtf();
+                    return GTRegistry.String.this.get(id);
+                }
+
+                public void encode(@NotNull RegistryFriendlyByteBuf buf, @NotNull V value) {
+                    buf.writeUtf(GTRegistry.String.this.getKey(value));
+                }
+            };
+        }
     }
 
     public static class RL<V> extends GTRegistry<ResourceLocation, V> {
@@ -268,6 +287,21 @@ public abstract class GTRegistry<K, V> implements Iterable<V> {
                             obj -> Optional.ofNullable(this.getKey(obj)).map(DataResult::success)
                                     .orElseGet(() -> DataResult.error(
                                             () -> "Unknown registry element in " + this.registryName + ": " + obj)));
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, V> streamCodec() {
+            return new StreamCodec<>() {
+
+                public V decode(@NotNull RegistryFriendlyByteBuf buf) {
+                    ResourceLocation id = ResourceLocation.STREAM_CODEC.decode(buf);
+                    return GTRegistry.RL.this.get(id);
+                }
+
+                public void encode(@NotNull RegistryFriendlyByteBuf buf, @NotNull V value) {
+                    ResourceLocation.STREAM_CODEC.encode(buf, GTRegistry.RL.this.getKey(value));
+                }
+            };
         }
     }
 }

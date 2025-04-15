@@ -7,8 +7,9 @@ import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.resources.ResourceLocation;
+
+import com.mojang.serialization.MapCodec;
 
 import java.util.function.Function;
 
@@ -28,14 +29,14 @@ public class VeinGenerators {
             DikeVeinGenerator::new);
     public static final MapCodec<VeinedVeinGenerator> VEINED = register(GTCEu.id("veined"), VeinedVeinGenerator.CODEC,
             VeinedVeinGenerator::new);
-    public static final MapCodec<ClassicVeinGenerator> CLASSIC = register(GTCEu.id("classic"), ClassicVeinGenerator.CODEC,
-            ClassicVeinGenerator::new);
+    public static final MapCodec<ClassicVeinGenerator> CLASSIC = register(GTCEu.id("classic"),
+            ClassicVeinGenerator.CODEC, ClassicVeinGenerator::new);
     public static final MapCodec<CuboidVeinGenerator> CUBOID = register(GTCEu.id("cuboid"), CuboidVeinGenerator.CODEC,
             CuboidVeinGenerator::new);
 
     public static <
             T extends VeinGenerator> MapCodec<T> register(ResourceLocation id, MapCodec<T> codec,
-                                                       Function<GTOreDefinition, ? extends VeinGenerator> function) {
+                                                          Function<GTOreDefinition, ? extends VeinGenerator> function) {
         WorldGeneratorUtils.VEIN_GENERATORS.put(id, codec);
         WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.put(id, function);
         return codec;

@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.worldgen.modifier;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -11,7 +11,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -21,8 +21,8 @@ public class BiomePlacement extends PlacementModifier {
     public static final PlacementModifierType<BiomePlacement> BIOME_PLACEMENT = GTRegistries.register(
             BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, GTCEu.id("biome_placement"), () -> BiomePlacement.CODEC);
 
-    public static final Codec<BiomePlacement> CODEC = BiomeWeightModifier.CODEC.listOf().fieldOf("modifiers")
-            .xmap(BiomePlacement::new, placement -> placement.modifiers).codec();
+    public static final MapCodec<BiomePlacement> CODEC = BiomeWeightModifier.CODEC.listOf().fieldOf("modifiers")
+            .xmap(BiomePlacement::new, placement -> placement.modifiers);
 
     public final List<BiomeWeightModifier> modifiers;
 

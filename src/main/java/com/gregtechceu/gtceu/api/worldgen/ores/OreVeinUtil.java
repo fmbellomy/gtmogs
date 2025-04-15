@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.worldgen.GTOres;
@@ -24,6 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -120,7 +120,7 @@ public class OreVeinUtil {
         JsonElement codecInput = resolveBiomeCodecInput(biomes);
         return () -> RegistryCodecs.homogeneousList(Registries.BIOME)
                 .parse(registryOps, codecInput)
-                .getOrThrow(false, GTCEu.LOGGER::error);
+                .getOrThrow();
     }
 
     private static JsonElement resolveBiomeCodecInput(List<String> biomes) {

@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.api.registry;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
@@ -16,30 +18,15 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
-import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
-import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
-import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author KilaBash
@@ -74,41 +61,24 @@ public final class GTRegistries {
     public static final GTRegistry.RL<DimensionMarker> DIMENSION_MARKERS = new GTRegistry.RL<>(
             GTCEu.id("dimension_marker"));
 
-    public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER = DeferredRegister
-            .create(Registries.PLACEMENT_MODIFIER_TYPE, GTCEu.MOD_ID);
-    public static final DeferredRegister<RecipeType<?>> RECIPE_TYPE = DeferredRegister.create(Registries.RECIPE_TYPE,
-            GTCEu.MOD_ID);
-    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister
-            .create(Registries.RECIPE_SERIALIZER, GTCEu.MOD_ID);
-    public static final DeferredRegister<SoundEvent> SOUND_EVENT = DeferredRegister.create(Registries.SOUND_EVENT,
-            GTCEu.MOD_ID);
-    public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIES = DeferredRegister
-            .create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, GTCEu.MOD_ID);
-
-    private static final Map<ResourceLocation, Object> TO_REGISTER = new HashMap<>();
-
+    private static final Table<Registry<?>, ResourceLocation, Object> TO_REGISTER = HashBasedTable.create();
     public static <V, T extends V> T register(Registry<V> registry, ResourceLocation name, T value) {
-        ResourceKey<?> registryKey = registry.key();
-
-        if (registryKey == Registries.RECIPE_TYPE) {
-            TO_REGISTER.put(name, value);
-        } else if (registryKey == Registries.RECIPE_SERIALIZER) {
-            TO_REGISTER.put(name, value);
-        } else if (registryKey == Registries.FEATURE) {
-            ForgeRegistries.FEATURES.register(name, (Feature<?>) value);
-        } else if (registryKey == Registries.PLACEMENT_MODIFIER_TYPE) {
-            PLACEMENT_MODIFIER.register(name.getPath(), () -> (PlacementModifierType<?>) value);
-        } else {
-            return Registry.register(registry, name, value);
-        }
-
+        TO_REGISTER.put(registry, name, value);
         return value;
     }
 
+    // ignore the generics and hope the registered objects are still correctly typed :3
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    private static void actuallyRegister(RegisterEvent event) {
+        for (Registry reg : TO_REGISTER.rowKeySet()) {
+            event.register(reg.key(), helper -> {
+                TO_REGISTER.row(reg).forEach(helper::register);
+            });
+        }
+    }
+
     public static void init(IEventBus eventBus) {
-        TRUNK_PLACER_TYPE.register(eventBus);
-        PLACEMENT_MODIFIER.register(eventBus);
-        GLOBAL_LOOT_MODIFIES.register(eventBus);
+        eventBus.addListener(GTRegistries::actuallyRegister);
     }
 
     private static final RegistryAccess BLANK = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);

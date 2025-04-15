@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -26,10 +25,12 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.mutable.MutableInt;
+
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;

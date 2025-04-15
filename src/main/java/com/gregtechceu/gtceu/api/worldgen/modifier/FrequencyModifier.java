@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 
 import java.util.stream.Stream;
 
@@ -31,8 +31,8 @@ public class FrequencyModifier extends PlacementModifier {
     public static final PlacementModifierType<FrequencyModifier> FREQUENCY_MODIFIER = GTRegistries
             .register(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, GTCEu.id("frequency"), () -> FrequencyModifier.CODEC);
 
-    public static final Codec<FrequencyModifier> CODEC = ExtraCodecs.POSITIVE_FLOAT.fieldOf("chance")
-            .xmap(FrequencyModifier::new, (modifier) -> modifier.frequency).codec();
+    public static final MapCodec<FrequencyModifier> CODEC = ExtraCodecs.POSITIVE_FLOAT.fieldOf("chance")
+            .xmap(FrequencyModifier::new, (modifier) -> modifier.frequency);
 
     private final float frequency;
 

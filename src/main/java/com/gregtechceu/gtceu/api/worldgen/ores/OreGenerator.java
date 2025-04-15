@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
-import VeinConfiguration;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.IWorldGenLayer;

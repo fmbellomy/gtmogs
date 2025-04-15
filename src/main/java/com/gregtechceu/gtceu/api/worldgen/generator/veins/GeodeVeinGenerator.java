@@ -7,8 +7,8 @@ import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,10 +38,12 @@ import net.minecraft.world.level.levelgen.feature.GeodeFeature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.material.FluidState;
+
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
@@ -57,8 +59,6 @@ import java.util.function.Predicate;
 @Accessors(chain = true, fluent = true)
 @AllArgsConstructor
 public class GeodeVeinGenerator extends VeinGenerator {
-
-    private static final Direction[] DIRECTIONS = Direction.values();
 
     public static final Codec<Double> CHANCE_RANGE = Codec.doubleRange(0.0, 1.0);
 
@@ -134,8 +134,8 @@ public class GeodeVeinGenerator extends VeinGenerator {
     @Override
     public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
                                                   BlockPos origin) {
-        // TODO refactor geode sizes for the new ore generation system. For now, geode veins are still generated in
-        // place.
+        // TODO refactor geode sizes for the new ore generation system.
+        // For now, geode veins are still generated in place.
 
         BulkSectionAccess access = new BulkSectionAccess(level);
 
@@ -198,10 +198,10 @@ public class GeodeVeinGenerator extends VeinGenerator {
             double s = 0.0;
             double t = 0.0;
             for (var pair : points) {
-                s += Mth.fastInvSqrt(pos.distSqr(pair.getFirst()) + (double) pair.getSecond()) + noiseValue;
+                s += Mth.invSqrt(pos.distSqr(pair.getFirst()) + (double) pair.getSecond()) + noiseValue;
             }
             for (BlockPos origin4 : list2) {
-                t += Mth.fastInvSqrt(pos.distSqr(origin4) + (double) geodeCrackSettings.crackPointOffset) + noiseValue;
+                t += Mth.invSqrt(pos.distSqr(origin4) + (double) geodeCrackSettings.crackPointOffset) + noiseValue;
             }
             if (s < outerSize) continue;
             if (!level.ensureCanWrite(pos))
@@ -211,7 +211,7 @@ public class GeodeVeinGenerator extends VeinGenerator {
                 continue;
             if (doCrack && t >= crackSize && s < fillingSize) {
                 this.safeSetBlock(access, section, pos, Blocks.AIR.defaultBlockState(), placementPredicate);
-                for (Direction direction : DIRECTIONS) {
+                for (Direction direction : GTUtil.DIRECTIONS) {
                     BlockPos origin5 = pos.relative(direction);
                     FluidState fluidState = level.getFluidState(origin5);
                     if (fluidState.isEmpty()) continue;
@@ -258,7 +258,7 @@ public class GeodeVeinGenerator extends VeinGenerator {
         block5:
         for (BlockPos origin2 : positions) {
             blockState = Util.getRandom(innerPlacements, random);
-            for (Direction direction2 : DIRECTIONS) {
+            for (Direction direction2 : GTUtil.DIRECTIONS) {
                 if (blockState.hasProperty(BlockStateProperties.FACING)) {
                     blockState = blockState.setValue(BlockStateProperties.FACING, direction2);
                 }

@@ -14,7 +14,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 import net.minecraft.world.level.levelgen.placement.PlacementFilter;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public class DimensionFilter extends PlacementFilter {
@@ -22,7 +22,7 @@ public class DimensionFilter extends PlacementFilter {
     public static final PlacementModifierType<DimensionFilter> DIMENSION_FILTER = GTRegistries
             .register(BuiltInRegistries.PLACEMENT_MODIFIER_TYPE, GTCEu.id("dimension"), () -> DimensionFilter.CODEC);
 
-    public static final Codec<DimensionFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+    public static final MapCodec<DimensionFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.DIMENSION_TYPE).fieldOf("dimension_id")
                     .forGetter(filter -> filter.dimensionId))
             .apply(instance, DimensionFilter::new));

@@ -38,5 +38,5 @@ public interface IGTFluidBuilder {
 
     Supplier<? extends Fluid> registerFluid();
 
-    RegistryEntry<? extends Fluid> register();
+    RegistryEntry<Fluid, ? extends Fluid> register();
 }

@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -42,8 +43,11 @@ public class BedrockFluidVeinSavedData extends SavedData {
     private final ServerLevel serverLevel;
 
     public static BedrockFluidVeinSavedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(tag -> new BedrockFluidVeinSavedData(serverLevel, tag),
-                () -> new BedrockFluidVeinSavedData(serverLevel), "gtceu_bedrock_fluid");
+        return serverLevel.getDataStorage()
+                .computeIfAbsent(
+                        new SavedData.Factory<>(() -> new BedrockFluidVeinSavedData(serverLevel),
+                                (tag, provider) -> new BedrockFluidVeinSavedData(serverLevel, tag)),
+                        "gtceu_bedrock_fluid");
     }
 
     public BedrockFluidVeinSavedData(ServerLevel serverLevel) {
@@ -61,7 +65,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
     }
 
     @Override
-    public CompoundTag save(CompoundTag nbt) {
+    public CompoundTag save(CompoundTag nbt, HolderLookup.Provider provider) {
         var oilList = new ListTag();
         for (var entry : veinFluids.entrySet()) {
             var tag = new CompoundTag();
