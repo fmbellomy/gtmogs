@@ -48,7 +48,6 @@ import com.gregtechceu.gtceu.data.pack.GTPackSource;
 import com.gregtechceu.gtceu.data.recipe.*;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
-import com.gregtechceu.gtceu.data.worldgen.GTPlacerTypes;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
 import com.gregtechceu.gtceu.integration.kjs.events.MaterialModificationEventJS;
@@ -91,7 +90,6 @@ public class CommonInit {
         UIFactory.register(MachineUIFactory.INSTANCE);
         UIFactory.register(CoverUIFactory.INSTANCE);
         UIFactory.register(GTUIEditorFactory.INSTANCE);
-        GTPlacerTypes.init();
         GTRecipeCapabilities.init();
         GTRecipeConditions.init();
         GTToolTiers.init();

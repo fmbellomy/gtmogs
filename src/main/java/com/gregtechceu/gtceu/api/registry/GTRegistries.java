@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.registry;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.api.material.Element;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
@@ -23,6 +24,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.levelgen.feature.Feature;
@@ -32,11 +34,12 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
-import com.mojang.serialization.Codec;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.ApiStatus;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author KilaBash
@@ -58,6 +61,8 @@ public final class GTRegistries {
             GTCEu.id("recipe_capability"));
     public static final GTRegistry.String<RecipeConditionType<?>> RECIPE_CONDITIONS = new GTRegistry.String<>(
             GTCEu.id("recipe_condition"));
+    public static final GTRegistry.RL<ToolBehaviorType<?>> TOOL_BEHAVIORS = new GTRegistry.RL<>(
+            GTCEu.id("tool_behavior"));
     public static final GTRegistry.String<ChanceLogic> CHANCE_LOGICS = new GTRegistry.String<>(
             GTCEu.id("chance_logic"));
     public static final GTRegistry.RL<SoundEntry> SOUNDS = new GTRegistry.RL<>(GTCEu.id("sound"));
@@ -68,26 +73,29 @@ public final class GTRegistries {
     public static final GTRegistry.RL<GTOreDefinition> ORE_VEINS = new GTRegistry.RL<>(GTCEu.id("ore_vein"));
     public static final GTRegistry.RL<DimensionMarker> DIMENSION_MARKERS = new GTRegistry.RL<>(
             GTCEu.id("dimension_marker"));
-    public static final DeferredRegister<TrunkPlacerType<?>> TRUNK_PLACER_TYPE = DeferredRegister
-            .create(Registries.TRUNK_PLACER_TYPE, GTCEu.MOD_ID);
+
     public static final DeferredRegister<PlacementModifierType<?>> PLACEMENT_MODIFIER = DeferredRegister
             .create(Registries.PLACEMENT_MODIFIER_TYPE, GTCEu.MOD_ID);
+    public static final DeferredRegister<RecipeType<?>> RECIPE_TYPE = DeferredRegister.create(Registries.RECIPE_TYPE,
+            GTCEu.MOD_ID);
+    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister
+            .create(Registries.RECIPE_SERIALIZER, GTCEu.MOD_ID);
+    public static final DeferredRegister<SoundEvent> SOUND_EVENT = DeferredRegister.create(Registries.SOUND_EVENT,
+            GTCEu.MOD_ID);
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> GLOBAL_LOOT_MODIFIES = DeferredRegister
             .create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, GTCEu.MOD_ID);
+
+    private static final Map<ResourceLocation, Object> TO_REGISTER = new HashMap<>();
 
     public static <V, T extends V> T register(Registry<V> registry, ResourceLocation name, T value) {
         ResourceKey<?> registryKey = registry.key();
 
         if (registryKey == Registries.RECIPE_TYPE) {
-            NeoForgeRegistries.RECIPE_TYPES.register(name, (RecipeType<?>) value);
+            TO_REGISTER.put(name, value);
         } else if (registryKey == Registries.RECIPE_SERIALIZER) {
-            ForgeRegistries.RECIPE_SERIALIZERS.register(name, (RecipeSerializer<?>) value);
+            TO_REGISTER.put(name, value);
         } else if (registryKey == Registries.FEATURE) {
             ForgeRegistries.FEATURES.register(name, (Feature<?>) value);
-        } else if (registryKey == Registries.FOLIAGE_PLACER_TYPE) {
-            ForgeRegistries.FOLIAGE_PLACER_TYPES.register(name, (FoliagePlacerType<?>) value);
-        } else if (registryKey == Registries.TRUNK_PLACER_TYPE) {
-            TRUNK_PLACER_TYPE.register(name.getPath(), () -> (TrunkPlacerType<?>) value);
         } else if (registryKey == Registries.PLACEMENT_MODIFIER_TYPE) {
             PLACEMENT_MODIFIER.register(name.getPath(), () -> (PlacementModifierType<?>) value);
         } else {
