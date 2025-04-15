@@ -36,18 +36,14 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
 import java.util.List;
 
 import static com.gregtechceu.gtceu.utils.GTMatrixUtils.*;
 
-/**
- * @author KilaBash
- * @date 2023/3/2
- * @implNote QuantumChestRenderer
- */
 public class QuantumChestRenderer extends TieredHullMachineRenderer {
 
     private static Item CREATIVE_CHEST_ITEM = null;
@@ -63,7 +59,7 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderBaseModel(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                                ModelState modelState, @Nullable Direction side, RandomSource rand) {
+                                ModelState modelState, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         quads.addAll(getRotatedModel(modelState).getQuads(definition.defaultBlockState(), side, rand));
     }
 
@@ -79,12 +75,12 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         if (CREATIVE_CHEST_ITEM == null) CREATIVE_CHEST_ITEM = GTMachines.CREATIVE_ITEM.getItem();
         model = getItemBakedModel();
-        if (model != null && stack.has(GTDataComponents.SINGLE_ITEM_STORAGE)) {
+        if (model != null && stack.has(GTDataComponents.LARGE_ITEM_CONTENT)) {
             poseStack.pushPose();
             model.getTransforms().getTransform(transformType).apply(leftHand, poseStack);
             poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-            var storage = stack.get(GTDataComponents.SINGLE_ITEM_STORAGE);
+            var storage = stack.get(GTDataComponents.LARGE_ITEM_CONTENT);
             ItemStack itemStack = storage.stored();
             long storedAmount = storage.amount();
             float tick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();

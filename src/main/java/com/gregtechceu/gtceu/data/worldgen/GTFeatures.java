@@ -15,11 +15,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/**
- * @author KilaBash
- * @date 2023/3/20
- * @implNote GTFeatures
- */
 public class GTFeatures {
 
     public static final ResourceLocation NEW_ORE_VEIN_TOGGLE = GTCEu.id("vein_toggle");

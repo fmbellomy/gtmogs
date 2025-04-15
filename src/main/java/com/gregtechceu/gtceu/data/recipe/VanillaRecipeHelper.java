@@ -27,11 +27,6 @@ import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/2/21
- * @implNote VanillaRecipeHelper
- */
 public class VanillaRecipeHelper {
 
     public static void addSmeltingRecipe(Consumer<FinishedRecipe> provider, @NotNull String regName, TagKey<Item> input,

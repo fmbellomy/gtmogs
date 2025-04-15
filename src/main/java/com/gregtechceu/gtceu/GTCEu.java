@@ -3,9 +3,12 @@ package com.gregtechceu.gtceu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.data.*;
+import com.gregtechceu.gtceu.common.CommonInit;
 import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.command.GTCommandArguments;
+import com.gregtechceu.gtceu.data.effect.GTMobEffects;
+import com.gregtechceu.gtceu.data.misc.GTValueProviderTypes;
 import com.gregtechceu.gtceu.data.particle.GTParticleTypes;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
 import com.gregtechceu.gtceu.forge.AlloyBlastPropertyAddition;
@@ -17,6 +20,7 @@ import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.javafmlmod.FMLModContainer;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
@@ -25,7 +29,6 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import dev.emi.emi.config.EmiConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
-import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.file.Path;
@@ -38,15 +41,11 @@ public class GTCEu {
     public static final String NAME = "GregTechCEu";
     public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
-    @ApiStatus.Internal
-    public static IEventBus gtModBus;
-
-    public GTCEu(IEventBus modBus) {
-        gtModBus = modBus;
-        GTCEu.init();
+    public GTCEu(IEventBus modBus, FMLModContainer container) {
         GTCEuAPI.instance = this;
 
-        // Moved here from CommonInit.
+        CommonInit.init(modBus);
+
         modBus.addListener(AlloyBlastPropertyAddition::addAlloyBlastProperties);
         // must be set here because of KubeJS compat
         // trying to read this before the pre-init stage
@@ -64,10 +63,6 @@ public class GTCEu {
         GTCommandArguments.init(modBus);
         GTMobEffects.init(modBus);
         GTParticleTypes.init(modBus);
-    }
-
-    public static void init() {
-        LOGGER.info("{} is initializing...", NAME);
     }
 
     public static ResourceLocation id(String path) {

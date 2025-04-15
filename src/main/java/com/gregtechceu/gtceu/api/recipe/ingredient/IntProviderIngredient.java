@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.recipe.ingredient;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 
+import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -28,8 +29,8 @@ public class IntProviderIngredient implements ICustomIngredient {
     public static final ResourceLocation TYPE = GTCEu.id("int_provider");
     public static final MapCodec<IntProviderIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Ingredient.CODEC.fieldOf("inner").forGetter(IntProviderIngredient::getInner),
-            IntProvider.CODEC.fieldOf("count_provider").forGetter(IntProviderIngredient::getCountProvider))
-            .apply(instance, IntProviderIngredient::new));
+            IntProvider.CODEC.fieldOf("count_provider").forGetter(IntProviderIngredient::getCountProvider)
+    ).apply(instance, IntProviderIngredient::new));
 
     @Getter
     protected final IntProvider countProvider;
@@ -49,8 +50,8 @@ public class IntProviderIngredient implements ICustomIngredient {
         this(Ingredient.of(tag), amount);
     }
 
-    public static IntProviderIngredient create(Ingredient inner, IntProvider countProvider) {
-        return new IntProviderIngredient(inner, countProvider);
+    public static Ingredient create(Ingredient inner, IntProvider countProvider) {
+        return new IntProviderIngredient(inner, countProvider).toVanilla();
     }
 
     @Override

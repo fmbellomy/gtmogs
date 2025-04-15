@@ -43,7 +43,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.DummyWorld;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
@@ -79,19 +78,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import static com.gregtechceu.gtceu.api.item.tool.ToolHelper.getBehaviorsComponent;
+import static com.gregtechceu.gtceu.common.item.tool.behavior.ToolModeSwitchBehavior.ModeType.*;
 
-/**
- * @author KilaBash
- * @date 2023/2/17
- * @implNote MetaMachine, an abstract layer of gregtech machine.
- *           Because I have to implement BlockEntities for both fabric and forge platform.
- *           All fundamental features will be implemented here.
- *           To add additional features, you can see {@link IMachineFeature}
- */
-@SuppressWarnings("removal")
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscription, IAppearance, IToolGridHighLight,
                          IFancyTooltip, IPaintable, IRedstoneSignalMachine {
 
@@ -406,20 +395,18 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
             if (isRemote())
                 return ItemInteractionResult.CONSUME;
             var itemStack = playerIn.getItemInHand(hand);
-            var tagCompound = ToolHelper.getBehaviorsComponent(itemStack);
-            tagCompound.getBehavior(ToolBehaviorType)
-            ToolModeSwitchBehavior.WrenchModeType type = ToolModeSwitchBehavior.WrenchModeType.values()[tagCompound
-                    .getByte("Mode")];
+            var component = ToolHelper.getBehaviorsComponent(itemStack);
+            ToolModeSwitchBehavior.ModeType type = Optional
+                    .ofNullable(component.getBehavior(GTToolBehaviors.MODE_SWITCH))
+                    .map(ToolModeSwitchBehavior::getModeType).orElse(BOTH);
 
-            if (type == ToolModeSwitchBehavior.WrenchModeType.ITEM ||
-                    type == ToolModeSwitchBehavior.WrenchModeType.BOTH) {
+            if (type == ITEM || type == BOTH) {
                 if (this instanceof IAutoOutputItem autoOutputItem &&
                         (!hasFrontFacing() || gridSide != getFrontFacing())) {
                     autoOutputItem.setOutputFacingItems(gridSide);
                 }
             }
-            if (type == ToolModeSwitchBehavior.WrenchModeType.FLUID ||
-                    type == ToolModeSwitchBehavior.WrenchModeType.BOTH) {
+            if (type == FLUID || type == BOTH) {
                 if (this instanceof IAutoOutputFluid autoOutputFluid &&
                         (!hasFrontFacing() || gridSide != getFrontFacing())) {
                     autoOutputFluid.setOutputFacingFluids(gridSide);

@@ -15,10 +15,13 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import lombok.Getter;
 import lombok.experimental.Accessors;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
@@ -88,7 +91,7 @@ public class AssemblyLineMachine extends WorkableElectricMultiblockMachine {
 
         for (int i = 0; i < inputsSize; i++) {
             var itemStack = itemInventory.get(i);
-            Ingredient recipeStack = ItemRecipeCapability.CAP.of(itemInputs.get(i).content);
+            SizedIngredient recipeStack = ItemRecipeCapability.CAP.of(itemInputs.get(i).content);
             if (!recipeStack.test(itemStack)) {
                 return false;
             }
@@ -120,8 +123,8 @@ public class AssemblyLineMachine extends WorkableElectricMultiblockMachine {
 
         for (int i = 0; i < inputsSize; i++) {
             var fluidStack = fluidInventory.get(i);
-            FluidIngredient recipeStack = FluidRecipeCapability.CAP.of(fluidInputs.get(i).content);
-            if (!recipeStack.test(fluidStack) || recipeStack.getAmount() > fluidStack.getAmount()) {
+            SizedFluidIngredient recipeStack = FluidRecipeCapability.CAP.of(fluidInputs.get(i).content);
+            if (!recipeStack.test(fluidStack)) {
                 return false;
             }
         }

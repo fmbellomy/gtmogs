@@ -4,31 +4,37 @@ import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.misc.forge.VoidFluidHandlerItemStack;
 
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
+import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class PlungerBehavior implements IToolBehavior, IComponentCapability, IInteractionItem {
+public class PlungerBehavior implements IToolBehavior<PlungerBehavior>, IComponentCapability, IInteractionItem {
 
     public static final PlungerBehavior INSTANCE = PlungerBehavior.create();
+    public static final Codec<PlungerBehavior> CODEC = Codec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, PlungerBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected PlungerBehavior() {/**/}
 
@@ -54,7 +60,7 @@ public class PlungerBehavior implements IToolBehavior, IComponentCapability, IIn
             fluidHandler = metaMachineBlockEntity.getMetaMachine().getFluidHandlerCap(context.getClickedFace(), false);
         } else {
             fluidHandler = FluidUtil
-                    .getFluidHandler(context.getLevel(), context.getClickedPos(), context.getClickedFace()).resolve()
+                    .getFluidHandler(context.getLevel(), context.getClickedPos(), context.getClickedFace())
                     .orElse(null);
         }
 
@@ -72,27 +78,29 @@ public class PlungerBehavior implements IToolBehavior, IComponentCapability, IIn
     }
 
     @Override
-    public void addInformation(@NotNull ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip,
+    public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("item.gtceu.tool.behavior.plunger"));
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(ItemStack itemStack, @NotNull Capability<T> cap) {
-        if (cap == Capabilities.FLUID_HANDLER_ITEM) {
-            return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap,
-                    LazyOptional.of(() -> new VoidFluidHandlerItemStack(itemStack) {
+    public ToolBehaviorType<PlungerBehavior> getType() {
+        return GTToolBehaviors.PLUNGER;
+    }
 
-                        @Override
-                        public int fill(FluidStack resource, FluidAction doFill) {
-                            int result = super.fill(resource, doFill);
-                            if (result > 0) {
-                                ToolHelper.damageItem(getContainer(), null);
-                            }
-                            return result;
+    @Override
+    public void attachCapabilities(RegisterCapabilitiesEvent event, Item item) {
+        event.registerItem(Capabilities.FluidHandler.ITEM,
+                (stack, unused) -> new FluidHandlerItemStack(GTDataComponents.FLUID_CONTENT, stack, Integer.MAX_VALUE) {
+
+                    @Override
+                    public int fill(FluidStack resource, FluidAction action) {
+                        int result = resource.getAmount();
+                        if (result > 0) {
+                            ToolHelper.damageItem(this.getContainer(), null);
                         }
-                    }));
-        }
-        return LazyOptional.empty();
+                        return result;
+                    }
+                }, item);
     }
 }

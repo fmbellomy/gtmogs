@@ -36,22 +36,18 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 import static com.gregtechceu.gtceu.utils.GTMatrixUtils.*;
 
-/**
- * @author KilaBash
- * @date 2023/3/2
- * @implNote QuantumChestRenderer
- */
 public class QuantumTankRenderer extends TieredHullMachineRenderer {
 
     private static final float MIN = 0.16f;
@@ -70,8 +66,10 @@ public class QuantumTankRenderer extends TieredHullMachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderBaseModel(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                                ModelState modelState, @Nullable Direction side, RandomSource rand) {
-        quads.addAll(getRotatedModel(modelState).getQuads(definition.defaultBlockState(), side, rand));
+                                ModelState modelState, @Nullable Direction side,
+                                @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+        quads.addAll(getRotatedModel(modelState)
+                .getQuads(definition.defaultBlockState(), side, rand, data, renderType));
     }
 
     @Override
@@ -85,12 +83,12 @@ public class QuantumTankRenderer extends TieredHullMachineRenderer {
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         if (CREATIVE_FLUID_ITEM == null) CREATIVE_FLUID_ITEM = GTMachines.CREATIVE_FLUID.getItem();
         model = getItemBakedModel();
-        if (model != null && stack.has(GTDataComponents.SINGLE_FLUID_STORAGE)) {
+        var storage = stack.get(GTDataComponents.LARGE_FLUID_CONTENT);
+        if (model != null && storage != null) {
             poseStack.pushPose();
-            model.getTransforms().getTransform(transformType).apply(leftHand, poseStack);
+            model.applyTransform(transformType, poseStack, leftHand);
             poseStack.translate(-0.5D, -0.5D, -0.5D);
 
-            var storage = stack.get(GTDataComponents.SINGLE_FLUID_STORAGE);
             FluidStack stored = storage.stored();
             long storedAmount = storage.amount();
             long maxAmount = storage.maxAmount();

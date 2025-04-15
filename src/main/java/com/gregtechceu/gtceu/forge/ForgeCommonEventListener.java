@@ -78,11 +78,6 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-/**
- * @author KilaBash
- * @date 2022/8/27
- * @implNote ForgeCommonEventListener
- */
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class ForgeCommonEventListener {
 
@@ -313,7 +308,7 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void stepAssistHandler(PlayerTickEvent.Pre event) {
         Player player = event.getEntity();
-        if (!player.isCrouching() && player.getItemBySlot(EquipmentSlot.FEET).is(CustomTags.STEP_BOOTS)) {
+        if (!player.isShiftKeyDown() && player.getItemBySlot(EquipmentSlot.FEET).is(CustomTags.STEP_BOOTS)) {
             if (player.maxUpStep() < IStepAssist.MAGIC_STEP_HEIGHT) {
                 player.getAttribute(Attributes.STEP_HEIGHT)
                         .addOrUpdateTransientModifier(IStepAssist.STEP_ASSIST_MODIFIER);

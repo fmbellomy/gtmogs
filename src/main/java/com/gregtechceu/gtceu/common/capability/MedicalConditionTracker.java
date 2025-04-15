@@ -4,6 +4,8 @@ import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.api.medicalcondition.Symptom;
 
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -29,7 +31,7 @@ public class MedicalConditionTracker implements IMedicalConditionTracker, INBTSe
     private final Object2FloatMap<MedicalCondition> medicalConditions = new Object2FloatOpenHashMap<>();
     private final Set<MedicalCondition> permanentConditions = new HashSet<>();
     private final Object2IntMap<Symptom.ConfiguredSymptom> activeSymptoms = new Object2IntOpenHashMap<>();
-    private final Object2IntMap<MobEffect> activeMobEffects = new Object2IntOpenHashMap<>();
+    private final Object2IntMap<Holder<MobEffect>> activeMobEffects = new Object2IntOpenHashMap<>();
 
     private final Set<MedicalCondition> flaggedForRemoval = new HashSet<>();
 
@@ -179,7 +181,7 @@ public class MedicalConditionTracker implements IMedicalConditionTracker, INBTSe
     }
 
     @Override
-    public void setMobEffect(MobEffect effect, int amplifier) {
+    public void setMobEffect(Holder<MobEffect> effect, int amplifier) {
         if (amplifier <= 0) {
             activeMobEffects.removeInt(effect);
         } else if (amplifier >= activeMobEffects.getOrDefault(effect, -1)) {
@@ -188,7 +190,7 @@ public class MedicalConditionTracker implements IMedicalConditionTracker, INBTSe
     }
 
     @Override
-    public CompoundTag serializeNBT() {
+    public CompoundTag serializeNBT(HolderLookup.Provider provider) {
         CompoundTag tag = new CompoundTag();
 
         ListTag effectsTag = new ListTag();
@@ -210,7 +212,7 @@ public class MedicalConditionTracker implements IMedicalConditionTracker, INBTSe
     }
 
     @Override
-    public void deserializeNBT(CompoundTag arg) {
+    public void deserializeNBT(HolderLookup.Provider provider, CompoundTag arg) {
         ListTag medicalConditionsTag = arg.getList("medical_conditions", Tag.TAG_COMPOUND);
         for (int i = 0; i < medicalConditionsTag.size(); ++i) {
             CompoundTag compoundTag = medicalConditionsTag.getCompound(i);

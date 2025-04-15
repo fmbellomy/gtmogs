@@ -10,6 +10,8 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
@@ -39,7 +41,10 @@ public record AntidoteBehavior(Set<MedicalCondition> types, int removePercent)
     @Override
     public ItemStack finishUsingItem(ItemStack stack, Level level, LivingEntity livingEntity) {
         ItemStack itemstack = IInteractionItem.super.finishUsingItem(stack, level, livingEntity);
-        IMedicalConditionTracker tracker = GTCapabilityHelper.getMedicalConditionTracker(livingEntity);
+        IMedicalConditionTracker tracker = null;
+        if (livingEntity instanceof Player player) {
+            tracker = GTCapabilityHelper.getMedicalConditionTracker(player);
+        }
         if (tracker == null) {
             return itemstack;
         }
@@ -67,7 +72,8 @@ public record AntidoteBehavior(Set<MedicalCondition> types, int removePercent)
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, @Nullable Item.TooltipContext context,
+                                List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         if (!ConfigHolder.INSTANCE.gameplay.hazardsEnabled) return;
 

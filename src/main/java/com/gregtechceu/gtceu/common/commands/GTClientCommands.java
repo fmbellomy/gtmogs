@@ -10,6 +10,7 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.world.entity.player.Player;
 
 import com.mojang.brigadier.CommandDispatcher;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class GTClientCommands {
         public void run() {
             boolean first = true;
             for (ClientCacheManager.ProspectionInfo info : prospectionData) {
-                GTNetwork.NETWORK.sendToServer(new SCPacketShareProspection(sender, reciever, info.cacheName, info.key,
+                PacketDistributor.sendToServer(new SCPacketShareProspection(sender, reciever, info.cacheName, info.key,
                         info.isDimCache, info.dim, info.data, first));
                 first = false;
 

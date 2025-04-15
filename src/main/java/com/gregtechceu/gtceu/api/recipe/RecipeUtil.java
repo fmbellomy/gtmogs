@@ -52,11 +52,15 @@ public class RecipeUtil {
         }
     }
 
-    public static SizedIngredient makeItemIngredient(ItemStack stack) {
+    public static SizedIngredient makeSizedIngredient(ItemStack stack) {
+        return new SizedIngredient(makeItemIngredient(stack), stack.getCount());
+    }
+
+    public static Ingredient makeItemIngredient(ItemStack stack) {
         if (stack.isComponentsPatchEmpty()) {
-            return new SizedIngredient(Ingredient.of(stack), stack.getCount());
+            return Ingredient.of(stack);
         } else {
-            return new SizedIngredient(DataComponentIngredient.of(true, stack), stack.getCount());
+            return DataComponentIngredient.of(true, stack);
         }
     }
 }

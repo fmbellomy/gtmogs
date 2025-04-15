@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.core.mixins;
 
 import com.lowdragmc.lowdraglib.core.mixins.MixinPluginShared;
 
+import net.neoforged.fml.loading.LoadingModList;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -21,10 +22,8 @@ public class GregTechMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.create")) {
-            return MixinPluginShared.isClassFound("com.simibubi.create.compat.Mods");
-        } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.rei")) {
-            return MixinPluginShared.isClassFound("me.shedaniel.rei.api.common.plugins.REIPlugin");
+        if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.rei")) {
+            return LoadingModList.get().getModFileById("roughlyenoughitems") != null;
         } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.top")) {
             return MixinPluginShared.isClassFound("mcjty.theoneprobe.api.ITheOneProbe");
         } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.jei")) {

@@ -3,21 +3,21 @@ package com.gregtechceu.gtceu.common.item.behavior;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.item.component.IEnchantableItem;
 import com.gregtechceu.gtceu.api.item.component.IItemAttributes;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 
 public class NanoSaberBehavior extends ToggleEnergyConsumerBehavior implements IItemAttributes, IEnchantableItem {
 
@@ -33,18 +33,18 @@ public class NanoSaberBehavior extends ToggleEnergyConsumerBehavior implements I
     }
 
     @Override
-    public Multimap<Attribute, AttributeModifier> getAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
-        HashMultimap<Attribute, AttributeModifier> modifiers = HashMultimap.create();
-        if (slot == EquipmentSlot.MAINHAND) {
-            double attackDamage = baseAttackDamage + (isItemActive(stack) ? additionalAttackDamage : 0.0D);
-            modifiers.put(Attributes.ATTACK_SPEED,
-                    new AttributeModifier(Item.BASE_ATTACK_SPEED_UUID, "Weapon modifier", -2.0,
-                            AttributeModifier.Operation.ADDITION));
-            modifiers.put(Attributes.ATTACK_DAMAGE,
-                    new AttributeModifier(Item.BASE_ATTACK_DAMAGE_UUID, "Weapon Modifier", attackDamage,
-                            AttributeModifier.Operation.ADDITION));
-        }
-        return modifiers;
+    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
+        double attackDamage = baseAttackDamage + (isItemActive(stack) ? additionalAttackDamage : 0.0D);
+        return ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, -2.0,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.HAND)
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, attackDamage,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.HAND)
+                .build();
     }
 
     @Override
@@ -59,11 +59,10 @@ public class NanoSaberBehavior extends ToggleEnergyConsumerBehavior implements I
 
     @Override
     public boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        if (enchantment.category == null) {
-            return false;
-        }
-        return enchantment != Enchantments.UNBREAKING &&
-                enchantment != Enchantments.MENDING &&
-                enchantment.category.canEnchant(Items.IRON_SWORD);
+        Registry<Enchantment> registry = GTRegistries.builtinRegistry().registryOrThrow(Registries.ENCHANTMENT);
+        var key = registry.getResourceKey(enchantment).get();
+        return key != Enchantments.UNBREAKING &&
+                key != Enchantments.MENDING &&
+                enchantment.canEnchant(Items.IRON_SWORD.getDefaultInstance());
     }
 }

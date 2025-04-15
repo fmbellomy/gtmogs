@@ -15,11 +15,6 @@ import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-/**
- * @author KilaBash
- * @date 2023/2/17
- * @implNote MachineUIFactory
- */
 public class MachineUIFactory extends UIFactory<MetaMachine> {
 
     public static final MachineUIFactory INSTANCE = new MachineUIFactory();

@@ -10,24 +10,15 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/4
- * @implNote CoilBlock
- */
-@ParametersAreNonnullByDefault
 public class CoilBlock extends ActiveBlock {
 
     public ICoilType coilType;
@@ -38,9 +29,9 @@ public class CoilBlock extends ActiveBlock {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable BlockGetter level, List<Component> tooltip,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip,
                                 TooltipFlag flag) {
-        super.appendHoverText(stack, level, tooltip, flag);
+        super.appendHoverText(stack, context, tooltip, flag);
         if (GTUtil.isShiftDown()) {
             int coilTier = coilType.getTier();
             tooltip.add(Component.translatable("block.gtceu.wire_coil.tooltip_heat", coilType.getCoilTemperature()));
@@ -60,18 +51,16 @@ public class CoilBlock extends ActiveBlock {
     }
 
     public enum CoilType implements StringRepresentable, ICoilType {
-
-        CUPRONICKEL("cupronickel", 1800, 1, 1, GTMaterials.Cupronickel,
-                GTCEu.id("block/casings/coils/machine_coil_cupronickel")),
+        // spotless:off
+        CUPRONICKEL("cupronickel", 1800, 1, 1, GTMaterials.Cupronickel, GTCEu.id("block/casings/coils/machine_coil_cupronickel")),
         KANTHAL("kanthal", 2700, 2, 1, GTMaterials.Kanthal, GTCEu.id("block/casings/coils/machine_coil_kanthal")),
         NICHROME("nichrome", 3600, 2, 2, GTMaterials.Nichrome, GTCEu.id("block/casings/coils/machine_coil_nichrome")),
         RTMALLOY("rtm_alloy", 4500, 4, 2, GTMaterials.RTMAlloy, GTCEu.id("block/casings/coils/machine_coil_rtm_alloy")),
         HSSG("hssg", 5400, 4, 4, GTMaterials.HSSG, GTCEu.id("block/casings/coils/machine_coil_hssg")),
         NAQUADAH("naquadah", 7200, 8, 4, GTMaterials.Naquadah, GTCEu.id("block/casings/coils/machine_coil_naquadah")),
         TRINIUM("trinium", 9001, 8, 8, GTMaterials.Trinium, GTCEu.id("block/casings/coils/machine_coil_trinium")),
-        TRITANIUM("tritanium", 10800, 16, 8, GTMaterials.Tritanium,
-                GTCEu.id("block/casings/coils/machine_coil_tritanium"));
-
+        TRITANIUM("tritanium", 10800, 16, 8, GTMaterials.Tritanium, GTCEu.id("block/casings/coils/machine_coil_tritanium"));
+        // spotless:on
         @NotNull
         @Getter
         private final String name;

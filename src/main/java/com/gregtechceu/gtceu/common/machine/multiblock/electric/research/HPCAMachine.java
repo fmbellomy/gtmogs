@@ -62,8 +62,6 @@ import java.util.function.Supplier;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class HPCAMachine extends WorkableElectricMultiblockMachine
                          implements IOpticalComputationProvider, IControllable {
 

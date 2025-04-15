@@ -5,8 +5,11 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.capability.ElectricItem;
+import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.TickTask;
@@ -26,13 +29,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerDestroyItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -40,7 +43,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = GTCEu.MOD_ID)
+@EventBusSubscriber(modid = GTCEu.MOD_ID)
 public class ToolEventHandlers {
 
     /**
@@ -106,18 +109,18 @@ public class ToolEventHandlers {
                                                  BlockPos pos, BlockState state, boolean isSilkTouch,
                                                  int fortuneLevel, List<ItemStack> drops,
                                                  float dropChance) {
-        if (!tool.hasTag() || !(tool.getItem() instanceof IGTTool)) {
+        if (!(tool.getItem() instanceof IGTTool)) {
             return drops;
         }
         if (!isSilkTouch) {
             ToolHelper.applyHammerDropConversion(level, pos, tool, state, drops, fortuneLevel, dropChance,
                     player.getRandom());
         }
-        if (!ToolHelper.hasBehaviorsTag(tool)) return drops;
+        if (!ToolHelper.hasBehaviorsComponent(tool)) return drops;
 
-        CompoundTag behaviorTag = ToolHelper.getBehaviorsTag(tool);
+        ToolBehaviors behaviorTag = ToolHelper.getBehaviorsComponent(tool);
         Block block = state.getBlock();
-        if (!isSilkTouch && state.is(BlockTags.ICE) && behaviorTag.getBoolean(ToolHelper.HARVEST_ICE_KEY)) {
+        if (!isSilkTouch && state.is(BlockTags.ICE) && behaviorTag.hasBehavior(GTToolBehaviors.HARVEST_ICE)) {
             Item iceBlock = block.asItem();
             if (drops.stream().noneMatch(drop -> drop.getItem() == iceBlock)) {
                 drops.add(new ItemStack(iceBlock));
@@ -134,14 +137,15 @@ public class ToolEventHandlers {
                 ((IGTTool) tool.getItem()).playSound(player);
             }
         }
-        if (behaviorTag.getBoolean(ToolHelper.RELOCATE_MINED_BLOCKS_KEY)) {
+        if (tool.has(GTDataComponents.RELOCATE_MINED_BLOCKS)) {
             Iterator<ItemStack> dropItr = drops.iterator();
             while (dropItr.hasNext()) {
                 ItemStack dropStack = dropItr.next();
                 ItemEntity drop = new ItemEntity(EntityType.ITEM, level);
                 drop.setItem(dropStack);
 
-                if (fireItemPickupEvent(drop, player) == -1 || player.addItem(dropStack)) {
+                if (fireItemPickupEvent(drop, player) || player.addItem(dropStack)) {
+                    EventHooks.fireItemPickupPost(drop, player, dropStack.copy());
                     dropItr.remove();
                 }
             }
@@ -149,8 +153,8 @@ public class ToolEventHandlers {
         return drops;
     }
 
-    public static int fireItemPickupEvent(ItemEntity drop, Player player) {
-        return EventHooks.onItemPickup(drop, player);
+    public static boolean fireItemPickupEvent(ItemEntity drop, Player player) {
+        return !EventHooks.fireItemPickupPre(drop, player).canPickup().isFalse();
     }
 
     /**
@@ -194,17 +198,15 @@ public class ToolEventHandlers {
 
     public static Collection<ItemEntity> onPlayerKilledEntity(ItemStack tool, Player player,
                                                               Collection<ItemEntity> drops) {
-        if (!ToolHelper.hasBehaviorsTag(tool)) return drops;
-        CompoundTag behaviorTag = ToolHelper.getBehaviorsTag(tool);
-
-        if (behaviorTag.getBoolean(ToolHelper.RELOCATE_MOB_DROPS_KEY)) {
+        if (tool.has(GTDataComponents.RELOCATE_MOB_DROPS)) {
             Iterator<ItemEntity> dropItr = drops.iterator();
 
             while (dropItr.hasNext()) {
                 ItemEntity drop = dropItr.next();
                 ItemStack dropStack = drop.getItem();
 
-                if (fireItemPickupEvent(drop, player) == -1 || player.addItem(dropStack)) {
+                if (fireItemPickupEvent(drop, player) || player.addItem(dropStack)) {
+                    EventHooks.fireItemPickupPost(drop, player, dropStack.copy());
                     dropItr.remove();
                 }
             }

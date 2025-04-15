@@ -9,11 +9,6 @@ import lombok.Getter;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/7/4
- * @implNote EditableUI
- */
 public class EditableUI<W extends Widget, T> implements IEditableUI<W, T> {
 
     @Getter

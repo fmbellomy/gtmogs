@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static com.gregtechceu.gtceu.common.data.GTCreativeModeTabs.MATERIAL_ITEM;
-import static com.gregtechceu.gtceu.common.data.GTCreativeModeTabs.TOOL;
+import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.MATERIAL_ITEM;
+import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.TOOL;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
 public class GTMaterialItems {

@@ -52,7 +52,7 @@ public class IngredientEquality {
         @Override
         public int compare(SizedIngredient first, SizedIngredient second) {
             if (first.get instanceof StrictNBTIngredient strict1) {
-                if (second instanceof StrictNBTIngredientAccessor strict2) {
+                if (second instanceof StrictNBTIngredient strict2) {
                     return strict1.test(strict2.getStack()) ? 0 : 1;
                 }
                 return 1;

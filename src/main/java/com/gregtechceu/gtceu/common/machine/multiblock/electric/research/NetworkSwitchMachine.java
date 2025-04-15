@@ -26,8 +26,6 @@ import java.util.Set;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class NetworkSwitchMachine extends DataBankMachine implements IOpticalComputationProvider {
 
     public static final int EUT_PER_HATCH = GTValues.VA[GTValues.IV];
@@ -43,7 +41,7 @@ public class NetworkSwitchMachine extends DataBankMachine implements IOpticalCom
         int receivers = 0;
         int transmitters = 0;
         for (var part : this.getParts()) {
-            Block block = part.self().getBlockState().getBlock();
+            net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
             if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
                 ++receivers;
             }
@@ -60,7 +58,7 @@ public class NetworkSwitchMachine extends DataBankMachine implements IOpticalCom
         List<IOpticalComputationHatch> receivers = new ArrayList<>();
         List<IOpticalComputationHatch> transmitters = new ArrayList<>();
         for (var part : this.getParts()) {
-            Block block = part.self().getBlockState().getBlock();
+            net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
             List<IOpticalComputationHatch> list;
             if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
                 list = receivers;

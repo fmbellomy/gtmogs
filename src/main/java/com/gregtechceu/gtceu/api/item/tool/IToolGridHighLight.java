@@ -12,10 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-/**
- * @author KilaBash
- * @date 2023/3/2
- */
 public interface IToolGridHighLight {
 
     default boolean shouldRenderGrid(Player player, BlockPos pos, BlockState state, ItemStack held,
@@ -23,8 +19,7 @@ public interface IToolGridHighLight {
         return true;
     }
 
-    @Nullable
-    default ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
+    default @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
                                      Direction side) {
         return null;
     }

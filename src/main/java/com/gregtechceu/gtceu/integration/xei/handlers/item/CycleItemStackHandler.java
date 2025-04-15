@@ -28,7 +28,7 @@ public class CycleItemStackHandler implements IItemHandlerModifiable {
         return stacks.size();
     }
 
-    @Nonnull
+    @NotNull
     @Override
     public ItemStack getStackInSlot(int i) {
         List<ItemStack> stackList = stacks.get(i).getStacks();
@@ -65,7 +65,7 @@ public class CycleItemStackHandler implements IItemHandlerModifiable {
     }
 
     @Override
-    public boolean isItemValid(int slot, @Nonnull ItemStack stack) {
+    public boolean isItemValid(int slot, @NotNull ItemStack stack) {
         return true;
     }
 }

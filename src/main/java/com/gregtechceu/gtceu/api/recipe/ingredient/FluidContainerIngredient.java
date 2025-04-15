@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.api.recipe.ingredient;
 
 import com.gregtechceu.gtceu.api.tag.TagUtil;
 
+import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,12 +28,10 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 
 public class FluidContainerIngredient implements ICustomIngredient {
-
-    public static final MapCodec<FluidContainerIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
-            .group(
-                    SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid").forGetter(FluidContainerIngredient::getFluid))
-            .apply(instance, FluidContainerIngredient::new));
-
+    // spotless:off
+    public static final MapCodec<FluidContainerIngredient> CODEC  = SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid")
+            .xmap(FluidContainerIngredient::new, FluidContainerIngredient::getFluid);
+    // spotless:on
     @Getter
     private final SizedFluidIngredient fluid;
 
@@ -52,7 +51,7 @@ public class FluidContainerIngredient implements ICustomIngredient {
 
     private Stream<ItemStack> cachedStacks;
 
-    @Nonnull
+    @NotNull
     @Override
     public Stream<ItemStack> getItems() {
         if (cachedStacks == null)

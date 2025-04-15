@@ -9,11 +9,6 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStackS
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2023/2/22
- * @implNote FluidHandlerHelperImpl
- */
 public class SimpleThermalFluidHandlerItemStack extends FluidHandlerItemStackSimple
                                                 implements IThermalFluidHandlerItemStack {
 

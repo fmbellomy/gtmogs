@@ -45,11 +45,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/3/31
- * @implNote IMachineBlock
- */
 public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
 
     DirectionProperty UPWARDS_FACING_PROPERTY = DirectionProperty.create("upwards_facing", Direction.Plane.HORIZONTAL);

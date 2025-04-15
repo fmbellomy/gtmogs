@@ -31,11 +31,6 @@ import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author KilaBash
- * @date 2023/2/18
- * @implNote PipeCoverContainer
- */
 
 public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 

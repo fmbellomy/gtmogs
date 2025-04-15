@@ -142,14 +142,14 @@ public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTar
         Rect2i rectangle = toRectangleBox();
         return Lists.newArrayList(new Target() {
 
-            @Nonnull
+            @NotNull
             @Override
             public Rect2i getArea() {
                 return rectangle;
             }
 
             @Override
-            public void accept(@Nonnull Object ingredient) {
+            public void accept(@NotNull Object ingredient) {
                 if (GTCEu.Mods.isEMILoaded() && ingredient instanceof EmiStack emiStack) {
                     Item item = emiStack.getKeyOfType(Item.class);
                     if (item != null) {

@@ -54,8 +54,8 @@ public class SurfaceIndicatorGenerator extends IndicatorGenerator {
                     .forGetter(ext -> ext.block),
             IntProvider.codec(1, 32).fieldOf("radius").forGetter(ext -> ext.radius),
             FloatProvider.codec(0.0f, 2.0f).fieldOf("density").forGetter(ext -> ext.density),
-            IndicatorPlacement.CODEC.fieldOf("placement").forGetter(ext -> ext.placement))
-            .apply(instance, SurfaceIndicatorGenerator::new));
+            IndicatorPlacement.CODEC.fieldOf("placement").forGetter(ext -> ext.placement)
+    ).apply(instance, SurfaceIndicatorGenerator::new));
 
     private Either<BlockState, Material> block = Either.left(Blocks.AIR.defaultBlockState());
     private IntProvider radius = ConstantInt.of(5);

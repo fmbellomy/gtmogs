@@ -22,11 +22,6 @@ import com.google.gson.JsonObject;
 import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/2/21
- * @implNote ShapedRecipeBuilder
- */
 public class ShapedRecipeBuilder extends Builder<Ingredient, ShapedRecipeBuilder> {
 
     protected ItemStack output = ItemStack.EMPTY;

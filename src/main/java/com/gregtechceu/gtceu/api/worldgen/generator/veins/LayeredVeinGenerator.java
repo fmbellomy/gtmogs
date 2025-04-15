@@ -35,12 +35,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class LayeredVeinGenerator extends VeinGenerator {
-
-    public static final MapCodec<LayeredVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            GTLayerPattern.CODEC.listOf().fieldOf("layer_patterns")
-                    .forGetter(LayeredVeinGenerator::getLayerPatterns))
-            .apply(instance, LayeredVeinGenerator::new));
-
+    // spotless:off
+    public static final MapCodec<LayeredVeinGenerator> CODEC = GTLayerPattern.CODEC.listOf().fieldOf("layer_patterns")
+            .xmap(LayeredVeinGenerator::new, LayeredVeinGenerator::getLayerPatterns);
+    // spotless:on
     private final List<NonNullSupplier<GTLayerPattern>> bakingLayerPatterns = new ArrayList<>();
 
     public List<GTLayerPattern> layerPatterns;
@@ -234,4 +232,5 @@ public class LayeredVeinGenerator extends VeinGenerator {
     public MapCodec<? extends VeinGenerator> codec() {
         return CODEC;
     }
+
 }

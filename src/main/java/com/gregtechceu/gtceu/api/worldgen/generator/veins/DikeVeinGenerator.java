@@ -46,9 +46,10 @@ import java.util.stream.Stream;
 public class DikeVeinGenerator extends VeinGenerator {
 
     public static final MapCodec<DikeVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.list(DikeBlockDefinition.CODEC).fieldOf("blocks").forGetter(it -> it.blocks),
-            Codec.INT.fieldOf("min_y").forGetter(it -> it.minYLevel),
-            Codec.INT.fieldOf("max_y").forGetter(it -> it.maxYLevel)).apply(instance, DikeVeinGenerator::new));
+                    Codec.list(DikeBlockDefinition.CODEC).fieldOf("blocks").forGetter(it -> it.blocks),
+                    Codec.INT.fieldOf("min_y").forGetter(it -> it.minYLevel),
+                    Codec.INT.fieldOf("max_y").forGetter(it -> it.maxYLevel)
+    ).apply(instance, DikeVeinGenerator::new));
 
     public List<DikeBlockDefinition> blocks;
     @Setter
@@ -116,8 +117,8 @@ public class DikeVeinGenerator extends VeinGenerator {
     }
 
     private void placeBlock(
-                            BulkSectionAccess level, LevelChunkSection section, long randomSeed, BlockPos pos,
-                            GTOreDefinition entry) {
+            BulkSectionAccess level, LevelChunkSection section, long randomSeed, BlockPos pos,
+            GTOreDefinition entry) {
         var rand = new XoroshiroRandomSource(randomSeed);
         List<? extends Map.Entry<Integer, DikeBlockDefinition>> entries = blocks.stream()
                 .map(b -> Map.entry(b.weight, b)).toList();
@@ -186,14 +187,15 @@ public class DikeVeinGenerator extends VeinGenerator {
     public record DikeBlockDefinition(Either<List<TargetBlockState>, Material> block, int weight,
                                       int minY, int maxY) {
 
+        // spotless:off
         public static final Codec<DikeBlockDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.either(TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec()).fieldOf("block")
-                        .forGetter(x -> x.block),
-                Codec.INT.fieldOf("weight").forGetter(x -> x.weight),
-                Codec.INT.fieldOf("min_y").orElse(320).forGetter(x -> x.minY),
-                Codec.INT.fieldOf("max_y").orElse(-64).forGetter(x -> x.maxY))
+                        Codec.either(TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec()).fieldOf("block").forGetter(x -> x.block),
+                        Codec.INT.fieldOf("weight").forGetter(x -> x.weight),
+                        Codec.INT.fieldOf("min_y").orElse(320).forGetter(x -> x.minY),
+                        Codec.INT.fieldOf("max_y").orElse(-64).forGetter(x -> x.maxY))
                 .apply(instance, DikeBlockDefinition::new));
 
+        // spotless:on
         public DikeBlockDefinition(Material block, int weight, int minY, int maxY) {
             this(Either.right(block), weight, minY, maxY);
         }
@@ -201,5 +203,7 @@ public class DikeVeinGenerator extends VeinGenerator {
         public DikeBlockDefinition(List<TargetBlockState> block, int weight, int minY, int maxY) {
             this(Either.left(block), weight, minY, maxY);
         }
+
     }
+
 }

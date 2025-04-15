@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
@@ -23,6 +24,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -32,11 +34,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote IntCircuitBehaviour
- */
 public class IntCircuitBehaviour implements IItemUIFactory, IAddInformation {
 
     public static final int CIRCUIT_MAX = 32;
@@ -55,27 +52,15 @@ public class IntCircuitBehaviour implements IItemUIFactory, IAddInformation {
     public static void setCircuitConfiguration(ItemStack itemStack, int configuration) {
         if (configuration < 0 || configuration > CIRCUIT_MAX)
             throw new IllegalArgumentException("Given configuration number is out of range!");
-        var tagCompound = itemStack.getOrCreateTag();
-        tagCompound.putInt("Configuration", configuration);
+        itemStack.set(GTDataComponents.CIRCUIT_CONFIG, configuration);
     }
 
     public static int getCircuitConfiguration(ItemStack itemStack) {
-        if (!isIntegratedCircuit(itemStack)) return 0;
-        var tagCompound = itemStack.getTag();
-        if (tagCompound != null) {
-            return tagCompound.getInt("Configuration");
-        }
-        return 0;
+        return itemStack.getOrDefault(GTDataComponents.CIRCUIT_CONFIG, 0);
     }
 
     public static boolean isIntegratedCircuit(ItemStack itemStack) {
-        boolean isCircuit = GTItems.PROGRAMMED_CIRCUIT.isIn(itemStack);
-        if (isCircuit && !itemStack.hasTag()) {
-            var compound = new CompoundTag();
-            compound.putInt("Configuration", 0);
-            itemStack.setTag(compound);
-        }
-        return isCircuit;
+        return GTItems.PROGRAMMED_CIRCUIT.isIn(itemStack);
     }
 
     // deprecated, not needed (for now)
@@ -96,7 +81,7 @@ public class IntCircuitBehaviour implements IItemUIFactory, IAddInformation {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         int configuration = getCircuitConfiguration(stack);
         tooltipComponents.add(Component.translatable("metaitem.int_circuit.configuration", configuration));
@@ -110,8 +95,7 @@ public class IntCircuitBehaviour implements IItemUIFactory, IAddInformation {
         var modular = new ModularUI(184, 132, holder, entityPlayer)
                 .widget(label);
         SlotWidget slotwidget = new SlotWidget(
-                new CustomItemStackHandler(stack(getCircuitConfiguration(holder.getHeld()))),
-                0, 82, 20, false, false);
+                new CustomItemStackHandler(stack(getCircuitConfiguration(holder.getHeld()))), 0, 82, 20, false, false);
         slotwidget.setBackground(GuiTextures.SLOT);
         modular.widget(slotwidget);
         int idx = 0;

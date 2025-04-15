@@ -4,43 +4,41 @@ import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 /**
  * The Tree Felling Behavior must be handled in a special way in
  * {@link IGTTool#definition$onBlockStartBreak(ItemStack, BlockPos, Player)}
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class TreeFellingBehavior implements IToolBehavior {
+public class TreeFellingBehavior implements IToolBehavior<TreeFellingBehavior> {
 
     public static final TreeFellingBehavior INSTANCE = new TreeFellingBehavior();
 
     protected TreeFellingBehavior() {/**/}
 
     @Override
-    public void addBehaviorNBT(ItemStack stack, CompoundTag tag) {
-        tag.putBoolean(ToolHelper.TREE_FELLING_KEY, true);
+    public ToolBehaviorType<TreeFellingBehavior> getType() {
+        return GTToolBehaviors.TREE_FELLING;
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
+    public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
+                               @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("item.gtceu.tool.behavior.tree_felling"));
     }
 
@@ -51,7 +49,7 @@ public class TreeFellingBehavior implements IToolBehavior {
         if (!(level instanceof ServerLevel) || !player.isShiftKeyDown()) {
             return InteractionResultHolder.pass(held);
         }
-        var tag = ToolHelper.getBehaviorsTag(held);
+        var tag = ToolHelper.getBehaviorsComponent(held);
         var disable = tag.getBoolean(ToolHelper.DISABLE_TREE_FELLING_KEY);
         tag.putBoolean(ToolHelper.DISABLE_TREE_FELLING_KEY, !disable);
         player.sendSystemMessage(Component.translatable("item.gtceu.tool.behavior.tree_felling").append(" - ")

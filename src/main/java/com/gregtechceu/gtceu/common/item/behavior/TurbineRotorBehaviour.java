@@ -13,7 +13,6 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,11 +20,6 @@ import java.util.List;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.turbineBlade;
 
-/**
- * @author KilaBash
- * @date 2023/7/10
- * @implNote TurbineRotorBehaviour
- */
 public class TurbineRotorBehaviour implements IMaterialPartItem, ISubItemHandler {
 
     @Override

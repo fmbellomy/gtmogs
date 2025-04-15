@@ -7,11 +7,6 @@ import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 
-/**
- * @author KilaBash
- * @date 2023/3/13
- * @implNote TagItemFilter
- */
 public class TagItemFilter extends TagFilter<ItemStack, ItemFilter> implements ItemFilter {
 
     private final Object2BooleanMap<Item> cache = new Object2BooleanOpenHashMap<>();

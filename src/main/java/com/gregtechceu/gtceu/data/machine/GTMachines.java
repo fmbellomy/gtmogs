@@ -30,6 +30,7 @@ import com.gregtechceu.gtceu.common.pipelike.fluidpipe.longdistance.LDFluidEndpo
 import com.gregtechceu.gtceu.common.pipelike.item.longdistance.LDItemEndpointMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -50,18 +51,13 @@ import java.util.function.BiConsumer;
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.capability.recipe.IO.IN;
 import static com.gregtechceu.gtceu.api.capability.recipe.IO.OUT;
-import static com.gregtechceu.gtceu.common.data.GTCreativeModeTabs.MACHINE;
+import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.MACHINE;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.DUMMY_RECIPES;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.STEAM_BOILER_RECIPES;
 import static com.gregtechceu.gtceu.data.machine.GTMachineUtils.*;
 import static com.gregtechceu.gtceu.data.machine.GTMachineUtils.ALL_TIERS;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
-/**
- * @author KilaBash
- * @date 2023/2/19
- * @implNote GTMachines
- */
 public class GTMachines {
 
     static {
@@ -519,10 +515,12 @@ public class GTMachines {
             .allowExtendedFacing(true)
             .tooltipBuilder((stack, list) -> {
                 CREATIVE_TOOLTIPS.accept(stack, list);
-                if (stack.hasTag()) {
-                    FluidStack f = FluidStack.loadFluidStackFromNBT(stack.getOrCreateTagElement("stored"));
-                    int perCycle = stack.getOrCreateTag().getInt("mBPerCycle");
-                    list.add(1, Component.translatable("gtceu.universal.tooltip.fluid_stored", f.getDisplayName(),
+                var storage = stack.get(GTDataComponents.LARGE_FLUID_CONTENT);
+                if (storage != null) {
+                    FluidStack f = storage.stored();
+                    var creativeInfo = stack.get(GTDataComponents.CREATIVE_MACHINE_INFO);
+                    int perCycle = creativeInfo != null ? creativeInfo.outputPerCycle() : 1;
+                    list.add(1, Component.translatable("gtceu.universal.tooltip.fluid_stored", f.getHoverName(),
                             FormattingUtil.formatNumbers(perCycle)));
                 }
             })
@@ -536,9 +534,11 @@ public class GTMachines {
             .allowExtendedFacing(true)
             .tooltipBuilder((stack, list) -> {
                 CREATIVE_TOOLTIPS.accept(stack, list);
-                if (stack.hasTag()) {
-                    ItemStack i = ItemStack.of(stack.getOrCreateTagElement("stored"));
-                    int perCycle = stack.getOrCreateTag().getInt("itemsPerCycle");
+                var storage = stack.get(GTDataComponents.LARGE_ITEM_CONTENT);
+                if (storage != null) {
+                    ItemStack i = storage.stored();
+                    var creativeInfo = stack.get(GTDataComponents.CREATIVE_MACHINE_INFO);
+                    int perCycle = creativeInfo != null ? creativeInfo.outputPerCycle() : 1;
                     list.add(1, Component.translatable("gtceu.universal.tooltip.item_stored", i.getHoverName(),
                             FormattingUtil.formatNumbers(perCycle)));
                 }
@@ -548,9 +548,10 @@ public class GTMachines {
             .register();
 
     public static BiConsumer<ItemStack, List<Component>> CHEST_TOOLTIPS = (stack, list) -> {
-        if (stack.hasTag()) {
-            ItemStack itemStack = ItemStack.of(stack.getOrCreateTagElement("stored"));
-            long storedAmount = stack.getOrCreateTag().getLong("storedAmount");
+        var storage = stack.get(GTDataComponents.LARGE_ITEM_CONTENT);
+        if (storage != null) {
+            ItemStack itemStack = storage.stored();
+            long storedAmount = storage.amount();
             list.add(1, Component.translatable("gtceu.universal.tooltip.item_stored", itemStack.getHoverName(),
                     FormattingUtil.formatNumbers(storedAmount)));
         }

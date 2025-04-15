@@ -13,8 +13,8 @@ public record SimpleEnergyContent(long maxCharge, long charge, boolean infinite,
             Codec.LONG.fieldOf("max_charge").forGetter(SimpleEnergyContent::maxCharge),
             Codec.LONG.fieldOf("charge").forGetter(SimpleEnergyContent::charge),
             Codec.BOOL.fieldOf("infinite").forGetter(SimpleEnergyContent::infinite),
-            Codec.BOOL.fieldOf("discharge_mode").forGetter(SimpleEnergyContent::dischargeMode))
-            .apply(instance, SimpleEnergyContent::new));
+            Codec.BOOL.fieldOf("discharge_mode").forGetter(SimpleEnergyContent::dischargeMode)
+    ).apply(instance, SimpleEnergyContent::new));
     public static final StreamCodec<ByteBuf, SimpleEnergyContent> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_LONG, SimpleEnergyContent::maxCharge,
             ByteBufCodecs.VAR_LONG, SimpleEnergyContent::charge,

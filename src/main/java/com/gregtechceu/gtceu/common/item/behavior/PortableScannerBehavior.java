@@ -25,12 +25,14 @@ import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectBedrockFluid;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -46,17 +48,17 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Getter;
+import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.annotation.Nonnull;
 
 public class PortableScannerBehavior implements IInteractionItem, IAddInformation {
 
@@ -118,41 +120,37 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Item item, Level level, Player player, InteractionHand usedHand) {
-        ItemStack heldItem = player.getItemInHand(usedHand);
-        if (player.isCrouching()) {
+    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player, InteractionHand usedHand) {
+        if (player.isShiftKeyDown()) {
             if (!level.isClientSide) {
-                setNextMode(heldItem);
-                var mode = getMode(heldItem);
+                setNextMode(item);
+                var mode = getMode(item);
                 player.sendSystemMessage(Component.translatable("behavior.portable_scanner.mode.caption",
                         Component.translatable(mode.getLangKey())));
             }
-            return InteractionResultHolder.success(heldItem);
+            return InteractionResultHolder.success(item);
         }
         return IInteractionItem.super.use(item, level, player, usedHand);
     }
 
-    protected boolean drainEnergy(@Nonnull ItemStack stack, int amount, boolean simulate) {
+    protected boolean drainEnergy(@NotNull ItemStack stack, int amount, boolean simulate) {
         IElectricItem electricItem = GTCapabilityHelper.getElectricItem(stack);
         if (electricItem == null) return false;
         return electricItem.discharge(amount, Integer.MAX_VALUE, true, false, simulate) >= amount;
     }
 
     protected void setNextMode(ItemStack stack) {
-        var tag = stack.getOrCreateTag();
-        tag.putInt("Mode", (tag.getInt("Mode") + 1) % DisplayMode.values().length);
+        stack.update(GTDataComponents.SCANNER_MODE, (byte) 0,
+                mode -> (byte) ((mode + 1) % DisplayMode.values().length));
     }
 
-    @Nonnull
+    @NotNull
     protected DisplayMode getMode(ItemStack stack) {
         if (stack == ItemStack.EMPTY) {
             return DisplayMode.SHOW_ALL;
         }
-        var tag = stack.getTag();
-        if (tag == null) {
-            return DisplayMode.SHOW_ALL;
-        }
-        return DisplayMode.values()[tag.getInt("Mode") % DisplayMode.values().length];
+        return DisplayMode.values()[stack.getOrDefault(GTDataComponents.SCANNER_MODE, (byte) 0) %
+                DisplayMode.values().length];
     }
 
     public int addScannerInfo(Player player, Level level, BlockPos pos, DisplayMode mode, List<Component> list) {
@@ -217,10 +215,10 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
                 }
 
                 // Fluid tanks
-                Optional<IFluidHandler> fluidCap = tileEntity.getCapability(Capabilities.FLUID_HANDLER).resolve();
-                if (fluidCap.isPresent()) {
+                IFluidHandler fluidHandler = tileEntity.getLevel().getCapability(Capabilities.FluidHandler.BLOCK,
+                        tileEntity.getBlockPos(), null);
+                if (fluidHandler != null) {
                     list.add(Component.translatable("behavior.portable_scanner.divider"));
-                    IFluidHandler fluidHandler = fluidCap.get();
                     boolean allTanksEmpty = true;
 
                     for (int i = 0; i < fluidHandler.getTanks(); i++) {
@@ -237,8 +235,7 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
                                         .withStyle(ChatFormatting.GREEN),
                                 Component.translatable(FormattingUtil.formatNumbers(fluidHandler.getTankCapacity(i)))
                                         .withStyle(ChatFormatting.YELLOW),
-                                Component.translatable(fluidStack.getTranslationKey())
-                                        .withStyle(ChatFormatting.GOLD)));
+                                ((MutableComponent) fluidStack.getHoverName()).withStyle(ChatFormatting.GOLD)));
                     }
 
                     if (allTanksEmpty) {
@@ -261,10 +258,9 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
             if (mode == DisplayMode.SHOW_ALL || mode == DisplayMode.SHOW_ELECTRICAL_INFO) {
 
                 // Energy container
-                Optional<IEnergyContainer> energyCap = tileEntity
-                        .getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER).resolve();
-                if (energyCap.isPresent()) {
-                    IEnergyContainer energyContainer = energyCap.get();
+                IEnergyContainer energyContainer = tileEntity.getLevel()
+                        .getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, tileEntity.getBlockPos(), null);
+                if (energyContainer != null) {
                     if (energyContainer.getInputVoltage() > 0) {
                         list.add(Component.translatable("behavior.portable_scanner.divider"));
                         list.add(Component.translatable("behavior.portable_scanner.energy_container_in",
@@ -318,10 +314,9 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
                 }
 
                 // Recipe logic for EU production/consumption
-                Optional<RecipeLogic> recipeLogicCap = tileEntity.getCapability(GTCapability.CAPABILITY_RECIPE_LOGIC)
-                        .resolve();
-                if (recipeLogicCap.isPresent()) {
-                    RecipeLogic recipeLogic = recipeLogicCap.get();
+                RecipeLogic recipeLogic = tileEntity.getLevel().getCapability(GTCapability.CAPABILITY_RECIPE_LOGIC,
+                        tileEntity.getBlockPos(), null);
+                if (recipeLogic != null) {
                     GTRecipe recipe = recipeLogic.getLastRecipe();
                     if (recipeLogic.getStatus().equals(RecipeLogic.Status.WAITING)) {
                         list.add(Component.translatable("behavior.portable_scanner.divider"));
@@ -402,11 +397,11 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
                     var fluidInfo = ProspectorMode.FluidInfo
                             .fromVeinWorldEntry(veinData.getFluidVeinWorldEntry(chunkX, chunkZ));
                     var packet = new SPacketProspectBedrockFluid(level.dimension(), pos, fluidInfo);
-                    GTNetwork.NETWORK.sendToPlayer(packet, (ServerPlayer) player);
+                    PacketDistributor.sendToPlayer((ServerPlayer) player, packet);
 
                     if (player.isCreative()) {
                         list.add(Component.translatable("behavior.portable_scanner.bedrock_fluid.amount",
-                                Component.translatable(stack.getTranslationKey())
+                                ((MutableComponent) stack.getHoverName())
                                         .withStyle(ChatFormatting.GOLD),
                                 Component.translatable(String.valueOf(
                                         veinData.getFluidYield(chunkX, chunkZ)))
@@ -457,7 +452,7 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         tooltipComponents.add(Component.translatable("metaitem.behavior.mode_switch.tooltip"));
         tooltipComponents.add(Component.translatable("behavior.portable_scanner.mode.caption",

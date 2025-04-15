@@ -6,11 +6,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-/**
- * @author KilaBash
- * @date 2019/12/7
- * @implNote CTMModelRenderer
- */
 public class CTMModelRenderer extends IModelRenderer {
 
     public CTMModelRenderer(ResourceLocation modelLocation) {

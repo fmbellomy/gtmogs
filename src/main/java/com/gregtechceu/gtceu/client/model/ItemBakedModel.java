@@ -10,11 +10,6 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-/**
- * @author KilaBash
- * @date 2023/2/20
- * @implNote ItemBakedModel
- */
 @OnlyIn(Dist.CLIENT)
 public interface ItemBakedModel extends BakedModel {
 

@@ -31,23 +31,22 @@ public final class GeneratedVeinMetadata {
                     obj -> Optional.ofNullable(ClientInit.CLIENT_ORE_VEINS.inverse().get(obj)).map(DataResult::success)
                             .orElseGet(() -> DataResult.error(
                                     () -> "Unknown registry element in client ore veins: " + obj)));
-
+    // spotless:off
     public static final Codec<GeneratedVeinMetadata> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     ResourceLocation.CODEC.fieldOf("id").forGetter(GeneratedVeinMetadata::id),
                     CHUNK_POS_CODEC.fieldOf("origin_chunk").forGetter(GeneratedVeinMetadata::originChunk),
                     BlockPos.CODEC.fieldOf("center").forGetter(GeneratedVeinMetadata::center),
                     GTRegistries.ORE_VEINS.codec().fieldOf("definition").forGetter(GeneratedVeinMetadata::definition),
-                    Codec.BOOL.optionalFieldOf("depleted", false).forGetter(GeneratedVeinMetadata::depleted))
-            .apply(instance, GeneratedVeinMetadata::new));
-    public static final Codec<GeneratedVeinMetadata> CLIENT_CODEC = RecordCodecBuilder.create(instance -> instance
-            .group(
+                    Codec.BOOL.optionalFieldOf("depleted", false).forGetter(GeneratedVeinMetadata::depleted)
+    ).apply(instance, GeneratedVeinMetadata::new));
+    public static final Codec<GeneratedVeinMetadata> CLIENT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
                     ResourceLocation.CODEC.fieldOf("id").forGetter(GeneratedVeinMetadata::id),
                     CHUNK_POS_CODEC.fieldOf("origin_chunk").forGetter(GeneratedVeinMetadata::originChunk),
                     BlockPos.CODEC.fieldOf("center").forGetter(GeneratedVeinMetadata::center),
                     CLIENT_DEFINITION_CODEC.fieldOf("definition").forGetter(GeneratedVeinMetadata::definition),
-                    Codec.BOOL.optionalFieldOf("depleted", false).forGetter(GeneratedVeinMetadata::depleted))
-            .apply(instance, GeneratedVeinMetadata::new));
-
+                    Codec.BOOL.optionalFieldOf("depleted", false).forGetter(GeneratedVeinMetadata::depleted)
+    ).apply(instance, GeneratedVeinMetadata::new));
+    // spotless:on
     @Getter
     @NotNull
     private final ResourceLocation id;

@@ -19,7 +19,6 @@ import com.lowdragmc.lowdraglib.client.bakedpipeline.Quad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 import com.lowdragmc.lowdraglib.client.model.custommodel.ICTMPredicate;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
-import com.lowdragmc.lowdraglib.utils.FacadeBlockAndTintGetter;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -84,12 +83,17 @@ public class MachineRenderer extends TextureOverrideRenderer
                     new ItemBakedModel() {
 
                         @Override
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random) {
+                            return getQuads(state, direction, random, ModelData.EMPTY, null);
+                        }
+
+                        @Override
                         @OnlyIn(Dist.CLIENT)
-                        public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction,
-                                                        RandomSource random) {
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction,
+                                                                 @NotNull RandomSource random, @NotNull ModelData data, RenderType renderType) {
                             List<BakedQuad> quads = new LinkedList<>();
                             renderMachine(quads, machineItem.getDefinition(), null, Direction.NORTH, direction, random,
-                                    direction, BlockModelRotation.X0_Y0);
+                                    direction, BlockModelRotation.X0_Y0, data, renderType);
                             return quads;
                         }
                     });
@@ -113,7 +117,7 @@ public class MachineRenderer extends TextureOverrideRenderer
                 var modelFacing = side == null ? null : ModelFactory.modelFacing(side, frontFacing);
                 var quads = new LinkedList<BakedQuad>();
                 // render machine additional quads
-                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, machineModelState);
+                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, machineModelState, data, renderType);
 
                 // render auto IO
                 if (machine instanceof IAutoOutputItem autoOutputItem) {
@@ -159,9 +163,10 @@ public class MachineRenderer extends TextureOverrideRenderer
 
     @OnlyIn(Dist.CLIENT)
     public void renderBaseModel(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                                ModelState modelState, @Nullable Direction side, RandomSource rand) {
+                                ModelState modelState, @Nullable Direction side,
+                                @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         quads.addAll(getRotatedModel(MetaMachine.getFrontFacing(machine))
-                .getQuads(definition.defaultBlockState(), side, rand));
+                .getQuads(definition.defaultBlockState(), side, rand, data, renderType));
     }
 
     /**
@@ -175,14 +180,18 @@ public class MachineRenderer extends TextureOverrideRenderer
      * @param rand        random
      * @param modelFacing model facing before rotation
      * @param modelState  uvLocked rotation according to the front facing
+     * @param data        arbitrary NeoForge model data
+     * @param renderType  current render type. The breaking overlay as well as non-standard rendering uses null here, so
+     *                    all quads should be returned.
      */
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, RandomSource rand,
-                              @Nullable Direction modelFacing, ModelState modelState) {
+                              Direction frontFacing, @Nullable Direction side,
+                              @NotNull RandomSource rand, @Nullable Direction modelFacing,
+                              ModelState modelState, @NotNull ModelData data, RenderType renderType) {
         if (!(machine instanceof IMultiPart part) || !part.replacePartModelWhenFormed() ||
                 !renderReplacedPartMachine(quads, part, frontFacing, side, rand, modelFacing, modelState)) {
-            renderBaseModel(quads, definition, machine, modelState, side, rand);
+            renderBaseModel(quads, definition, machine, modelState, side, rand, data, renderType);
         }
     }
 

@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.fluid.FluidConstants;
 import com.gregtechceu.gtceu.api.fluid.FluidState;
 import com.gregtechceu.gtceu.api.fluid.GTFluid;
-import com.gregtechceu.gtceu.common.data.GTFluids;
+import com.gregtechceu.gtceu.data.fluid.GTFluids;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
 import com.gregtechceu.gtceu.data.lang.LangHandler;
@@ -20,10 +20,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.item.BucketItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.MilkBucketItem;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.material.EmptyFluid;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.api.distmarker.Dist;
@@ -33,18 +30,13 @@ import net.neoforged.neoforge.fluids.FluidType;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/3/11
- * @implNote TooltipsHandler
- */
 @OnlyIn(Dist.CLIENT)
 public class TooltipsHandler {
 
     private static final String ITEM_PREFIX = "item." + GTCEu.MOD_ID;
     private static final String BLOCK_PREFIX = "block." + GTCEu.MOD_ID;
 
-    public static void appendTooltips(ItemStack stack, TooltipFlag flag, List<Component> tooltips) {
+    public static void appendTooltips(ItemStack stack, TooltipFlag flag, List<Component> tooltips, Item.TooltipContext context) {
         // Formula
         var materialEntry = ChemicalHelper.getMaterialEntry(stack.getItem());
         if (!materialEntry.isEmpty()) {
@@ -56,10 +48,10 @@ public class TooltipsHandler {
         if (stack.getItem() instanceof BucketItem bucket) {
             var fluid = bucket.content;
             if (!(fluid instanceof EmptyFluid)) {
-                appendFluidTooltips(new FluidStack(fluid, FluidType.BUCKET_VOLUME), tooltips::add, flag);
+                appendFluidTooltips(new FluidStack(fluid, FluidType.BUCKET_VOLUME), tooltips::add, flag, context);
             }
         } else if (stack.getItem() instanceof MilkBucketItem) {
-            appendFluidTooltips(GTMaterials.Milk.getFluid(FluidType.BUCKET_VOLUME), tooltips::add, flag);
+            appendFluidTooltips(GTMaterials.Milk.getFluid(FluidType.BUCKET_VOLUME), tooltips::add, flag, context);
         }
 
         // Block/Item custom tooltips
@@ -83,16 +75,16 @@ public class TooltipsHandler {
         GTUtil.appendHazardTooltips(material, tooltips);
     }
 
-    public static void appendFluidTooltips(FluidStack fluidStack, Consumer<Component> tooltips, TooltipFlag flag) {
+    public static void appendFluidTooltips(FluidStack fluidStack, Consumer<Component> tooltips, TooltipFlag flag, Item.TooltipContext context) {
         Fluid fluid = fluidStack.getFluid();
         int amount = fluidStack.getAmount();
         FluidType fluidType = fluid.getFluidType();
 
         if (fluidType == GTFluids.POTION.getType()) {
-            if (fluid.is(FluidTags.WATER)) {
+            if (fluidStack.is(FluidTags.WATER)) {
                 return;
             }
-            PotionFluidHelper.addPotionTooltip(fluidStack, tooltips);
+            PotionFluidHelper.addPotionTooltip(fluidStack, tooltips, context);
             return;
         }
 

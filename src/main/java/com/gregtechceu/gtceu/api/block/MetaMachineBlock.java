@@ -197,6 +197,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         ItemStack itemStack = super.getCloneItemStack(state, target, level, pos, player);
         if (getMachine(level, pos) instanceof IDropSaveMachine dropSaveMachine && dropSaveMachine.savePickClone()) {
             CompoundTag tag = itemStack.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY).copyTag();
+            // TODO remove in future version.
             dropSaveMachine.saveToItem(tag);
             itemStack.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
         }
@@ -241,20 +242,6 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
             if (machine instanceof IMachineModifyDrops machineModifyDrops) {
                 machineModifyDrops.onDrops(drops);
             }
-            if (machine instanceof IDropSaveMachine dropSaveMachine && dropSaveMachine.saveBreak()) {
-                for (ItemStack drop : drops) {
-                    if (drop.getItem() instanceof MetaMachineItem item && item.getBlock() == this) {
-                        CompoundTag tag = drop.getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.EMPTY)
-                                .copyTag();
-                        dropSaveMachine.saveToItem(tag);
-                        tag.remove("id");
-                        BlockEntity.addEntityType(tag, tileEntity.getType());
-                        drop.set(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(tag));
-                        // break here to not dupe contents if a machine drops multiple of itself for whatever reason.
-                        break;
-                    }
-                }
-            }
         }
         return drops;
     }
@@ -289,9 +276,9 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos,
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
                                               Player player, InteractionHand hand, BlockHitResult hit) {
-        var machine = getMachine(world, pos);
+        var machine = getMachine(level, pos);
         boolean shouldOpenUi = true;
 
         Set<GTToolType> types = ToolHelper.getToolTypes(stack);
@@ -309,7 +296,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         }
 
         if (stack.is(GTItems.PORTABLE_SCANNER.get())) {
-            return getFromInteractionResult(stack.getItem().use(world, player, hand).getResult());
+            return getFromInteractionResult(stack.getItem().use(level, player, hand).getResult());
         }
 
         if (stack.getItem() instanceof IGTTool gtToolItem) {
@@ -317,7 +304,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         }
 
         if (machine instanceof IInteractedMachine interactedMachine) {
-            var result = interactedMachine.onUse(state, world, pos, player, hand, hit);
+            var result = interactedMachine.onUseWithItem(stack, state, level, pos, player, hand, hit);
             if (result.result() != InteractionResult.PASS) return result;
         }
         if (shouldOpenUi && machine instanceof IUIMachine uiMachine &&
@@ -325,6 +312,17 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
             return uiMachine.tryToOpenUI(player, hand, hit);
         }
         return shouldOpenUi ? ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION : ItemInteractionResult.CONSUME;
+    }
+
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos,
+                                               Player player, BlockHitResult hit) {
+        var machine = getMachine(level, pos);
+        if (machine instanceof IUIMachine uiMachine &&
+                MachineOwner.canOpenOwnerMachine(player, machine)) {
+            return uiMachine.tryToOpenUI(player, InteractionHand.MAIN_HAND, hit).result();
+        }
+        return super.useWithoutItem(state, level, pos, player, hit);
     }
 
     public boolean canConnectRedstone(BlockGetter level, BlockPos pos, Direction side) {

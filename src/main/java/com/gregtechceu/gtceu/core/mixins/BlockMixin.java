@@ -34,11 +34,12 @@ public abstract class BlockMixin {
                                                      BlockPos pos, @Nullable BlockEntity blockEntity,
                                                      @Nullable Entity entity, ItemStack tool) {
         if (!tool.isEmpty() && entity instanceof Player player) {
-            boolean isSilktouch = EnchantmentHelper.hasSilkTouch(tool);
-            int fortuneLevel = tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE);
-            return ToolEventHandlers.onHarvestDrops(player, tool, level, pos, state, isSilktouch,
-                    fortuneLevel,
-                    original, 1);
+            boolean isSilkTouch = EnchantmentHelper
+                    .getItemEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.SILK_TOUCH), tool) > 0;
+            int fortuneLevel = EnchantmentHelper
+                    .getItemEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.FORTUNE), tool);
+            return ToolEventHandlers.onHarvestDrops(player, tool, level, pos, state,
+                    isSilkTouch, fortuneLevel, original, 1);
         }
         return original;
     }

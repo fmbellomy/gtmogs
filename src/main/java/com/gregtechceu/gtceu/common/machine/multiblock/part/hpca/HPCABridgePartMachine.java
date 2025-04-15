@@ -10,8 +10,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class HPCABridgePartMachine extends HPCAComponentPartMachine {
 
     public HPCABridgePartMachine(IMachineBlockEntity holder) {

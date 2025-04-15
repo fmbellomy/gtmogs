@@ -1,16 +1,22 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
+import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -20,18 +26,19 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
 
-public class ScrapeBehavior implements IToolBehavior {
+public class ScrapeBehavior implements IToolBehavior<ScrapeBehavior> {
 
     public static final ScrapeBehavior INSTANCE = create();
+    public static final Codec<ScrapeBehavior> CODEC = Codec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, ScrapeBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected ScrapeBehavior() {/**/}
 
@@ -106,19 +113,24 @@ public class ScrapeBehavior implements IToolBehavior {
     protected boolean isBlockScrapable(ItemStack stack, Level level, Player player, BlockPos pos,
                                        UseOnContext context) {
         BlockState state = level.getBlockState(pos);
-        BlockState newState = state.getToolModifiedState(context, ToolActions.AXE_SCRAPE, false);
+        BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_SCRAPE, false);
         return newState != null && newState != state;
     }
 
     protected BlockState getScraped(BlockState unscrapedState, UseOnContext context) {
         // just assume it exists.
-        BlockState newState = unscrapedState.getToolModifiedState(context, ToolActions.AXE_SCRAPE, false);
+        BlockState newState = unscrapedState.getToolModifiedState(context, ItemAbilities.AXE_SCRAPE, false);
         return newState != null ? newState : unscrapedState;
     }
 
     @Override
-    public void addInformation(@NotNull ItemStack stack, @Nullable Level Level, @NotNull List<Component> tooltip,
+    public void addInformation(@NotNull ItemStack stack, Item.TooltipContext Level, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("item.gtceu.tool.behavior.scrape"));
+    }
+
+    @Override
+    public ToolBehaviorType<ScrapeBehavior> getType() {
+        return GTToolBehaviors.SCRAPE;
     }
 }

@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.CommonInit;
 import com.lowdragmc.lowdraglib.gui.editor.configurator.IConfigurableWidget;
 import com.lowdragmc.lowdraglib.gui.editor.data.Resources;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -24,11 +23,6 @@ import java.io.InputStream;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/7/4
- * @implNote EditableMachineUI
- */
 public class EditableMachineUI implements IEditableUI<WidgetGroup, MetaMachine> {
 
     @Getter

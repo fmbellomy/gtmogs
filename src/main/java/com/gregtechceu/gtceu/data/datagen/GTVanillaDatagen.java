@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.data.datagen;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.registrate.SoundEntryBuilder;
+import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
 import com.gregtechceu.gtceu.data.jukebox.GTJukeboxSongs;
 import com.gregtechceu.gtceu.data.worldgen.GTBiomeModifiers;
 import com.gregtechceu.gtceu.data.worldgen.GTConfiguredFeatures;
@@ -24,7 +25,7 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.Set;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class GTVanillaDatagen {
 
     @SubscribeEvent
@@ -46,7 +47,8 @@ public class GTVanillaDatagen {
                             .add(Registries.PLACED_FEATURE, GTPlacedFeatures::bootstrap)
                             .add(Registries.DENSITY_FUNCTION, GTDensityFunctions::bootstrap)
                             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, GTBiomeModifiers::bootstrap)
-                            .add(Registries.JUKEBOX_SONG, GTJukeboxSongs::bootstrap),
+                            .add(Registries.JUKEBOX_SONG, GTJukeboxSongs::bootstrap)
+                            .add(Registries.ENCHANTMENT_PROVIDER, GTEnchantmentProviders::bootstrap),
                     set));
             generator.addProvider(true,
                     new DamageTagsLoader(packOutput, provider.getRegistryProvider(), existingFileHelper));

@@ -4,12 +4,17 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 
+import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.Getter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 
@@ -23,13 +28,17 @@ public class IntCircuitIngredient implements ICustomIngredient {
 
     public static final int CIRCUIT_MIN = 0;
     public static final int CIRCUIT_MAX = IntCircuitBehaviour.CIRCUIT_MAX;
-    public static final MapCodec<IntCircuitIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ExtraCodecs.intRange(CIRCUIT_MIN, CIRCUIT_MAX).fieldOf("configuration").forGetter(val -> val.configuration))
-            .apply(instance, IntCircuitIngredient::new));
-
+    // spotless:off
+    public static final MapCodec<IntCircuitIngredient> CODEC = ExtraCodecs.intRange(CIRCUIT_MIN, CIRCUIT_MAX).fieldOf("configuration")
+            .xmap(IntCircuitIngredient::getIngredient, IntCircuitIngredient::getConfiguration);
+    // spotless:on
     private static final IntCircuitIngredient[] INGREDIENTS = new IntCircuitIngredient[CIRCUIT_MAX + 1];
 
-    public static Ingredient circuitInput(int configuration) {
+    public static Ingredient circuit(int configuration) {
+        return getIngredient(configuration).toVanilla();
+    }
+
+    private static IntCircuitIngredient getIngredient(int configuration) {
         if (configuration < CIRCUIT_MIN || configuration > CIRCUIT_MAX) {
             throw new IndexOutOfBoundsException("Circuit configuration " + configuration + " is out of range");
         }
@@ -37,9 +46,10 @@ public class IntCircuitIngredient implements ICustomIngredient {
         if (ingredient == null) {
             INGREDIENTS[configuration] = ingredient = new IntCircuitIngredient(configuration);
         }
-        return ingredient.toVanilla();
+        return ingredient;
     }
 
+    @Getter(AccessLevel.PRIVATE)
     private final int configuration;
     private final ItemStack stack;
 
@@ -68,5 +78,9 @@ public class IntCircuitIngredient implements ICustomIngredient {
     @Override
     public IngredientType<?> getType() {
         return GTIngredientTypes.INT_CIRCUIT_INGREDIENT.get();
+    }
+
+    public DataComponentIngredient convertToData() {
+        return (DataComponentIngredient) DataComponentIngredient.of(true, this.stack).getCustomIngredient();
     }
 }

@@ -15,11 +15,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2023/3/15
- * @implNote SteamVentCondition
- */
 @NoArgsConstructor
 public class VentCondition extends RecipeCondition {
 

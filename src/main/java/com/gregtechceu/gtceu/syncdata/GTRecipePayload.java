@@ -16,11 +16,6 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author KilaBash
- * @date 2023/2/18
- * @implNote GTRecipePayload
- */
 public class GTRecipePayload extends ObjectTypedPayload<GTRecipe> {
 
     private static RecipeManager getRecipeManager() {

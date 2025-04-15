@@ -1,17 +1,23 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
+import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -20,18 +26,19 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
 
-public class GrassPathBehavior implements IToolBehavior {
+public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
 
     public static final GrassPathBehavior INSTANCE = create();
+    public static final Codec<GrassPathBehavior> CODEC = Codec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, GrassPathBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected GrassPathBehavior() {/**/}
 
@@ -111,19 +118,24 @@ public class GrassPathBehavior implements IToolBehavior {
                                              UseOnContext context) {
         if (level.getBlockState(pos.above()).isAir()) {
             BlockState state = level.getBlockState(pos);
-            BlockState newState = state.getToolModifiedState(context, ToolActions.SHOVEL_FLATTEN, false);
+            BlockState newState = state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
             return newState != null && newState != state;
         }
         return false;
     }
 
     protected BlockState getFlattened(BlockState unFlattenedState, UseOnContext context) {
-        return unFlattenedState.getToolModifiedState(context, ToolActions.SHOVEL_FLATTEN, false);
+        return unFlattenedState.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
     }
 
     @Override
-    public void addInformation(@NotNull ItemStack stack, @Nullable Level Level, @NotNull List<Component> tooltip,
+    public void addInformation(@NotNull ItemStack stack, Item.TooltipContext Level, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("item.gtceu.tool.behavior.grass_path"));
+    }
+
+    @Override
+    public ToolBehaviorType<GrassPathBehavior> getType() {
+        return GTToolBehaviors.PATH;
     }
 }

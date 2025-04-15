@@ -21,9 +21,9 @@ import com.gregtechceu.gtceu.common.block.explosive.PowderbarrelBlock;
 import com.gregtechceu.gtceu.common.item.LaserPipeBlockItem;
 import com.gregtechceu.gtceu.common.item.OpticalPipeBlockItem;
 import com.gregtechceu.gtceu.data.worldgen.GTConfiguredFeatures;
-import com.gregtechceu.gtceu.common.data.GTCreativeModeTabs;
+import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.data.GTModels;
+import com.gregtechceu.gtceu.data.datagen.client.GTModels;
 import com.gregtechceu.gtceu.common.pipelike.duct.DuctPipeType;
 import com.gregtechceu.gtceu.common.pipelike.fluidpipe.longdistance.LDFluidPipeType;
 import com.gregtechceu.gtceu.common.pipelike.item.longdistance.LDItemPipeType;
@@ -85,15 +85,10 @@ import java.util.function.Supplier;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.data.block.GCYMBlocks.*;
-import static com.gregtechceu.gtceu.common.data.GTModels.createModelBlockState;
+import static com.gregtechceu.gtceu.data.datagen.client.GTModels.createModelBlockState;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
 
-/**
- * @author KilaBash
- * @date 2023/2/13
- * @implNote GTBlocks
- */
 @SuppressWarnings("removal")
 public class GTBlocks {
     //////////////////////////////////////
@@ -861,8 +856,8 @@ public class GTBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<GTStandingSignBlock> RUBBER_SIGN = REGISTRATE
-            .block("rubber_sign", (p) -> new GTStandingSignBlock(p, RUBBER_TYPE))
+    public static final BlockEntry<StandingSignBlock> RUBBER_SIGN = REGISTRATE
+            .block("rubber_sign", (p) -> new StandingSignBlock(RUBBER_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_SIGN)
             .lang("Rubber Sign")
             .blockstate((ctx, prov) -> prov.signBlock(ctx.get(), GTBlocks.RUBBER_WALL_SIGN.get(),
@@ -875,8 +870,8 @@ public class GTBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<GTWallSignBlock> RUBBER_WALL_SIGN = REGISTRATE
-            .block("rubber_wall_sign", (p) -> new GTWallSignBlock(p, RUBBER_TYPE))
+    public static final BlockEntry<WallSignBlock> RUBBER_WALL_SIGN = REGISTRATE
+            .block("rubber_wall_sign", (p) -> new WallSignBlock(RUBBER_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_WALL_SIGN)
             .lang("Rubber Wall Sign")
             .setData(ProviderType.BLOCKSTATE, NonNullBiConsumer.noop())
@@ -884,8 +879,8 @@ public class GTBlocks {
             .loot((table, block) -> table.dropOther(block, RUBBER_SIGN.asItem()))
             .register();
 
-    public static final BlockEntry<GTCeilingHangingSignBlock> RUBBER_HANGING_SIGN = REGISTRATE
-            .block("rubber_hanging_sign", (p) -> new GTCeilingHangingSignBlock(p, RUBBER_TYPE))
+    public static final BlockEntry<CeilingHangingSignBlock> RUBBER_HANGING_SIGN = REGISTRATE
+            .block("rubber_hanging_sign", (p) -> new CeilingHangingSignBlock(RUBBER_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_HANGING_SIGN)
             .lang("Rubber Hanging Sign")
             .blockstate((ctx, prov) -> {
@@ -901,8 +896,8 @@ public class GTBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<GTWallHangingSignBlock> RUBBER_WALL_HANGING_SIGN = REGISTRATE
-            .block("rubber_wall_hanging_sign", (p) -> new GTWallHangingSignBlock(p, RUBBER_TYPE))
+    public static final BlockEntry<WallHangingSignBlock> RUBBER_WALL_HANGING_SIGN = REGISTRATE
+            .block("rubber_wall_hanging_sign", (p) -> new WallHangingSignBlock(RUBBER_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_WALL_HANGING_SIGN)
             .lang("Rubber Wall Hanging Sign")
             .blockstate((ctx, prov) -> {
@@ -1027,8 +1022,8 @@ public class GTBlocks {
             .build()
             .register();
 
-    public static final BlockEntry<GTStandingSignBlock> TREATED_WOOD_SIGN = REGISTRATE
-            .block("treated_wood_sign", (p) -> new GTStandingSignBlock(p, TREATED_WOOD_TYPE))
+    public static final BlockEntry<StandingSignBlock> TREATED_WOOD_SIGN = REGISTRATE
+            .block("treated_wood_sign", (p) -> new StandingSignBlock(TREATED_WOOD_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_SIGN)
             .lang("Treated Wood Sign")
             .blockstate((ctx, prov) -> prov.signBlock(ctx.get(), GTBlocks.TREATED_WOOD_WALL_SIGN.get(),
@@ -1040,16 +1035,16 @@ public class GTBlocks {
             .tag(ItemTags.SIGNS)
             .build()
             .register();
-    public static final BlockEntry<GTWallSignBlock> TREATED_WOOD_WALL_SIGN = REGISTRATE
-            .block("treated_wood_wall_sign", (p) -> new GTWallSignBlock(p, TREATED_WOOD_TYPE))
+    public static final BlockEntry<WallSignBlock> TREATED_WOOD_WALL_SIGN = REGISTRATE
+            .block("treated_wood_wall_sign", (p) -> new WallSignBlock(p, TREATED_WOOD_TYPE))
             .initialProperties(() -> Blocks.SPRUCE_WALL_SIGN)
             .lang("Treated Wood Wall Sign")
             .setData(ProviderType.BLOCKSTATE, NonNullBiConsumer.noop())
             .tag(BlockTags.WALL_SIGNS, BlockTags.MINEABLE_WITH_AXE)
             .loot((table, block) -> table.dropOther(block, TREATED_WOOD_SIGN.asItem()))
             .register();
-    public static final BlockEntry<GTCeilingHangingSignBlock> TREATED_WOOD_HANGING_SIGN = REGISTRATE
-            .block("treated_wood_hanging_sign", (p) -> new GTCeilingHangingSignBlock(p, TREATED_WOOD_TYPE))
+    public static final BlockEntry<CeilingHangingSignBlock> TREATED_WOOD_HANGING_SIGN = REGISTRATE
+            .block("treated_wood_hanging_sign", (p) -> new CeilingHangingSignBlock(TREATED_WOOD_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_HANGING_SIGN)
             .lang("Treated Wood Hanging Sign")
             .blockstate((ctx, prov) -> {
@@ -1065,8 +1060,8 @@ public class GTBlocks {
             .setData(ProviderType.LANG, NonNullBiConsumer.noop())
             .build()
             .register();
-    public static final BlockEntry<GTWallHangingSignBlock> TREATED_WOOD_WALL_HANGING_SIGN = REGISTRATE
-            .block("treated_wood_wall_hanging_sign", (p) -> new GTWallHangingSignBlock(p, TREATED_WOOD_TYPE))
+    public static final BlockEntry<WallHangingSignBlock> TREATED_WOOD_WALL_HANGING_SIGN = REGISTRATE
+            .block("treated_wood_wall_hanging_sign", (p) -> new WallHangingSignBlock(p, TREATED_WOOD_TYPE))
             .initialProperties(() -> Blocks.SPRUCE_WALL_HANGING_SIGN)
             .lang("Treated Wood Wall Hanging Sign")
             .blockstate((ctx, prov) -> {

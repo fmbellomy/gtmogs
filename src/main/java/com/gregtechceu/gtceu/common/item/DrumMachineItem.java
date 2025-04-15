@@ -6,22 +6,19 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.misc.forge.ThermalFluidHandlerItemStack;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 
-import net.minecraft.world.item.ItemStack;
-
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2023/3/28
- * @implNote DrumMachineItem
- */
 public class DrumMachineItem extends MetaMachineItem {
 
     @NotNull
-    private Material mat = GTMaterials.NULL;
+    private final Material mat;
 
     protected DrumMachineItem(IMachineBlock block, Properties properties, @NotNull Material mat) {
         super(block, properties);
@@ -32,22 +29,21 @@ public class DrumMachineItem extends MetaMachineItem {
         return new DrumMachineItem(block, properties, mat);
     }
 
-    public @NotNull <T> LazyOptional<T> getCapability(ItemStack itemStack, @NotNull Capability<T> cap) {
-        FluidPipeProperties property;
+    public void attachCapabilities(RegisterCapabilitiesEvent event) {
         if (mat.hasProperty(PropertyKey.FLUID_PIPE)) {
-            property = mat.getProperty(PropertyKey.FLUID_PIPE);
-        } else {
-            property = null;
-        }
-
-        if (cap == Capabilities.FLUID_HANDLER_ITEM && property != null) {
-            return Capabilities.FLUID_HANDLER_ITEM.orEmpty(cap, LazyOptional.of(
-                    () -> new ThermalFluidHandlerItemStack(
-                            itemStack,
-                            Math.toIntExact(GTMachineUtils.DRUM_CAPACITY.get(getDefinition())),
+            FluidPipeProperties property = mat.getProperty(PropertyKey.FLUID_PIPE);
+            event.registerItem(Capabilities.FluidHandler.ITEM,
+                    (stack, ignored) -> new ThermalFluidHandlerItemStack(stack,
+                            GTMachineUtils.DRUM_CAPACITY.getInt(getDefinition()),
                             property.getMaxFluidTemperature(), property.isGasProof(), property.isAcidProof(),
-                            property.isCryoProof(), property.isPlasmaProof())));
+                            property.isCryoProof(),
+                            property.isPlasmaProof()),
+                    this);
+        } else {
+            event.registerItem(Capabilities.FluidHandler.ITEM,
+                    (stack, ignored) -> new FluidHandlerItemStack(GTDataComponents.FLUID_CONTENT, stack,
+                            GTMachineUtils.DRUM_CAPACITY.getInt(getDefinition())),
+                    this);
         }
-        return LazyOptional.empty();
     }
 }

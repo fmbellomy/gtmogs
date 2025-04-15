@@ -29,11 +29,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/3/28
- * @implNote GTBucketItem
- */
 public class GTBucketItem extends BucketItem {
 
     final Material material;

@@ -54,11 +54,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2023/2/27
- * @implNote MaterialBlock
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class MaterialBlock extends AppearanceBlock {
@@ -244,7 +239,7 @@ public class MaterialBlock extends AppearanceBlock {
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
         if (this.tagPrefix == TagPrefix.frameGt && useContext.getItemInHand().getItem() instanceof PipeBlockItem &&
-                !useContext.getPlayer().isCrouching())
+                !useContext.getPlayer().isShiftKeyDown())
             return true;
         return super.canBeReplaced(state, useContext);
     }

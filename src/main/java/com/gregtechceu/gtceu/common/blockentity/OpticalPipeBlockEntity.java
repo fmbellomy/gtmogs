@@ -34,11 +34,15 @@ public class OpticalPipeBlockEntity extends PipeBlockEntity<OpticalPipeType, Opt
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(OpticalPipeBlockEntity.class,
             PipeBlockEntity.MANAGED_FIELD_HOLDER);
 
+    @Getter
     private final EnumMap<Direction, OpticalNetHandler> handlers = new EnumMap<>(Direction.class);
     // the OpticalNetHandler can only be created on the server, so we have an empty placeholder for the client
+    @Getter
     private final IDataAccessHatch clientDataHandler = new DefaultDataHandler();
+    @Getter
     private final IOpticalComputationProvider clientComputationHandler = new DefaultComputationHandler();
     private WeakReference<OpticalPipeNet> currentPipeNet = new WeakReference<>(null);
+    @Getter
     private OpticalNetHandler defaultHandler;
 
     @Getter
@@ -56,7 +60,7 @@ public class OpticalPipeBlockEntity extends PipeBlockEntity<OpticalPipeType, Opt
         return false;
     }
 
-    private void initHandlers() {
+    public void initHandlers() {
         OpticalPipeNet net = getOpticalPipeNet();
         if (net == null) return;
         for (Direction facing : GTUtil.DIRECTIONS) {

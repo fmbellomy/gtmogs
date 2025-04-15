@@ -14,11 +14,6 @@ import static com.gregtechceu.gtceu.api.material.material.ItemMaterialData.regis
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
-/**
- * @author KilaBash
- * @date 2023/2/28
- * @implNote ItemTagsHandler
- */
 public class TagsHandler {
 
     public static void initItem(RegistrateTagsProvider<Item> provider) {

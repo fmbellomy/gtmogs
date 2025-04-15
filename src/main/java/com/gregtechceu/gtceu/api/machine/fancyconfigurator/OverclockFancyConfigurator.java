@@ -25,11 +25,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/7/1
- * @implNote OverclockFancyConfigurator
- */
 public class OverclockFancyConfigurator implements IFancyConfigurator {
 
     protected IOverclockMachine overclockMachine;

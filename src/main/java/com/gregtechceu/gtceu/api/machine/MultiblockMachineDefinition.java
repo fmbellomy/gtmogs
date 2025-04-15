@@ -20,11 +20,6 @@ import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/3/4
- * @implNote MultiblockMachineDefinition
- */
 public class MultiblockMachineDefinition extends MachineDefinition {
 
     @Getter
@@ -32,7 +27,7 @@ public class MultiblockMachineDefinition extends MachineDefinition {
     private boolean generator;
     @Setter
     @Getter
-    @NonNull
+    @NotNull
     private Supplier<BlockPattern> patternFactory;
     @Setter
     @Getter

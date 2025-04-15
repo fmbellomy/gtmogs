@@ -18,8 +18,8 @@ public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
 
     public static final Codec<BiomeWeightModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(mod -> mod.biomes.get()),
-            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight))
-            .apply(instance, (biomes, weight) -> new BiomeWeightModifier(() -> biomes, weight)));
+            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight)
+    ).apply(instance, (biomes, weight) -> new BiomeWeightModifier(() -> biomes, weight)));
 
     public Supplier<HolderSet<Biome>> biomes;
     public int addedWeight;

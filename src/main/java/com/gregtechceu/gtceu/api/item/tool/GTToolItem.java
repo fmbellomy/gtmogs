@@ -28,11 +28,6 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote GTToolItem
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class GTToolItem extends TieredItem implements IGTTool {
@@ -176,5 +171,10 @@ public class GTToolItem extends TieredItem implements IGTTool {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         return definition$use(level, player, usedHand);
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+        return this.definition$isCorrectToolForDrops(stack, state);
     }
 }

@@ -23,11 +23,6 @@ import net.minecraft.world.level.block.Blocks;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2023/3/28
- * @implNote FacadeCoverRecipe
- */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class FacadeCoverRecipe implements CraftingRecipe {

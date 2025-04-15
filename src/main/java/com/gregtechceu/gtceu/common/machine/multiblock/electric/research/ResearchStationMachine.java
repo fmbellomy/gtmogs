@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.CWURecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IDisplayUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockDisplayText;
@@ -29,8 +30,6 @@ import java.util.List;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ResearchStationMachine extends WorkableElectricMultiblockMachine
                                     implements IOpticalComputationReceiver, IDisplayUIMachine {
 
@@ -66,9 +65,12 @@ public class ResearchStationMachine extends WorkableElectricMultiblockMachine
                 addHandlerList(RecipeHandlerList.of(IO.IN, iObjectHolder.getAsHandler()));
             }
 
-            part.self().holder.self()
-                    .getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER)
-                    .ifPresent(provider -> this.computationProvider = provider);
+            MetaMachine base = part.self();
+            var provider = getLevel().getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER,
+                    base.getPos(), base.getBlockState(), base.getHolder().self(), null);
+            if (provider != null) {
+                this.computationProvider = provider;
+            }
         }
 
         // should never happen, but would rather do this than have an obscure NPE

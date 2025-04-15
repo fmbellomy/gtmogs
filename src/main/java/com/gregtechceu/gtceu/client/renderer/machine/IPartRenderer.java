@@ -14,11 +14,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/3/16
- * @implNote IPartRenderer
- */
 public interface IPartRenderer {
 
     /**
@@ -40,7 +35,7 @@ public interface IPartRenderer {
                             modelState);
                     return true;
                 } else if (renderer instanceof MachineRenderer machineRenderer) {
-                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), modelState, side, rand);
+                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), modelState, side, rand, data, renderType);
                     return true;
                 }
             }

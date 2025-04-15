@@ -16,6 +16,7 @@ import com.gregtechceu.gtceu.utils.GradientUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -27,6 +28,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -54,11 +56,6 @@ import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/2/22
- * @implNote ColorSprayBehaviour
- */
 public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IAddInformation {
 
     // vanilla
@@ -180,7 +177,7 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         int remainingUses = getUsesLeft(stack);
         if (color != null) {
@@ -282,12 +279,12 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
                 }
             }
         } else if (first instanceof ShulkerBoxBlockEntity shulkerBoxBE) {
-            var tag = shulkerBoxBE.saveWithFullMetadata();
             var level = first.getLevel();
+            var tag = shulkerBoxBE.saveWithFullMetadata(level.registryAccess());
             var pos = first.getBlockPos();
             recolorBlockNoState(SHULKER_BOX_MAP, color, level, pos, Blocks.SHULKER_BOX);
             if (level.getBlockEntity(pos) instanceof ShulkerBoxBlockEntity newShulker) {
-                newShulker.load(tag);
+                newShulker.loadFromTag(tag, level.registryAccess());
             }
         } else {
             return false;
@@ -340,7 +337,7 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
     }
 
     private boolean tryPaintSpecialBlock(Level world, BlockPos pos, Block block) {
-        if (block.defaultBlockState().is(Tags.Blocks.GLASS)) {
+        if (block.defaultBlockState().is(Tags.Blocks.GLASS_BLOCKS)) {
             if (recolorBlockNoState(GLASS_MAP, this.color, world, pos, Blocks.GLASS)) {
                 return true;
             }
@@ -483,15 +480,11 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
     }
 
     public final int getUsesLeft(ItemStack stack) {
-        CompoundTag tagCompound = stack.getTag();
-        if (tagCompound == null || !tagCompound.contains("UsesLeft", Tag.TAG_INT))
-            return totalUses;
-        return tagCompound.getInt("UsesLeft");
+        return totalUses - stack.getOrDefault(DataComponents.DAMAGE, 0);
     }
 
-    public static void setUsesLeft(ItemStack itemStack, int usesLeft) {
-        CompoundTag tagCompound = itemStack.getOrCreateTag();
-        tagCompound.putInt("UsesLeft", usesLeft);
+    public void setUsesLeft(ItemStack itemStack, int usesLeft) {
+        itemStack.set(DataComponents.DAMAGE, totalUses - usesLeft);
     }
 
     private static final BiPredicate<IPaintable, IPaintable> paintablePredicate = (parent, child) -> {
@@ -501,14 +494,14 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
         return parent.getPaintingColor() == child.getPaintingColor();
     };
 
-    private static final TriPredicate<BlockEntity, BlockEntity, Direction> paintablePredicateWrapper = (parent, child,
+    private static final TriPredicate<@Nullable BlockEntity, @Nullable BlockEntity, Direction> paintablePredicateWrapper = (parent, child,
                                                                                                         direction) -> {
         if (parent == null && child instanceof IPaintable) return true;
         return parent instanceof IPaintable pp && child instanceof IPaintable pc && paintablePredicate.test(pp, pc);
     };
 
     @SuppressWarnings("rawtypes")
-    private static final TriPredicate<PipeBlockEntity, PipeBlockEntity, Direction> gtPipePredicate = (parent, child,
+    private static final TriPredicate<@Nullable PipeBlockEntity, PipeBlockEntity, Direction> gtPipePredicate = (parent, child,
                                                                                                       direction) -> {
         if (parent == null) return true;
         if (!paintablePredicate.test(parent, child)) {
@@ -517,7 +510,7 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
         return parent.isConnected(direction) && child.isConnected(direction.getOpposite());
     };
 
-    private static final TriPredicate<MetaMachineBlockEntity, MetaMachineBlockEntity, Direction> gtMetaMachinePredicate = (parent,
+    private static final TriPredicate<@Nullable MetaMachineBlockEntity, MetaMachineBlockEntity, Direction> gtMetaMachinePredicate = (parent,
                                                                                                                            child,
                                                                                                                            direction) -> {
         if (parent == null) return true;

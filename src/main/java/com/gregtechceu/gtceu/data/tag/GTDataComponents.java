@@ -7,8 +7,10 @@ import com.gregtechceu.gtceu.api.cover.filter.SimpleItemFilter;
 import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.*;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.common.item.behavior.ItemMagnetBehavior;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -24,6 +26,7 @@ import com.mojang.serialization.Codec;
 
 public class GTDataComponents {
 
+    private static final StreamCodec<ByteBuf, Unit> UNIT_STREAM_CODEC = StreamCodec.unit(Unit.INSTANCE);
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister
             .createDataComponents(Registries.DATA_COMPONENT_TYPE, GTCEu.MOD_ID);
 
@@ -38,14 +41,14 @@ public class GTDataComponents {
             .registerComponentType("aoe", builder -> builder.persistent(AoESymmetrical.CODEC)
                     .networkSynchronized(AoESymmetrical.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> DISALLOW_CONTAINER_ITEM = DATA_COMPONENTS
-            .registerComponentType("disallow_container_item", builder -> builder.persistent(Codec.unit(Unit.INSTANCE))
-                    .networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+            .registerComponentType("disallow_container_item", builder -> builder.persistent(Unit.CODEC)
+                    .networkSynchronized(UNIT_STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> RELOCATE_MINED_BLOCKS = DATA_COMPONENTS
-            .registerComponentType("relocate_mined_blocks", builder -> builder.persistent(Codec.unit(Unit.INSTANCE))
-                    .networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+            .registerComponentType("relocate_mined_blocks", builder -> builder.persistent(Unit.CODEC)
+                    .networkSynchronized(UNIT_STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> RELOCATE_MOB_DROPS = DATA_COMPONENTS
-            .registerComponentType("relocate_mob_drops", builder -> builder.persistent(Codec.unit(Unit.INSTANCE))
-                    .networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+            .registerComponentType("relocate_mob_drops", builder -> builder.persistent(Unit.CODEC)
+                    .networkSynchronized(UNIT_STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> ACTIVE = DATA_COMPONENTS
             .registerComponentType("active", builder -> builder.persistent(Codec.BOOL)
                     .networkSynchronized(ByteBufCodecs.BOOL));
@@ -61,16 +64,17 @@ public class GTDataComponents {
             .registerComponentType("armor",
                     builder -> builder.persistent(GTArmor.CODEC).networkSynchronized(GTArmor.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> FLY_MODE = DATA_COMPONENTS
-            .registerComponentType("fly_mode", builder -> builder.persistent(Codec.unit(Unit.INSTANCE))
-                    .networkSynchronized(StreamCodec.unit(Unit.INSTANCE)));
+            .registerComponentType("fly_mode", builder -> builder.persistent(Unit.CODEC)
+                    .networkSynchronized(UNIT_STREAM_CODEC));
 
     // component item-related
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<ResearchManager.ResearchItem>> RESEARCH_ITEM = DATA_COMPONENTS
             .registerComponentType("research_item", builder -> builder.persistent(ResearchManager.ResearchItem.CODEC)
                     .networkSynchronized(ResearchManager.ResearchItem.STREAM_CODEC));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> ITEM_MAGNET = DATA_COMPONENTS
-            .registerComponentType("item_magnet",
-                    builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ItemMagnetBehavior.MagnetComponent>> MAGNET = DATA_COMPONENTS
+            .registerComponentType("magnet",
+                    builder -> builder.persistent(ItemMagnetBehavior.MagnetComponent.CODEC)
+                            .networkSynchronized(ItemMagnetBehavior.MagnetComponent.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Byte>> SCANNER_MODE = DATA_COMPONENTS
             .registerComponentType("scanner_mode",
                     builder -> builder.persistent(Codec.BYTE).networkSynchronized(ByteBufCodecs.BYTE));
@@ -96,22 +100,32 @@ public class GTDataComponents {
             .registerComponentType("data_copy_tag", builder -> builder.persistent(CustomData.CODEC)
                     .networkSynchronized(CustomData.STREAM_CODEC));
 
+    // machine info
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<LargeItemContent>> LARGE_ITEM_CONTENT = DATA_COMPONENTS
+            .registerComponentType("large_item_content", builder -> builder
+                    .persistent(LargeItemContent.CODEC)
+                    .networkSynchronized(LargeItemContent.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<LargeFluidContent>> LARGE_FLUID_CONTENT = DATA_COMPONENTS
+            .registerComponentType("large_fluid_content", builder -> builder
+                    .persistent(LargeFluidContent.CODEC)
+                    .networkSynchronized(LargeFluidContent.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<CreativeMachineInfo>> CREATIVE_MACHINE_INFO = DATA_COMPONENTS
+            .registerComponentType("creative_machine_info", builder -> builder
+                    .persistent(CreativeMachineInfo.CODEC)
+                    .networkSynchronized(CreativeMachineInfo.STREAM_CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> TAPED = DATA_COMPONENTS
+            .registerComponentType("taped",
+                    builder -> builder.persistent(Unit.CODEC).networkSynchronized(UNIT_STREAM_CODEC));
+
     // misc
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<FacadeWrapper>> FACADE = DATA_COMPONENTS
             .registerComponentType("facade",
                     builder -> builder.persistent(FacadeWrapper.CODEC).networkSynchronized(FacadeWrapper.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<LampBlockItem.LampData>> LAMP_DATA = DATA_COMPONENTS
             .registerComponentType("lamp",
-                    builder -> builder.persistent(LampBlockItem.LampData.CODEC));
+                    builder -> builder.persistent(LampBlockItem.LampData.CODEC)
+                            .networkSynchronized(LampBlockItem.LampData.STREAM_CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LIGHTER_OPEN = DATA_COMPONENTS
             .registerComponentType("lighter_open",
                     builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SingleItemStorage>> SINGLE_ITEM_STORAGE = DATA_COMPONENTS
-            .registerComponentType("single_item_storage", builder -> builder
-                    .persistent(SingleItemStorage.CODEC)
-                    .networkSynchronized(SingleItemStorage.STREAM_CODEC));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SingleFluidStorage>> SINGLE_FLUID_STORAGE = DATA_COMPONENTS
-            .registerComponentType("single_fluid_storage", builder -> builder
-                    .persistent(SingleFluidStorage.CODEC)
-                    .networkSynchronized(SingleFluidStorage.STREAM_CODEC));
 }

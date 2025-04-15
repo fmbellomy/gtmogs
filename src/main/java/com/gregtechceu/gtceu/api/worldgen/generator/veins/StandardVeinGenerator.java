@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -40,19 +41,16 @@ import java.util.stream.Collectors;
 
 public class StandardVeinGenerator extends VeinGenerator {
 
-    public static final MapCodec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder
-            .mapCodec(instance -> instance.group(
+    // spotless:off
+    public static final MapCodec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("block").forGetter(ext -> ext.block.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("deep_block").forGetter(ext -> ext.deepBlock.get()),
-                    BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block")
-                            .forGetter(ext -> ext.netherBlock.get()))
-                    .apply(instance, StandardVeinGenerator::new));
-
-    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
-                    .fieldOf("targets").forGetter(ext -> ext.blocks))
-            .apply(instance, StandardVeinGenerator::new));
-
+                    BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block").forGetter(ext -> ext.netherBlock.get())
+    ).apply(instance, StandardVeinGenerator::new));
+    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
+            .fieldOf("targets")
+            .xmap(StandardVeinGenerator::new, StandardVeinGenerator::getBlocks);
+    // spotless:on
     public static final MapCodec<StandardVeinGenerator> CODEC = Codec.mapEither(CODEC_SEPARATE, CODEC_LIST)
             .xmap(Either::unwrap, Either::left);
 
@@ -60,6 +58,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     public NonNullSupplier<? extends Block> deepBlock;
     public NonNullSupplier<? extends Block> netherBlock;
 
+    @Getter
     public Either<List<OreConfiguration.TargetBlockState>, Material> blocks;
 
     public StandardVeinGenerator(GTOreDefinition entry) {
@@ -334,4 +333,5 @@ public class StandardVeinGenerator extends VeinGenerator {
             placedAmount.increment();
         });
     }
+
 }

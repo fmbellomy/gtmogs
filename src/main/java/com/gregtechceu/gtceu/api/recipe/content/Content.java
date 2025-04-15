@@ -42,15 +42,14 @@ public class Content {
     }
 
     public static <T> Codec<Content> codec(RecipeCapability<T> capability) {
+        // spotless:off
         return RecordCodecBuilder.create(instance -> instance.group(
                 capability.serializer.codec().fieldOf("content").forGetter(val -> capability.of(val.content)),
-                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("chance", ChanceLogic.getMaxChancedValue())
-                        .forGetter(val -> val.chance),
-                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("maxChance", ChanceLogic.getMaxChancedValue())
-                        .forGetter(val -> val.maxChance),
-                Codec.INT.optionalFieldOf("tierChanceBoost", 0)
-                        .forGetter(val -> val.tierChanceBoost))
+                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("chance", ChanceLogic.getMaxChancedValue()).forGetter(val -> val.chance),
+                ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("maxChance", ChanceLogic.getMaxChancedValue()).forGetter(val -> val.maxChance),
+                Codec.INT.optionalFieldOf("tierChanceBoost", 0).forGetter(val -> val.tierChanceBoost))
                 .apply(instance, Content::new));
+        // spotless:on
     }
 
     public Content copy(RecipeCapability<?> capability) {

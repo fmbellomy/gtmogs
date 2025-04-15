@@ -4,13 +4,13 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketAddHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketRemoveHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketSyncHazardZoneStrength;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
@@ -19,13 +19,13 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -51,8 +51,10 @@ public class EnvironmentalHazardSavedData extends SavedData {
     private final Map<ChunkPos, HazardZone> hazardZones = new HashMap<>();
 
     public static EnvironmentalHazardSavedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(tag -> new EnvironmentalHazardSavedData(serverLevel, tag),
-                () -> new EnvironmentalHazardSavedData(serverLevel), "gtceu_environmental_hazard_tracker");
+        return serverLevel.getDataStorage()
+                .computeIfAbsent(new SavedData.Factory<>(() -> new EnvironmentalHazardSavedData(serverLevel),
+                        (tag, provider) -> new EnvironmentalHazardSavedData(serverLevel, tag)),
+                        "gtceu_environmental_hazard_tracker");
     }
 
     public EnvironmentalHazardSavedData(ServerLevel serverLevel) {
@@ -103,8 +105,7 @@ public class EnvironmentalHazardSavedData extends SavedData {
         for (ChunkPos pos : zonesToRemove) {
             hazardZones.remove(pos);
             if (this.serverLevel.hasChunk(pos.x, pos.z)) {
-                LevelChunk chunk = this.serverLevel.getChunk(pos.x, pos.z);
-                GTNetwork.NETWORK.sendToTrackingChunk(new SPacketRemoveHazardZone(pos), chunk);
+                PacketDistributor.sendToPlayersTrackingChunk(this.serverLevel, pos, new SPacketRemoveHazardZone(pos));
             }
         }
 
@@ -136,8 +137,8 @@ public class EnvironmentalHazardSavedData extends SavedData {
             if (newZone == null) {
                 hazardZones.remove(pos);
                 if (this.serverLevel.hasChunk(pos.x, pos.z)) {
-                    LevelChunk chunk = this.serverLevel.getChunk(pos.x, pos.z);
-                    GTNetwork.NETWORK.sendToTrackingChunk(new SPacketRemoveHazardZone(pos), chunk);
+                    PacketDistributor.sendToPlayersTrackingChunk(this.serverLevel, pos,
+                            new SPacketRemoveHazardZone(pos));
                 }
             }
             this.setDirty();
@@ -209,8 +210,8 @@ public class EnvironmentalHazardSavedData extends SavedData {
     public void removeZone(ChunkPos chunkPos) {
         this.hazardZones.remove(chunkPos);
         if (this.serverLevel.hasChunk(chunkPos.x, chunkPos.z)) {
-            LevelChunk chunk = this.serverLevel.getChunk(chunkPos.x, chunkPos.z);
-            GTNetwork.NETWORK.sendToTrackingChunk(new SPacketRemoveHazardZone(chunkPos), chunk);
+            PacketDistributor.sendToPlayersTrackingChunk(this.serverLevel, chunkPos,
+                    new SPacketRemoveHazardZone(chunkPos));
         }
     }
 
@@ -237,7 +238,7 @@ public class EnvironmentalHazardSavedData extends SavedData {
 
     @NotNull
     @Override
-    public CompoundTag save(@NotNull CompoundTag compoundTag) {
+    public CompoundTag save(@NotNull CompoundTag compoundTag, HolderLookup.Provider provider) {
         ListTag hazardZonesTag = new ListTag();
         for (var entry : hazardZones.entrySet()) {
             CompoundTag zoneTag = new CompoundTag();
@@ -291,7 +292,7 @@ public class EnvironmentalHazardSavedData extends SavedData {
         }
 
         public static HazardZone deserializeNBT(CompoundTag zoneTag) {
-            BlockPos source = NbtUtils.readBlockPos(zoneTag.getCompound("source"));
+            BlockPos source = NbtUtils.readBlockPos(zoneTag, "source").orElse(null);
             float strength = zoneTag.getFloat("strength");
             boolean canSpread = zoneTag.getBoolean("can_spread");
             HazardProperty.HazardTrigger trigger = HazardProperty.HazardTrigger.ALL_TRIGGERS
@@ -322,15 +323,14 @@ public class EnvironmentalHazardSavedData extends SavedData {
 
     public void sendAddZonePacket(ChunkPos pos, HazardZone zone) {
         if (this.serverLevel.hasChunk(pos.x, pos.z)) {
-            LevelChunk chunk = this.serverLevel.getChunk(pos.x, pos.z);
-            GTNetwork.NETWORK.sendToTrackingChunk(new SPacketAddHazardZone(pos, zone), chunk);
+            PacketDistributor.sendToPlayersTrackingChunk(this.serverLevel, pos, new SPacketAddHazardZone(pos, zone));
         }
     }
 
     public void sendSyncZonePacket(ChunkPos pos, HazardZone zone) {
         if (this.serverLevel.hasChunk(pos.x, pos.z)) {
-            LevelChunk chunk = this.serverLevel.getChunk(pos.x, pos.z);
-            GTNetwork.NETWORK.sendToTrackingChunk(new SPacketSyncHazardZoneStrength(pos, zone.strength()), chunk);
+            PacketDistributor.sendToPlayersTrackingChunk(this.serverLevel, pos,
+                    new SPacketSyncHazardZoneStrength(pos, zone.strength()));
         }
     }
 }

@@ -11,9 +11,7 @@ import com.gregtechceu.gtceu.client.particle.HazardParticle;
 import com.gregtechceu.gtceu.client.particle.MufflerParticle;
 import com.gregtechceu.gtceu.client.renderer.entity.GTExplosiveRenderer;
 import com.gregtechceu.gtceu.client.renderer.item.GTItemBarRenderer;
-import com.gregtechceu.gtceu.common.CommonInit;
-import com.gregtechceu.gtceu.common.data.GTBlockEntities;
-import com.gregtechceu.gtceu.common.data.GTEntityTypes;
+import com.gregtechceu.gtceu.data.entity.GTEntityTypes;
 import com.gregtechceu.gtceu.data.particle.GTParticleTypes;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -25,12 +23,11 @@ import com.gregtechceu.gtceu.integration.map.layer.builtin.FluidRenderLayer;
 import com.gregtechceu.gtceu.integration.map.layer.builtin.OreRenderLayer;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 
-import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -38,22 +35,14 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-/**
- * @author KilaBash
- * @date 2023/7/30
- * @implNote ClientInit
- */
-public class ClientInit extends CommonInit {
+public class ClientInit {
 
     public static final BiMap<ResourceLocation, GTOreDefinition> CLIENT_ORE_VEINS = HashBiMap.create();
     public static final BiMap<ResourceLocation, BedrockFluidDefinition> CLIENT_FLUID_VEINS = HashBiMap.create();
     public static final BiMap<ResourceLocation, BedrockOreDefinition> CLIENT_BEDROCK_ORE_VEINS = HashBiMap.create();
 
-    public ClientInit() {
-        super();
-    }
-
-    public static void init() {
+    public static void init(IEventBus modBus) {
+        modBus.register(ClientInit.class);
         if (!GTCEu.isDataGen()) {
             ClientCacheManager.registerClientCache(GTClientCache.instance, "gtceu");
             Layers.registerLayer(OreRenderLayer::new, "ore_veins");
@@ -62,20 +51,11 @@ public class ClientInit extends CommonInit {
     }
 
     @SubscribeEvent
-    public void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    public static void onRegisterEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(GTEntityTypes.DYNAMITE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(GTEntityTypes.POWDERBARREL.get(), GTExplosiveRenderer::new);
         event.registerEntityRenderer(GTEntityTypes.INDUSTRIAL_TNT.get(), GTExplosiveRenderer::new);
-
-        event.registerBlockEntityRenderer(GTBlockEntities.GT_SIGN.get(), SignRenderer::new);
-        event.registerBlockEntityRenderer(GTBlockEntities.GT_HANGING_SIGN.get(), HangingSignRenderer::new);
     }
-
-    @SubscribeEvent
-    public void registerKeyBindings(RegisterKeyMappingsEvent event) {
-        KeyBind.onRegisterKeyBinds(event);
-    }
-
 
     @SubscribeEvent
     public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
@@ -87,12 +67,18 @@ public class ClientInit extends CommonInit {
     }
 
     @SubscribeEvent
+    public static void registerKeyBindings(RegisterKeyMappingsEvent event) {
+        KeyBind.onRegisterKeyBinds(event);
+    }
+
+
+    @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiLayersEvent event) {
         event.registerAboveAll(GTCEu.id("hud"), new HudGuiOverlay());
     }
 
     @SubscribeEvent
-    public void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
+    public static void onRegisterParticleProviders(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(GTParticleTypes.HAZARD_PARTICLE.get(), HazardParticle.Provider::new);
         event.registerSpriteSet(GTParticleTypes.MUFFLER_PARTICLE.get(), MufflerParticle.Provider::new);
     }

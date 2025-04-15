@@ -5,13 +5,14 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
+import com.gregtechceu.gtceu.api.item.datacomponents.GTArmor;
 import com.gregtechceu.gtceu.core.IFireImmuneEntity;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -42,36 +43,28 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
     }
 
     @Override
-    public void onArmorTick(Level world, Player player, ItemStack item) {
-        IElectricItem cont = GTCapabilityHelper.getElectricItem(item);
+    public void onArmorTick(Level world, Player player, ItemStack stack) {
+        IElectricItem cont = GTCapabilityHelper.getElectricItem(stack);
         if (cont == null) {
             return;
         }
 
-        CompoundTag data = item.getOrCreateTag();
-        // Assume no tags exist if we don't see the enabled tag
-        if (!data.contains("enabled")) {
-            data.putBoolean("enabled", true);
-            data.putBoolean("hover", false);
-            data.putByte("toggleTimer", (byte) 0);
-            data.putBoolean("canShare", false);
-        }
-
-        boolean jetpackEnabled = data.getBoolean("enabled");
-        boolean hoverMode = data.getBoolean("hover");
-        byte toggleTimer = data.getByte("toggleTimer");
-        boolean canShare = data.getBoolean("canShare");
+        GTArmor.Mutable data = stack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY).toMutable();
+        boolean hoverMode = data.hover();
+        byte toggleTimer = data.toggleTimer();
+        boolean canShare = data.canShare();
+        boolean jetpackEnabled = data.enabled();
 
         String messageKey = null;
         if (toggleTimer == 0) {
             if (KeyBind.JETPACK_ENABLE.isKeyDown(player)) {
                 jetpackEnabled = !jetpackEnabled;
                 messageKey = "metaarmor.jetpack.flight." + (jetpackEnabled ? "enable" : "disable");
-                data.putBoolean("enabled", jetpackEnabled);
+                data.enabled(jetpackEnabled);
             } else if (KeyBind.ARMOR_HOVER.isKeyDown(player)) {
                 hoverMode = !hoverMode;
                 messageKey = "metaarmor.jetpack.hover." + (hoverMode ? "enable" : "disable");
-                data.putBoolean("hover", hoverMode);
+                data.hover(hoverMode);
             } else if (KeyBind.ARMOR_CHARGING.isKeyDown(player)) {
                 canShare = !canShare;
                 if (canShare && cont.getCharge() == 0) { // Only allow for charging to be enabled if charge is nonzero
@@ -80,7 +73,7 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
                 } else {
                     messageKey = "metaarmor.qts.share." + (canShare ? "enable" : "disable");
                 }
-                data.putBoolean("canShare", canShare);
+                data.canShare(canShare);
             }
 
             if (messageKey != null) {
@@ -90,9 +83,11 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
         }
 
         if (toggleTimer > 0) toggleTimer--;
-        data.putByte("toggleTimer", toggleTimer);
+        data.toggleTimer(toggleTimer);
 
-        performFlying(player, jetpackEnabled, hoverMode, item);
+        stack.set(GTDataComponents.ARMOR_DATA, data.toImmutable());
+
+        performFlying(player, jetpackEnabled, hoverMode, stack);
 
         if (type == ArmorItem.Type.CHESTPLATE && !player.fireImmune()) {
             ((IFireImmuneEntity) player).gtceu$setFireImmune(true);
@@ -149,21 +144,18 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
 
     @Override
     public void addInfo(ItemStack itemStack, List<Component> lines) {
-        CompoundTag data = itemStack.getOrCreateTag();
-        Component state;
-        boolean enabled = !data.contains("enabled") || data.getBoolean("enabled");
-        state = enabled ? Component.translatable("metaarmor.hud.status.enabled") :
+        GTArmor data = itemStack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY);
+
+        Component state = data.enabled() ? Component.translatable("metaarmor.hud.status.enabled") :
                 Component.translatable("metaarmor.hud.status.disabled");
         lines.add(Component.translatable("metaarmor.hud.engine_enabled", state));
 
-        boolean canShare = data.contains("canShare") && data.getBoolean("canShare");
-        state = canShare ? Component.translatable("metaarmor.hud.status.enabled") :
+        state = data.canShare() ? Component.translatable("metaarmor.hud.status.enabled") :
                 Component.translatable("metaarmor.hud.status.disabled");
         lines.add(Component.translatable("metaarmor.energy_share.tooltip", state));
         lines.add(Component.translatable("metaarmor.energy_share.tooltip.guide"));
 
-        boolean hover = data.contains("hover") && data.getBoolean("hover");
-        state = hover ? Component.translatable("metaarmor.hud.status.enabled") :
+        state = data.hover() ? Component.translatable("metaarmor.hud.status.enabled") :
                 Component.translatable("metaarmor.hud.status.disabled");
         lines.add(Component.translatable("metaarmor.hud.hover_mode", state));
         super.addInfo(itemStack, lines);
@@ -173,8 +165,8 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
     public InteractionResultHolder<ItemStack> onRightClick(Level world, Player player, InteractionHand hand) {
         ItemStack armor = player.getItemInHand(hand);
         if (armor.getItem() instanceof ArmorComponentItem && player.isShiftKeyDown()) {
-            CompoundTag data = armor.getOrCreateTag();
-            boolean canShare = data.contains("canShare") && data.getBoolean("canShare");
+            GTArmor data = armor.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY);
+            boolean canShare = data.canShare();
             IElectricItem cont = GTCapabilityHelper.getElectricItem(armor);
             if (cont == null) {
                 return InteractionResultHolder.fail(armor);
@@ -192,7 +184,9 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
             }
 
             canShare = canShare && (cont.getCharge() != 0);
-            data.putBoolean("canShare", canShare);
+            final boolean finalCanShare = canShare;
+            armor.update(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY,
+                    data1 -> data1.setCanShare(finalCanShare));
             return InteractionResultHolder.success(armor);
         } else {
             return super.onRightClick(world, player, hand);
@@ -206,26 +200,23 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
         IElectricItem cont = GTCapabilityHelper.getElectricItem(item);
         if (cont == null) return;
         if (!cont.canUse(energyPerUse)) return;
-        CompoundTag data = item.getTag();
+        GTArmor data = item.get(GTDataComponents.ARMOR_DATA);
         if (data != null) {
-            if (data.contains("enabled")) {
-                Component status = (data.getBoolean("enabled") ?
-                        Component.translatable("metaarmor.hud.status.enabled") :
-                        Component.translatable("metaarmor.hud.status.disabled"));
-                Component result = Component.translatable("metaarmor.hud.engine_enabled", status);
-                this.HUD.newString(result);
-            }
-            if (data.contains("canShare")) {
-                String status = data.getBoolean("canShare") ? "metaarmor.hud.status.enabled" :
-                        "metaarmor.hud.status.disabled";
-                this.HUD.newString(Component.translatable("mataarmor.hud.supply_mode", Component.translatable(status)));
-            }
+            Component status = data.enabled() ?
+                    Component.translatable("metaarmor.hud.status.enabled") :
+                    Component.translatable("metaarmor.hud.status.disabled");
+            Component result = Component.translatable("metaarmor.hud.engine_enabled", status);
+            this.HUD.newString(result);
 
-            if (data.contains("hover")) {
-                String status = data.getBoolean("hover") ? "metaarmor.hud.status.enabled" :
-                        "metaarmor.hud.status.disabled";
-                this.HUD.newString(Component.translatable("metaarmor.hud.hover_mode", Component.translatable(status)));
-            }
+            status = data.canShare() ?
+                    Component.translatable("metaarmor.hud.status.enabled") :
+                    Component.translatable("metaarmor.hud.status.disabled");
+            this.HUD.newString(Component.translatable("mataarmor.hud.supply_mode", status));
+
+            status = data.hover() ?
+                    Component.translatable("metaarmor.hud.status.enabled") :
+                    Component.translatable("metaarmor.hud.status.disabled");
+            this.HUD.newString(Component.translatable("metaarmor.hud.hover_mode", status));
         }
         this.HUD.draw(guiGraphics);
         this.HUD.reset();

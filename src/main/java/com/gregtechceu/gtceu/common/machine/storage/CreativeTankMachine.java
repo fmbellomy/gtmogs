@@ -1,13 +1,15 @@
 package com.gregtechceu.gtceu.common.machine.storage;
 
-import WidgetGroup;
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.PhantomFluidWidget;
+import com.gregtechceu.gtceu.api.item.datacomponents.CreativeMachineInfo;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceBorderTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
@@ -17,6 +19,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -92,7 +95,7 @@ public class CreativeTankMachine extends QuantumTankMachine {
         if (hit.getDirection() == getFrontFacing() && !isRemote()) {
             // Clear fluid if empty + shift-rclick
             if (heldItem.isEmpty()) {
-                if (player.isCrouching() && !stored.isEmpty()) {
+                if (player.isShiftKeyDown() && !stored.isEmpty()) {
                     return updateStored(FluidStack.EMPTY);
                 }
                 return InteractionResult.PASS;
@@ -158,6 +161,22 @@ public class CreativeTankMachine extends QuantumTankMachine {
     @Override
     public ManagedFieldHolder getFieldHolder() {
         return MANAGED_FIELD_HOLDER;
+    }
+
+    @Override
+    public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {
+        super.applyImplicitComponents(componentInput);
+        CreativeMachineInfo info = componentInput.get(GTDataComponents.CREATIVE_MACHINE_INFO);
+        if (info != null) {
+            mBPerCycle = info.outputPerCycle();
+            ticksPerCycle = info.ticksPerCycle();
+        }
+    }
+
+    @Override
+    public void collectImplicitComponents(DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        components.set(GTDataComponents.CREATIVE_MACHINE_INFO, new CreativeMachineInfo(mBPerCycle, ticksPerCycle));
     }
 
     private class InfiniteCache extends FluidCache {

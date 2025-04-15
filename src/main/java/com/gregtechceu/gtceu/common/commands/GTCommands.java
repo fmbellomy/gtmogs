@@ -16,8 +16,9 @@ import com.gregtechceu.gtceu.data.loader.BedrockOreLoader;
 import com.gregtechceu.gtceu.data.loader.GTOreLoader;
 import com.gregtechceu.gtceu.data.pack.GTDynamicDataPack;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
-import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
@@ -35,16 +36,16 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 
 import static net.minecraft.commands.Commands.*;
 
-/**
- * @author KilaBash
- * @date 2023/2/9
- * @implNote GTCommands
- */
 public class GTCommands {
+
+    private static final Dynamic2CommandExceptionType VEIN_PLACE_FAILURE = new Dynamic2CommandExceptionType(
+            (id, sourcePos) -> Component.translatable("command.gtceu.place_vein.failure", id, sourcePos)
+    );
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         dispatcher.register(
@@ -89,8 +90,8 @@ public class GTCommands {
         int dumpedCount = 0;
         for (ResourceLocation id : registry.keys()) {
             T entry = registry.get(id);
-            JsonElement json = codec.encodeStart(ops, entry).getOrThrow(false, GTCEu.LOGGER::error);
-            GTDynamicDataPack.writeJson(id, folder, parent, json);
+            JsonElement json = codec.encodeStart(ops, entry).getOrThrow();
+            GTDynamicDataPack.writeJson(id, folder, parent, json.toString().getBytes(StandardCharsets.UTF_8));
             dumpedCount++;
         }
         final int result = dumpedCount;
@@ -101,7 +102,8 @@ public class GTCommands {
         return result;
     }
 
-    private static int placeVein(CommandContext<CommandSourceStack> context, BlockPos sourcePos) {
+    private static int placeVein(CommandContext<CommandSourceStack> context,
+                                 BlockPos sourcePos) throws CommandSyntaxException {
         GTOreDefinition vein = context.getArgument("vein", GTOreDefinition.class);
         ResourceLocation id = GTRegistries.ORE_VEINS.getKey(vein);
 
@@ -118,8 +120,7 @@ public class GTCommands {
             var generated = generator.generateOres(new OreGenerator.VeinConfiguration(metadata, random), level,
                     chunkPos);
             if (generated.isEmpty()) {
-                throw new CommandRuntimeException(Component.translatable("command.gtceu.place_vein.failure",
-                        id.toString(), sourcePos.toString()));
+                throw VEIN_PLACE_FAILURE.create(id.toString(), sourcePos.toString());
             }
             for (ChunkPos pos : generated.get().getGeneratedChunks()) {
                 placer.placeVein(pos, random, access, generated.get(), AlwaysTrueTest.INSTANCE);

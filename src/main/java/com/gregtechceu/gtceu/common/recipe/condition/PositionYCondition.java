@@ -18,11 +18,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2022/05/27
- * @implNote WhetherCondition, specific whether
- */
 @NoArgsConstructor
 public class PositionYCondition extends RecipeCondition {
 
@@ -30,8 +25,8 @@ public class PositionYCondition extends RecipeCondition {
             .isReverse(instance)
             .and(instance.group(
                     Codec.INT.fieldOf("min").forGetter(val -> val.min),
-                    Codec.INT.fieldOf("max").forGetter(val -> val.max)))
-            .apply(instance, PositionYCondition::new));
+                    Codec.INT.fieldOf("max").forGetter(val -> val.max))
+    ).apply(instance, PositionYCondition::new));
 
     public final static PositionYCondition INSTANCE = new PositionYCondition();
     private int min;

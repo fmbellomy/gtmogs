@@ -1,17 +1,15 @@
 package com.gregtechceu.gtceu.common.fluid.potion;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.common.data.GTFluids;
+import com.gregtechceu.gtceu.data.fluid.GTFluids;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
-import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -22,6 +20,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
@@ -41,38 +40,32 @@ public class PotionFluid extends BaseFlowingFluid {
         builder.add(LEVEL);
     }
 
-    public static FluidStack of(int amount, Potion potion) {
+    public static FluidStack of(int amount, Holder<Potion> potion) {
         FluidStack fluidStack = new FluidStack(GTFluids.POTION.get()
                 .getSource(), amount);
         addPotionToFluidStack(fluidStack, potion);
         return fluidStack;
     }
 
-    public static FluidStack withEffects(int amount, Potion potion, List<MobEffectInstance> customEffects) {
+    public static FluidStack withEffects(int amount, Holder<Potion> potion, List<MobEffectInstance> customEffects) {
         FluidStack fluidStack = of(amount, potion);
         appendEffects(fluidStack, customEffects);
         return fluidStack;
     }
 
-    public static FluidStack addPotionToFluidStack(FluidStack fluidStack, Potion potion) {
-        ResourceLocation resourcelocation = BuiltInRegistries.POTION.getKey(potion);
-        if (potion == Potions.EMPTY) {
-            fluidStack.removeChildTag("Potion");
-            return fluidStack;
-        }
-        fluidStack.getOrCreateTag()
-                .putString("Potion", resourcelocation.toString());
+    public static FluidStack addPotionToFluidStack(FluidStack fluidStack, Holder<Potion> potion) {
+        fluidStack.set(DataComponents.POTION_CONTENTS, new PotionContents(potion));
         return fluidStack;
     }
 
     public static FluidStack appendEffects(FluidStack fluidStack, Collection<MobEffectInstance> customEffects) {
         if (customEffects.isEmpty())
             return fluidStack;
-        CompoundTag tag = fluidStack.getOrCreateTag();
-        ListTag effects = tag.getList("CustomPotionEffects", 9);
-        for (MobEffectInstance effect : customEffects)
-            effects.add(effect.save(new CompoundTag()));
-        tag.put("CustomPotionEffects", effects);
+        PotionContents contents = fluidStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);
+        List<MobEffectInstance> effects = new ArrayList<>(contents.customEffects());
+        effects.addAll(customEffects);
+        fluidStack.set(DataComponents.POTION_CONTENTS,
+                new PotionContents(contents.potion(), contents.customColor(), effects));
         return fluidStack;
     }
 
@@ -115,17 +108,16 @@ public class PotionFluid extends BaseFlowingFluid {
 
                 @Override
                 public int getTintColor(FluidStack stack) {
-                    CompoundTag tag = stack.getOrCreateTag();
-                    return PotionUtils.getColor(PotionUtils.getAllEffects(tag)) | 0xff000000;
+                    return stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                            .getColor()| 0xff000000;
                 }
             });
         }
 
         @Override
         public String getDescriptionId(FluidStack stack) {
-            CompoundTag tag = stack.getOrCreateTag();
-            return PotionUtils.getPotion(tag)
-                    .getName(Items.POTION.getDescriptionId() + ".effect.");
+            return Potion.getName(stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion(),
+                    this.getDescriptionId() + ".effect.");
         }
     }
 }

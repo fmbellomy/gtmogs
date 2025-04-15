@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
@@ -20,15 +21,18 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
 import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
 
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,10 +55,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.providers.VanillaEnchantmentProviders;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
@@ -77,11 +83,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote ToolHelper
- */
+@ExtensionMethod(SizedIngredientExtensions.class)
 public class ToolHelper {
 
     // Crafting Symbols
@@ -257,22 +259,18 @@ public class ToolHelper {
         boolean apply(ItemStack stack, Level level, Player player, BlockPos start, UseOnContext context);
     }
 
-    public static AoESymmetrical getMaxAoEDefinition(ItemStack stack) {
-        return AoESymmetrical.readMax(getBehaviorsTag(stack));
-    }
-
     public static AoESymmetrical getAoEDefinition(ItemStack stack) {
-        return AoESymmetrical.read(getBehaviorsTag(stack), getMaxAoEDefinition(stack));
+        return stack.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none());
     }
 
     public static Set<BlockPos> iterateAoE(ItemStack stack, AoESymmetrical aoeDefinition, Level world,
                                            Player player, HitResult rayTraceResult,
                                            AOEFunction function) {
-        if (aoeDefinition != AoESymmetrical.none() && rayTraceResult instanceof BlockHitResult blockHit &&
-                blockHit.getDirection() != null) {
-            int column = aoeDefinition.column;
-            int row = aoeDefinition.row;
-            int layer = aoeDefinition.layer;
+        if (aoeDefinition != null && aoeDefinition != AoESymmetrical.none() &&
+                rayTraceResult instanceof BlockHitResult blockHit && blockHit.getDirection() != null) {
+            int column = aoeDefinition.column();
+            int row = aoeDefinition.row();
+            int layer = aoeDefinition.layer();
             Direction playerFacing = player.getDirection();
             Direction.Axis playerAxis = playerFacing.getAxis();
             Direction.Axis sideHitAxis = blockHit.getDirection().getAxis();
@@ -355,10 +353,8 @@ public class ToolHelper {
     public static void applyHammerDropConversion(ServerLevel world, BlockPos pos, ItemStack tool, BlockState state,
                                                  List<ItemStack> drops, int fortune, float dropChance,
                                                  RandomSource random) {
-        if (is(tool, GTToolType.HARD_HAMMER) || /*
-                                                 * EnchantmentHelper.getEnchantmentLevel(EnchantmentHardHammer.INSTANCE,
-                                                 * tool)
-                                                 */ -1 > 0) {
+        // EnchantmentHelper.getEnchantmentLevel(EnchantmentHardHammer.INSTANCE, tool) > 0
+        if (is(tool, GTToolType.HARD_HAMMER)) {
             List<ItemStack> silktouchDrops = getSilkTouchDrop(world, pos, state);
             for (ItemStack silktouchDrop : silktouchDrops) {
                 if (silktouchDrop.isEmpty()) continue;
@@ -388,7 +384,7 @@ public class ToolHelper {
                     if (prefix.isEmpty()) {
                         for (Content output : hammerRecipe.getOutputContents(ItemRecipeCapability.CAP)) {
                             if (dropChance >= 1.0F || random.nextFloat() <= dropChance) {
-                                drops.add(SizedIngredient.copy(ItemRecipeCapability.CAP.of(output.content))
+                                drops.add(ItemRecipeCapability.CAP.of(output.content).copy()
                                         .getItems()[0]);
                             }
                         }
@@ -461,22 +457,7 @@ public class ToolHelper {
     }
 
     public static double getPlayerBlockReach(@NotNull Player player) {
-        return player.getBlockReach();
-    }
-
-    public static boolean isCorrectTierForDrops(BlockState state, int tier) {
-        return TierSortingRegistry.isCorrectTierForDrops(getTier(tier), state);
-    }
-
-    private static Tier getTier(int harvestLevel) {
-        List<Tier> tiers = TierSortingRegistry.getSortedTiers().stream()
-                .filter(tier -> tier.getLevel() == harvestLevel)
-                .toList();
-        return !tiers.isEmpty() ? tiers.get(tiers.size() - 1) : Tiers.WOOD;
-    }
-
-    public static boolean onBlockStartBreak(ItemStack itemstack, BlockPos pos, Player player) {
-        return itemstack.onBlockStartBreak(pos, player);
+        return player.blockInteractionRange();
     }
 
     public static boolean removeBlockRoutine(@Nullable BlockState state, Level world, ServerPlayer player, BlockPos pos,
@@ -501,7 +482,7 @@ public class ToolHelper {
     }
 
     public static Set<BlockPos> getHarvestableBlocks(ItemStack stack, Player player) {
-        if (!hasBehaviorsTag(stack)) return Collections.emptySet();
+        if (!hasBehaviorsComponent(stack)) return Collections.emptySet();
 
         AoESymmetrical aoeDefiniton = getAoEDefinition(stack);
         if (aoeDefiniton == AoESymmetrical.none()) {
@@ -572,11 +553,9 @@ public class ToolHelper {
     }
 
     // encompasses all vanilla special case tool checks for harvesting
-    public static boolean isToolEffective(BlockState state, Set<GTToolType> toolClasses, int harvestLevel) {
-        if (toolClasses.stream().anyMatch(type -> type.harvestTags.stream().anyMatch(state::is))) {
-            return isCorrectTierForDrops(state, harvestLevel);
-        }
-        return false;
+    public static boolean isToolEffective(ItemStack stack, BlockState state, Set<GTToolType> toolClasses, int harvestLevel) {
+        Tool tool = stack.get(DataComponents.TOOL);
+        return tool != null && tool.isCorrectForDrops(state);
     }
 
     /**
@@ -637,11 +616,9 @@ public class ToolHelper {
             Level world = player.serverLevel();
             BlockState state = world.getBlockState(pos);
             if (state.getBlock() instanceof IShearable shearable) {
-                if (shearable.isShearable(tool, world, pos)) {
-                    List<ItemStack> shearedDrops = shearable.onSheared(player, tool, world, pos,
-                            tool.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE));
-                    boolean relocateMinedBlocks = hasBehaviorsTag(tool) &&
-                            getBehaviorsTag(tool).getBoolean(RELOCATE_MINED_BLOCKS_KEY);
+                if (shearable.isShearable(player, tool, world, pos)) {
+                    List<ItemStack> shearedDrops = shearable.onSheared(player, tool, world, pos);
+                    boolean relocateMinedBlocks = tool.has(GTDataComponents.RELOCATE_MINED_BLOCKS);
                     Iterator<ItemStack> iter = shearedDrops.iterator();
                     while (iter.hasNext()) {
                         ItemStack stack = iter.next();
@@ -685,11 +662,18 @@ public class ToolHelper {
      * @return the silk touch drop
      */
     @NotNull
-    public static List<ItemStack> getSilkTouchDrop(ServerLevel world, BlockPos origin, @NotNull BlockState state) {
+    public static List<ItemStack> getSilkTouchDrop(ServerLevel level, BlockPos origin, @NotNull BlockState state) {
         ItemStack tool = GTMaterialItems.TOOL_ITEMS.get(GTMaterials.Neutronium, GTToolType.PICKAXE).get().get();
-        tool.enchant(Enchantments.SILK_TOUCH, 1);
+        // oh wow, this exists now. cool!
+        EnchantmentHelper.enchantItemFromProvider(
+                tool,
+                level.registryAccess(),
+                GTEnchantmentProviders.SILK_TOUCH,
+                level.getCurrentDifficultyAt(origin),
+                level.getRandom()
+        );
 
-        return state.getDrops(new LootParams.Builder(world).withParameter(LootContextParams.BLOCK_STATE, state)
+        return state.getDrops(new LootParams.Builder(level).withParameter(LootContextParams.BLOCK_STATE, state)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(origin))
                 .withParameter(LootContextParams.TOOL, tool));
     }

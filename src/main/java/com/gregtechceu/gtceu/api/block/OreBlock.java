@@ -22,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class OreBlock extends MaterialBlock {
 
     public OreBlock(Properties properties, TagPrefix tagPrefix, Material material, boolean registerModel) {

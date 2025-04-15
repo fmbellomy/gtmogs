@@ -28,6 +28,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -123,7 +124,7 @@ public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
     private List<IMultiPart> getPrioritySortedParts() {
         return getParts().stream().sorted(Comparator.comparing(part -> {
             if (part instanceof MetaMachine partMachine) {
-                Block partBlock = partMachine.getBlockState().getBlock();
+                net.minecraft.world.level.block.Block partBlock = partMachine.getBlockState().getBlock();
 
                 if (PartAbility.OUTPUT_ENERGY.isApplicable(partBlock))
                     return 1;

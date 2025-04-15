@@ -7,11 +7,6 @@ import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote ItemFluidContainer
- */
 public class ItemFluidContainer implements IRecipeRemainder {
 
     @Override
@@ -21,7 +16,7 @@ public class ItemFluidContainer implements IRecipeRemainder {
             if (drained.getAmount() != FluidType.BUCKET_VOLUME) return ItemStack.EMPTY;
             handler.drain(FluidType.BUCKET_VOLUME, FluidAction.EXECUTE);
             var copy = handler.getContainer();
-            copy.setTag(null);
+            copy.getComponentsPatch().forget(type -> true);
             return copy;
         }).orElse(itemStack);
     }

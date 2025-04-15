@@ -12,11 +12,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-/**
- * @author KilaBash
- * @date 2023/7/5
- * @implNote UIMainPanel
- */
 public class UIMainPanel extends MainPanel implements IGuiTexture {
 
     final String description;

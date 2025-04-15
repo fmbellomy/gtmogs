@@ -19,8 +19,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @date 2023/7/11
  * @implNote TieredWorkableElectricMultiblockMachine
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class TieredWorkableElectricMultiblockMachine extends WorkableElectricMultiblockMachine
                                                      implements ITieredMachine, IOverclockMachine {
 

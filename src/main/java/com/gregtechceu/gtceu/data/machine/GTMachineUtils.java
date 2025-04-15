@@ -51,6 +51,7 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
@@ -83,7 +84,7 @@ import static com.gregtechceu.gtceu.api.capability.recipe.IO.IN;
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.*;
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.autoAbilities;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.ALL_FIREBOXES;
-import static com.gregtechceu.gtceu.common.data.GTCreativeModeTabs.MACHINE;
+import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.MACHINE;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.DUMMY_RECIPES;
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 import static com.gregtechceu.gtceu.utils.FormattingUtil.toEnglishName;
@@ -653,12 +654,12 @@ public class GTMachineUtils {
     }
 
     public static BiConsumer<ItemStack, List<Component>> TANK_TOOLTIPS = (stack, list) -> {
-        if (stack.hasTag()) {
-            String key = stack.getTag().contains("stored") ? "stored" : "Fluid";
-            FluidStack stored = FluidStack.loadFluidStackFromNBT(stack.getOrCreateTagElement(key));
-            long storedAmount = stack.getOrCreateTag().getLong("storedAmount");
+        var content = stack.get(GTDataComponents.LARGE_FLUID_CONTENT);
+        if (content != null) {
+            FluidStack stored = content.stored();
+            long storedAmount = content.amount();
             if (storedAmount == 0 && !stored.isEmpty()) storedAmount = stored.getAmount();
-            list.add(1, Component.translatable("gtceu.universal.tooltip.fluid_stored", stored.getDisplayName(),
+            list.add(1, Component.translatable("gtceu.universal.tooltip.fluid_stored", stored.getHoverName(),
                     FormattingUtil.formatNumbers(storedAmount)));
         }
     };

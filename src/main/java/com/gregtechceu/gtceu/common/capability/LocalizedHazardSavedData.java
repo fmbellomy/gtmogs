@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.common.capability;
 
-import HazardZone;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
@@ -11,10 +10,8 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.BreadthFirstBlockSearch;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.*;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
@@ -47,8 +44,10 @@ public class LocalizedHazardSavedData extends SavedData {
     private final Map<BlockPos, HazardZone> hazardZones = new HashMap<>();
 
     public static LocalizedHazardSavedData getOrCreate(ServerLevel serverLevel) {
-        return serverLevel.getDataStorage().computeIfAbsent(tag -> new LocalizedHazardSavedData(serverLevel, tag),
-                () -> new LocalizedHazardSavedData(serverLevel), "gtceu_localized_hazard_tracker");
+        return serverLevel.getDataStorage()
+                .computeIfAbsent(new SavedData.Factory<>(() -> new LocalizedHazardSavedData(serverLevel),
+                        (tag, provider) -> new LocalizedHazardSavedData(serverLevel, tag)),
+                        "gtceu_localized_hazard_tracker");
     }
 
     public LocalizedHazardSavedData(ServerLevel serverLevel) {
@@ -290,7 +289,7 @@ public class LocalizedHazardSavedData extends SavedData {
 
     @NotNull
     @Override
-    public CompoundTag save(@NotNull CompoundTag compoundTag) {
+    public CompoundTag save(@NotNull CompoundTag compoundTag, HolderLookup.Provider provider) {
         ListTag hazardZonesTag = new ListTag();
         for (var entry : hazardZones.entrySet()) {
             CompoundTag zoneTag = new CompoundTag();
@@ -325,9 +324,12 @@ public class LocalizedHazardSavedData extends SavedData {
         }
 
         public static HazardZone deserializeNBT(CompoundTag zoneTag) {
-            Set<BlockPos> blocks = zoneTag.getList("blocks", Tag.TAG_COMPOUND).stream()
-                    .map(CompoundTag.class::cast)
-                    .map(NbtUtils::readBlockPos)
+            Set<BlockPos> blocks = zoneTag.getList("blocks", Tag.TAG_INT_ARRAY).stream()
+                    .map(IntArrayTag.class::cast)
+                    .map(tag -> {
+                        int[] aint = tag.getAsIntArray();
+                        return aint.length == 3 ? new BlockPos(aint[0], aint[1], aint[2]) : null;
+                    })
                     .collect(Collectors.toSet());
             boolean canSpread = zoneTag.getBoolean("can_spread");
             HazardProperty.HazardTrigger trigger = HazardProperty.HazardTrigger.ALL_TRIGGERS

@@ -79,16 +79,15 @@ public class ElectricStats implements IInteractionItem, ISubItemHandler, IAddInf
     @Override
     public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player,
                                                   InteractionHand usedHand) {
-        var itemStack = player.getItemInHand(usedHand);
-        var electricItem = GTCapabilityHelper.getElectricItem(itemStack);
+        var electricItem = GTCapabilityHelper.getElectricItem(item);
         if (electricItem != null && electricItem.canProvideChargeExternally() && player.isShiftKeyDown()) {
             if (!level.isClientSide) {
-                boolean isInDischargeMode = isInDischargeMode(itemStack);
+                boolean isInDischargeMode = isInDischargeMode(item);
                 String locale = "metaitem.electric.discharge_mode." + (isInDischargeMode ? "disabled" : "enabled");
                 player.displayClientMessage(Component.translatable(locale), true);
-                setInDischargeMode(itemStack, !isInDischargeMode);
+                setInDischargeMode(item, !isInDischargeMode);
             }
-            return InteractionResultHolder.success(itemStack);
+            return InteractionResultHolder.success(item);
         }
         return IInteractionItem.super.use(item, level, player, usedHand);
     }

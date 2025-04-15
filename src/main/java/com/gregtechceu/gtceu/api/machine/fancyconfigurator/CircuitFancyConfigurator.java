@@ -29,11 +29,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/6/30
- * @implNote CircuitFancyConfigurator
- */
 public class CircuitFancyConfigurator implements IFancyConfigurator, IFancyCustomMouseWheelAction,
                                       IFancyCustomMiddleClickAction {
 

@@ -6,7 +6,7 @@ import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.IItemLifeCycle;
 
-import net.minecraft.nbt.CompoundTag;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -16,8 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,18 +28,17 @@ public class ToggleEnergyConsumerBehavior implements IInteractionItem, IItemLife
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Item item, Level world, Player player, InteractionHand hand) {
-        ItemStack itemStack = player.getItemInHand(hand);
+    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player, InteractionHand hand) {
         if (player.isShiftKeyDown()) {
-            IElectricItem electricItem = GTCapabilityHelper.getElectricItem(itemStack);
-            boolean isItemActive = isItemActive(itemStack);
+            IElectricItem electricItem = GTCapabilityHelper.getElectricItem(item);
+            boolean isItemActive = isItemActive(item);
             if (isItemActive) {
-                setItemActive(itemStack, false);
+                setItemActive(item, false);
             } else if (electricItem != null && drainActivationEnergy(electricItem, true)) {
-                setItemActive(itemStack, true);
+                setItemActive(item, true);
             }
         }
-        return InteractionResultHolder.pass(itemStack);
+        return InteractionResultHolder.pass(item);
     }
 
     private boolean drainActivationEnergy(IElectricItem electricItem, boolean simulate) {
@@ -61,18 +58,16 @@ public class ToggleEnergyConsumerBehavior implements IInteractionItem, IItemLife
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltipComponents,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
         tooltipComponents.add(Component.translatable("behavior.toggle_energy_consumer.tooltip"));
     }
 
     public static boolean isItemActive(ItemStack itemStack) {
-        CompoundTag tagCompound = itemStack.getTag();
-        return tagCompound != null && tagCompound.getBoolean("Active");
+        return itemStack.getOrDefault(GTDataComponents.ACTIVE, false);
     }
 
     public static void setItemActive(ItemStack itemStack, boolean isActive) {
-        CompoundTag tagCompound = itemStack.getOrCreateTag();
-        tagCompound.putBoolean("Active", isActive);
+        itemStack.set(GTDataComponents.ACTIVE, isActive);
     }
 }

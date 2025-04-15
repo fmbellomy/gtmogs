@@ -19,11 +19,6 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * @author KilaBash
- * @date 2023/7/24
- * @implNote IFancyConfiguratorButton
- */
 public interface IFancyConfiguratorButton extends IFancyConfigurator {
 
     void onClick(ClickData clickData);

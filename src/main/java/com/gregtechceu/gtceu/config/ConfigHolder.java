@@ -8,11 +8,6 @@ import dev.toma.configuration.config.Config;
 import dev.toma.configuration.config.Configurable;
 import dev.toma.configuration.config.format.ConfigFormats;
 
-/**
- * @author KilaBash
- * @date 2023/2/14
- * @implNote ConfigHolder
- */
 @Config(id = GTCEu.MOD_ID)
 public class ConfigHolder {
 
@@ -22,7 +17,7 @@ public class ConfigHolder {
     public static void init() {
         synchronized (LOCK) {
             if (INSTANCE == null) {
-                INSTANCE = Configuration.registerConfig(ConfigHolder.class, ConfigFormats.yaml()).getConfigInstance();
+                INSTANCE = Configuration.registerConfig(ConfigHolder.class, ConfigFormats.YAML).getConfigInstance();
             }
         }
     }
@@ -135,6 +130,12 @@ public class ConfigHolder {
     }
 
     public static class CompatibilityConfigs {
+
+        @Configurable
+        @Configurable.Comment({ "Whether to run datafixers on world load.",
+                "Do note that mods like ModernFix will interfere with this.",
+                "Default: true" })
+        public boolean doDatafixers = true;
 
         @Configurable
         @Configurable.Comment("Config options regarding GTEU compatibility with other energy systems")

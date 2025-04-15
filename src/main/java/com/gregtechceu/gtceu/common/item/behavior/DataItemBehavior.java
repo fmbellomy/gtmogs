@@ -9,9 +9,11 @@ import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -48,13 +50,13 @@ public class DataItemBehavior implements IInteractionItem, IAddInformation, IDat
                                 TooltipFlag isAdvanced) {
         Pair<GTRecipeType, String> researchData = ResearchManager.readResearchId(stack);
         if (researchData == null) {
-            if (stack.getOrCreateTag().contains("pos", Tag.TAG_INT_ARRAY) && stack.hasTag()) {
-                int[] posArray = stack.getOrCreateTag().getIntArray("pos");
+            BlockPos pos = stack.get(GTDataComponents.DATA_COPY_POS);
+            if (pos != null) {
                 tooltipComponents.add(Component.translatable(
                         "gtceu.tooltip.proxy_bind",
-                        Component.literal("" + posArray[0]).withStyle(ChatFormatting.LIGHT_PURPLE),
-                        Component.literal("" + posArray[1]).withStyle(ChatFormatting.LIGHT_PURPLE),
-                        Component.literal("" + posArray[2]).withStyle(ChatFormatting.LIGHT_PURPLE)));
+                        Component.literal("" + pos.getX()).withStyle(ChatFormatting.LIGHT_PURPLE),
+                        Component.literal("" + pos.getY()).withStyle(ChatFormatting.LIGHT_PURPLE),
+                        Component.literal("" + pos.getZ()).withStyle(ChatFormatting.LIGHT_PURPLE)));
             }
         } else {
             Collection<GTRecipe> recipes = researchData.getFirst().getDataStickEntry(researchData.getSecond());
@@ -64,7 +66,7 @@ public class DataItemBehavior implements IInteractionItem, IAddInformation, IDat
                 outer:
                 for (GTRecipe recipe : recipes) {
                     ItemStack output = ItemRecipeCapability.CAP
-                            .of(recipe.getOutputContents(ItemRecipeCapability.CAP).get(0).content).getItems()[0];
+                            .of(recipe.getOutputContents(ItemRecipeCapability.CAP).getFirst().content).getItems()[0];
                     for (var item : added) {
                         if (output.is(item.getItem())) continue outer;
                     }

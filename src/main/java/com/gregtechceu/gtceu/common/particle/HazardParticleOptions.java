@@ -23,8 +23,8 @@ public record HazardParticleOptions(int color, float scale) implements ParticleO
 
     public static final Codec<HazardParticleOptions> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.fieldOf("color").forGetter(particle -> particle.color),
-            Codec.FLOAT.fieldOf("scale").forGetter(particle -> particle.scale))
-            .apply(instance, HazardParticleOptions::new));
+            Codec.FLOAT.fieldOf("scale").forGetter(particle -> particle.scale)
+    ).apply(instance, HazardParticleOptions::new));
     @SuppressWarnings("deprecation")
     public static final Deserializer<HazardParticleOptions> DESERIALIZER = new Deserializer<>() {
 

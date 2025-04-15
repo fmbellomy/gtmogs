@@ -18,11 +18,6 @@ import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 
-/**
- * @author KilaBash
- * @date 2022/8/27
- * @implNote ForgeCommonEventListener
- */
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)
 public class ForgeClientEventListener {
@@ -45,7 +40,7 @@ public class ForgeClientEventListener {
 
     @SubscribeEvent
     public static void onTooltipEvent(ItemTooltipEvent event) {
-        TooltipsHandler.appendTooltips(event.getItemStack(), event.getFlags(), event.getToolTip());
+        TooltipsHandler.appendTooltips(event.getItemStack(), event.getFlags(), event.getToolTip(), event.getContext());
     }
 
     @SubscribeEvent

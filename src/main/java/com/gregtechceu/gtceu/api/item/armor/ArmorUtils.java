@@ -34,7 +34,7 @@ public class ArmorUtils {
 
     public static final int MIN_NIGHTVISION_CHARGE = 4;
     public static final int NIGHTVISION_DURATION = 20 * 20; // 20 seconds
-    public static final int NIGHT_VISION_RESET = 11 * 20; // 11 seconds is before the flashing
+    public static final int NIGHT_VISION_RESET = 12 * 20; // 12 seconds is before the flashing
 
     /**
      * Check is possible to charge item

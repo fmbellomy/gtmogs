@@ -2,13 +2,11 @@ package com.gregtechceu.gtceu.common.block.explosive;
 
 import com.gregtechceu.gtceu.common.entity.GTExplosiveEntity;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,10 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SuppressWarnings("deprecation")
 public abstract class GTExplosiveBlock extends Block {
 
@@ -58,7 +52,7 @@ public abstract class GTExplosiveBlock extends Block {
     }
 
     protected abstract GTExplosiveEntity createEntity(@NotNull Level world, @NotNull BlockPos pos,
-                                                      @NotNull LivingEntity exploder);
+                                                      @Nullable LivingEntity exploder);
 
     @Override
     public boolean isCollisionShapeFullBlock(BlockState state, BlockGetter level, BlockPos pos) {
@@ -70,7 +64,7 @@ public abstract class GTExplosiveBlock extends Block {
         return false;
     }
 
-    public void explode(Level world, BlockPos pos, LivingEntity exploder) {
+    public void explode(Level world, BlockPos pos, @Nullable LivingEntity exploder) {
         if (!world.isClientSide) {
             GTExplosiveEntity entity = createEntity(world, pos, exploder);
             entity.setFuse(fuseLength);
@@ -90,8 +84,8 @@ public abstract class GTExplosiveBlock extends Block {
     }
 
     @Override
-    public ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
-                                 BlockHitResult hit) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+                                              Player player, InteractionHand hand, BlockHitResult hit) {
         if (!stack.isEmpty() && (stack.getItem() == Items.FLINT_AND_STEEL || stack.getItem() == Items.FIRE_CHARGE)) {
             this.explode(level, pos, player);
             level.removeBlock(pos, false);
@@ -109,7 +103,7 @@ public abstract class GTExplosiveBlock extends Block {
     public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
         if (explodeOnMine) {
             Entity entity = params.getOptionalParameter(LootContextParams.THIS_ENTITY);
-            if (entity != null && !entity.isCrouching() && entity instanceof LivingEntity living) {
+            if (entity != null && !entity.isShiftKeyDown() && entity instanceof LivingEntity living) {
                 this.explode(params.getLevel(), BlockPos.containing(params.getParameter(LootContextParams.ORIGIN)),
                         living);
                 return List.of();

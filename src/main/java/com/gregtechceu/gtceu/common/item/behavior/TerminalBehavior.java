@@ -35,8 +35,7 @@ public class TerminalBehavior implements IInteractionItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Item item, Level level, Player player, InteractionHand usedHand) {
-        ItemStack heldItem = player.getItemInHand(usedHand);
-        return InteractionResultHolder.pass(heldItem);
+    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player, InteractionHand usedHand) {
+        return InteractionResultHolder.pass(item);
     }
 }

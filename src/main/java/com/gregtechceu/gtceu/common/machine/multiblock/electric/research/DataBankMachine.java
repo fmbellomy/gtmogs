@@ -18,11 +18,9 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import lombok.Getter;
@@ -31,10 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class DataBankMachine extends WorkableElectricMultiblockMachine
                              implements IFancyUIMachine, IDisplayUIMachine, IControllable {
 
@@ -93,7 +87,7 @@ public class DataBankMachine extends WorkableElectricMultiblockMachine
         int transmitters = 0;
         int regulars = 0;
         for (var part : this.getParts()) {
-            Block block = part.self().getBlockState().getBlock();
+            net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
             if (PartAbility.OPTICAL_DATA_RECEPTION.isApplicable(block)) {
                 ++receivers;
             }

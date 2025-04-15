@@ -6,13 +6,18 @@ import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
@@ -32,6 +37,8 @@ import java.util.Set;
 public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior> {
 
     public static final HarvestCropsBehavior INSTANCE = new HarvestCropsBehavior();
+    public static final Codec<HarvestCropsBehavior> CODEC = Codec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, HarvestCropsBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected HarvestCropsBehavior() {/**/}
 
@@ -79,11 +86,6 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
         }
 
         return harvested ? InteractionResult.SUCCESS : InteractionResult.PASS;
-    }
-
-    @Override
-    public ToolBehaviorType getType() {
-        return null;
     }
 
     private static boolean isBlockCrops(ItemStack stack, Level world, Player player, BlockPos pos,
@@ -140,8 +142,13 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
     }
 
     @Override
-    public void addInformation(@NotNull ItemStack stack, @Nullable Level world, @NotNull List<Component> tooltip,
+    public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("item.gtceu.tool.behavior.crop_harvesting"));
+    }
+
+    @Override
+    public ToolBehaviorType<HarvestCropsBehavior> getType() {
+        return GTToolBehaviors.HARVEST_CROPS;
     }
 }

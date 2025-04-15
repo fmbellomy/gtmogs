@@ -50,7 +50,7 @@ public class ConfigMixin {
         for (Material mat : GTCEuAPI.materialManager.getRegisteredMaterials()) {
             if (mat.hasProperty(PropertyKey.TOOL)) {
                 MaterialToolTier tier = mat.getToolTier();
-                int harvestLevel = tier.getLevel();
+                int harvestLevel = tier.property.getHarvestLevel();
                 if (!passedTiers.contains(harvestLevel)) {
                     passedTiers.add(harvestLevel);
                     TagKey<Block> tag = CustomTags.TOOL_TIERS[harvestLevel];

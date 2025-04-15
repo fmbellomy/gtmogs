@@ -48,8 +48,8 @@ public class ClassicVeinGenerator extends VeinGenerator {
             Layer.CODEC.fieldOf("secondary").forGetter(val -> val.secondary),
             Layer.CODEC.fieldOf("between").forGetter(val -> val.between),
             Layer.CODEC.fieldOf("sporadic").forGetter(val -> val.sporadic),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius))
-            .apply(instance, ClassicVeinGenerator::new));
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius)
+    ).apply(instance, ClassicVeinGenerator::new));
 
     private Layer primary;
     private Layer secondary;

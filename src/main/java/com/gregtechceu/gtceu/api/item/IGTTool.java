@@ -24,6 +24,7 @@ import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
+import com.gregtechceu.gtceu.data.tag.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -43,7 +44,6 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -208,6 +208,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return toolProperty == null ? 0 : toolProperty.getHarvestLevel();
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default long getMaxCharge(ItemStack stack) {
         if (isElectric()) {
             if (stack.has(GTDataComponents.ENERGY_CONTENT)) {
@@ -217,6 +218,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return -1L;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default long getCharge(ItemStack stack) {
         if (isElectric()) {
             if (stack.has(GTDataComponents.ENERGY_CONTENT)) {
@@ -226,6 +228,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return -1L;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default float getTotalToolSpeed(ItemStack stack) {
         if (stack.has(GTDataComponents.GT_TOOL) && stack.get(GTDataComponents.GT_TOOL).toolSpeed().isPresent()) {
             return stack.get(GTDataComponents.GT_TOOL).toolSpeed().get();
@@ -236,6 +239,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return toolSpeed;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default float getTotalAttackDamage(ItemStack stack) {
         if (stack.has(GTDataComponents.GT_TOOL) && stack.get(GTDataComponents.GT_TOOL).attackDamage().isPresent()) {
             return stack.get(GTDataComponents.GT_TOOL).attackDamage().get();
@@ -253,6 +257,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return attackDamage;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default float getTotalAttackSpeed(ItemStack stack) {
         if (stack.has(GTDataComponents.GT_TOOL) && stack.get(GTDataComponents.GT_TOOL).toolSpeed().isPresent()) {
             return stack.get(GTDataComponents.GT_TOOL).toolSpeed().get();
@@ -262,6 +267,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return attackSpeed;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default int getTotalMaxDurability(ItemStack stack) {
         if (stack.has(DataComponents.MAX_DAMAGE)) {
             return stack.get(DataComponents.MAX_DAMAGE);
@@ -279,6 +285,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return maxDurability;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default int getTotalEnchantability(ItemStack stack) {
         if (stack.has(GTDataComponents.GT_TOOL) && stack.get(GTDataComponents.GT_TOOL).enchantability().isPresent()) {
             return stack.get(GTDataComponents.GT_TOOL).enchantability().get();
@@ -288,11 +295,12 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         return enchantability;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     default int getTotalHarvestLevel(ItemStack stack) {
         if (stack.has(GTDataComponents.GT_TOOL) && stack.get(GTDataComponents.GT_TOOL).harvestLevel().isPresent()) {
             return stack.get(GTDataComponents.GT_TOOL).harvestLevel().get();
         }
-        int harvestLevel = getMaterialHarvestLevel(stack) + getToolStats().getBaseQuality();
+        int harvestLevel = getMaterialHarvestLevel(stack) + getToolStats().getBaseQuality(stack);
         stack.update(GTDataComponents.GT_TOOL, GTTool.EMPTY, tool -> tool.setHarvestLevel(harvestLevel));
         return harvestLevel;
     }
@@ -331,9 +339,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
             if (result != 0) {
                 // prevent exploits with instantly breakable blocks
                 BlockState state = player.level().getBlockState(pos);
-                boolean effective = stack.get(DataComponents.TOOL).isCorrectForDrops(state);
-
-                effective |= isToolEffective(stack, state, getToolClasses(stack), getTotalHarvestLevel(stack));
+                boolean effective = isToolEffective(stack, state, getToolClasses(stack), getTotalHarvestLevel(stack));
 
                 if (effective) {
                     if (areaOfEffectBlockBreakRoutine(stack, playerMP)) {
@@ -452,8 +458,8 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
 
         newKeys.remove(DataComponents.DAMAGE);
         oldKeys.remove(DataComponents.DAMAGE);
-        newKeys.remove(GTDataComponents.ELECTRIC_ITEM.get());
-        oldKeys.remove(GTDataComponents.ELECTRIC_ITEM.get());
+        newKeys.remove(GTDataComponents.ENERGY_CONTENT.get());
+        oldKeys.remove(GTDataComponents.ENERGY_CONTENT.get());
 
         if (!newKeys.equals(oldKeys))
             return true;
@@ -628,7 +634,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         if (aoeDefinition != AoESymmetrical.none()) {
             addedBehaviorNewLine = tooltip.add(Component.literal(""));
             tooltip.add(Component.translatable("item.gtceu.tool.behavior.aoe_mining",
-                    aoeDefinition.column * 2 + 1, aoeDefinition.row * 2 + 1, aoeDefinition.layer + 1));
+                    aoeDefinition.column() * 2 + 1, aoeDefinition.row() * 2 + 1, aoeDefinition.layer() + 1));
         }
 
         if (stack.has(GTDataComponents.RELOCATE_MINED_BLOCKS)) {
@@ -662,7 +668,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
                                 FormattingUtil::combineComponents)));
 
         // repair info
-        if (!tagCompound.getBoolean(UNBREAKABLE_KEY)) {
+        if (!stack.has(DataComponents.UNBREAKABLE)) {
             if (GTUtil.isShiftDown()) {
                 Material material = getToolMaterial(stack);
 
@@ -774,6 +780,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
                     case 0, -101 -> {
                         if (item.getToolClasses(itemStack).contains(GTToolType.CROWBAR)) {
                             if (itemStack.has(DataComponents.DYED_COLOR)) {
+                                //noinspection DataFlowIssue
                                 yield itemStack.get(DataComponents.DYED_COLOR).rgb();
                             }
                         }

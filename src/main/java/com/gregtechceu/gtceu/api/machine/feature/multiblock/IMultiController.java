@@ -24,11 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
-/**
- * @author KilaBash
- * @date 2023/3/3
- * @implNote IControllerComponent
- */
 public interface IMultiController extends IMachineFeature, IInteractedMachine {
 
     @Override

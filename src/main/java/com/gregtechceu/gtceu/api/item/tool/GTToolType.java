@@ -2,10 +2,11 @@ package com.gregtechceu.gtceu.api.item.tool;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
->import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.ExistingSoundEntry;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.common.item.tool.behavior.*;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
@@ -527,6 +528,7 @@ public class GTToolType {
     public final SoundEntry soundEntry;
     public final boolean playSoundOnBlockDestroy;
     public final Character symbol;
+    public final long materialAmount;
 
     public final IGTToolDefinition toolDefinition;
     public final ToolConstructor constructor;
@@ -535,7 +537,7 @@ public class GTToolType {
     public GTToolType(String name, String idFormat, Character symbol, Set<GTToolType> toolClasses,
                       IGTToolDefinition toolDefinition, ToolConstructor constructor, List<TagKey<Item>> itemTags,
                       ResourceLocation modelLocation, Set<String> toolClassNames, @Nullable SoundEntry soundEntry,
-                      boolean playSoundOnBlockDestroy, int electricTier) {
+                      boolean playSoundOnBlockDestroy, int electricTier, long materialAmount) {
         this.name = name;
         this.idFormat = idFormat;
         this.symbol = symbol;
@@ -549,6 +551,7 @@ public class GTToolType {
         this.soundEntry = soundEntry;
         this.playSoundOnBlockDestroy = playSoundOnBlockDestroy;
         this.electricTier = electricTier;
+        this.materialAmount = materialAmount;
 
         types.put(name, this);
     }
@@ -586,6 +589,8 @@ public class GTToolType {
         private final Set<GTToolType> toolClasses = new HashSet<>();
         @Setter
         private IGTToolDefinition toolStats;
+        @Setter
+        private long materialAmount;
         @Setter
         private int tier = -1;
         @Setter
@@ -654,7 +659,8 @@ public class GTToolType {
                     toolClassNames,
                     sound,
                     playSoundOnBlockDestroy,
-                    tier);
+                    tier,
+                    materialAmount);
         }
 
         public GTToolType build() {
@@ -673,7 +679,5 @@ public class GTToolType {
             ToolHelper.registerToolSymbol(this.symbol, supplied);
             return supplied;
         }
-
     }
-
 }

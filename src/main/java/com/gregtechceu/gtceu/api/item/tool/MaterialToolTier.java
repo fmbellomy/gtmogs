@@ -12,11 +12,6 @@ import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote MaterialTier
- */
 public class MaterialToolTier implements Tier {
 
     public final Material material;

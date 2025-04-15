@@ -123,14 +123,14 @@ public class PhantomFluidWidget extends TankWidget implements IGhostIngredientTa
         Rect2i rectangle = toRectangleBox();
         return Lists.newArrayList(new Target() {
 
-            @Nonnull
+            @NotNull
             @Override
             public Rect2i getArea() {
                 return rectangle;
             }
 
             @Override
-            public void accept(@Nonnull Object ingredient) {
+            public void accept(@NotNull Object ingredient) {
                 if (GTCEu.Mods.isREILoaded() && ingredient instanceof dev.architectury.fluid.FluidStack fluidStack) {
                     ingredient = new FluidStack(fluidStack.getFluid().builtInRegistryHolder(),
                             (int) fluidStack.getAmount(),

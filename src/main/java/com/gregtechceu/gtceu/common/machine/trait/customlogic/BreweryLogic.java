@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.machine.trait.customlogic;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
@@ -14,6 +15,8 @@ import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
 import com.gregtechceu.gtceu.core.mixins.PotionBrewingAccessor;
 
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -29,11 +32,14 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
@@ -281,14 +287,14 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
     @Override
     public void buildRepresentativeRecipes() {
         int index = 0;
-        for (PotionBrewing.Mix<Potion> mix : PotionBrewingAccessor.getPotionMixes()) {
-            FluidStack fromFluid = PotionFluidHelper.getFluidFromPotion(mix.from.get(),
+        for (PotionBrewing.Mix<Potion> mix : ((PotionBrewingAccessor) getPotionBrewing()).getPotionMixes()) {
+            FluidStack fromFluid = PotionFluidHelper.getFluidFromPotion(mix.from(),
                     PotionFluidHelper.MB_PER_RECIPE);
-            FluidStack toFluid = PotionFluidHelper.getFluidFromPotion(mix.to.get(), PotionFluidHelper.MB_PER_RECIPE);
+            FluidStack toFluid = PotionFluidHelper.getFluidFromPotion(mix.to(), PotionFluidHelper.MB_PER_RECIPE);
 
             GTRecipe recipe = GTRecipeTypes.BREWING_RECIPES
-                    .recipeBuilder("potion_vanilla_" + mix.to.get().getName("") + "_" + index++)
-                    .inputItems(mix.ingredient)
+                    .recipeBuilder("potion_vanilla_" + Potion.getName(Optional.of(mix.to()), "") + "_" + index++)
+                    .inputItems(mix.ingredient())
                     .inputFluids(fromFluid)
                     .outputFluids(toFluid)
                     .duration(400)
@@ -300,18 +306,18 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
             GTRecipeTypes.BREWING_RECIPES.addToMainCategory(recipe);
         }
 
-        for (IBrewingRecipe brewingRecipe : BrewingRecipeRegistry.getRecipes()) {
+        for (IBrewingRecipe brewingRecipe : getPotionBrewing().getRecipes()) {
             if (!(brewingRecipe instanceof BrewingRecipe impl)) {
                 continue;
             }
 
-            FluidIngredient fromFluid = PotionFluidHelper.getPotionFluidIngredientFrom(impl.getInput(),
+            SizedFluidIngredient fromFluid = PotionFluidHelper.getPotionFluidIngredientFrom(impl.getInput(),
                     PotionFluidHelper.MB_PER_RECIPE);
             FluidStack toFluid = PotionFluidHelper.getFluidFromPotionItem(impl.getOutput(),
                     PotionFluidHelper.MB_PER_RECIPE);
 
             String name = toFluid.getFluid().builtInRegistryHolder().key().location().getPath();
-            Potion output = PotionUtils.getPotion(impl.getOutput());
+            Potion output = impl.getOutput().get(DataComponents.POTION_CONTENTS).potion();
             if (output != null) {
                 name = output.getName("");
             }
@@ -326,6 +332,14 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
             // for EMI to detect it's a synthetic recipe (not ever in JSON)
             recipe.setId(recipe.getId().withPrefix("/"));
             GTRecipeTypes.BREWING_RECIPES.addToMainCategory(recipe);
+        }
+    }
+
+    private static PotionBrewing getPotionBrewing() {
+        if (GTCEu.isClientThread()) {
+            return Minecraft.getInstance().getConnection().potionBrewing();
+        } else {
+            return GTCEu.getMinecraftServer().potionBrewing();
         }
     }
 }
