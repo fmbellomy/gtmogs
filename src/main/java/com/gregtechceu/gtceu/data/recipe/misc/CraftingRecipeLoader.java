@@ -11,7 +11,7 @@ import com.gregtechceu.gtceu.common.pipelike.duct.DuctPipeType;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
@@ -21,15 +21,13 @@ import net.neoforged.neoforge.common.Tags;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
-
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.item.GTItems.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
 public class CraftingRecipeLoader {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         // todo facades
         // registerFacadeRecipe(provider, Iron, 4);
 
@@ -291,7 +289,7 @@ public class CraftingRecipeLoader {
         SpecialRecipeBuilder.special(FacadeCoverRecipe.SERIALIZER).save(provider, "gtceu:crafting/facade_cover");
     }
 
-    private static void addDuctRecipes(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material,
+    private static void addDuctRecipes(@NotNull RecipeOutput provider, @NotNull Material material,
                                        int outputAmount) {
         VanillaRecipeHelper.addShapedRecipe(provider, "small_duct_%s".formatted(material.getName()),
                 GTBlocks.DUCT_PIPES[DuctPipeType.SMALL.ordinal()].asStack(outputAmount * 2), "w", "X", "h",
@@ -307,7 +305,7 @@ public class CraftingRecipeLoader {
                 'X', new MaterialEntry(plateDouble, material));
     }
 
-    // private static void registerFacadeRecipe(Consumer<FinishedRecipe> provider, Material material, int facadeAmount)
+    // private static void registerFacadeRecipe(RecipeOutput provider, Material material, int facadeAmount)
     // {
     // OreIngredient ingredient = new OreIngredient(new MaterialEntry(plate, material).toString());
     // ForgeRegistries.RECIPES.register(new FacadeRecipe(null, ingredient, facadeAmount).setRegistryName("facade_" +

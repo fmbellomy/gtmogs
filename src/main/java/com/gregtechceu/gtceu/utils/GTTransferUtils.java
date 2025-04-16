@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.utils;
 
+import com.gregtechceu.gtceu.api.capability.GTCapability;
+import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.transfer.fluid.FluidHandlerList;
 
@@ -64,6 +66,23 @@ public class GTTransferUtils {
     // Same as above, but returns the presence
     public static boolean hasAdjacentItemHandler(Level level, BlockPos pos, Direction facing) {
         return getAdjacentItemHandler(level, pos, facing).isPresent();
+    }
+
+    /**
+     * Get the EnergyContainer Capability from the given block
+     *
+     * @param level Level of block
+     * @param pos   BlockPos of block
+     * @param side  Side of block
+     * @return LazyOpt of ItemHandler of given block
+     */
+    public static Optional<IEnergyContainer> getEnergyContainer(Level level, BlockPos pos, @Nullable Direction side) {
+        return Optional.ofNullable(level.getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, pos, side));
+    }
+
+    // Same as getAdjacentFluidHandler, but for EnergyContainer
+    public static Optional<IEnergyContainer> getAdjacentEnergyContainer(Level level, BlockPos pos, Direction facing) {
+        return getEnergyContainer(level, pos.relative(facing), facing.getOpposite());
     }
 
     /**

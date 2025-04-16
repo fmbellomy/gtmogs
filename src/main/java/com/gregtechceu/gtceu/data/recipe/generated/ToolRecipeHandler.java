@@ -19,10 +19,12 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.component.DyedItemColor;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -30,8 +32,6 @@ import it.unimi.dsi.fastutil.ints.Int2ReferenceArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.function.Consumer;
 
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialFlags.*;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
@@ -51,7 +51,7 @@ public final class ToolRecipeHandler {
 
     private ToolRecipeHandler() {}
 
-    public static void run(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material) {
+    public static void run(@NotNull RecipeOutput provider, @NotNull Material material) {
         ToolProperty property = material.getProperty(PropertyKey.TOOL);
         if (property == null) {
             return;
@@ -61,7 +61,7 @@ public final class ToolRecipeHandler {
         processElectricTool(provider, property, material);
     }
 
-    private static void processTool(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material) {
+    private static void processTool(@NotNull RecipeOutput provider, @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(plate)) {
             return;
         }
@@ -183,7 +183,7 @@ public final class ToolRecipeHandler {
         }
     }
 
-    private static void processElectricTool(@NotNull Consumer<FinishedRecipe> provider, @NotNull ToolProperty property,
+    private static void processElectricTool(@NotNull RecipeOutput provider, @NotNull ToolProperty property,
                                             @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(plate)) {
             return;
@@ -256,9 +256,9 @@ public final class ToolRecipeHandler {
             }
 
             // buzzsaw
-            if (property.hasType(GTToolType.BUZZSAW)) {
+            if (property.hasType(GTToolType.BUZZSAW_LV)) {
                 toolPrefix = TagPrefix.toolHeadBuzzSaw;
-                addElectricToolRecipe(provider, toolPrefix, new GTToolType[] { GTToolType.BUZZSAW }, material);
+                addElectricToolRecipe(provider, toolPrefix, new GTToolType[] { GTToolType.BUZZSAW_LV }, material);
 
                 VanillaRecipeHelper.addShapedRecipe(provider, String.format("buzzsaw_blade_%s", material.getName()),
                         ChemicalHelper.get(toolPrefix, material),
@@ -299,7 +299,7 @@ public final class ToolRecipeHandler {
         }
     }
 
-    private static void addElectricToolRecipe(@NotNull Consumer<FinishedRecipe> provider, @NotNull TagPrefix toolHead,
+    private static void addElectricToolRecipe(@NotNull RecipeOutput provider, @NotNull TagPrefix toolHead,
                                               @NotNull GTToolType @NotNull [] toolItems,
                                               @NotNull Material material) {
         for (GTToolType toolType : toolItems) {
@@ -320,7 +320,7 @@ public final class ToolRecipeHandler {
         }
     }
 
-    public static void addToolRecipe(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material,
+    public static void addToolRecipe(@NotNull RecipeOutput provider, @NotNull Material material,
                                      @NotNull GTToolType tool, boolean mirrored, Object... recipe) {
         ItemStack toolStack = ToolHelper.get(tool, material);
         if (toolStack.isEmpty()) return;
@@ -336,12 +336,12 @@ public final class ToolRecipeHandler {
     /**
      * {@code D} is inferred as the dye key
      */
-    public static void addDyeableToolRecipe(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material,
+    public static void addDyeableToolRecipe(@NotNull RecipeOutput provider, @NotNull Material material,
                                             @NotNull GTToolType tool, boolean mirrored, Object... recipe) {
         ItemStack toolStack = ToolHelper.get(tool, material);
         if (toolStack.isEmpty()) return;
         for (var color : MarkerMaterials.Color.COLORS.entrySet()) {
-            ToolHelper.getToolTag(toolStack).putInt(ToolHelper.TINT_COLOR_KEY, color.getKey().getTextColor());
+            toolStack.set(DataComponents.DYED_COLOR, new DyedItemColor(color.getKey().getTextColor(), false));
             Object[] recipeWithDye = ArrayUtils.addAll(recipe, 'D',
                     new MaterialEntry(TagPrefix.dye, color.getValue()));
 

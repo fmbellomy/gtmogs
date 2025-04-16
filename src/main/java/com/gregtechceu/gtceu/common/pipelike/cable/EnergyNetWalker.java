@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.material.material.properties.WireProperties;
 import com.gregtechceu.gtceu.api.pipenet.PipeNetWalker;
 import com.gregtechceu.gtceu.common.blockentity.CableBlockEntity;
 
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -67,9 +68,8 @@ public class EnergyNetWalker extends PipeNetWalker<CableBlockEntity, WirePropert
             throw new IllegalStateException(
                     "The current pipe is not the last added pipe. Something went seriously wrong!");
         }
-        IEnergyContainer container = pipeTile.getLevel().getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER,
-                pipePos.relative(faceToNeighbour), faceToNeighbour.getOpposite());
-        if (container != null) {
+        var container = GTTransferUtils.getAdjacentEnergyContainer(pipeTile.getPipeLevel(), pipePos, faceToNeighbour);
+        if (container.isPresent()) {
             routes.add(new EnergyRoutePath(pipePos.immutable(), faceToNeighbour, pipes, getWalkedBlocks(), loss));
         }
     }

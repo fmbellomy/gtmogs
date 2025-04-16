@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class RockBreakerCondition extends RecipeCondition {
+public class RockBreakerCondition extends RecipeCondition<RockBreakerCondition> {
 
     public static final MapCodec<RockBreakerCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -32,7 +32,7 @@ public class RockBreakerCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<RockBreakerCondition> getType() {
         return GTRecipeConditions.ROCK_BREAKER;
     }
 

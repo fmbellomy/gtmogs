@@ -2,32 +2,24 @@ package com.gregtechceu.gtceu.data.recipe.misc;
 
 import com.gregtechceu.gtceu.data.recipe.GTRecipeCategories;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.DyeColor;
-import java.util.function.Consumer;
 
-import static com.gregtechceu.gtceu.api.tag.TagPrefix.block;
-import static com.gregtechceu.gtceu.api.tag.TagPrefix.plate;
-import static com.gregtechceu.gtceu.data.block.GTBlocks.LARGE_METAL_SHEETS;
-import static com.gregtechceu.gtceu.data.block.GTBlocks.METAL_SHEETS;
-import static com.gregtechceu.gtceu.data.block.GTBlocks.STUDS;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.CHEMICAL_DYES;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.Concrete;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.Iron;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.Rubber;
-import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.ASSEMBLER_RECIPES;
-import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.CHEMICAL_BATH_RECIPES;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
+import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
+import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
+import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 public class DecorationRecipes {
 
     private DecorationRecipes() {}
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         assemblerRecipes(provider);
         dyeRecipes(provider);
     }
 
-    private static void assemblerRecipes(Consumer<FinishedRecipe> provider) {
+    private static void assemblerRecipes(RecipeOutput provider) {
         ASSEMBLER_RECIPES.recipeBuilder("metal_sheet_white")
                 .inputItems(block, Concrete, 5)
                 .inputItems(plate, Iron, 2)
@@ -53,7 +45,7 @@ public class DecorationRecipes {
                 .addMaterialInfo(true).save(provider);
     }
 
-    private static void dyeRecipes(Consumer<FinishedRecipe> provider) {
+    private static void dyeRecipes(RecipeOutput provider) {
         for (int i = 0; i < CHEMICAL_DYES.length; i++) {
             var color = DyeColor.values()[i];
             var colorName = color.getName();

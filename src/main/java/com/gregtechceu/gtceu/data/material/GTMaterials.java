@@ -773,9 +773,9 @@ public class GTMaterials {
     public static Material ConstructionFoam;
 
     public static Material Oil;
-    public static Material OilHeavy;
+    public static Material HeavyOil;
     public static Material RawOil;
-    public static Material OilLight;
+    public static Material LightOil;
     public static Material NaturalGas;
     public static Material SulfuricHeavyFuel;
     public static Material HeavyFuel;

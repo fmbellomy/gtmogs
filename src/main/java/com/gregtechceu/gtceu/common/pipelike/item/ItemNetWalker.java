@@ -9,12 +9,12 @@ import com.gregtechceu.gtceu.common.cover.ItemFilterCover;
 import com.gregtechceu.gtceu.common.cover.ShutterCover;
 import com.gregtechceu.gtceu.common.cover.data.FilterMode;
 
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 
 import org.jetbrains.annotations.NotNull;
@@ -102,8 +102,7 @@ public class ItemNetWalker extends PipeNetWalker<ItemPipeBlockEntity, ItemPipePr
         if (neighbourTile == null || (pipePos.equals(sourcePipe) && faceToNeighbour == facingToHandler)) {
             return;
         }
-        LazyOptional<IItemHandler> handler = neighbourTile.getCapability(Capabilities.ITEM_HANDLER,
-                faceToNeighbour.getOpposite());
+        var handler = GTTransferUtils.getAdjacentItemHandler(pipeTile.getPipeLevel(), pipePos, faceToNeighbour);
         if (handler.isPresent()) {
             List<Predicate<ItemStack>> filters = new ArrayList<>(this.filters);
             List<Predicate<ItemStack>> moreFilters = nextFilters.get(faceToNeighbour);

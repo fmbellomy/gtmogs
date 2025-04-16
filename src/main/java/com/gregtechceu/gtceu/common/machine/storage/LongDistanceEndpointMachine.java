@@ -92,7 +92,7 @@ public abstract class LongDistanceEndpointMachine extends MetaMachine implements
             setIoType(IO.NONE);
         } else if (networks.size() == 1) {
             // one neighbour network found, attach self to neighbour network
-            networks.get(0).onPlaceEndpoint(this);
+            networks.getFirst().onPlaceEndpoint(this);
         } else {
             // two neighbour networks found, configuration invalid
             setIoType(IO.NONE);
@@ -147,7 +147,7 @@ public abstract class LongDistanceEndpointMachine extends MetaMachine implements
                 network.onPlaceEndpoint(this);
             } else if (networks.size() == 1) {
                 // add to neighbour network
-                networks.get(0).onPlaceEndpoint(this);
+                networks.getFirst().onPlaceEndpoint(this);
             }
         } else {
             if (networks.size() > 1) {
@@ -186,7 +186,7 @@ public abstract class LongDistanceEndpointMachine extends MetaMachine implements
     }
 
     @Override
-    public ILDEndpoint getLink() {
+    public @Nullable ILDEndpoint getLink() {
         if (link == null) {
             LongDistanceNetwork network = LongDistanceNetwork.get(getLevel(), getPos());
             if (network != null && network.isValid()) {

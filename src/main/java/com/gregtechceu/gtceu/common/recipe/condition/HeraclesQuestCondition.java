@@ -8,11 +8,8 @@ import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 
 import com.mojang.serialization.MapCodec;
-import lombok.val;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import com.google.gson.JsonObject;
@@ -86,13 +83,6 @@ public class HeraclesQuestCondition extends RecipeCondition {
         var obj = super.serialize();
         obj.addProperty("questId", questId);
         return obj;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        questId = GsonHelper.getAsString(config, "questId");
-        return this;
     }
 
     @Override

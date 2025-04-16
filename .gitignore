@@ -1,6 +1,6 @@
 build/
 *.ipr
-run/
+run*/
 *.iws
 out/
 *.iml
@@ -21,4 +21,3 @@ src/generated/resources/.cache/
 
 *.patch
 *.DS_Store
-

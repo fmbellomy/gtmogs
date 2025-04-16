@@ -156,7 +156,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
             ingredients.add(new MapItemStackIngredient(stack));
 
             stack.getTags().forEach(tag -> ingredients.add(new MapItemTagIngredient(tag)));
-            if (!stack.getComponentsPatch().isEmpty()) {
+            if (!stack.isComponentsPatchEmpty()) {
                 // formatter:off
                 ingredients
                         .add(new MapItemStackStrictComponentIngredient(stack,

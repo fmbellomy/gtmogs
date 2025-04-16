@@ -18,7 +18,7 @@ import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -31,14 +31,12 @@ import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import org.apache.commons.lang3.ArrayUtils;
 import java.util.Arrays;
 import java.util.Locale;
-import java.util.function.Consumer;
-
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.data.recipe.GTCraftingComponents.*;
 
 public class MetaTileEntityLoader {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         VanillaRecipeHelper.addShapedRecipe(provider, true, "casing_ulv", GTBlocks.MACHINE_CASING_ULV.asStack(), "PPP",
                 "PwP", "PPP", 'P', new MaterialEntry(TagPrefix.plate, GTMaterials.WroughtIron));
         VanillaRecipeHelper.addShapedRecipe(provider, true, "casing_lv", GTBlocks.MACHINE_CASING_LV.asStack(), "PPP",
@@ -1210,7 +1208,7 @@ public class MetaTileEntityLoader {
     // - CraftingComponent.Component
     // - MaterialEntry
     // - TagKey<?>
-    public static void registerMachineRecipe(Consumer<FinishedRecipe> provider, boolean setMaterialInfoData,
+    public static void registerMachineRecipe(RecipeOutput provider, boolean setMaterialInfoData,
                                              MachineDefinition[] machines, Object... recipe) {
         for (MachineDefinition machine : machines) {
 
@@ -1227,7 +1225,7 @@ public class MetaTileEntityLoader {
         }
     }
 
-    public static void registerMachineRecipe(Consumer<FinishedRecipe> provider, MachineDefinition[] machines,
+    public static void registerMachineRecipe(RecipeOutput provider, MachineDefinition[] machines,
                                              Object... recipe) {
         registerMachineRecipe(provider, true, machines, recipe);
     }

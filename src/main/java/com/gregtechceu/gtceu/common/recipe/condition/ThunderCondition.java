@@ -7,10 +7,8 @@ import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 
 import com.google.gson.JsonObject;
@@ -20,7 +18,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class ThunderCondition extends RecipeCondition {
+public class ThunderCondition extends RecipeCondition<ThunderCondition> {
 
     public static final MapCodec<ThunderCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -40,7 +38,7 @@ public class ThunderCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<ThunderCondition> getType() {
         return GTRecipeConditions.THUNDER;
     }
 
@@ -70,13 +68,6 @@ public class ThunderCondition extends RecipeCondition {
         JsonObject config = super.serialize();
         config.addProperty("level", level);
         return config;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        level = GsonHelper.getAsFloat(config, "level", 0);
-        return this;
     }
 
     @Override

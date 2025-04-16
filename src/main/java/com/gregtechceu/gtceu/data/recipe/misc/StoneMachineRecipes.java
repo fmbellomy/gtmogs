@@ -14,7 +14,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.recipe.StoneTypeEntry;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -22,14 +22,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.ASSEMBLER_RECIPES;
 
 public class StoneMachineRecipes {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         registerStoneRecipes(provider);
     }
 
@@ -516,13 +514,13 @@ public class StoneMachineRecipes {
         }
     }
 
-    private static void registerStoneRecipes(Consumer<FinishedRecipe> provider) {
+    private static void registerStoneRecipes(RecipeOutput provider) {
         for (StoneTypeEntry entry : getDefaultEntries()) {
             registerStoneTypeRecipes(provider, entry);
         }
     }
 
-    public static void registerStoneTypeRecipes(Consumer<FinishedRecipe> provider, @NotNull StoneTypeEntry entry) {
+    public static void registerStoneTypeRecipes(RecipeOutput provider, @NotNull StoneTypeEntry entry) {
         if (entry.stone == null) {
             GTCEu.LOGGER.error("could not find stone form of StoneTypeEntry, id: {}", entry.stoneName);
             return;

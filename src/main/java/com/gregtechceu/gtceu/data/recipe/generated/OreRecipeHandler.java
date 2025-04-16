@@ -15,7 +15,7 @@ import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.IntersectionIngredient;
@@ -37,7 +37,7 @@ public final class OreRecipeHandler {
 
     private OreRecipeHandler() {}
 
-    public static void run(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material) {
+    public static void run(@NotNull RecipeOutput provider, @NotNull Material material) {
         OreProperty property = material.getProperty(PropertyKey.ORE);
         if (property == null) {
             return;
@@ -57,7 +57,7 @@ public final class OreRecipeHandler {
         processPureDust(provider, property, material);
     }
 
-    private static void processMetalSmelting(@NotNull Consumer<FinishedRecipe> provider, @NotNull OreProperty property,
+    private static void processMetalSmelting(@NotNull RecipeOutput provider, @NotNull OreProperty property,
                                              @NotNull TagPrefix prefix, @NotNull Material material) {
         Material smeltingResult = property.getDirectSmeltResult().isNull() ? material : property.getDirectSmeltResult();
         if (smeltingResult.hasProperty(PropertyKey.INGOT)) {
@@ -71,7 +71,7 @@ public final class OreRecipeHandler {
         }
     }
 
-    private static void processOre(@NotNull Consumer<FinishedRecipe> provider, @NotNull TagPrefix orePrefix,
+    private static void processOre(@NotNull RecipeOutput provider, @NotNull TagPrefix orePrefix,
                                    @NotNull OreProperty property, @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(orePrefix)) {
             return;
@@ -152,7 +152,7 @@ public final class OreRecipeHandler {
         }
     }
 
-    private static void processRawOre(@NotNull Consumer<FinishedRecipe> provider, @NotNull OreProperty property,
+    private static void processRawOre(@NotNull RecipeOutput provider, @NotNull OreProperty property,
                                       @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(rawOre)) {
             return;
@@ -248,7 +248,7 @@ public final class OreRecipeHandler {
                 .duration(300).EUt(2).save(provider);
     }
 
-    private static void processCrushedOre(@NotNull Consumer<FinishedRecipe> provider, @NotNull OreProperty property,
+    private static void processCrushedOre(@NotNull RecipeOutput provider, @NotNull OreProperty property,
                                           @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(crushed)) {
             return;
@@ -334,7 +334,7 @@ public final class OreRecipeHandler {
         processMetalSmelting(provider, property, crushed, material);
     }
 
-    private static void processCrushedCentrifuged(@NotNull Consumer<FinishedRecipe> provider,
+    private static void processCrushedCentrifuged(@NotNull RecipeOutput provider,
                                                   @NotNull OreProperty property, @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(crushedRefined)) {
             return;
@@ -365,7 +365,7 @@ public final class OreRecipeHandler {
         processMetalSmelting(provider, property, crushedRefined, material);
     }
 
-    private static void processCrushedPurified(@NotNull Consumer<FinishedRecipe> provider,
+    private static void processCrushedPurified(@NotNull RecipeOutput provider,
                                                @NotNull OreProperty property,
                                                @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(crushedPurified)) {
@@ -450,7 +450,7 @@ public final class OreRecipeHandler {
         processMetalSmelting(provider, property, crushedPurified, material);
     }
 
-    private static void processDirtyDust(@NotNull Consumer<FinishedRecipe> provider, @NotNull OreProperty property,
+    private static void processDirtyDust(@NotNull RecipeOutput provider, @NotNull OreProperty property,
                                          @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(dustImpure)) {
             return;
@@ -484,7 +484,7 @@ public final class OreRecipeHandler {
         processMetalSmelting(provider, property, dustImpure, material);
     }
 
-    private static void processPureDust(@NotNull Consumer<FinishedRecipe> provider, @NotNull OreProperty property,
+    private static void processPureDust(@NotNull RecipeOutput provider, @NotNull OreProperty property,
                                         @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(dustPure)) {
             return;

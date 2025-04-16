@@ -11,14 +11,11 @@ import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -74,13 +71,6 @@ public class EnvironmentalHazardCondition extends RecipeCondition {
         JsonObject value = super.serialize();
         value.addProperty("condition", condition.name);
         return value;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        this.condition = MedicalCondition.CONDITIONS.get(GsonHelper.getAsString(config, "condition"));
-        return this;
     }
 
     @Override

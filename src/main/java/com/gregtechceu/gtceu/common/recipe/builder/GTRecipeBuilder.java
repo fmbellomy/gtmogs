@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.recipe.builder;
 
+import com.google.gson.JsonElement;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
@@ -29,12 +30,16 @@ import com.gregtechceu.gtceu.common.recipe.condition.*;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
+import com.gregtechceu.gtceu.utils.codec.CodecUtils;
 import com.lowdragmc.lowdraglib.utils.NBTToJsonConverter;
 
+import com.mojang.serialization.JsonOps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -43,6 +48,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -1107,11 +1113,11 @@ public class GTRecipeBuilder {
         return addCondition(new CleanroomCondition(cleanroomType));
     }
 
-    public GTRecipeBuilder dimension(ResourceLocation dimension, boolean reverse) {
+    public GTRecipeBuilder dimension(ResourceKey<Level> dimension, boolean reverse) {
         return addCondition(new DimensionCondition(dimension).setReverse(reverse));
     }
 
-    public GTRecipeBuilder dimension(ResourceLocation dimension) {
+    public GTRecipeBuilder dimension(ResourceKey<Level> dimension) {
         return dimension(dimension, false);
     }
 
@@ -1343,8 +1349,12 @@ public class GTRecipeBuilder {
 
         if (!conditions.isEmpty()) {
             JsonArray array = new JsonArray();
+            RegistryOps<JsonElement> ops = GTRegistries.builtinRegistry()
+                    .createSerializationContext(JsonOps.INSTANCE);
             for (RecipeCondition condition : conditions) {
-                var condJson = condition.serialize();
+                var condJson = CodecUtils.encodeMap(condition, condition.getType().getCodec(), )
+                var condJson = condition.getType().getCodec().encode(condition, ops, ops.mapBuilder())
+                        .build(JsonOps.INSTANCE.empty());
                 condJson.addProperty("type", GTRegistries.RECIPE_CONDITIONS.getKey(condition.getType()));
                 array.add(condJson);
             }

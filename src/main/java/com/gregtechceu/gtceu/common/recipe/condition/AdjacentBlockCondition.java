@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class AdjacentBlockCondition extends RecipeCondition {
+public class AdjacentBlockCondition extends RecipeCondition<AdjacentBlockCondition> {
 
     public static final MapCodec<AdjacentBlockCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -31,7 +31,7 @@ public class AdjacentBlockCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<AdjacentBlockCondition> getType() {
         return GTRecipeConditions.ADJACENT_BLOCK;
     }
 

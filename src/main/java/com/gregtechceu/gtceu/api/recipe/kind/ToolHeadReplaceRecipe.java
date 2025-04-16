@@ -39,8 +39,8 @@ public class ToolHeadReplaceRecipe extends CustomRecipe {
         TOOL_HEAD_TO_TOOL_MAP.computeIfAbsent(toolHead, p -> new GTToolType[GTValues.MAX])[tool.electricTier] = tool;
     }
 
-    public ToolHeadReplaceRecipe(ResourceLocation id, CraftingBookCategory category) {
-        super(id, category);
+    public ToolHeadReplaceRecipe(CraftingBookCategory category) {
+        super(category);
     }
 
     @Override

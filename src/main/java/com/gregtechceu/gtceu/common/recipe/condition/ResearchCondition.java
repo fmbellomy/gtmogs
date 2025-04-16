@@ -8,18 +8,16 @@ import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
-public class ResearchCondition extends RecipeCondition {
+public class ResearchCondition extends RecipeCondition<ResearchCondition> {
 
     public static final MapCodec<ResearchCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -53,13 +51,6 @@ public class ResearchCondition extends RecipeCondition {
         JsonObject value = super.serialize();
         value.add("research", this.data.toJson());
         return value;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        this.data = ResearchData.fromJson(config.getAsJsonArray("research"));
-        return this;
     }
 
     @Override

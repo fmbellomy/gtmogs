@@ -7,10 +7,8 @@ import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
@@ -19,7 +17,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class PositionYCondition extends RecipeCondition {
+public class PositionYCondition extends RecipeCondition<PositionYCondition> {
 
     public static final MapCodec<PositionYCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> RecipeCondition
             .isReverse(instance)
@@ -44,7 +42,7 @@ public class PositionYCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<PositionYCondition> getType() {
         return GTRecipeConditions.POSITION_Y;
     }
 
@@ -79,14 +77,6 @@ public class PositionYCondition extends RecipeCondition {
         config.addProperty("min", this.min);
         config.addProperty("max", this.max);
         return config;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        min = GsonHelper.getAsInt(config, "min", Integer.MIN_VALUE);
-        max = GsonHelper.getAsInt(config, "max", Integer.MAX_VALUE);
-        return this;
     }
 
     @Override

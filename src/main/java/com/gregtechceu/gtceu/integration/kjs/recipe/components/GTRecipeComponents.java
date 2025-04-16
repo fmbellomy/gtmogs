@@ -9,11 +9,14 @@ import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeCapabilities;
 
+import com.mojang.serialization.JsonOps;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.match.ItemMatch;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
+import dev.latvian.mods.kubejs.util.NBTUtils;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -210,10 +213,8 @@ public class GTRecipeComponents {
                 var conditionKey = GsonHelper.getAsString(jsonObject, "type", "");
                 var type = GTRegistries.RECIPE_CONDITIONS.get(conditionKey);
                 if (type != null) {
-                    RecipeCondition condition = type.factory.createDefault();
-                    if (condition != null) {
-                        return condition.deserialize(jsonObject);
-                    }
+                    RegistryOps<JsonElement> ops = GTRegistries.builtinRegistry().createSerializationContext(JsonOps.INSTANCE);
+                    return type.getCodec().codec().parse(ops, jsonObject).getOrThrow();
                 }
             } else if (from instanceof Tag tag) {
                 return read(recipe, NBTUtils.toJson(tag));

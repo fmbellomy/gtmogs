@@ -9,10 +9,8 @@ import com.gregtechceu.gtceu.common.machine.owner.FTBOwner;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
@@ -87,13 +85,6 @@ public class FTBQuestCondition extends RecipeCondition {
         var obj = super.serialize();
         obj.addProperty("questId", parsedQuestId);
         return obj;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        parsedQuestId = GsonHelper.getAsLong(config, "questId");
-        return this;
     }
 
     @Override

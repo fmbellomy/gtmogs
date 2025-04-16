@@ -5,22 +5,20 @@ import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.Consumer;
-
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 public class FuelRecipes {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         // TODO this all needs to be cleaned up, but this will make it somewhat work for now
         // do these first because for some reason vanilla fuels are not set up yet at this phase?
         Set<Item> addedItems = new HashSet<>();
@@ -69,8 +67,8 @@ public class FuelRecipes {
                 .duration(10)
                 .save(provider);
 
-        LARGE_BOILER_RECIPES.recipeBuilder("oil_heavy")
-                .inputFluids(OilHeavy.getFluid(32))
+        LARGE_BOILER_RECIPES.recipeBuilder("heavy_oil")
+                .inputFluids(HeavyOil.getFluid(32))
                 .duration(10)
                 .save(provider);
 
@@ -169,7 +167,7 @@ public class FuelRecipes {
                 .save(provider);
 
         COMBUSTION_GENERATOR_FUELS.recipeBuilder("light_oil")
-                .inputFluids(OilLight.getFluid(32))
+                .inputFluids(LightOil.getFluid(32))
                 .duration(5)
                 .EUt(-V[LV])
                 .save(provider);

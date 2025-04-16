@@ -13,7 +13,7 @@ import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.Util;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
@@ -61,7 +61,7 @@ public final class WireRecipeHandler {
 
     private WireRecipeHandler() {}
 
-    public static void run(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material) {
+    public static void run(@NotNull RecipeOutput provider, @NotNull Material material) {
         WireProperties property = material.getProperty(PropertyKey.WIRE);
         if (property == null) {
             return;
@@ -82,7 +82,7 @@ public final class WireRecipeHandler {
         generateCableCovering(provider, property, wireGtHex, material);
     }
 
-    private static void processWires(@NotNull Consumer<FinishedRecipe> provider, @NotNull Material material) {
+    private static void processWires(@NotNull RecipeOutput provider, @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(wireGtSingle)) {
             return;
         }
@@ -134,7 +134,7 @@ public final class WireRecipeHandler {
         }
     }
 
-    private static void generateCableCovering(@NotNull Consumer<FinishedRecipe> provider,
+    private static void generateCableCovering(@NotNull RecipeOutput provider,
                                               @NotNull WireProperties property,
                                               @NotNull TagPrefix prefix, @NotNull Material material) {
         if (!material.shouldGenerateRecipesFor(prefix) || property.isSuperconductor()) {
@@ -208,7 +208,7 @@ public final class WireRecipeHandler {
                 .save(provider);
     }
 
-    private static void generateManualRecipe(@NotNull Consumer<FinishedRecipe> provider, @NotNull TagPrefix wirePrefix,
+    private static void generateManualRecipe(@NotNull RecipeOutput provider, @NotNull TagPrefix wirePrefix,
                                              @NotNull TagPrefix cablePrefix, int cableAmount,
                                              @NotNull Material material) {
         int insulationAmount = INSULATION_AMOUNT.getInt(cablePrefix);

@@ -1,8 +1,6 @@
 package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 
-import net.minecraft.data.recipes.FinishedRecipe;
-
-import java.util.function.Consumer;
+import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
@@ -12,7 +10,7 @@ import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.MIXER_RECIPES;
 
 public class GemSlurryRecipes {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         // Ruby
         MIXER_RECIPES.recipeBuilder("ruby_slurry").duration(280).EUt(VA[EV])
                 .inputItems(crushed, Ruby, 2)

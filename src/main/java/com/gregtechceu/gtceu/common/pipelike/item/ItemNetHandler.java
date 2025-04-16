@@ -18,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
@@ -353,14 +352,10 @@ public class ItemNetHandler implements IItemHandlerModifiable {
     }
 
     public CoverBehavior getCoverOnNeighbour(BlockPos pos, Direction handlerFacing) {
-        BlockEntity tile = pipe.getLevel().getBlockEntity(pos.relative(handlerFacing));
-        if (tile != null) {
-            ICoverable coverable = GTCapabilityHelper.getCoverable(pipe.getLevel(), pos.relative(handlerFacing),
-                    handlerFacing.getOpposite());
-            if (coverable == null) return null;
-            return coverable.getCoverAtSide(handlerFacing.getOpposite());
-        }
-        return null;
+        ICoverable coverable = GTCapabilityHelper.getCoverable(pipe.getLevel(), pos.relative(handlerFacing),
+                handlerFacing.getOpposite());
+        if (coverable == null) return null;
+        return coverable.getCoverAtSide(handlerFacing.getOpposite());
     }
 
     public ItemStack insertOverRobotArm(IItemHandler handler, RobotArmCover arm, ItemStack stack, boolean simulate,
@@ -405,7 +400,7 @@ public class ItemNetHandler implements IItemHandlerModifiable {
             ItemStack slot = handler.getStackInSlot(i);
             if (slot.isEmpty()) continue;
             if (ignoreNBT && !ItemStack.isSameItem(stack, slot)) continue;
-            else if (!ItemStack.isSameItemSameTags(stack, slot)) continue;
+            else if (!ItemStack.isSameItemSameComponents(stack, slot)) continue;
             if (arm.getFilterHandler().getFilter().test(slot)) {
                 count += slot.getCount();
             }

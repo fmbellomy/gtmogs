@@ -1,8 +1,6 @@
 package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 
-import net.minecraft.data.recipes.FinishedRecipe;
-
-import java.util.function.Consumer;
+import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.GTValues.LV;
@@ -13,14 +11,14 @@ import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 public class AntidoteRecipes {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         paracetamolProcess(provider);
         potassiumHydroxideProcess(provider);
         prussianBlueProcess(provider);
         dtpaProcess(provider);
     }
 
-    private static void paracetamolProcess(Consumer<FinishedRecipe> provider) {
+    private static void paracetamolProcess(RecipeOutput provider) {
         CHEMICAL_RECIPES.recipeBuilder("acetic_anhydride")
                 .inputFluids(Ethenone.getFluid(1000))
                 .inputFluids(AceticAcid.getFluid(1000))
@@ -43,7 +41,7 @@ public class AntidoteRecipes {
                 .duration(100).EUt(VA[LV]).save(provider);
     }
 
-    private static void potassiumHydroxideProcess(Consumer<FinishedRecipe> provider) {
+    private static void potassiumHydroxideProcess(RecipeOutput provider) {
         CHEMICAL_RECIPES.recipeBuilder("potassium_hydroxide")
                 .inputItems(dust, RockSalt, 2)
                 .inputFluids(Water.getFluid(1000))
@@ -60,7 +58,7 @@ public class AntidoteRecipes {
                 .duration(100).EUt(VA[MV]).save(provider);
     }
 
-    private static void prussianBlueProcess(Consumer<FinishedRecipe> provider) {
+    private static void prussianBlueProcess(RecipeOutput provider) {
         CHEMICAL_RECIPES.recipeBuilder("calcium_hydroxide")
                 .inputItems(dust, Quicklime, 2)
                 .inputFluids(Water.getFluid(1000))
@@ -134,7 +132,7 @@ public class AntidoteRecipes {
                 .duration(500).EUt(VA[HV]).save(provider);
     }
 
-    public static void dtpaProcess(Consumer<FinishedRecipe> provider) {
+    public static void dtpaProcess(RecipeOutput provider) {
         CHEMICAL_RECIPES.recipeBuilder("dichloroethane")
                 .circuitMeta(2)
                 .inputFluids(Ethylene.getFluid(1000))

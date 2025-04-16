@@ -2,9 +2,7 @@ package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
 
-import net.minecraft.data.recipes.FinishedRecipe;
-
-import java.util.function.Consumer;
+import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
@@ -13,7 +11,7 @@ import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 public class PetrochemRecipes {
 
-    public static void init(Consumer<FinishedRecipe> provider) {
+    public static void init(RecipeOutput provider) {
         moderatelyCrack(provider, Ethane, HydroCrackedEthane, SteamCrackedEthane);
         moderatelyCrack(provider, Ethylene, HydroCrackedEthylene, SteamCrackedEthylene);
         moderatelyCrack(provider, Propene, HydroCrackedPropene, SteamCrackedPropene);
@@ -40,7 +38,7 @@ public class PetrochemRecipes {
                 .duration(20).EUt(96).save(provider);
 
         DISTILLATION_RECIPES.recipeBuilder("distill_light_oil")
-                .inputFluids(OilLight.getFluid(150))
+                .inputFluids(LightOil.getFluid(150))
                 .outputFluids(SulfuricHeavyFuel.getFluid(10))
                 .outputFluids(SulfuricLightFuel.getFluid(20))
                 .outputFluids(SulfuricNaphtha.getFluid(30))
@@ -48,7 +46,7 @@ public class PetrochemRecipes {
                 .duration(20).EUt(96).save(provider);
 
         DISTILLATION_RECIPES.recipeBuilder("distill_heavy_oil")
-                .inputFluids(OilHeavy.getFluid(100))
+                .inputFluids(HeavyOil.getFluid(100))
                 .outputFluids(SulfuricHeavyFuel.getFluid(250))
                 .outputFluids(SulfuricLightFuel.getFluid(45))
                 .outputFluids(SulfuricNaphtha.getFluid(15))
@@ -68,7 +66,7 @@ public class PetrochemRecipes {
         distilleryRecipes(provider);
     }
 
-    private static void desulfurizationRecipes(Consumer<FinishedRecipe> provider) {
+    private static void desulfurizationRecipes(RecipeOutput provider) {
         CHEMICAL_RECIPES.recipeBuilder("desulfurize_heavy_fuel")
                 .inputFluids(SulfuricHeavyFuel.getFluid(8000))
                 .inputFluids(Hydrogen.getFluid(2000))
@@ -105,7 +103,7 @@ public class PetrochemRecipes {
                 .duration(160).EUt(VA[LV]).save(provider);
     }
 
-    private static void distillationRecipes(Consumer<FinishedRecipe> provider) {
+    private static void distillationRecipes(RecipeOutput provider) {
         DISTILLATION_RECIPES.recipeBuilder("distill_refinery_gas")
                 .inputFluids(RefineryGas.getFluid(1000))
                 .outputFluids(Butane.getFluid(60))
@@ -400,7 +398,7 @@ public class PetrochemRecipes {
                 .duration(120).EUt(VA[MV]).save(provider);
     }
 
-    private static void distilleryRecipes(Consumer<FinishedRecipe> provider) {
+    private static void distilleryRecipes(RecipeOutput provider) {
         DISTILLERY_RECIPES.recipeBuilder("distill_toluene_to_light_fuel")
                 .circuitMeta(1)
                 .inputFluids(Toluene.getFluid(30))
@@ -426,7 +424,7 @@ public class PetrochemRecipes {
                 .duration(32).EUt(24).save(provider);
     }
 
-    private static void lightlyCrack(Consumer<FinishedRecipe> provider, Material raw, Material hydroCracked,
+    private static void lightlyCrack(RecipeOutput provider, Material raw, Material hydroCracked,
                                      Material steamCracked) {
         CRACKING_RECIPES.recipeBuilder("lightly_hydro_crack_" + raw.getName())
                 .circuitMeta(1)
@@ -457,7 +455,7 @@ public class PetrochemRecipes {
                 .duration(160).duration(VA[LV]).save(provider);
     }
 
-    private static void moderatelyCrack(Consumer<FinishedRecipe> provider, Material raw, Material hydroCracked,
+    private static void moderatelyCrack(RecipeOutput provider, Material raw, Material hydroCracked,
                                         Material steamCracked) {
         CRACKING_RECIPES.recipeBuilder("hydro_crack_" + raw.getName())
                 .circuitMeta(2)
@@ -488,7 +486,7 @@ public class PetrochemRecipes {
                 .duration(240).EUt(VA[LV]).save(provider);
     }
 
-    private static void severelyCrack(Consumer<FinishedRecipe> provider, Material raw, Material hydroCracked,
+    private static void severelyCrack(RecipeOutput provider, Material raw, Material hydroCracked,
                                       Material steamCracked) {
         CRACKING_RECIPES.recipeBuilder("severely_hydro_crack_" + raw.getName())
                 .circuitMeta(2)

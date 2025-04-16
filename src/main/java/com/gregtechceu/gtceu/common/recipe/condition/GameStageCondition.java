@@ -9,10 +9,8 @@ import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 
 import com.mojang.serialization.MapCodec;
 import net.darkhax.gamestages.data.GameStageSaveHandler;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
@@ -75,13 +73,6 @@ public class GameStageCondition extends RecipeCondition {
         var obj = super.serialize();
         obj.addProperty("stageName", stageName);
         return obj;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        stageName = GsonHelper.getAsString(config, "stageName");
-        return this;
     }
 
     @Override

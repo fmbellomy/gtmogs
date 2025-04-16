@@ -13,13 +13,10 @@ import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class CleanroomCondition extends RecipeCondition {
+public class CleanroomCondition extends RecipeCondition<CleanroomCondition> {
 
     public static final MapCodec<CleanroomCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -45,7 +42,7 @@ public class CleanroomCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<CleanroomCondition> getType() {
         return GTRecipeConditions.CLEANROOM;
     }
 
@@ -76,13 +73,6 @@ public class CleanroomCondition extends RecipeCondition {
         JsonObject value = super.serialize();
         value.addProperty("cleanroom", cleanroom.name());
         return value;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        this.cleanroom = CleanroomType.getByNameOrDefault(GsonHelper.getAsString(config, "cleanroom", "cleanroom"));
-        return this;
     }
 
     @Override

@@ -16,7 +16,7 @@ import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -120,7 +120,7 @@ public final class ResearchManager {
      * @param builder the builder to retrieve recipe info from
      */
     public static void createDefaultResearchRecipe(@NotNull GTRecipeBuilder builder,
-                                                   Consumer<FinishedRecipe> provider) {
+                                                   RecipeOutput provider) {
         if (!ConfigHolder.INSTANCE.machines.enableResearch) return;
 
         for (GTRecipeBuilder.ResearchRecipeEntry entry : builder.researchRecipeEntries()) {

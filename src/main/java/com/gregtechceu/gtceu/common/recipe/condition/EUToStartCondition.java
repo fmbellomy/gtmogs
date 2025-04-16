@@ -8,10 +8,8 @@ import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
@@ -19,13 +17,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author Screret
- * @date 2023/6/16
- * @implNote EUToStartCondition
- */
 @NoArgsConstructor
-public class EUToStartCondition extends RecipeCondition {
+public class EUToStartCondition extends RecipeCondition<EUToStartCondition> {
 
     public static final MapCodec<EUToStartCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -45,7 +38,7 @@ public class EUToStartCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<EUToStartCondition> getType() {
         return GTRecipeConditions.EU_TO_START;
     }
 
@@ -71,13 +64,6 @@ public class EUToStartCondition extends RecipeCondition {
         JsonObject config = super.serialize();
         config.addProperty("euToStart", euToStart);
         return config;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        euToStart = GsonHelper.getAsLong(config, "euToStart", 0);
-        return this;
     }
 
     @Override

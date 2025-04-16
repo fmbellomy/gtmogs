@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.common.recipe.builder;
 
 import com.gregtechceu.gtceu.api.recipe.kind.ShapedFluidContainerRecipe;
 
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
@@ -16,7 +16,7 @@ public class ShapedFluidContainerRecipeBuilder extends ShapedRecipeBuilder {
         super(id);
     }
 
-    public void save(Consumer<FinishedRecipe> consumer) {
+    public void save(RecipeOutput consumer) {
         consumer.accept(new FinishedRecipe() {
 
             @Override

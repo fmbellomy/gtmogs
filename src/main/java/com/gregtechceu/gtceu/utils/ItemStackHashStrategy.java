@@ -28,7 +28,7 @@ public interface ItemStackHashStrategy extends Hash.Strategy<ItemStack> {
     static ItemStackHashStrategy comparingAll() {
         return builder().compareItem(true)
                 .compareCount(true)
-                .compareTag(true)
+                .compareComponents(true)
                 .build();
     }
 
@@ -40,7 +40,7 @@ public interface ItemStackHashStrategy extends Hash.Strategy<ItemStack> {
      */
     static ItemStackHashStrategy comparingAllButCount() {
         return builder().compareItem(true)
-                .compareTag(true)
+                .compareComponents(true)
                 .build();
     }
 
@@ -84,7 +84,7 @@ public interface ItemStackHashStrategy extends Hash.Strategy<ItemStack> {
          * @param choice {@code true} to consider this property, {@code false} to ignore it.
          * @return {@code this}
          */
-        public ItemStackHashStrategyBuilder compareTag(boolean choice) {
+        public ItemStackHashStrategyBuilder compareComponents(boolean choice) {
             tag = choice;
             return this;
         }
@@ -100,7 +100,7 @@ public interface ItemStackHashStrategy extends Hash.Strategy<ItemStack> {
                     return o == null || o.isEmpty() ? 0 : Objects.hash(
                             item ? o.getItem() : null,
                             count ? o.getCount() : null,
-                            tag ? o.getTag() : null);
+                            tag ? o.getComponents() : null);
                 }
 
                 @Override
@@ -110,7 +110,7 @@ public interface ItemStackHashStrategy extends Hash.Strategy<ItemStack> {
 
                     return (!item || a.getItem() == b.getItem()) &&
                             (!count || a.getCount() == b.getCount()) &&
-                            (!tag || Objects.equals(a.getTag(), b.getTag()));
+                            (!tag || Objects.equals(a.getComponents(), b.getComponents()));
                 }
             };
         }

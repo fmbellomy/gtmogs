@@ -2,6 +2,8 @@ package com.gregtechceu.gtceu.utils.codec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
 
 import java.util.function.Function;
 
@@ -18,5 +20,9 @@ public class CodecUtils {
                                 ? DataResult.success(value)
                                 : DataResult.error(() -> errorMessage.apply(value))
                 );
+    }
+
+    public static <T, A> DataResult<A> encodeMap(T value, MapCodec<T> codec, DynamicOps<A> ops) {
+        return codec.encode(value, ops, ops.mapBuilder()).build(ops.empty());
     }
 }

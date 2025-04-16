@@ -7,10 +7,8 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.GsonHelper;
 
 import com.google.gson.JsonObject;
 import com.mojang.datafixers.Products;
@@ -22,16 +20,15 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
 @Accessors(chain = true)
-public abstract class RecipeCondition {
+public abstract class RecipeCondition<T extends RecipeCondition<T>> {
 
-    public static final Codec<RecipeCondition> CODEC = GTRegistries.RECIPE_CONDITIONS.codec()
+    public static final Codec<RecipeCondition<?>> CODEC = GTRegistries.RECIPE_CONDITIONS.codec()
             .dispatch(RecipeCondition::getType, RecipeConditionType::getCodec);
-
-    public static <
-            RC extends RecipeCondition> Products.P1<RecordCodecBuilder.Mu<RC>, Boolean> isReverse(RecordCodecBuilder.Instance<RC> instance) {
+    // spotless:off
+    public static <RC extends RecipeCondition<?>> Products.P1<RecordCodecBuilder.Mu<RC>, Boolean> isReverse(RecordCodecBuilder.Instance<RC> instance) {
         return instance.group(Codec.BOOL.optionalFieldOf("reverse", false).forGetter(val -> val.isReverse));
     }
-
+    // spotless:on
     @Getter
     @Setter
     protected boolean isReverse;
@@ -44,7 +41,7 @@ public abstract class RecipeCondition {
         this.isReverse = isReverse;
     }
 
-    public abstract RecipeConditionType<?> getType();
+    public abstract RecipeConditionType<T> getType();
 
     public String getTranslationKey() {
         return "gtceu.recipe.condition." + getType();
@@ -72,7 +69,7 @@ public abstract class RecipeCondition {
 
     protected abstract boolean testCondition(@NotNull GTRecipe recipe, @NotNull RecipeLogic recipeLogic);
 
-    public abstract RecipeCondition createTemplate();
+    public abstract RecipeCondition<T> createTemplate();
 
     @NotNull
     public JsonObject serialize() {
@@ -81,11 +78,6 @@ public abstract class RecipeCondition {
             jsonObject.addProperty("reverse", true);
         }
         return jsonObject;
-    }
-
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        isReverse = GsonHelper.getAsBoolean(config, "reverse", false);
-        return this;
     }
 
     public void toNetwork(RegistryFriendlyByteBuf buf) {

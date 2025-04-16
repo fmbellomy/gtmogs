@@ -9,24 +9,20 @@ import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
 import com.mojang.serialization.MapCodec;
-import lombok.val;
 import net.minecraft.core.Holder;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
 import com.google.gson.JsonObject;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class BiomeCondition extends RecipeCondition {
+public class BiomeCondition extends RecipeCondition<BiomeCondition> {
 
     public static final MapCodec<BiomeCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -46,7 +42,7 @@ public class BiomeCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<BiomeCondition> getType() {
         return GTRecipeConditions.BIOME;
     }
 
@@ -84,14 +80,6 @@ public class BiomeCondition extends RecipeCondition {
         JsonObject config = super.serialize();
         config.addProperty("biome", biome.toString());
         return config;
-    }
-
-    @Override
-    public RecipeCondition deserialize(@NotNull JsonObject config) {
-        super.deserialize(config);
-        biome = ResourceLocation.parse(
-                GsonHelper.getAsString(config, "biome", "dummy"));
-        return this;
     }
 
     @Override
