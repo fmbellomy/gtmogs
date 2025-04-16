@@ -1,19 +1,19 @@
 package com.gregtechceu.gtceu.common.network.packets.prospecting;
 
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Collection;
+import java.util.function.Function;
 
-public abstract class SPacketProspect<T> implements IPacket {
+public abstract class SPacketProspect<T> implements CustomPacketPayload {
 
     protected final Table<ResourceKey<Level>, BlockPos, T> data;
 
@@ -52,9 +52,6 @@ public abstract class SPacketProspect<T> implements IPacket {
 
     public abstract void encodeData(FriendlyByteBuf buf, T data);
 
-    public abstract T decodeData(FriendlyByteBuf buf);
-
-    @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeInt(data.rowKeySet().size());
         data.rowMap().forEach((key, entry) -> {
@@ -67,20 +64,23 @@ public abstract class SPacketProspect<T> implements IPacket {
         });
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
+    public static <T, V extends SPacketProspect<T>> V decode(FriendlyByteBuf buf,
+                                                             Function<FriendlyByteBuf, T> decodeFunction,
+                                                             Function<Table<ResourceKey<Level>, BlockPos, T>, V> createFunction) {
+        Table<ResourceKey<Level>, BlockPos, T> data = HashBasedTable.create();
+
         var rowCount = buf.readInt();
         for (int i = 0; i < rowCount; i++) {
             var rowKey = buf.readResourceKey(Registries.DIMENSION);
             var entryCount = buf.readInt();
             for (int j = 0; j < entryCount; j++) {
                 var blockPos = buf.readBlockPos();
-                var t = decodeData(buf);
+                var t = decodeFunction.apply(buf);
                 data.put(rowKey, blockPos, t);
             }
         }
+        return createFunction.apply(data);
     }
 
-    @Override
-    public abstract void execute(IHandlerContext handler);
+    public abstract void execute(IPayloadContext handler);
 }

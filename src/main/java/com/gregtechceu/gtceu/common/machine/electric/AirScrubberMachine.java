@@ -26,6 +26,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import it.unimi.dsi.fastutil.objects.Object2FloatMap;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import lombok.Getter;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import static com.gregtechceu.gtceu.api.GTValues.LV;
@@ -126,8 +127,8 @@ public class AirScrubberMachine extends SimpleTieredMachine implements IEnvironm
                     zone.removeStrength(toClean);
                     if (zone.strength() <= 0) {
                         if (serverLevel.hasChunk(chunkPos.x, chunkPos.z)) {
-                            LevelChunk chunk = serverLevel.getChunk(chunkPos.x, chunkPos.z);
-                            GTNetwork.NETWORK.sendToTrackingChunk(new SPacketRemoveHazardZone(chunkPos), chunk);
+                            PacketDistributor.sendToPlayersTrackingChunk(serverLevel, chunkPos,
+                                    new SPacketRemoveHazardZone(chunkPos));
                         }
                         return null;
                     } else return zone;

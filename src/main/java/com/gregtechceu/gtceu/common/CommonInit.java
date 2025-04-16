@@ -102,7 +102,6 @@ public class CommonInit {
         modBus.register(CommonInit.class);
 
         GTCEu.LOGGER.info("GTCEu common proxy init!");
-        GTNetwork.init();
         UIFactory.register(MachineUIFactory.INSTANCE);
         UIFactory.register(CoverUIFactory.INSTANCE);
         UIFactory.register(GTUIEditorFactory.INSTANCE);

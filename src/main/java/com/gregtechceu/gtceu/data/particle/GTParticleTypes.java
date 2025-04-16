@@ -7,9 +7,12 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.jetbrains.annotations.NotNull;
 
 public class GTParticleTypes {
 
@@ -17,11 +20,16 @@ public class GTParticleTypes {
             .create(Registries.PARTICLE_TYPE, GTCEu.MOD_ID);
 
     public static final DeferredHolder<ParticleType<?>, ParticleType<HazardParticleOptions>> HAZARD_PARTICLE = PARTICLE_TYPES
-            .register("hazard", () -> new ParticleType<>(false, HazardParticleOptions.DESERIALIZER) {
+            .register("hazard", () -> new ParticleType<>(false) {
 
                 @Override
-                public MapCodec<HazardParticleOptions> codec() {
+                public @NotNull MapCodec<HazardParticleOptions> codec() {
                     return HazardParticleOptions.CODEC;
+                }
+
+                @Override
+                public @NotNull StreamCodec<FriendlyByteBuf, HazardParticleOptions> streamCodec() {
+                    return HazardParticleOptions.STREAM_CODEC;
                 }
             });
     public static final DeferredHolder<ParticleType<?>, SimpleParticleType> MUFFLER_PARTICLE = PARTICLE_TYPES

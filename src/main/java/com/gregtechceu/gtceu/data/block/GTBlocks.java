@@ -1036,7 +1036,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<WallSignBlock> TREATED_WOOD_WALL_SIGN = REGISTRATE
-            .block("treated_wood_wall_sign", (p) -> new WallSignBlock(p, TREATED_WOOD_TYPE))
+            .block("treated_wood_wall_sign", (p) -> new WallSignBlock(TREATED_WOOD_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_WALL_SIGN)
             .lang("Treated Wood Wall Sign")
             .setData(ProviderType.BLOCKSTATE, NonNullBiConsumer.noop())
@@ -1061,7 +1061,7 @@ public class GTBlocks {
             .build()
             .register();
     public static final BlockEntry<WallHangingSignBlock> TREATED_WOOD_WALL_HANGING_SIGN = REGISTRATE
-            .block("treated_wood_wall_hanging_sign", (p) -> new WallHangingSignBlock(p, TREATED_WOOD_TYPE))
+            .block("treated_wood_wall_hanging_sign", (p) -> new WallHangingSignBlock(TREATED_WOOD_TYPE, p))
             .initialProperties(() -> Blocks.SPRUCE_WALL_HANGING_SIGN)
             .lang("Treated Wood Wall Hanging Sign")
             .blockstate((ctx, prov) -> {

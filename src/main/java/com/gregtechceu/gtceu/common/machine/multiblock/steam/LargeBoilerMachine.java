@@ -35,6 +35,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluids;
 
 import lombok.Getter;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
@@ -110,41 +111,41 @@ public class LargeBoilerMachine extends WorkableMultiblockMachine implements IEx
             // drain water
             var maxDrain = currentTemperature * throttle * TICKS_PER_STEAM_GENERATION /
                     (ConfigHolder.INSTANCE.machines.largeBoilers.steamPerWater * 100);
-            var drainWater = List.of(FluidIngredient.of(maxDrain, Fluids.WATER));
+            var drainWater = List.of(SizedFluidIngredient.of(Fluids.WATER, maxDrain));
             List<IRecipeHandler<?>> inputTanks = new ArrayList<>();
             inputTanks.addAll(getCapabilitiesFlat(IO.IN, FluidRecipeCapability.CAP));
             inputTanks.addAll(getCapabilitiesFlat(IO.BOTH, FluidRecipeCapability.CAP));
             if (currentTemperature < 100) {
                 steamGenerated = 0;
                 for (IRecipeHandler<?> tank : inputTanks) {
-                    drainWater = (List<FluidIngredient>) tank.handleRecipe(IO.IN, null, drainWater, true);
+                    drainWater = (List<SizedFluidIngredient>) tank.handleRecipe(IO.IN, null, drainWater, true);
                     this.hasNoWater = !(drainWater == null || drainWater.isEmpty() ||
-                            drainWater.get(0).getAmount() > 0);
+                            drainWater.getFirst().amount() > 0);
                     if (!this.hasNoWater) {
                         break;
                     }
                 }
             } else {
                 for (IRecipeHandler<?> tank : inputTanks) {
-                    drainWater = (List<FluidIngredient>) tank.handleRecipe(IO.IN, null, drainWater, false);
+                    drainWater = (List<SizedFluidIngredient>) tank.handleRecipe(IO.IN, null, drainWater, false);
                     if (drainWater == null || drainWater.isEmpty()) {
                         break;
                     }
                 }
                 var drained = (drainWater == null || drainWater.isEmpty()) ? maxDrain :
-                        maxDrain - drainWater.get(0).getAmount();
+                        maxDrain - drainWater.getFirst().amount();
 
                 boolean hasDrainedWater = drained > 0;
                 steamGenerated = drained * ConfigHolder.INSTANCE.machines.largeBoilers.steamPerWater;
 
                 if (hasDrainedWater) {
                     // fill steam
-                    var fillSteam = List.of(FluidIngredient.of(GTMaterials.Steam.getFluid(steamGenerated)));
+                    var fillSteam = List.of(SizedFluidIngredient.of(GTMaterials.Steam.getFluid(steamGenerated)));
                     List<IRecipeHandler<?>> outputTanks = new ArrayList<>();
                     outputTanks.addAll(getCapabilitiesFlat(IO.OUT, FluidRecipeCapability.CAP));
                     outputTanks.addAll(getCapabilitiesFlat(IO.BOTH, FluidRecipeCapability.CAP));
                     for (IRecipeHandler<?> tank : outputTanks) {
-                        fillSteam = (List<FluidIngredient>) tank.handleRecipe(IO.OUT, null, fillSteam, false);
+                        fillSteam = (List<SizedFluidIngredient>) tank.handleRecipe(IO.OUT, null, fillSteam, false);
                         if (fillSteam == null) break;
                     }
                 }

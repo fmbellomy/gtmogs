@@ -1,32 +1,49 @@
 package com.gregtechceu.gtceu.common.network.packets;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 
 import com.lowdragmc.lowdraglib.networking.IHandlerContext;
 import com.lowdragmc.lowdraglib.networking.IPacket;
 
+import lombok.AllArgsConstructor;
 import net.minecraft.network.FriendlyByteBuf;
 
 import lombok.NoArgsConstructor;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class SPacketSendWorldID implements IPacket {
+@AllArgsConstructor
+public class SPacketSendWorldID implements CustomPacketPayload {
+
+    public static final ResourceLocation ID = GTCEu.id("send_world_id");
+    public static final Type<SPacketSendWorldID> TYPE = new Type<>(ID);
+    public static final StreamCodec<FriendlyByteBuf, SPacketSendWorldID> CODEC = StreamCodec
+            .ofMember(SPacketSendWorldID::encode, SPacketSendWorldID::decode);
 
     private String worldId;
 
-    @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeUtf(WorldIDSaveData.getWorldID());
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
-        this.worldId = buf.readUtf();
+    public static SPacketSendWorldID decode(FriendlyByteBuf buf) {
+        String worldId = buf.readUtf();
+        return new SPacketSendWorldID(worldId);
+    }
+
+    public void execute(IPayloadContext context) {
+        ClientCacheManager.init(worldId);
     }
 
     @Override
-    public void execute(IHandlerContext handler) {
-        ClientCacheManager.init(worldId);
+    public @NotNull Type<SPacketSendWorldID> type() {
+        return TYPE;
     }
+
 }

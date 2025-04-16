@@ -16,13 +16,14 @@ import com.gregtechceu.gtceu.core.mixins.PotionBrewingAccessor;
 
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.common.brewing.BrewingRecipe;
@@ -53,8 +54,8 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
     private static final Function<Fluid, TagKey<Fluid>> FLUID_TAGS = Util
             .memoize(fluid -> TagUtil.createFluidTag(BuiltInRegistries.FLUID.getKey(fluid).getPath()));
     private static final Function<PotionBrewing.Mix<Potion>, FluidStack> MIX_INPUTS = Util
-            .memoize(mix -> PotionFluidHelper.getFluidFromPotion(mix.from.get(), PotionFluidHelper.MB_PER_RECIPE));
-    private static final Function<BrewingRecipe, FluidIngredient> BREW_INGREDIENTS = Util.memoize(
+            .memoize(mix -> PotionFluidHelper.getFluidFromPotion(mix.from(), PotionFluidHelper.MB_PER_RECIPE));
+    private static final Function<BrewingRecipe, SizedFluidIngredient> BREW_INGREDIENTS = Util.memoize(
             brew -> PotionFluidHelper.getPotionFluidIngredientFrom(brew.getInput(), PotionFluidHelper.MB_PER_RECIPE));
 
     @Override
@@ -85,9 +86,9 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
             if (!collect(handlerList, itemStacks, fluidStacks)) continue;
 
             for (var itemStack : itemStacks) {
-                for (PotionBrewing.Mix<Potion> mix : PotionBrewingAccessor.getPotionMixes()) {
+                for (PotionBrewing.Mix<Potion> mix : ((PotionBrewingAccessor) getPotionBrewing()).getPotionMixes()) {
                     // test item ingredient first
-                    if (!mix.ingredient.test(itemStack)) {
+                    if (!mix.ingredient().test(itemStack)) {
                         continue;
                     }
                     FluidStack fromFluid = MIX_INPUTS.apply(mix);
@@ -99,11 +100,11 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     }
                 }
 
-                for (IBrewingRecipe recipe : BrewingRecipeRegistry.getRecipes()) {
+                for (IBrewingRecipe recipe : getPotionBrewing().getRecipes()) {
                     if (!(recipe instanceof BrewingRecipe brew) || !brew.isIngredient(itemStack)) {
                         continue;
                     }
-                    FluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
+                    SizedFluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
 
                     for (var fluidStack : fluidStacks) {
                         if (fromFluid.test(fluidStack)) {
@@ -124,11 +125,11 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
         ReferenceOpenHashSet<PotionBrewing.Mix<Potion>> mixesWithIngredient = new ReferenceOpenHashSet<>();
         ReferenceOpenHashSet<BrewingRecipe> brewsWithIngredient = new ReferenceOpenHashSet<>();
         Reference2ObjectOpenHashMap<PotionBrewing.Mix<Potion>, FluidStack> mixesWithInput = new Reference2ObjectOpenHashMap<>();
-        Reference2ObjectOpenHashMap<BrewingRecipe, FluidIngredient> brewsWithInput = new Reference2ObjectOpenHashMap<>();
+        Reference2ObjectOpenHashMap<BrewingRecipe, SizedFluidIngredient> brewsWithInput = new Reference2ObjectOpenHashMap<>();
 
-        for (PotionBrewing.Mix<Potion> mix : PotionBrewingAccessor.getPotionMixes()) {
+        for (PotionBrewing.Mix<Potion> mix : ((PotionBrewingAccessor) getPotionBrewing()).getPotionMixes()) {
             for (var itemStack : itemStacks) {
-                if (mix.ingredient.test(itemStack)) {
+                if (mix.ingredient().test(itemStack)) {
                     mixesWithIngredient.add(mix);
                     break;
                 }
@@ -147,7 +148,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
             }
         }
 
-        for (IBrewingRecipe recipe : BrewingRecipeRegistry.getRecipes()) {
+        for (IBrewingRecipe recipe : getPotionBrewing().getRecipes()) {
             if (!(recipe instanceof BrewingRecipe brew)) continue;
             for (var itemStack : itemStacks) {
                 if (brew.isIngredient(itemStack)) {
@@ -157,7 +158,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
             }
 
             for (var fluidStack : fluidStacks) {
-                FluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
+                SizedFluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
                 if (fromFluid.test(fluidStack)) {
                     if (brewsWithIngredient.contains(brew)) {
                         return forgePotionRecipe(brew, fromFluid);
@@ -185,7 +186,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     for (var entry : mixesWithInput.reference2ObjectEntrySet()) {
                         var mix = entry.getKey();
                         var fluid = entry.getValue();
-                        if (mix.ingredient.test(itemStack)) return vanillaPotionRecipe(mix, fluid);
+                        if (mix.ingredient().test(itemStack)) return vanillaPotionRecipe(mix, fluid);
                     }
 
                     for (var entry : brewsWithInput.reference2ObjectEntrySet()) {
@@ -206,7 +207,7 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     }
 
                     for (var brew : brewsWithIngredient) {
-                        FluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
+                        SizedFluidIngredient fromFluid = BREW_INGREDIENTS.apply(brew);
                         if (fromFluid.test(fluidStack)) {
                             return forgePotionRecipe(brew, fromFluid);
                         }
@@ -221,16 +222,16 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
     private static boolean testMixFluid(FluidStack fluidStack, FluidStack fromFluid) {
         var fromTag = FLUID_TAGS.apply(fromFluid.getFluid());
         return (fluidStack.getFluid() == fromFluid.getFluid() || fluidStack.getFluid().is(fromTag)) &&
-                Objects.equals(fromFluid.getTag(), fluidStack.getTag());
+                Objects.equals(fromFluid.getComponents(), fluidStack.getComponents());
     }
 
-    private static @NotNull GTRecipe forgePotionRecipe(BrewingRecipe brew, FluidIngredient fromFluid) {
+    private static @NotNull GTRecipe forgePotionRecipe(BrewingRecipe brew, SizedFluidIngredient fromFluid) {
         FluidStack toFluid = PotionFluidHelper.getFluidFromPotionItem(brew.getOutput(),
                 PotionFluidHelper.MB_PER_RECIPE);
         String name;
-        Potion output = PotionUtils.getPotion(brew.getOutput());
-        if (output != Potions.EMPTY) {
-            name = output.getName("");
+        PotionContents output = brew.getOutput().get(DataComponents.POTION_CONTENTS);
+        if (output != PotionContents.EMPTY) {
+            name = Potion.getName(output.potion(), "");
         } else {
             name = toFluid.getFluid().builtInRegistryHolder().key().location().getPath();
         }
@@ -245,9 +246,9 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
     }
 
     private static @NotNull GTRecipe vanillaPotionRecipe(PotionBrewing.Mix<Potion> mix, FluidStack fromFluid) {
-        FluidStack toFluid = PotionFluidHelper.getFluidFromPotion(mix.to.get(), PotionFluidHelper.MB_PER_RECIPE);
-        return GTRecipeTypes.BREWING_RECIPES.recipeBuilder("potion_vanilla_" + mix.to.get().getName(""))
-                .inputItems(mix.ingredient)
+        FluidStack toFluid = PotionFluidHelper.getFluidFromPotion(mix.to(), PotionFluidHelper.MB_PER_RECIPE);
+        return GTRecipeTypes.BREWING_RECIPES.recipeBuilder("potion_vanilla_" + Potion.getName(Optional.of(mix.to()), ""))
+                .inputItems(mix.ingredient())
                 .inputFluids(fromFluid)
                 .outputFluids(toFluid)
                 .duration(400)
@@ -317,9 +318,9 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     PotionFluidHelper.MB_PER_RECIPE);
 
             String name = toFluid.getFluid().builtInRegistryHolder().key().location().getPath();
-            Potion output = impl.getOutput().get(DataComponents.POTION_CONTENTS).potion();
-            if (output != null) {
-                name = output.getName("");
+            Optional<Holder<Potion>> output = impl.getOutput().get(DataComponents.POTION_CONTENTS).potion();
+            if (output.isPresent()) {
+                name = Potion.getName(output, "");
             }
 
             GTRecipe recipe = GTRecipeTypes.BREWING_RECIPES.recipeBuilder("potion_forge_" + name + "_" + index++)

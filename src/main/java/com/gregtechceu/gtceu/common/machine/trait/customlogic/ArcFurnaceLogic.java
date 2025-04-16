@@ -15,6 +15,7 @@ import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.item.behavior.TurbineRotorBehaviour;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -99,7 +100,7 @@ public enum ArcFurnaceLogic implements GTRecipeType.ICustomRecipeLogic {
     @Override
     public void buildRepresentativeRecipes() {
         ItemStack stack = GTItems.TURBINE_ROTOR.asStack();
-        stack.setHoverName(Component.translatable("gtceu.auto_decomp.rotor"));
+        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.auto_decomp.rotor"));
         GTRecipe rotorRecipe;
         GTRecipe pickaxeRecipe;
         float durability = 0.69f;
@@ -115,7 +116,7 @@ public enum ArcFurnaceLogic implements GTRecipeType.ICustomRecipeLogic {
 
         // noinspection DataFlowIssue
         stack = GTMaterialItems.TOOL_ITEMS.get(GTMaterials.Iron, GTToolType.PICKAXE).asStack();
-        stack.setHoverName(Component.translatable("gtceu.auto_decomp.tool"));
+        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.auto_decomp.tool"));
         stack.setDamageValue(79);
         pickaxeRecipe = applyDurabilityRecipe("tool_decomp", stack, GTMaterials.Iron,
                 (float) (GTToolType.PICKAXE.materialAmount / GTValues.M), durability,

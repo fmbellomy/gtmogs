@@ -121,7 +121,7 @@ public class FluidDrillMachine extends WorkableElectricMultiblockMachine impleme
         return 1;
     }
 
-    public static Block getCasingState(int tier) {
+    public static net.minecraft.world.level.block.Block getCasingState(int tier) {
         if (tier == GTValues.MV)
             return GTBlocks.CASING_STEEL_SOLID.get();
         if (tier == GTValues.HV)
@@ -132,7 +132,7 @@ public class FluidDrillMachine extends WorkableElectricMultiblockMachine impleme
     }
 
     @SuppressWarnings("DataFlowIssue")
-    public static Block getFrameState(int tier) {
+    public static net.minecraft.world.level.block.Block getFrameState(int tier) {
         if (tier == GTValues.MV)
             return GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, GTMaterials.Steel).get();
         if (tier == GTValues.HV)

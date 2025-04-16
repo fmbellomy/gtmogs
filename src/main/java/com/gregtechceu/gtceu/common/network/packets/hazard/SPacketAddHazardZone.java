@@ -1,40 +1,47 @@
 package com.gregtechceu.gtceu.common.network.packets.hazard;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.client.EnvironmentalHazardClientHandler;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
-
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-@NoArgsConstructor
 @AllArgsConstructor
-public class SPacketAddHazardZone implements IPacket {
+public class SPacketAddHazardZone implements CustomPacketPayload {
+
+    public static final ResourceLocation ID = GTCEu.id("add_hazard_zone");
+    public static final Type<SPacketAddHazardZone> TYPE = new Type<>(ID);
+    public static final StreamCodec<FriendlyByteBuf, SPacketAddHazardZone> CODEC = StreamCodec
+            .ofMember(SPacketAddHazardZone::encode, SPacketAddHazardZone::decode);
 
     private ChunkPos pos;
     private EnvironmentalHazardSavedData.HazardZone zone;
 
-    @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeChunkPos(pos);
         zone.toNetwork(buf);
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
-        pos = buf.readChunkPos();
-        zone = EnvironmentalHazardSavedData.HazardZone.fromNetwork(buf);
+    public static SPacketAddHazardZone decode(FriendlyByteBuf buf) {
+        ChunkPos pos = buf.readChunkPos();
+        var zone = EnvironmentalHazardSavedData.HazardZone.fromNetwork(buf);
+        return new SPacketAddHazardZone(pos, zone);
+    }
+
+    public void execute(IPayloadContext handler) {
+        EnvironmentalHazardClientHandler.INSTANCE.addHazardZone(this.pos, this.zone);
     }
 
     @Override
-    public void execute(IHandlerContext handler) {
-        if (handler.isClient()) {
-            EnvironmentalHazardClientHandler.INSTANCE.addHazardZone(pos, zone);
-        }
+    public @NotNull Type<SPacketAddHazardZone> type() {
+        return TYPE;
     }
 }

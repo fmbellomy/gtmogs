@@ -19,7 +19,6 @@ import com.gregtechceu.gtceu.api.recipe.ActionResult;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
@@ -27,8 +26,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class ResearchStationMachine extends WorkableElectricMultiblockMachine
                                     implements IOpticalComputationReceiver, IDisplayUIMachine {

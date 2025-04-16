@@ -160,7 +160,7 @@ public class FluidHatchPartMachine extends TieredIOPartMachine implements IMachi
     //////////////////////////////////////
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateTankSubscription();
     }
@@ -266,9 +266,9 @@ public class FluidHatchPartMachine extends TieredIOPartMachine implements IMachi
     private Component getFluidNameText(TankWidget tankWidget) {
         Component translation;
         if (!tank.getFluidInTank(tankWidget.getTank()).isEmpty()) {
-            translation = tank.getFluidInTank(tankWidget.getTank()).getDisplayName();
+            translation = tank.getFluidInTank(tankWidget.getTank()).getHoverName();
         } else {
-            translation = this.tank.getLockedFluid().getFluid().getDisplayName();
+            translation = this.tank.getLockedFluid().getFluid().getHoverName();
         }
         return translation;
     }

@@ -16,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import lombok.Getter;
@@ -120,8 +121,8 @@ public class TransformerMachine extends TieredEnergyMachine implements IControll
     }
 
     @Override
-    protected InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                   BlockHitResult hitResult) {
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                       BlockHitResult hitResult) {
         if (!isRemote()) {
             setTransformUp(!isTransformUp());
             playerIn.sendSystemMessage(Component.translatable(
@@ -130,6 +131,6 @@ public class TransformerMachine extends TieredEnergyMachine implements IControll
                     energyContainer.getInputVoltage(), energyContainer.getInputAmperage(),
                     energyContainer.getOutputVoltage(), energyContainer.getOutputAmperage()));
         }
-        return InteractionResult.CONSUME;
+        return ItemInteractionResult.CONSUME;
     }
 }

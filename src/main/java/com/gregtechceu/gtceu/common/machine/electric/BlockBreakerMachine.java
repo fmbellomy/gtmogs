@@ -42,6 +42,7 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
@@ -181,7 +182,7 @@ public class BlockBreakerMachine extends TieredEnergyMachine
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateBreakerSubscription();
         updateAutoOutputSubscription();
@@ -217,9 +218,10 @@ public class BlockBreakerMachine extends TieredEnergyMachine
                         var remainder = tryFillCache(drop);
                         if (!remainder.isEmpty()) {
                             if (getOutputFacingItems() == null) {
-                                Block.popResource(getLevel(), getPos(), remainder);
+                                net.minecraft.world.level.block.Block.popResource(getLevel(), getPos(), remainder);
                             } else {
-                                Block.popResource(getLevel(), getPos().relative(getOutputFacingItems()), remainder);
+                                net.minecraft.world.level.block.Block.popResource(getLevel(),
+                                        getPos().relative(getOutputFacingItems()), remainder);
                             }
                         }
                     }
@@ -256,8 +258,8 @@ public class BlockBreakerMachine extends TieredEnergyMachine
     }
 
     private List<ItemStack> tryDestroyBlockAndGetDrops(BlockPos pos) {
-        List<ItemStack> drops = Block.getDrops(getLevel().getBlockState(pos), (ServerLevel) getLevel(), pos, null, null,
-                ItemStack.EMPTY);
+        List<ItemStack> drops = net.minecraft.world.level.block.Block.getDrops(getLevel().getBlockState(pos),
+                (ServerLevel) getLevel(), pos, null, null, ItemStack.EMPTY);
         getLevel().destroyBlock(pos, false);
         return drops;
     }
@@ -458,12 +460,14 @@ public class BlockBreakerMachine extends TieredEnergyMachine
     // ******* Interactions ********//
     //////////////////////////////////////
     @Override
-    protected InteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                              BlockHitResult hitResult) {
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                  BlockHitResult hitResult) {
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
             var tool = playerIn.getItemInHand(hand);
-            if (tool.getDamageValue() >= tool.getMaxDamage()) return InteractionResult.PASS;
-            if (hasFrontFacing() && gridSide == getFrontFacing()) return InteractionResult.PASS;
+            if (tool.getDamageValue() >= tool.getMaxDamage())
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (hasFrontFacing() && gridSide == getFrontFacing())
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
             // important not to use getters here, which have different logic
             Direction itemFacing = this.outputFacingItems;
@@ -476,14 +480,14 @@ public class BlockBreakerMachine extends TieredEnergyMachine
                 setOutputFacingItems(null);
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
 
         return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
     }
 
     @Override
-    protected InteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                   BlockHitResult hitResult) {
         var controllable = GTCapabilityHelper.getControllable(getLevel(), getPos(), gridSide);
         if (controllable != null) {
@@ -492,8 +496,8 @@ public class BlockBreakerMachine extends TieredEnergyMachine
                 playerIn.sendSystemMessage(Component.translatable(controllable.isWorkingEnabled() ?
                         "behaviour.soft_hammer.enabled" : "behaviour.soft_hammer.disabled"));
             }
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 }

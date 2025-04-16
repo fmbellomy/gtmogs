@@ -1,37 +1,43 @@
 package com.gregtechceu.gtceu.common.network;
 
-import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.common.network.packets.*;
-import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketAddHazardZone;
-import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketRemoveHazardZone;
-import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketSyncHazardZoneStrength;
-import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketSyncLevelHazards;
+import com.gregtechceu.gtceu.common.network.packets.hazard.*;
+
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectBedrockFluid;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectBedrockOre;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectOre;
-
-import com.lowdragmc.lowdraglib.networking.INetworking;
-import com.lowdragmc.lowdraglib.networking.forge.LDLNetworkingImpl;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class GTNetwork {
 
-    public static final INetworking NETWORK = LDLNetworkingImpl.createNetworking(GTCEu.id("network"), "0.0.1");
+    public static void registerPayloads(RegisterPayloadHandlersEvent event) {
+        PayloadRegistrar registar = event.registrar(GTCEuAPI.NETWORK_VERSION);
 
-    public static void init() {
-        NETWORK.registerC2S(CPacketKeysPressed.class);
-        NETWORK.registerS2C(SPacketSyncOreVeins.class);
-        NETWORK.registerS2C(SPacketSyncFluidVeins.class);
-        NETWORK.registerS2C(SPacketSyncBedrockOreVeins.class);
+        registar.playToServer(CPacketKeysPressed.TYPE, CPacketKeysPressed.CODEC, CPacketKeysPressed::execute);
 
-        NETWORK.registerS2C(SPacketAddHazardZone.class);
-        NETWORK.registerS2C(SPacketRemoveHazardZone.class);
-        NETWORK.registerS2C(SPacketSyncHazardZoneStrength.class);
-        NETWORK.registerS2C(SPacketSyncLevelHazards.class);
-        NETWORK.registerS2C(SPacketProspectOre.class);
-        NETWORK.registerS2C(SPacketProspectBedrockFluid.class);
-        NETWORK.registerS2C(SPacketProspectBedrockOre.class);
-        NETWORK.registerS2C(SPacketSendWorldID.class);
+        registar.playToClient(SPacketSyncOreVeins.TYPE, SPacketSyncOreVeins.CODEC, SPacketSyncOreVeins::execute);
+        registar.playToClient(SPacketSyncBedrockFluidVeins.TYPE, SPacketSyncBedrockFluidVeins.CODEC,
+                SPacketSyncBedrockFluidVeins::execute);
+        registar.playToClient(SPacketSyncBedrockOreVeins.TYPE, SPacketSyncBedrockOreVeins.CODEC,
+                SPacketSyncBedrockOreVeins::execute);
 
-        NETWORK.registerBoth(SCPacketShareProspection.class);
+        registar.playToClient(SPacketAddHazardZone.TYPE, SPacketAddHazardZone.CODEC, SPacketAddHazardZone::execute);
+        registar.playToClient(SPacketRemoveHazardZone.TYPE, SPacketRemoveHazardZone.CODEC,
+                SPacketRemoveHazardZone::execute);
+        registar.playToClient(SPacketSyncHazardZoneStrength.TYPE, SPacketSyncHazardZoneStrength.CODEC,
+                SPacketSyncHazardZoneStrength::execute);
+        registar.playToClient(SPacketSyncLevelHazards.TYPE, SPacketSyncLevelHazards.CODEC,
+                SPacketSyncLevelHazards::execute);
+
+        registar.playToClient(SPacketProspectOre.TYPE, SPacketProspectOre.CODEC, SPacketProspectOre::execute);
+        registar.playToClient(SPacketProspectBedrockFluid.TYPE, SPacketProspectBedrockFluid.CODEC,
+                SPacketProspectBedrockFluid::execute);
+        registar.playToClient(SPacketProspectBedrockOre.TYPE, SPacketProspectBedrockOre.CODEC,
+                SPacketProspectBedrockOre::execute);
+        registar.playToClient(SPacketSendWorldID.TYPE, SPacketSendWorldID.CODEC, SPacketSendWorldID::execute);
+        registar.playBidirectional(SCPacketShareProspection.TYPE, SCPacketShareProspection.CODEC,
+                SCPacketShareProspection::execute);
     }
 }

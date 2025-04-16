@@ -5,24 +5,30 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.ClientInit;
 
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
-
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class SPacketSyncBedrockOreVeins implements IPacket {
+public class SPacketSyncBedrockOreVeins implements CustomPacketPayload {
+
+    public static final Type<SPacketSyncBedrockOreVeins> TYPE = new Type<>(GTCEu.id("sync_bedrock_ore_veins"));
+    public static final StreamCodec<RegistryFriendlyByteBuf, SPacketSyncBedrockOreVeins> CODEC = StreamCodec
+            .ofMember(SPacketSyncBedrockOreVeins::encode, SPacketSyncBedrockOreVeins::decode);
 
     private final Map<ResourceLocation, BedrockOreDefinition> veins;
 
@@ -30,34 +36,36 @@ public class SPacketSyncBedrockOreVeins implements IPacket {
         this.veins = new HashMap<>();
     }
 
-    @Override
-    public void encode(FriendlyByteBuf buf) {
-        RegistryOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, GTRegistries.builtinRegistry());
+    public void encode(RegistryFriendlyByteBuf buf) {
+        RegistryOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, buf.registryAccess());
         int size = veins.size();
         buf.writeVarInt(size);
         for (var entry : veins.entrySet()) {
             buf.writeResourceLocation(entry.getKey());
             CompoundTag tag = (CompoundTag) BedrockOreDefinition.FULL_CODEC.encodeStart(ops, entry.getValue())
-                    .getOrThrow(false, GTCEu.LOGGER::error);
+                    .getOrThrow();
             buf.writeNbt(tag);
         }
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
-        RegistryOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, GTRegistries.builtinRegistry());
-        Stream.generate(() -> {
+    public static SPacketSyncBedrockOreVeins decode(RegistryFriendlyByteBuf buf) {
+        RegistryOps<Tag> ops = RegistryOps.create(NbtOps.INSTANCE, buf.registryAccess());
+        var veins = Stream.generate(() -> {
             ResourceLocation id = buf.readResourceLocation();
-            CompoundTag tag = buf.readAnySizeNbt();
-            BedrockOreDefinition def = BedrockOreDefinition.FULL_CODEC.parse(ops, tag).getOrThrow(false,
-                    GTCEu.LOGGER::error);
+            CompoundTag tag = buf.readNbt();
+            BedrockOreDefinition def = BedrockOreDefinition.FULL_CODEC.parse(ops, tag).getOrThrow();
             return Map.entry(id, def);
-        }).limit(buf.readVarInt()).forEach(entry -> veins.put(entry.getKey(), entry.getValue()));
+        }).limit(buf.readVarInt()).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return new SPacketSyncBedrockOreVeins(veins);
+    }
+
+    public static void execute(SPacketSyncBedrockOreVeins packet, IPayloadContext handler) {
+        ClientInit.CLIENT_BEDROCK_ORE_VEINS.clear();
+        ClientInit.CLIENT_BEDROCK_ORE_VEINS.putAll(packet.veins);
     }
 
     @Override
-    public void execute(IHandlerContext handler) {
-        ClientInit.CLIENT_BEDROCK_ORE_VEINS.clear();
-        ClientInit.CLIENT_BEDROCK_ORE_VEINS.putAll(veins);
+    public @NotNull Type<SPacketSyncBedrockOreVeins> type() {
+        return TYPE;
     }
 }

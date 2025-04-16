@@ -82,14 +82,14 @@ public class TankValvePartMachine extends MultiblockPartMachine {
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         autoIOSubscription.updateSubscription();
     }
 
     @Nullable
     private IFluidHandler getTargetTank() {
-        return GTTransferUtils.getAdjacentFluidHandler(getLevel(), getPos(), getFrontFacing()).resolve().orElse(null);
+        return GTTransferUtils.getAdjacentFluidHandler(getLevel(), getPos(), getFrontFacing()).orElse(null);
     }
 
     private void autoIO() {

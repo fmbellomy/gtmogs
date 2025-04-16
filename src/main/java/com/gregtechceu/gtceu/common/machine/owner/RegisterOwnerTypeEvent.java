@@ -9,7 +9,7 @@ import java.util.function.Function;
 /**
  * Event to register/override the machine ownership object generator.
  * This event isn't made with addons/other mods in mind and in most cases should be avoided!!!
- * Its intended use is to enable mod-pack creators to change how the ownership system works.
+ * Its intended use is to enable modpack creators to change how the ownership system works.
  */
 public class RegisterOwnerTypeEvent extends Event implements IModBusEvent {
 

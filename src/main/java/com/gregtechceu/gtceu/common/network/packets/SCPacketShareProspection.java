@@ -1,11 +1,7 @@
 package com.gregtechceu.gtceu.common.network.packets;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
-
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -13,15 +9,27 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 
 import lombok.AllArgsConstructor;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
 @AllArgsConstructor
-public class SCPacketShareProspection implements IPacket {
+public class SCPacketShareProspection implements CustomPacketPayload {
+
+    public static final ResourceLocation ID = GTCEu.id("share_prospection");
+    public static final Type<SCPacketShareProspection> TYPE = new Type<>(ID);
+    public static final StreamCodec<FriendlyByteBuf, SCPacketShareProspection> CODEC = StreamCodec
+            .ofMember(SCPacketShareProspection::encode, SCPacketShareProspection::decode);
 
     private UUID sender;
     private UUID receiver;
@@ -34,7 +42,6 @@ public class SCPacketShareProspection implements IPacket {
 
     public SCPacketShareProspection() {}
 
-    @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeUUID(sender);
         buf.writeUUID(receiver);
@@ -46,21 +53,20 @@ public class SCPacketShareProspection implements IPacket {
         buf.writeBoolean(first);
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
-        sender = buf.readUUID();
-        receiver = buf.readUUID();
-        cacheName = buf.readUtf();
-        key = buf.readUtf();
-        isDimCache = buf.readBoolean();
-        dimension = buf.readResourceKey(Registries.DIMENSION);
-        data = buf.readNbt();
-        first = buf.readBoolean();
+    public static SCPacketShareProspection decode(FriendlyByteBuf buf) {
+        UUID sender = buf.readUUID();
+        UUID receiver = buf.readUUID();
+        String cacheName = buf.readUtf();
+        String key = buf.readUtf();
+        boolean isDimCache = buf.readBoolean();
+        ResourceKey<Level> dimension = buf.readResourceKey(Registries.DIMENSION);
+        CompoundTag data = buf.readNbt();
+        boolean first = buf.readBoolean();
+        return new SCPacketShareProspection(sender, receiver, cacheName, key, isDimCache, dimension, data, first);
     }
 
-    @Override
-    public void execute(IHandlerContext handler) {
-        if (handler.isClient()) {
+    public void execute(IPayloadContext context) {
+        if (context.flow().isClientbound()) {
             if (first) {
                 PlayerInfo senderInfo = Minecraft.getInstance().getConnection().getPlayerInfo(sender);
                 if (senderInfo == null) {
@@ -75,12 +81,21 @@ public class SCPacketShareProspection implements IPacket {
             }
             ClientCacheManager.processProspectionShare(cacheName, key, isDimCache, dimension, data);
         } else {
+            ServerPlayer receiverPlayer = GTCEu.getMinecraftServer().getPlayerList().getPlayer(receiver);
+            if (receiverPlayer == null) {
+                return;
+            }
             SCPacketShareProspection newPacket = new SCPacketShareProspection(sender, receiver,
                     cacheName, key,
                     isDimCache, dimension,
                     data, first);
-            GTNetwork.NETWORK.sendToPlayer(newPacket,
-                    GTCEu.getMinecraftServer().getPlayerList().getPlayer(receiver));
+            PacketDistributor.sendToPlayer(receiverPlayer, newPacket);
         }
     }
+
+    @Override
+    public @NotNull Type<SCPacketShareProspection> type() {
+        return TYPE;
+    }
+
 }

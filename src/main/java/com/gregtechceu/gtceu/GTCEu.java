@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.CommonInit;
+import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.command.GTCommandArguments;
@@ -37,7 +38,7 @@ import java.nio.file.Path;
 public class GTCEu {
 
     public static final String MOD_ID = "gtceu";
-    private static final ResourceLocation EMPTY_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "");
+    private static final ResourceLocation TEMPLATE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "");
     public static final String NAME = "GregTechCEu";
     public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
 
@@ -47,6 +48,7 @@ public class GTCEu {
         CommonInit.init(modBus);
 
         modBus.addListener(AlloyBlastPropertyAddition::addAlloyBlastProperties);
+        modBus.addListener(GTNetwork::registerPayloads);
         // must be set here because of KubeJS compat
         // trying to read this before the pre-init stage
         GTCEuAPI.materialManager = MaterialRegistryManager.getInstance();
@@ -66,7 +68,7 @@ public class GTCEu {
     }
 
     public static ResourceLocation id(String path) {
-        return EMPTY_LOCATION.withPath(FormattingUtil.toLowerCaseUnder(path));
+        return TEMPLATE_LOCATION.withPath(FormattingUtil.toLowerCaseUnder(path));
     }
 
     public static String appendIdString(String id) {

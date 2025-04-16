@@ -29,7 +29,7 @@ import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.client.model.generators.ModelProvider;
-import net.neoforged.neoforge.registries.ForgeRegistries;
+
 import com.google.gson.JsonObject;
 import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.RegistrateBlockstateProvider;
@@ -48,7 +48,7 @@ public class GTModels {
 
     public static void createCrossBlockState(DataGenContext<Block, ? extends Block> ctx,
                                              RegistrateBlockstateProvider prov) {
-        prov.simpleBlock(ctx.getEntry(), prov.models().cross(ForgeRegistries.BLOCKS.getKey(ctx.getEntry()).getPath(),
+        prov.simpleBlock(ctx.getEntry(), prov.models().cross(BuiltInRegistries.BLOCK.getKey(ctx.getEntry()).getPath(),
                 prov.blockTexture(ctx.getEntry())));
     }
 
@@ -263,7 +263,7 @@ public class GTModels {
             ModelFile inactive = prov.models().cubeAll(name, casingType.getTexture());
             ModelFile active = prov.models().withExistingParent(name + "_active", GTCEu.id("block/cube_2_layer/all"))
                     .texture("bot_all", casingType.getTexture())
-                    .texture("top_all", ResourceLocation.parse(casingType.getTexture() + "_bloom"));
+                    .texture("top_all", casingType.getTexture().withSuffix("_bloom"));
             prov.getVariantBuilder(block)
                     .partialState().with(ActiveBlock.ACTIVE, false).modelForState().modelFile(inactive).addModel()
                     .partialState().with(ActiveBlock.ACTIVE, true).modelForState().modelFile(active).addModel();

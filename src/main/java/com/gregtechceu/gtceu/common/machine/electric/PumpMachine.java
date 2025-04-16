@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.common.machine.electric;
 
-import PumpQueue;
-import SearchResult;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
@@ -232,7 +230,7 @@ public class PumpMachine extends TieredEnergyMachine implements IAutoOutputFluid
                 // Remember all the sources we find
                 boolean isSource = fluidState.isSource();
                 if (isSource) {
-                    var fluidHandler = new BucketPickupHandlerWrapper(liquidBlock, level, check);
+                    var fluidHandler = new BucketPickupHandlerWrapper(null, liquidBlock, level, check);
                     FluidStack drainStack = fluidHandler.drain(Integer.MAX_VALUE, FluidAction.SIMULATE);
                     if (!drainStack.isEmpty()) {
                         return new SearchResult(check, true);
@@ -459,7 +457,7 @@ public class PumpMachine extends TieredEnergyMachine implements IAutoOutputFluid
                 }
                 BlockState state = level.getBlockState(pos);
                 if (state.getBlock() instanceof LiquidBlock liquidBlock &&
-                        (liquidBlock.getFluidState(state)).getFluidType() == pumpQueue.fluidType()) {
+                        liquidBlock.fluid.getFluidType() == pumpQueue.fluidType()) {
                     states.add(new SourceState(state, pos));
                 } else {
                     break;
@@ -474,7 +472,7 @@ public class PumpMachine extends TieredEnergyMachine implements IAutoOutputFluid
                     states.removeLast();
                     FluidState fluidState = sourceState.state().getFluidState();
                     if (sourceState.state().getBlock() instanceof LiquidBlock liquidBlock && fluidState.isSource()) {
-                        var fluidHandler = new BucketPickupHandlerWrapper(liquidBlock, getLevel(), pos);
+                        var fluidHandler = new BucketPickupHandlerWrapper(null, liquidBlock, getLevel(), pos);
                         FluidStack drainStack = fluidHandler.drain(Integer.MAX_VALUE, FluidAction.SIMULATE);
                         if (!drainStack.isEmpty() &&
                                 cache.fillInternal(drainStack, FluidAction.SIMULATE) == drainStack.getAmount()) {

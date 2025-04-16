@@ -7,11 +7,7 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
 import lombok.Getter;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class HPCACoolerPartMachine extends HPCAComponentPartMachine implements IHPCACoolantProvider {
 

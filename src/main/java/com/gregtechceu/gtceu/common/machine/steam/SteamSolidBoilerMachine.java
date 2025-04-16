@@ -39,7 +39,7 @@ public class SteamSolidBoilerMachine extends SteamBoilerMachine implements IMach
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             SteamSolidBoilerMachine.class, SteamBoilerMachine.MANAGED_FIELD_HOLDER);
-    public static final Object2BooleanMap<Item> FUEL_CACHE = new Object2BooleanOpenHashMap<>();
+    public static final Object2BooleanMap<net.minecraft.world.item.Item> FUEL_CACHE = new Object2BooleanOpenHashMap<>();
 
     @Persisted
     public final NotifiableItemStackHandler fuelHandler, ashHandler;
@@ -53,9 +53,9 @@ public class SteamSolidBoilerMachine extends SteamBoilerMachine implements IMach
             return FUEL_CACHE.computeIfAbsent(itemStack.getItem(), item -> {
                 if (isRemote()) return true;
                 return recipeLogic.getRecipeManager().getAllRecipesFor(getRecipeType()).stream().anyMatch(recipe -> {
-                    var list = recipe.inputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList());
+                    var list = recipe.value().inputs.getOrDefault(ItemRecipeCapability.CAP, Collections.emptyList());
                     if (!list.isEmpty()) {
-                        return Arrays.stream(ItemRecipeCapability.CAP.of(list.get(0).content).getItems())
+                        return Arrays.stream(ItemRecipeCapability.CAP.of(list.getFirst().content).getItems())
                                 .map(ItemStack::getItem).anyMatch(i -> i == item);
                     }
                     return false;

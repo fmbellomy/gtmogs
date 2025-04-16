@@ -27,7 +27,7 @@ import com.gregtechceu.gtceu.common.item.armor.IStepAssist;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSendWorldID;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSyncBedrockOreVeins;
-import com.gregtechceu.gtceu.common.network.packets.SPacketSyncFluidVeins;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncBedrockFluidVeins;
 import com.gregtechceu.gtceu.common.network.packets.SPacketSyncOreVeins;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketAddHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketRemoveHazardZone;
@@ -267,14 +267,14 @@ public class ForgeCommonEventListener {
             // if player == null, the /reload command was ran. sync to all players.
             PacketDistributor.sendToAllPlayers(new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()));
             PacketDistributor
-                    .sendToAllPlayers(new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
+                    .sendToAllPlayers(new SPacketSyncBedrockFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
             PacketDistributor
                     .sendToAllPlayers(new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()));
         } else {
             // else it's a player logging in. sync to only that player.
             PacketDistributor.sendToPlayer(player, new SPacketSyncOreVeins(GTRegistries.ORE_VEINS.registry()));
             PacketDistributor.sendToPlayer(player,
-                    new SPacketSyncFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
+                    new SPacketSyncBedrockFluidVeins(GTRegistries.BEDROCK_FLUID_DEFINITIONS.registry()));
             PacketDistributor.sendToPlayer(player,
                     new SPacketSyncBedrockOreVeins(GTRegistries.BEDROCK_ORE_DEFINITIONS.registry()));
         }

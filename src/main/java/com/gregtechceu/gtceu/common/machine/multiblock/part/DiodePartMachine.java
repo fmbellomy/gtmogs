@@ -16,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -95,15 +96,15 @@ public class DiodePartMachine extends TieredIOPartMachine {
     }
 
     @Override
-    protected InteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                  BlockHitResult hitResult) {
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                      BlockHitResult hitResult) {
         cycleAmpMode();
         if (getLevel().isClientSide) {
             scheduleRenderUpdate();
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
         playerIn.sendSystemMessage(Component.translatable("gtceu.machine.diode.message", amps));
-        return InteractionResult.CONSUME;
+        return ItemInteractionResult.CONSUME;
     }
 
     @Override

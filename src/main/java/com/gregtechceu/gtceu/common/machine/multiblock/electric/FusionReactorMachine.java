@@ -228,7 +228,7 @@ public class FusionReactorMachine extends WorkableElectricMultiblockMachine impl
         if (color == -1) {
             if (!recipe.getOutputContents(FluidRecipeCapability.CAP).isEmpty()) {
                 var stack = FluidRecipeCapability.CAP
-                        .of(recipe.getOutputContents(FluidRecipeCapability.CAP).get(0).getContent()).getStacks()[0];
+                        .of(recipe.getOutputContents(FluidRecipeCapability.CAP).getFirst().getContent()).getFluids()[0];
                 int newColor = 0xFF000000 | GTUtil.getFluidColor(stack);
                 if (!Objects.equals(color, newColor)) {
                     color = newColor;
@@ -312,7 +312,7 @@ public class FusionReactorMachine extends WorkableElectricMultiblockMachine impl
         return energyInputAmount * (long) Math.pow(2, tier - LuV) * 10000000L;
     }
 
-    public static Block getCasingState(int tier) {
+    public static net.minecraft.world.level.block.Block getCasingState(int tier) {
         return switch (tier) {
             case LuV -> FUSION_CASING.get();
             case ZPM -> FUSION_CASING_MK2.get();
@@ -320,7 +320,7 @@ public class FusionReactorMachine extends WorkableElectricMultiblockMachine impl
         };
     }
 
-    public static Block getCoilState(int tier) {
+    public static net.minecraft.world.level.block.Block getCoilState(int tier) {
         if (tier == GTValues.LuV)
             return SUPERCONDUCTING_COIL.get();
 

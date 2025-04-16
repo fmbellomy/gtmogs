@@ -18,6 +18,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -69,8 +70,8 @@ public class ConverterMachine extends TieredEnergyMachine {
     // ****** Interaction ******//
     //////////////////////////////////////
     @Override
-    public InteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction facing,
-                                               BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction facing,
+                                                   BlockHitResult hitResult) {
         if (!isRemote()) {
             if (getConverterTrait().isFeToEu()) {
                 setFeToEu(false);
@@ -90,7 +91,7 @@ public class ConverterMachine extends TieredEnergyMachine {
                                 getConverterTrait().getAmps(), getConverterTrait().getVoltage()));
             }
         }
-        return InteractionResult.CONSUME;
+        return ItemInteractionResult.CONSUME;
     }
 
     public void setFeToEu(boolean feToEu) {

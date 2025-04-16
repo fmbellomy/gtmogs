@@ -46,6 +46,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -371,7 +372,7 @@ public class ItemCollectorMachine extends TieredEnergyMachine
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateAutoOutputSubscription();
     }
@@ -522,14 +523,16 @@ public class ItemCollectorMachine extends TieredEnergyMachine
 
     //////////////////////////////////////
     // ******* Interactions ********//
-    //////////////////////////////////////
+    /// ///////////////////////////////////
     @Override
-    protected InteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                              BlockHitResult hitResult) {
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                  BlockHitResult hitResult) {
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
             var tool = playerIn.getItemInHand(hand);
-            if (tool.getDamageValue() >= tool.getMaxDamage()) return InteractionResult.PASS;
-            if (hasFrontFacing() && gridSide == getFrontFacing()) return InteractionResult.PASS;
+            if (tool.getDamageValue() >= tool.getMaxDamage())
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (hasFrontFacing() && gridSide == getFrontFacing())
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 
             // important not to use getters here, which have different logic
             Direction itemFacing = this.outputFacingItems;
@@ -542,14 +545,14 @@ public class ItemCollectorMachine extends TieredEnergyMachine
                 setOutputFacingItems(null);
             }
             playerIn.swing(hand);
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
 
         return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
     }
 
     @Override
-    protected InteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
                                                   BlockHitResult hitResult) {
         var controllable = GTCapabilityHelper.getControllable(getLevel(), getPos(), gridSide);
         if (controllable != null) {
@@ -558,8 +561,8 @@ public class ItemCollectorMachine extends TieredEnergyMachine
                 playerIn.sendSystemMessage(Component.translatable(controllable.isWorkingEnabled() ?
                         "behaviour.soft_hammer.enabled" : "behaviour.soft_hammer.disabled"));
             }
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 }

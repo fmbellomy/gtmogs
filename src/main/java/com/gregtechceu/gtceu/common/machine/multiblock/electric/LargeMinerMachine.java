@@ -34,6 +34,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -105,7 +106,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
         return GTMaterials.Steel;
     }
 
-    public static Block getCasingState(int tier) {
+    public static net.minecraft.world.level.block.Block getCasingState(int tier) {
         return GTBlocks.MATERIALS_TO_CASINGS.get(getMaterial(tier)).get();
     }
 
@@ -188,7 +189,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
             FluidStack drillingFluid = DrillingFluid
                     .getFluid(this.drillingFluidConsumePerTick * getRecipeLogic().getOverclockAmount());
             FluidStack fluidStack = inputFluidInventory.getFluidInTank(0);
-            if (fluidStack != FluidStack.EMPTY && fluidStack.isFluidEqual(DrillingFluid.getFluid(1)) &&
+            if (fluidStack != FluidStack.EMPTY && fluidStack.is(DrillingFluid.getFluid()) &&
                     fluidStack.getAmount() >= drillingFluid.getAmount()) {
                 if (!simulate) {
                     GTTransferUtils.drainFluidAccountNotifiableList(inputFluidInventory, drillingFluid,
@@ -257,10 +258,10 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    public InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction facing,
-                                                BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction facing,
+                                                    BlockHitResult hitResult) {
         if (isRemote() || !this.isFormed())
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
 
         if (!this.isActive()) {
             int currentRadius = getRecipeLogic().getCurrentRadius();
@@ -287,7 +288,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
         } else {
             playerIn.sendSystemMessage(Component.translatable("gtceu.multiblock.large_miner.errorradius"));
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @NotNull

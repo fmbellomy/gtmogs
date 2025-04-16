@@ -1,39 +1,46 @@
 package com.gregtechceu.gtceu.common.network.packets.hazard;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.client.EnvironmentalHazardClientHandler;
 
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
-
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
-@NoArgsConstructor
 @AllArgsConstructor
-public class SPacketSyncHazardZoneStrength implements IPacket {
+public class SPacketSyncHazardZoneStrength implements CustomPacketPayload {
+
+    public static final ResourceLocation ID = GTCEu.id("sync_hazard_zone_strength");
+    public static final Type<SPacketSyncHazardZoneStrength> TYPE = new Type<>(ID);
+    public static final StreamCodec<FriendlyByteBuf, SPacketSyncHazardZoneStrength> CODEC = StreamCodec
+            .ofMember(SPacketSyncHazardZoneStrength::encode, SPacketSyncHazardZoneStrength::decode);
 
     public ChunkPos pos;
     public float newAmount;
 
-    @Override
     public void encode(FriendlyByteBuf buf) {
         buf.writeChunkPos(pos);
         buf.writeFloat(newAmount);
     }
 
-    @Override
-    public void decode(FriendlyByteBuf buf) {
-        pos = buf.readChunkPos();
-        this.newAmount = buf.readFloat();
+    public static SPacketSyncHazardZoneStrength decode(FriendlyByteBuf buf) {
+        ChunkPos pos = buf.readChunkPos();
+        float newAmount = buf.readFloat();
+        return new SPacketSyncHazardZoneStrength(pos, newAmount);
+    }
+
+    public void execute(IPayloadContext handler) {
+        EnvironmentalHazardClientHandler.INSTANCE.updateHazardStrength(this.pos, this.newAmount);
     }
 
     @Override
-    public void execute(IHandlerContext handler) {
-        if (handler.isClient()) {
-            EnvironmentalHazardClientHandler.INSTANCE.updateHazardStrength(pos, newAmount);
-        }
+    public @NotNull Type<SPacketSyncHazardZoneStrength> type() {
+        return TYPE;
     }
 }

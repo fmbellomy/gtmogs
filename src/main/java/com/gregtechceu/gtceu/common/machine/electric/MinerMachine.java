@@ -49,6 +49,7 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -158,7 +159,7 @@ public class MinerMachine extends WorkableTieredMachine
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateAutoOutputSubscription();
     }
@@ -376,9 +377,9 @@ public class MinerMachine extends WorkableTieredMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    protected InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                   BlockHitResult hitResult) {
-        if (isRemote()) return InteractionResult.SUCCESS;
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                       BlockHitResult hitResult) {
+        if (isRemote()) return ItemInteractionResult.SUCCESS;
 
         if (!this.isActive()) {
             int currentRadius = getRecipeLogic().getCurrentRadius();
@@ -397,7 +398,7 @@ public class MinerMachine extends WorkableTieredMachine
         } else {
             playerIn.sendSystemMessage(Component.translatable("gtceu.multiblock.large_miner.errorradius"));
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @NotNull

@@ -18,6 +18,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IDropSaveMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.data.tag.GTDataComponents;
@@ -167,10 +168,10 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
         super.loadCustomPersistedData(tag);
 
         var from = tag.contains("cache") ? tag.getCompound("cache") : tag;
-        this.lockedFluid.readFromNBT(from.getCompound("lockedFluid"));
+        this.lockedFluid.readFromNBT(GTRegistries.builtinRegistry(), from.getCompound("lockedFluid"));
 
-        var stored = FluidStack.loadFluidStackFromNBT(tag.getCompound("stored"));
-        this.stored = new FluidStack(stored, 1000);
+        var stored = FluidStack.parseOptional(GTRegistries.builtinRegistry(), tag.getCompound("stored"));
+        this.stored = stored.copyWithAmount(FluidType.BUCKET_VOLUME);
 
         if (!tag.contains("storedAmount")) this.storedAmount = stored.getAmount();
         else this.storedAmount = tag.getLong("storedAmount");

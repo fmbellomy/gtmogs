@@ -30,6 +30,7 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -212,14 +213,14 @@ public class DrumMachine extends MetaMachine implements IAutoOutputFluid, IDropS
     }
 
     @Override
-    protected InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                   BlockHitResult hitResult) {
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+                                                       BlockHitResult hitResult) {
         if (!isRemote()) {
             if (!playerIn.isShiftKeyDown()) {
                 setAutoOutputFluids(!isAutoOutputFluids());
                 playerIn.sendSystemMessage(Component
                         .translatable("gtceu.machine.drum." + (autoOutputFluids ? "enable" : "disable") + "_output"));
-                return InteractionResult.SUCCESS;
+                return ItemInteractionResult.SUCCESS;
             }
         }
         return super.onScrewdriverClick(playerIn, hand, gridSide, hitResult);

@@ -11,15 +11,12 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class HPCAComponentPartMachine extends MultiblockPartMachine
                                                implements IHPCAComponentHatch, IMachineModifyDrops {

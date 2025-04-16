@@ -51,7 +51,7 @@ public class OpticalDataHatchMachine extends MultiblockPartMachine implements IO
             List<IDataAccessHatch> dataAccesses = new ArrayList<>();
             List<IDataAccessHatch> transmitters = new ArrayList<>();
             for (var part : controller.getParts()) {
-                Block block = part.self().getBlockState().getBlock();
+                net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
                 if (part instanceof IDataAccessHatch hatch && PartAbility.DATA_ACCESS.isApplicable(block)) {
                     dataAccesses.add(hatch);
                 }
@@ -64,18 +64,10 @@ public class OpticalDataHatchMachine extends MultiblockPartMachine implements IO
             return isRecipeAvailable(dataAccesses, seen, recipe) ||
                     isRecipeAvailable(transmitters, seen, recipe);
         } else {
-            BlockEntity tileEntity = getLevel().getBlockEntity(getPos().relative(getFrontFacing()));
-            if (tileEntity == null) return false;
-
-            if (tileEntity instanceof OpticalPipeBlockEntity) {
-                // noinspection DataFlowIssue
-                IDataAccessHatch cap = tileEntity.getCapability(GTCapability.CAPABILITY_DATA_ACCESS,
-                        getFrontFacing().getOpposite()).orElse(null);
-                // noinspection ConstantValue
-                return cap != null && cap.isRecipeAvailable(recipe, seen);
-            }
+            IDataAccessHatch cap = getLevel().getCapability(GTCapability.CAPABILITY_DATA_ACCESS,
+                    getPos().relative(getFrontFacing()), getFrontFacing().getOpposite());
+            return cap != null && cap.isRecipeAvailable(recipe, seen);
         }
-        return false;
     }
 
     private static boolean isRecipeAvailable(@NotNull Iterable<? extends IDataAccessHatch> hatches,
