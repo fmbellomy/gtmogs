@@ -30,11 +30,7 @@ public record AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column
             ByteBufCodecs.VAR_INT, AoESymmetrical::layer,
             AoESymmetrical::new);
 
-    private static final AoESymmetrical NONE = new AoESymmetrical();
-
-    private AoESymmetrical() {
-        this(0, 0, 0, 0, 0, 0);
-    }
+    private static final AoESymmetrical NONE = new AoESymmetrical(0, 0, 0, 0, 0, 0);
 
     public boolean isNone() {
         return this == NONE || (this.maxColumn == 0 && this.maxRow == 0 && this.maxLayer == 0);

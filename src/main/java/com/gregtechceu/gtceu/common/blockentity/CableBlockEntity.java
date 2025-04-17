@@ -13,6 +13,7 @@ import com.gregtechceu.gtceu.common.block.CableBlock;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.pipelike.cable.*;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -29,6 +30,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -315,6 +317,11 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
     @Override
     public GTToolType getPipeTuneTool() {
         return GTToolType.WIRE_CUTTER;
+    }
+
+    @Override
+    public boolean hasCorrectAction(ItemStack stack) {
+        return stack.canPerformAction(GTItemAbilities.WIRE_CUTTER_CONNECT);
     }
 
     @Override

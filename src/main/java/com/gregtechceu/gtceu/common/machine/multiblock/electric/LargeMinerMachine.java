@@ -17,6 +17,7 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
 import com.gregtechceu.gtceu.api.transfer.fluid.FluidHandlerList;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.machine.trait.miner.LargeMinerLogic;
@@ -33,9 +34,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -258,7 +259,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction facing,
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction facing,
                                                     BlockHitResult hitResult) {
         if (isRemote() || !this.isFormed())
             return ItemInteractionResult.SUCCESS;

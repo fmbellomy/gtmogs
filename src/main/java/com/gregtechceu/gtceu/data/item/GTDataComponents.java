@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.tag;
+package com.gregtechceu.gtceu.data.item;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.*;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.common.item.behavior.ItemMagnetBehavior;
+import com.gregtechceu.gtceu.common.item.tool.behavior.ToolModeSwitchBehavior;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
 import io.netty.buffer.ByteBuf;
@@ -52,6 +53,10 @@ public class GTDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> ACTIVE = DATA_COMPONENTS
             .registerComponentType("active", builder -> builder.persistent(Codec.BOOL)
                     .networkSynchronized(ByteBufCodecs.BOOL));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolModeSwitchBehavior.ModeType>> TOOL_MODE = DATA_COMPONENTS
+            .registerComponentType("tool_mode", builder -> builder
+                    .persistent(ToolModeSwitchBehavior.ModeType.CODEC)
+                    .networkSynchronized(ToolModeSwitchBehavior.ModeType.STREAM_CODEC));
 
     // Material-related
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Material>> ITEM_MATERIAL = DATA_COMPONENTS

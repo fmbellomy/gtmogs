@@ -58,7 +58,7 @@ public class RainingCondition extends RecipeCondition<RainingCondition> {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public RainingCondition createTemplate() {
         return new RainingCondition();
     }
 
@@ -71,7 +71,7 @@ public class RainingCondition extends RecipeCondition<RainingCondition> {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public RainingCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         level = buf.readFloat();
         return this;

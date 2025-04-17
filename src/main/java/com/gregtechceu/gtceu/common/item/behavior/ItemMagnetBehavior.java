@@ -18,7 +18,7 @@ import com.gregtechceu.gtceu.api.item.component.IItemLifeCycle;
 import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;

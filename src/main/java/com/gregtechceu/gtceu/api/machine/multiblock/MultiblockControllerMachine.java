@@ -18,13 +18,13 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.annotation.UpdateListener;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -39,8 +39,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class MultiblockControllerMachine extends MetaMachine implements IMultiController {
 
@@ -248,28 +246,6 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
                 checkPattern();
             }
         }
-    }
-
-    @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                  BlockHitResult hitResult) {
-        if (gridSide == getFrontFacing() && allowExtendedFacing()) {
-            setUpwardsFacing(playerIn.isShiftKeyDown() ? getUpwardsFacing().getCounterClockWise() :
-                    getUpwardsFacing().getClockWise());
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
-        }
-        if (playerIn.isShiftKeyDown()) {
-            if (gridSide == getFrontFacing() || !isFacingValid(gridSide)) {
-                return ItemInteractionResult.FAIL;
-            }
-            if (!isRemote()) {
-                setFrontFacing(gridSide);
-            }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
-        }
-        return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
     }
 
     @Override

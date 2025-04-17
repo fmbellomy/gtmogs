@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.pack;
+package com.gregtechceu.gtceu.common.pack;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackLocationInfo;

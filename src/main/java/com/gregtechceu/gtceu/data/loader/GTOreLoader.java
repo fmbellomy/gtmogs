@@ -1,9 +1,8 @@
 package com.gregtechceu.gtceu.data.loader;
 
+import com.google.gson.*;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.addon.AddonFinder;
-import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
@@ -19,13 +18,8 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.profiling.ProfilerFiller;
-import net.minecraft.world.level.storage.loot.Deserializers;
 import net.neoforged.fml.ModLoader;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.serialization.JsonOps;
 import dev.latvian.mods.kubejs.script.ScriptType;
 import org.apache.logging.log4j.LogManager;
@@ -35,7 +29,8 @@ import java.util.Map;
 
 public class GTOreLoader extends SimpleJsonResourceReloadListener {
 
-    public static final Gson GSON_INSTANCE = Deserializers.createFunctionSerializer().create();
+    public static final Gson GSON_INSTANCE = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient()
+            .create();
     public static final String FOLDER = "gtceu/ore_veins";
     protected static final Logger LOGGER = LogManager.getLogger();
 
@@ -53,8 +48,7 @@ public class GTOreLoader extends SimpleJsonResourceReloadListener {
         GTRegistries.ORE_VEINS.registry().clear();
 
         GTOres.init();
-        AddonFinder.getAddons().forEach(IGTAddon::registerOreVeins);
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.ORE_VEINS, GTOreDefinition.class));
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.ORE_VEINS));
         if (GTCEu.Mods.isKubeJSLoaded()) {
             KJSCallWrapper.fireKJSEvent();
         }
@@ -104,7 +98,7 @@ public class GTOreLoader extends SimpleJsonResourceReloadListener {
     }
 
     public static GTOreDefinition fromJson(ResourceLocation id, JsonObject json, RegistryOps<JsonElement> ops) {
-        return GTOreDefinition.FULL_CODEC.parse(ops, json).getOrThrow(false, LOGGER::error);
+        return GTOreDefinition.FULL_CODEC.parse(ops, json).getOrThrow();
     }
 
     public static final class KJSCallWrapper {

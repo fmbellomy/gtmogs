@@ -989,7 +989,7 @@ public class GTBlocks {
             .initialProperties(() -> Blocks.OAK_PLANKS)
             .lang("Treated Wood Planks")
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_GRAY))
-            .tag(TagUtil.createBlockTag("treated_wood")) // matches IE treated wood tag
+            .tag(TagUtil.createBlockTag("treated_wood")) // matches IE treated wood create
             .tag(BlockTags.MINEABLE_WITH_AXE)
             .item()
             .tag(TagUtil.createItemTag("treated_wood"))
@@ -1239,7 +1239,7 @@ public class GTBlocks {
                         .transform(type == StoneBlockType.STONE ?
                                 GTBlocks.unificationBlock(strata.getTagPrefix(), strata.getMaterial()) :
                                 builder2 -> builder2)
-                        .tag(BlockTags.MINEABLE_WITH_PICKAXE, CustomTags.NEEDS_WOOD_TOOL)
+                        .tag(BlockTags.MINEABLE_WITH_PICKAXE, Tags.Blocks.NEEDS_WOOD_TOOL)
                         .loot((tables, block) -> {
                             if (type == StoneBlockType.STONE) {
                                 tables.add(block, tables.createSingleItemTableWithSilkTouch(block,
@@ -1383,7 +1383,7 @@ public class GTBlocks {
             studsBuilder.put(dyeColor, REGISTRATE.block("%s_studs".formatted(dyeColor.getName()), Block::new)
                     .initialProperties(() -> Blocks.WHITE_WOOL)
                     .properties(p -> p.strength(1.5F, 2.5F).mapColor(dyeColor))
-                    .tag(BlockTags.MINEABLE_WITH_PICKAXE, CustomTags.NEEDS_WOOD_TOOL)
+                    .tag(BlockTags.MINEABLE_WITH_PICKAXE, Tags.Blocks.NEEDS_WOOD_TOOL)
                     .blockstate((ctx, prov) -> prov.simpleBlock(ctx.get(),
                             prov.models().cubeAll(ctx.getName(),
                                     GTCEu.id("block/decoration/studs_%s".formatted(dyeColor.getName())))))

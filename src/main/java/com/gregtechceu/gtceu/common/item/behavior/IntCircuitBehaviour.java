@@ -11,7 +11,7 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
@@ -19,7 +19,6 @@ import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
 import com.lowdragmc.lowdraglib.gui.widget.ButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
@@ -28,10 +27,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class IntCircuitBehaviour implements IItemUIFactory, IAddInformation {

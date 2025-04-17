@@ -28,6 +28,6 @@ public class MapFluidTagIngredient extends AbstractMapIngredient {
 
     @Override
     public String toString() {
-        return "MapFluidTagIngredient{" + "tag=" + tag.location() + "}";
+        return "MapFluidTagIngredient{" + "create=" + tag.location() + "}";
     }
 }

@@ -42,7 +42,6 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.fml.ModLoader;
-import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import java.util.ArrayList;
@@ -218,14 +217,14 @@ public class GTRecipeTypes {
                         recipeBuilder.tickInput.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList())
                                 .isEmpty()) {
                     recipeBuilder
-                            .copy(new ResourceLocation(recipeBuilder.id.toString() + "_water"))
+                            .copy(recipeBuilder.id.withSuffix("_water"))
                             .inputFluids(GTMaterials.Water.getFluid((int) Math.max(4,
                                     Math.min(1000, recipeBuilder.duration * recipeBuilder.EUt() / 320))))
                             .duration(recipeBuilder.duration * 2)
                             .save(provider);
 
                     recipeBuilder
-                            .copy(new ResourceLocation(recipeBuilder.id.toString() + "_distilled_water"))
+                            .copy(recipeBuilder.id.withSuffix("_distilled_water"))
                             .inputFluids(GTMaterials.DistilledWater.getFluid((int) Math.max(3,
                                     Math.min(750, recipeBuilder.duration * recipeBuilder.EUt() / 426))))
                             .duration((int) (recipeBuilder.duration * 1.5))
@@ -385,7 +384,7 @@ public class GTRecipeTypes {
                 if (recipeBuilder.input.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList()).isEmpty() &&
                         recipeBuilder.tickInput.getOrDefault(FluidRecipeCapability.CAP, Collections.emptyList())
                                 .isEmpty()) {
-                    recipeBuilder.copy(new ResourceLocation(recipeBuilder.id.toString() + "_soldering_alloy"))
+                    recipeBuilder.copy(recipeBuilder.id.withSuffix("_soldering_alloy"))
                             .inputFluids(GTMaterials.SolderingAlloy
                                     .getFluid(Math.max(1, (GTValues.L / 2) * recipeBuilder.getSolderMultiplier())))
                             .save(provider);
@@ -431,8 +430,8 @@ public class GTRecipeTypes {
             .setSteamProgressBar(GuiTextures.PROGRESS_BAR_MACERATE_STEAM, LEFT_TO_RIGHT)
             .prepareBuilder(recipeBuilder -> recipeBuilder.addCondition(RockBreakerCondition.INSTANCE))
             .setUiBuilder((recipe, widgetGroup) -> {
-                var fluidA = BuiltInRegistries.FLUID.get(new ResourceLocation(recipe.data.getString("fluidA")));
-                var fluidB = BuiltInRegistries.FLUID.get(new ResourceLocation(recipe.data.getString("fluidB")));
+                var fluidA = BuiltInRegistries.FLUID.get(ResourceLocation.parse(recipe.data.getString("fluidA")));
+                var fluidB = BuiltInRegistries.FLUID.get(ResourceLocation.parse(recipe.data.getString("fluidB")));
                 if (fluidA != Fluids.EMPTY) {
                     widgetGroup.addWidget(new TankWidget(new CustomFluidTank(new FluidStack(fluidA, 1000)),
                             widgetGroup.getSize().width - 30, widgetGroup.getSize().height - 30, false, false)
@@ -667,7 +666,8 @@ public class GTRecipeTypes {
     public static GTRecipeType register(String name, String group, RecipeType<?>... proxyRecipes) {
         var recipeType = new GTRecipeType(GTCEu.id(name), group, proxyRecipes);
         GTRegistries.register(BuiltInRegistries.RECIPE_TYPE, recipeType.registryName, recipeType);
-        GTRegistries.register(BuiltInRegistries.RECIPE_SERIALIZER, recipeType.registryName, new GTRecipeSerializer());
+        recipeType.setSerializer(GTRegistries.register(BuiltInRegistries.RECIPE_SERIALIZER, recipeType.registryName,
+                new GTRecipeSerializer()));
         GTRegistries.RECIPE_TYPES.register(recipeType.registryName, recipeType);
         return recipeType;
     }
@@ -677,11 +677,9 @@ public class GTRecipeTypes {
         if (GTCEu.Mods.isKubeJSLoaded()) {
             GTRegistryInfo.registerFor(GTRegistries.RECIPE_TYPES.getRegistryName());
         }
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.RECIPE_TYPES, GTRecipeType.class));
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.RECIPE_TYPES));
         GTRegistries.RECIPE_TYPES.freeze();
 
-        GTRegistries.register(BuiltInRegistries.RECIPE_SERIALIZER, GTCEu.id("machine"),
-                GTRecipeSerializer.SERIALIZER);
         GTRegistries.register(BuiltInRegistries.RECIPE_SERIALIZER, GTCEu.id("crafting_facade_cover"),
                 FacadeCoverRecipe.SERIALIZER);
         GTRegistries.register(BuiltInRegistries.RECIPE_SERIALIZER, GTCEu.id("crafting_shaped_strict"),

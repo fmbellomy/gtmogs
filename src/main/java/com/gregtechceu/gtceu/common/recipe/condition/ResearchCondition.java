@@ -60,7 +60,7 @@ public class ResearchCondition extends RecipeCondition<ResearchCondition> {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public ResearchCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         this.data = ResearchData.fromNetwork(buf);
         return this;
@@ -72,7 +72,7 @@ public class ResearchCondition extends RecipeCondition<ResearchCondition> {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public ResearchCondition createTemplate() {
         return new ResearchCondition();
     }
 }

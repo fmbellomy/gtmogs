@@ -129,7 +129,7 @@ public class OreVeinUtil {
 
         if (biomes.stream().anyMatch(filter -> filter.startsWith("#")))
             throw new IllegalStateException(
-                    "Cannot resolve biomes: You may use either a single tag or multiple individual biomes.");
+                    "Cannot resolve biomes: You may use either a single create or multiple individual biomes.");
 
         var jsonArray = new JsonArray();
         biomes.forEach(jsonArray::add);

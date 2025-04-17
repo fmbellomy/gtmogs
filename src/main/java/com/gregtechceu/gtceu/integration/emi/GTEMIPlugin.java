@@ -24,9 +24,10 @@ import com.gregtechceu.gtceu.integration.emi.recipe.GTRecipeEMICategory;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUIContainer;
 
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import appeng.menu.me.items.PatternEncodingTermMenu;
@@ -87,21 +88,22 @@ public class GTEMIPlugin implements EmiPlugin {
                 EmiStack.of(GTMultiMachines.LARGE_CHEMICAL_REACTOR.asStack()));
 
         // Comparators
-        registry.setDefaultComparison(GTItems.TURBINE_ROTOR.asItem(), Comparison.compareNbt());
+        registry.setDefaultComparison(GTItems.TURBINE_ROTOR.asItem(), Comparison.compareComponents());
 
-        registry.setDefaultComparison(GTItems.PROGRAMMED_CIRCUIT.asItem(), Comparison.compareNbt());
+        registry.setDefaultComparison(GTItems.PROGRAMMED_CIRCUIT.asItem(), Comparison.compareComponents());
         registry.removeEmiStacks(EmiStack.of(GTItems.PROGRAMMED_CIRCUIT.asStack()));
         registry.addEmiStack(EmiStack.of(IntCircuitBehaviour.stack(0)));
         registry.addWorkstation(GTProgrammedCircuitCategory.CATEGORY, EmiStack.of(IntCircuitBehaviour.stack(0)));
 
-        Comparison potionComparison = Comparison.compareData(stack -> PotionUtils.getPotion(stack.getNbt()));
+        Comparison potionComparison = Comparison.compareData(
+                stack -> stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY));
         PotionFluid potionFluid = GTFluids.POTION.get();
         registry.setDefaultComparison(potionFluid.getSource(), potionComparison);
         registry.setDefaultComparison(potionFluid.getFlowing(), potionComparison);
 
-        for (Potion potion : BuiltInRegistries.POTION) {
+        BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack stack = PotionFluidHelper.getFluidFromPotion(potion, PotionFluidHelper.BOTTLE_AMOUNT);
-            registry.addEmiStack(EmiStack.of(stack.getFluid(), stack.getTag()));
-        }
+            registry.addEmiStack(EmiStack.of(stack.getFluid(), stack.getComponentsPatch()));
+        });
     }
 }

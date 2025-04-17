@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class FTBQuestCondition extends RecipeCondition {
+public class FTBQuestCondition extends RecipeCondition<FTBQuestCondition> {
 
     private static final Long2ObjectMap<QuestObject> QUEST_CACHE = new Long2ObjectOpenHashMap<>();
     public static final MapCodec<FTBQuestCondition> CODEC = RecordCodecBuilder
@@ -50,7 +50,7 @@ public class FTBQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<FTBQuestCondition> getType() {
         return GTRecipeConditions.FTB_QUEST;
     }
 
@@ -76,7 +76,7 @@ public class FTBQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public RecipeCondition<FTBQuestCondition> createTemplate() {
         return new FTBQuestCondition();
     }
 
@@ -88,7 +88,7 @@ public class FTBQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public FTBQuestCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         parsedQuestId = buf.readLong();
         return this;

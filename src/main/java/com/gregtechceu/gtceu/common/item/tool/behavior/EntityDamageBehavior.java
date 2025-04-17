@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
+import com.google.common.base.Strings;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
@@ -8,6 +9,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -29,28 +32,28 @@ import java.util.*;
 
 /**
  * Add to tools to have them deal bonus damage to specific mobs.
- * Pass null for the mobType parameter to ignore the tooltip.
+ * Pass {@code null} or {@link Optional#empty()} for the {@code mobType} parameter to ignore the tooltip.
  */
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior> {
-
+    // spotless:off
     public static final Codec<EntityDamageBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.STRING.lenientOptionalFieldOf("mob_type", "")
-                    .forGetter(val -> val.mobType == null ? "" : val.mobType),
+            Codec.STRING.lenientOptionalFieldOf("mob_type")
+                    .forGetter(val -> val.mobType),
             Codec.unboundedMap(TagKey.codec(Registries.ENTITY_TYPE), Codec.FLOAT).fieldOf("bonus_list")
                     .forGetter(val -> val.bonusList))
             .apply(instance, EntityDamageBehavior::new));
-
     public static final StreamCodec<ByteBuf, TagKey<EntityType<?>>> TAG_KEY_STREAM_CODEC = ResourceLocation.STREAM_CODEC
             .map(rl -> TagKey.create(Registries.ENTITY_TYPE, rl), TagKey::location);
-
     public static final StreamCodec<RegistryFriendlyByteBuf, EntityDamageBehavior> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.optional(ByteBufCodecs.stringUtf8(128)), val -> Optional.ofNullable(val.mobType),
+            ByteBufCodecs.optional(ByteBufCodecs.stringUtf8(128)), val -> val.mobType,
             ByteBufCodecs.map(Object2FloatOpenHashMap::new, TAG_KEY_STREAM_CODEC, ByteBufCodecs.FLOAT),
             val -> val.bonusList,
             EntityDamageBehavior::new);
+    // spotless:on
 
-    private final Map<TagKey<EntityType<?>>, Float> bonusList = new Object2FloatOpenHashMap<>();
-    private final String mobType;
+    private final Reference2FloatMap<TagKey<EntityType<?>>> bonusList = new Reference2FloatOpenHashMap<>();
+    private final Optional<String> mobType;
 
     @SafeVarargs
     public EntityDamageBehavior(float bonus, TagKey<EntityType<?>>... entities) {
@@ -61,30 +64,34 @@ public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior>
         this((String) null, entities);
     }
 
+    @SafeVarargs
     public EntityDamageBehavior(String mobType, float bonus, TagKey<EntityType<?>>... entities) {
-        this.mobType = mobType == null || mobType.isEmpty() ? null : mobType;
+        this.mobType = Strings.isNullOrEmpty(mobType) ? Optional.empty() : Optional.of(mobType);
         for (TagKey<EntityType<?>> entity : entities) {
             bonusList.put(entity, bonus);
         }
     }
 
     public EntityDamageBehavior(String mobType, Map<TagKey<EntityType<?>>, Float> entities) {
-        this.mobType = mobType == null || mobType.isEmpty() ? null : mobType;
+        this.mobType = mobType == null || mobType.isEmpty() ? Optional.empty() : Optional.of(mobType);
         bonusList.putAll(entities);
     }
 
-    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public EntityDamageBehavior(Optional<String> mobType, Map<TagKey<EntityType<?>>, Float> entities) {
-        this.mobType = mobType.orElse(null);
+        this.mobType = mobType;
         bonusList.putAll(entities);
     }
 
     @Override
     public void hitEntity(@NotNull ItemStack stack, @NotNull LivingEntity target,
                           @NotNull LivingEntity attacker) {
-        float damageBonus = bonusList.entrySet().stream().filter(entry -> target.getType().is(entry.getKey()))
-                .map(Map.Entry::getValue).filter(f -> f > 0).findFirst().orElse(0f);
-        if (damageBonus != 0f) {
+        float damageBonus = bonusList.reference2FloatEntrySet()
+                .stream()
+                .filter(entry -> target.getType().is(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .filter(f -> f > 0)
+                .findFirst().orElse(0f);
+        if (damageBonus > 0f) {
             DamageSource source = attacker instanceof Player player ?
                     attacker.damageSources().playerAttack(player) : attacker.damageSources().mobAttack(attacker);
             target.hurt(source, damageBonus);
@@ -94,9 +101,10 @@ public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior>
     @Override
     public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
-        if (mobType != null && !mobType.isEmpty()) {
+        //noinspection OptionalIsPresent
+        if (mobType.isPresent()) {
             tooltip.add(Component.translatable("item.gtceu.tool.behavior.damage_boost",
-                    Component.translatable("item.gtceu.tool.behavior.damage_boost_" + mobType)));
+                    Component.translatable("item.gtceu.tool.behavior.damage_boost_" + mobType.get())));
         }
     }
 

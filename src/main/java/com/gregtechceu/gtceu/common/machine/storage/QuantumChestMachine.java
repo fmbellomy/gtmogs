@@ -21,7 +21,8 @@ import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
@@ -319,12 +320,15 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     }
 
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                   BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
+            return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
+        }
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
             var tool = playerIn.getItemInHand(hand);
-            if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.FAIL;
+            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
             if (gridSide != getOutputFacingItems()) {
                 setOutputFacingItems(gridSide);
             } else {
@@ -334,12 +338,12 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
             return ItemInteractionResult.CONSUME;
         }
 
-        return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
+        return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
     }
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                   BlockHitResult hitResult) {
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+                                                       BlockHitResult hitResult) {
         if (!isRemote()) {
             if (gridSide == getOutputFacingItems()) {
                 if (isAllowInputFromOutputSideItems()) {
@@ -356,7 +360,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
             }
             return ItemInteractionResult.SUCCESS;
         }
-        return super.onScrewdriverClick(playerIn, hand, gridSide, hitResult);
+        return super.onScrewdriverClick(playerIn, hand, held, gridSide, hitResult);
     }
 
     public boolean isLocked() {
@@ -444,7 +448,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     //////////////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.WRENCH)) {
             if (!player.isShiftKeyDown()) {
                 if (!hasFrontFacing() || side != getFrontFacing()) {
@@ -458,7 +462,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
         } else if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             if (side == getFrontFacing()) return null;
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     protected class ItemCache extends MachineTrait implements IItemHandlerModifiable {

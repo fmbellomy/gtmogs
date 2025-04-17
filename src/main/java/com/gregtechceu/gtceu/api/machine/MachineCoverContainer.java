@@ -147,7 +147,7 @@ public class MachineCoverContainer implements ICoverable, IEnhancedManaged {
     }
 
     @Override
-    public CoverBehavior getCoverAtSide(Direction side) {
+    public @Nullable CoverBehavior getCoverAtSide(Direction side) {
         return switch (side) {
             case UP -> up;
             case SOUTH -> south;

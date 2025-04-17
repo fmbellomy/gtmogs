@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.integration.ae2.slot;
 
+import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -60,9 +61,7 @@ public class ExportOnlyAEItemSlot extends ExportOnlyAESlot implements IItemHandl
     @Override
     public ItemStack getStackInSlot(int slot) {
         if (slot == 0 && this.stock != null) {
-            return this.stock.what() instanceof AEItemKey itemKey ?
-                    itemKey.toStack(GTMath.saturatedCast(this.stock.amount())) :
-                    ItemStack.EMPTY;
+            return AEUtil.toItemStack(stock);
         }
         return ItemStack.EMPTY;
     }

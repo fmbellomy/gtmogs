@@ -23,9 +23,8 @@ import com.gregtechceu.gtceu.common.blockentity.FluidPipeBlockEntity;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectBedrockFluid;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -55,10 +54,9 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import lombok.Getter;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class PortableScannerBehavior implements IInteractionItem, IAddInformation {
 

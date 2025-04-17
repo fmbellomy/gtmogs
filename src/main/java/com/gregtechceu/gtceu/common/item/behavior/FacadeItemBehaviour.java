@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.item.datacomponents.FacadeWrapper;
 import com.gregtechceu.gtceu.client.renderer.cover.FacadeCoverRenderer;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
 import net.minecraft.core.NonNullList;

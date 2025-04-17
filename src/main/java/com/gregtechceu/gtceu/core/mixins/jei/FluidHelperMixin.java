@@ -2,6 +2,8 @@ package com.gregtechceu.gtceu.core.mixins.jei;
 
 import com.gregtechceu.gtceu.client.TooltipsHandler;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -21,6 +23,7 @@ public class FluidHelperMixin {
             require = 0)
     private void gtceu$injectFluidTooltips(ITooltipBuilder tooltip, FluidStack ingredient, TooltipFlag tooltipFlag,
                                            CallbackInfo ci) {
-        TooltipsHandler.appendFluidTooltips(ingredient, tooltip::add, tooltipFlag);
+        TooltipsHandler.appendFluidTooltips(ingredient, tooltip::add, tooltipFlag,
+                Item.TooltipContext.of(Minecraft.getInstance().level));
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
 public class EntityTypeTagLoader {
@@ -14,6 +15,8 @@ public class EntityTypeTagLoader {
         create(provider, CustomTags.HEAT_IMMUNE, EntityType.BLAZE, EntityType.MAGMA_CUBE, EntityType.WITHER_SKELETON,
                 EntityType.WITHER);
         create(provider, CustomTags.CHEMICAL_IMMUNE, EntityType.SKELETON, EntityType.STRAY);
+        create(provider, CustomTags.IRON_GOLEMS, EntityType.IRON_GOLEM);
+        create(provider, CustomTags.SPIDERS, EntityType.SPIDER, EntityType.CAVE_SPIDER);
     }
 
     public static void create(RegistrateTagsProvider<EntityType<?>> provider, TagKey<EntityType<?>> tagKey,

@@ -23,7 +23,7 @@ import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.machine.trait.miner.MinerLogic;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
@@ -48,9 +48,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
@@ -377,7 +377,7 @@ public class MinerMachine extends WorkableTieredMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (isRemote()) return ItemInteractionResult.SUCCESS;
 

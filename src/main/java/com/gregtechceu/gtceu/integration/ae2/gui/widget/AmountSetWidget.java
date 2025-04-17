@@ -9,6 +9,7 @@ import com.lowdragmc.lowdraglib.utils.Position;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -18,11 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringSized;
 
-/**
- * @Author GlodBlock
- * @Description The amount set widget for config slot
- * @Date 2023/4/21-21:20
- */
 public class AmountSetWidget extends Widget {
 
     private int index = -1;
@@ -73,7 +69,7 @@ public class AmountSetWidget extends Widget {
     }
 
     @Override
-    public void handleClientAction(int id, FriendlyByteBuf buffer) {
+    public void handleClientAction(int id, RegistryFriendlyByteBuf buffer) {
         super.handleClientAction(id, buffer);
         if (id == 0) {
             this.index = buffer.readVarInt();

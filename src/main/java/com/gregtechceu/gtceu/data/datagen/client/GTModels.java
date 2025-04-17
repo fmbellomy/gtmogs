@@ -14,7 +14,7 @@ import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
 import com.gregtechceu.gtceu.api.machine.multiblock.IBatteryData;
 import com.gregtechceu.gtceu.common.block.*;
 import com.gregtechceu.gtceu.core.MixinHelpers;
-import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;

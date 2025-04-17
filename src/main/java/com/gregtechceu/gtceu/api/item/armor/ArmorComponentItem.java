@@ -26,6 +26,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -193,6 +194,16 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
             }
         }
         return super.getBarColor(stack);
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        for (IItemComponent component : components) {
+            if (component instanceof IAbilityItem abilityItem && abilityItem.canPerformAction(stack, action)) {
+                return true;
+            }
+        }
+        return super.canPerformAction(stack, action);
     }
 
     @Override

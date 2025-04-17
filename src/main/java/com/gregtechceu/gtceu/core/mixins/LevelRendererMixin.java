@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.core.mixins;
 
-import RenderBuffers;
 import com.gregtechceu.gtceu.api.block.MaterialBlock;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
-import com.gregtechceu.gtceu.api.item.tool.aoe.AoESymmetrical;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.*;
@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.SheetedDecalTextureGenerator;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Final;
@@ -57,17 +58,18 @@ public abstract class LevelRendererMixin {
     @Shadow
     private @Nullable ClientLevel level;
 
-    @Inject(
-            method = { "renderLevel" },
-            at = { @At("HEAD") })
-    private void renderLevel(PoseStack poseStack, float partialTick, long finishNanoTime, boolean renderBlockOutline,
-                             Camera camera, GameRenderer gameRenderer, LightTexture lightTexture,
-                             Matrix4f projectionMatrix, CallbackInfo ci) {
+    @Inject(method = "renderLevel",
+            at = @At(value = "INVOKE",
+                     target = "Lit/unimi/dsi/fastutil/longs/Long2ObjectMap;long2ObjectEntrySet()Lit/unimi/dsi/fastutil/objects/ObjectSet;"))
+    private void renderLevel(DeltaTracker partialTick, boolean renderBlockOutline, Camera camera,
+                             GameRenderer gameRenderer, LightTexture lightTexture, Matrix4f viewMatrix,
+                             Matrix4f projectionMatrix, CallbackInfo ci,
+                             @Local(ordinal = 0) PoseStack poseStack) {
         if (minecraft.player == null || minecraft.level == null) return;
 
         ItemStack mainHandItem = minecraft.player.getMainHandItem();
-        if (!ToolHelper.hasBehaviorsTag(mainHandItem) ||
-                ToolHelper.getAoEDefinition(mainHandItem) == AoESymmetrical.none() ||
+        if (!ToolHelper.hasBehaviorsComponent(mainHandItem) ||
+                ToolHelper.getAoEDefinition(mainHandItem).isNone() ||
                 !(minecraft.hitResult instanceof BlockHitResult result) || minecraft.player.isShiftKeyDown())
             return;
 
@@ -93,41 +95,40 @@ public abstract class LevelRendererMixin {
             VertexConsumer breakProgressDecal = new SheetedDecalTextureGenerator(
                     this.renderBuffers.crumblingBufferSource()
                             .getBuffer(ModelBakery.DESTROY_TYPES.get(progress.getProgress())),
-                    last.pose(),
-                    last.normal(),
+                    last,
                     1.0f);
+            ModelData modelData = level.getModelData(pos);
             this.minecraft.getBlockRenderer().renderBreakingTexture(minecraft.level.getBlockState(pos), pos,
-                    minecraft.level, poseStack, breakProgressDecal);
+                    minecraft.level, poseStack, breakProgressDecal, modelData);
             poseStack.popPose();
         }
     }
 
     @Shadow
-    public static void renderShape(PoseStack poseStack, VertexConsumer consumer, VoxelShape shape, double x, double y,
-                                   double z, float red, float green, float blue, float alpha) {
+    private static void renderShape(PoseStack poseStack, VertexConsumer consumer, VoxelShape shape, double x, double y,
+                                    double z, float red, float green, float blue, float alpha) {
         throw new AssertionError();
     }
 
     @Inject(method = "renderHitOutline", at = @At("HEAD"), cancellable = true)
-    private void gtceu$handleAOEOutline(PoseStack poseStack, VertexConsumer consumer, Entity entity, double camX,
-                                        double camY,
-                                        double camZ, BlockPos pos, BlockState state, CallbackInfo ci) {
+    private void gtceu$handleAOEOutline(PoseStack poseStack, VertexConsumer consumer, Entity entity,
+                                        double camX, double camY, double camZ,
+                                        BlockPos pos, BlockState state, CallbackInfo ci) {
         if (minecraft.player == null || level == null) return;
 
         ItemStack mainHandItem = minecraft.player.getMainHandItem();
 
         if (state.isAir() || !level.isInWorldBounds(pos) || !mainHandItem.isCorrectToolForDrops(state) ||
-                minecraft.player.isShiftKeyDown() || !ToolHelper.hasBehaviorsTag(mainHandItem)) {
+                minecraft.player.isShiftKeyDown() || !ToolHelper.hasBehaviorsComponent(mainHandItem)) {
             gtceu$renderContextAwareOutline(poseStack, consumer, entity, camX, camY, camZ, pos, state);
             ci.cancel();
             return;
         }
 
-        ToolHelper
-                .getHarvestableBlocks(mainHandItem, ToolHelper.getAoEDefinition(mainHandItem), level, minecraft.player,
-                        minecraft.hitResult)
-                .forEach(position -> gtceu$renderContextAwareOutline(poseStack, consumer, entity, camX, camY, camZ,
-                        position, level.getBlockState(position)));
+        ToolHelper.getHarvestableBlocks(mainHandItem, ToolHelper.getAoEDefinition(mainHandItem),
+                        level, minecraft.player, minecraft.hitResult)
+                .forEach(position -> gtceu$renderContextAwareOutline(poseStack, consumer, entity,
+                        camX, camY, camZ, position, level.getBlockState(position)));
         ci.cancel();
     }
 

@@ -21,11 +21,11 @@ import java.util.function.Function;
 public class MaterialParser {
 
     private static final SimpleCommandExceptionType ERROR_NO_TAGS_ALLOWED = new SimpleCommandExceptionType(
-            Component.translatable("argument.item.tag.disallowed"));
+            Component.translatable("argument.item.create.disallowed"));
     private static final DynamicCommandExceptionType ERROR_UNKNOWN_ITEM = new DynamicCommandExceptionType(
             id -> Component.translatable("argument.item.id.invalid", id));
     private static final DynamicCommandExceptionType ERROR_UNKNOWN_TAG = new DynamicCommandExceptionType(
-            tag -> Component.translatable("arguments.item.tag.unknown", tag));
+            tag -> Component.translatable("arguments.item.create.unknown", tag));
     private static final char SYNTAX_START_NBT = '{';
     private static final char SYNTAX_TAG = '#';
     private static final Function<SuggestionsBuilder, CompletableFuture<Suggestions>> SUGGEST_NOTHING = SuggestionsBuilder::buildFuture;

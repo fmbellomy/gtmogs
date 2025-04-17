@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;

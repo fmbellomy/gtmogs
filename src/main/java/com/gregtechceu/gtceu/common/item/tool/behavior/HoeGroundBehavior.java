@@ -30,6 +30,7 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -42,14 +43,15 @@ import java.util.Set;
  */
 public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
 
-    public static final HoeGroundBehavior INSTANCE = create();
+    public static final HoeGroundBehavior INSTANCE = new HoeGroundBehavior();
     public static final Codec<HoeGroundBehavior> CODEC = Codec.unit(INSTANCE);
     public static final StreamCodec<ByteBuf, HoeGroundBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected HoeGroundBehavior() {/**/}
 
-    protected static HoeGroundBehavior create() {
-        return new HoeGroundBehavior();
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == ItemAbilities.HOE_TILL;
     }
 
     @NotNull
@@ -68,17 +70,13 @@ public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
         Set<BlockPos> blocks;
         // only attempt to till if the center block is tillable
         if (isBlockTillable(stack, world, player, pos, context)) {
-            if (aoeDefinition == AoESymmetrical.none()) {
+            if (aoeDefinition.isNone()) {
                 blocks = ImmutableSet.of(pos);
             } else {
                 HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
 
-                if (rayTraceResult == null) return InteractionResult.PASS;
                 if (rayTraceResult.getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
-                if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                    return InteractionResult.PASS;
-                if (blockHitResult.getDirection() == null)
-                    return InteractionResult.PASS;
+                if (!(rayTraceResult instanceof BlockHitResult blockHitResult)) return InteractionResult.PASS;
 
                 blocks = getTillableBlocks(stack, aoeDefinition, world, player, blockHitResult);
                 if (isBlockTillable(stack, world, player, blockHitResult.getBlockPos(), context)) {

@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.common.block;
 import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.client.renderer.block.LampRenderer;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.lowdragmc.lowdraglib.client.renderer.IBlockRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 

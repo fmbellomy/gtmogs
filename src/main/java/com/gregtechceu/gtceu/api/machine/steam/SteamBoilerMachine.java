@@ -31,7 +31,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -43,10 +42,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
@@ -57,8 +55,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class SteamBoilerMachine extends SteamWorkableMachine
                                          implements IUIMachine, IExplosionMachine, IDataInfoProvider {
@@ -289,7 +285,7 @@ public abstract class SteamBoilerMachine extends SteamWorkableMachine
     //////////////////////////////////////
 
     @Override
-    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                       BlockHitResult hitResult) {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }

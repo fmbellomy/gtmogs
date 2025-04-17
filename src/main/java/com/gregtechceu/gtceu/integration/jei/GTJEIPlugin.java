@@ -17,17 +17,18 @@ import com.gregtechceu.gtceu.integration.jei.orevein.GTBedrockFluidInfoCategory;
 import com.gregtechceu.gtceu.integration.jei.orevein.GTBedrockOreInfoCategory;
 import com.gregtechceu.gtceu.integration.jei.orevein.GTOreVeinInfoCategory;
 import com.gregtechceu.gtceu.integration.jei.recipe.GTRecipeJEICategory;
+import com.gregtechceu.gtceu.integration.jei.subtype.CircuitSubtypeInterpreter;
+import com.gregtechceu.gtceu.integration.jei.subtype.MaterialSubtypeInterpreter;
 import com.gregtechceu.gtceu.integration.jei.subtype.PotionFluidSubtypeInterpreter;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.alchemy.Potion;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
-import mezz.jei.api.forge.ForgeTypes;
+import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.helpers.IPlatformFluidHelper;
 import mezz.jei.api.registration.*;
@@ -108,26 +109,26 @@ public class GTJEIPlugin implements IModPlugin {
 
     @Override
     public void registerItemSubtypes(ISubtypeRegistration registration) {
-        registration.useNbtForSubtypes(GTItems.PROGRAMMED_CIRCUIT.asItem());
-        registration.useNbtForSubtypes(GTItems.TURBINE_ROTOR.asItem());
+        registration.registerSubtypeInterpreter(GTItems.PROGRAMMED_CIRCUIT.asItem(), CircuitSubtypeInterpreter.INSTANCE);
+        registration.registerSubtypeInterpreter(GTItems.TURBINE_ROTOR.asItem(), MaterialSubtypeInterpreter.INSTANCE);
     }
 
     @Override
     public <T> void registerFluidSubtypes(ISubtypeRegistration registration,
                                           IPlatformFluidHelper<T> platformFluidHelper) {
-        PotionFluidSubtypeInterpreter interpreter = new PotionFluidSubtypeInterpreter();
+        PotionFluidSubtypeInterpreter interpreter = PotionFluidSubtypeInterpreter.INSTANCE;
         PotionFluid potionFluid = GTFluids.POTION.get();
-        registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, potionFluid.getSource(), interpreter);
-        registration.registerSubtypeInterpreter(ForgeTypes.FLUID_STACK, potionFluid.getFlowing(), interpreter);
+        registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getSource(), interpreter);
+        registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getFlowing(), interpreter);
     }
 
     @Override
     public void registerExtraIngredients(IExtraIngredientRegistration registration) {
         Collection<FluidStack> potionFluids = new ArrayList<>(BuiltInRegistries.POTION.size());
-        for (Potion potion : BuiltInRegistries.POTION) {
+        BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack potionFluid = PotionFluid.of(1000, potion);
             potionFluids.add(potionFluid);
-        }
-        registration.addExtraIngredients(ForgeTypes.FLUID_STACK, potionFluids);
+        });
+        registration.addExtraIngredients(NeoForgeTypes.FLUID_STACK, potionFluids);
     }
 }

@@ -58,7 +58,7 @@ public class ThunderCondition extends RecipeCondition<ThunderCondition> {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public ThunderCondition createTemplate() {
         return new ThunderCondition();
     }
 
@@ -71,7 +71,7 @@ public class ThunderCondition extends RecipeCondition<ThunderCondition> {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public ThunderCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         level = buf.readFloat();
         return this;

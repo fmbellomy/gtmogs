@@ -23,7 +23,7 @@ import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.api.item.component.*;
 import com.gregtechceu.gtceu.data.cover.GTCovers;
 import com.gregtechceu.gtceu.data.enumproxy.GTEnumProxies;
-import com.gregtechceu.gtceu.data.jukebox.GTJukeboxSongs;
+import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 import com.gregtechceu.gtceu.common.item.armor.*;
@@ -31,7 +31,7 @@ import com.gregtechceu.gtceu.common.item.behavior.*;
 import com.gregtechceu.gtceu.common.item.behavior.LighterBehavior;
 import com.gregtechceu.gtceu.common.item.behavior.MetaMachineConfigCopyBehaviour;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -1781,7 +1781,7 @@ public class GTItems {
             .onRegister(materialInfo(new ItemMaterialInfo(new MaterialStack(GTMaterials.Zinc, GTValues.M * 2))))
             .register();
     public static ItemEntry<ComponentItem> SMART_ITEM_FILTER = REGISTRATE
-            .item("item_smart_filter", ComponentItem::new)
+            .item("smart_item_filter", ComponentItem::new)
             .lang("Smart Item Filter")
             .onRegister(attach(new ItemFilterBehaviour(SmartItemFilter::loadFilter),
                     new CoverPlaceBehavior(GTCovers.ITEM_FILTER)))

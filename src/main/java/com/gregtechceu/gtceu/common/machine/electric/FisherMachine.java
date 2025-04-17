@@ -20,7 +20,8 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
@@ -44,7 +45,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -499,7 +499,7 @@ public class FisherMachine extends TieredEnergyMachine
     //////////////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.WRENCH)) {
             if (!player.isShiftKeyDown()) {
                 if (!hasFrontFacing() || side != getFrontFacing()) {
@@ -513,21 +513,22 @@ public class FisherMachine extends TieredEnergyMachine
         } else if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             return this.isWorkingEnabled ? GuiTextures.TOOL_PAUSE : GuiTextures.TOOL_START;
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     //////////////////////////////////////
     // ******* Interactions ********//
     /// ///////////////////////////////////
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                   BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
+            return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
+        }
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
             var tool = playerIn.getItemInHand(hand);
-            if (tool.getDamageValue() >= tool.getMaxDamage())
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
-            if (hasFrontFacing() && gridSide == getFrontFacing())
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.FAIL;
+            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
 
             // important not to use getters here, which have different logic
             Direction itemFacing = this.outputFacingItems;
@@ -543,6 +544,6 @@ public class FisherMachine extends TieredEnergyMachine
             return ItemInteractionResult.CONSUME;
         }
 
-        return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
+        return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
     }
 }

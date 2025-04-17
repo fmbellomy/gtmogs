@@ -110,6 +110,7 @@ public class GTOreDefinition {
 
     @Getter
     @Setter
+    @Nullable
     private VeinGenerator veinGenerator;
 
     @Getter

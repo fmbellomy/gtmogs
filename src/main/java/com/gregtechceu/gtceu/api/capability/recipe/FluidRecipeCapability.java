@@ -238,7 +238,7 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
             for (Map.Entry<FluidKey, Integer> inputFluid : fluidStacks.entrySet()) {
                 // Strip the Non-consumable tags here, as FluidKey compares the tags, which causes finding matching
                 // fluids
-                // in the input tanks to fail, because there is nothing in those hatches with a non-consumable tag
+                // in the input tanks to fail, because there is nothing in those hatches with a non-consumable create
                 FluidStack stack = new FluidStack(inputFluid.getKey().fluid, inputFluid.getValue(),
                         inputFluid.getKey().component);
                 if (notConsumableFluid.getKey().equals(stack)) {

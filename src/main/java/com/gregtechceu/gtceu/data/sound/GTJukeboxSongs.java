@@ -1,7 +1,6 @@
-package com.gregtechceu.gtceu.data.jukebox;
+package com.gregtechceu.gtceu.data.sound;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;

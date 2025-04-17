@@ -3,17 +3,15 @@ package com.gregtechceu.gtceu.common.item.tool.behavior;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.tag.TagUtil;
-import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import lombok.AllArgsConstructor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -24,12 +22,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 @AllArgsConstructor

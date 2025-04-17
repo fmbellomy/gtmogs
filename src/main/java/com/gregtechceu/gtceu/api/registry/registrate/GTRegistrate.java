@@ -29,8 +29,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.neoforged.neoforge.registries.RegistryObject;
 
 import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.builders.Builder;
@@ -42,6 +40,7 @@ import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -80,10 +79,6 @@ public class GTRegistrate extends Registrate {
     @NotNull
     public static GTRegistrate create(String modId) {
         return new GTRegistrate(modId);
-    }
-
-    public void registerRegistrate() {
-        registerEventListeners(FMLJavaModLoadingContext.get().getModEventBus());
     }
 
     @Override
@@ -165,30 +160,29 @@ public class GTRegistrate extends Registrate {
         return super.item(name, factory).lang(FormattingUtil.toEnglishName(name.replaceAll("\\.", "_")));
     }
 
-    private RegistryEntry<CreativeModeTab> currentTab;
-    private static final Map<RegistryEntry<?>, RegistryEntry<CreativeModeTab>> TAB_LOOKUP = new IdentityHashMap<>();
+    private RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> currentTab;
+    private static final Map<RegistryEntry<?, ?>, RegistryEntry<CreativeModeTab, ? extends CreativeModeTab>> TAB_LOOKUP = new IdentityHashMap<>();
 
-    public void creativeModeTab(Supplier<RegistryEntry<CreativeModeTab>> currentTab) {
+    public void creativeModeTab(Supplier<RegistryEntry<CreativeModeTab, ? extends CreativeModeTab>> currentTab) {
         this.currentTab = currentTab.get();
     }
 
-    public void creativeModeTab(RegistryEntry<CreativeModeTab> currentTab) {
+    public void creativeModeTab(RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> currentTab) {
         this.currentTab = currentTab;
     }
 
-    public boolean isInCreativeTab(RegistryEntry<?> entry, RegistryEntry<CreativeModeTab> tab) {
+    public boolean isInCreativeTab(RegistryEntry<?, ?> entry, RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
         return TAB_LOOKUP.get(entry) == tab;
     }
 
-    public void setCreativeTab(RegistryEntry<?> entry, @Nullable RegistryEntry<CreativeModeTab> tab) {
+    public void setCreativeTab(RegistryEntry<?, ?> entry, @Nullable RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
         TAB_LOOKUP.put(entry, tab);
     }
 
-    protected <R,
-            T extends R> RegistryEntry<T> accept(String name, ResourceKey<? extends Registry<R>> type,
+    protected <R, T extends R> RegistryEntry<R, T> accept(String name, ResourceKey<? extends Registry<R>> type,
                                                  Builder<R, T, ?, ?> builder, NonNullSupplier<? extends T> creator,
-                                                 NonNullFunction<RegistryObject<T>, ? extends RegistryEntry<T>> entryFactory) {
-        RegistryEntry<T> entry = super.accept(name, type, builder, creator, entryFactory);
+                                                 NonNullFunction<DeferredHolder<R, T>, ? extends RegistryEntry<R, T>> entryFactory) {
+        RegistryEntry<R, T> entry = super.accept(name, type, builder, creator, entryFactory);
 
         if (this.currentTab != null) {
             TAB_LOOKUP.put(entry, this.currentTab);

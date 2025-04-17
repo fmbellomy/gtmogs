@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredIOPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.ProxySlotRecipeHandler;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
@@ -117,14 +118,10 @@ public class MEPatternBufferProxyPartMachine extends TieredIOPartMachine
 
     @Override
     public InteractionResult onDataStickUse(Player player, ItemStack dataStick) {
-        if (dataStick.hasTag()) {
-            assert dataStick.getTag() != null;
-            if (dataStick.getTag().contains("pos", Tag.TAG_INT_ARRAY)) {
-                var posArray = dataStick.getOrCreateTag().getIntArray("pos");
-                var bufferPos = new BlockPos(posArray[0], posArray[1], posArray[2]);
-                setBuffer(bufferPos);
-                return InteractionResult.SUCCESS;
-            }
+        BlockPos bufferPos = dataStick.get(GTDataComponents.DATA_COPY_POS);
+        if (bufferPos != null) {
+            setBuffer(bufferPos);
+            return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }

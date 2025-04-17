@@ -44,7 +44,7 @@ public class GTCEu {
 
     public GTCEu(IEventBus modBus, FMLModContainer container) {
         GTCEuAPI.instance = this;
-
+        ConfigHolder.init();
         CommonInit.init(modBus);
 
         modBus.addListener(AlloyBlastPropertyAddition::addAlloyBlastProperties);
@@ -52,7 +52,6 @@ public class GTCEu {
         // must be set here because of KubeJS compat
         // trying to read this before the pre-init stage
         GTCEuAPI.materialManager = MaterialRegistryManager.getInstance();
-        ConfigHolder.init();
         GTCEuAPI.initializeHighTier();
         if (GTCEu.isDev()) {
             ConfigHolder.INSTANCE.recipes.generateLowQualityGems = true;

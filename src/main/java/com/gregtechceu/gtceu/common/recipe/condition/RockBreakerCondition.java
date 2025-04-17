@@ -60,7 +60,7 @@ public class RockBreakerCondition extends RecipeCondition<RockBreakerCondition> 
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public RockBreakerCondition createTemplate() {
         return new RockBreakerCondition();
     }
 }

@@ -21,8 +21,7 @@ public class AEPatternViewSlotWidget extends SlotWidget {
 
     public AEPatternViewSlotWidget() {}
 
-    public AEPatternViewSlotWidget(
-                                   Container inventory,
+    public AEPatternViewSlotWidget(Container inventory,
                                    int slotIndex,
                                    int xPosition,
                                    int yPosition,
@@ -31,8 +30,7 @@ public class AEPatternViewSlotWidget extends SlotWidget {
         super(inventory, slotIndex, xPosition, yPosition, canTakeItems, canPutItems);
     }
 
-    public AEPatternViewSlotWidget(
-                                   IItemHandlerModifiable itemHandler,
+    public AEPatternViewSlotWidget(IItemHandlerModifiable itemHandler,
                                    int slotIndex,
                                    int xPosition,
                                    int yPosition,
@@ -41,8 +39,7 @@ public class AEPatternViewSlotWidget extends SlotWidget {
         super(itemHandler, slotIndex, xPosition, yPosition, canTakeItems, canPutItems);
     }
 
-    public AEPatternViewSlotWidget(
-                                   IItemHandlerModifiable itemHandler, int slotIndex, int xPosition, int yPosition) {
+    public AEPatternViewSlotWidget(IItemHandlerModifiable itemHandler, int slotIndex, int xPosition, int yPosition) {
         super(itemHandler, slotIndex, xPosition, yPosition);
     }
 

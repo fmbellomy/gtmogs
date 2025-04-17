@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
+import com.google.common.collect.ImmutableMap;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -9,6 +10,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
 import com.mojang.serialization.Codec;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
-public record ToolBehaviors(Map<ToolBehaviorType<?>, IToolBehavior<?>> behaviors) {
+public record ToolBehaviors(@Unmodifiable Map<ToolBehaviorType<?>, IToolBehavior<?>> behaviors) {
 
     public static final ToolBehaviors EMPTY = new ToolBehaviors(Map.of());
 
@@ -45,8 +47,10 @@ public record ToolBehaviors(Map<ToolBehaviorType<?>, IToolBehavior<?>> behaviors
     }
 
     public ToolBehaviors withBehavior(IToolBehavior<?> behavior) {
-        Map<ToolBehaviorType<?>, IToolBehavior<?>> behaviors = new HashMap<>(this.behaviors);
-        behaviors.put(behavior.getType(), behavior);
+        var behaviors = ImmutableMap.<ToolBehaviorType<?>, IToolBehavior<?>>builder()
+                .putAll(this.behaviors)
+                .put(behavior.getType(), behavior)
+                .buildKeepingLast();
         return new ToolBehaviors(behaviors);
     }
 }

@@ -6,8 +6,8 @@ import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -50,17 +50,16 @@ public record CoverPlaceBehavior(CoverDefinition coverDefinition) implements IIn
         Item item = itemStack.getItem();
         if (item instanceof IComponentItem componentItem) {
             for (IItemComponent component : componentItem.getComponents()) {
-                if (component instanceof CoverPlaceBehavior placeBehavior) {
-                    if (canPlaceCover == null || canPlaceCover.test(placeBehavior.coverDefinition)) {
+                if (component instanceof CoverPlaceBehavior(CoverDefinition definition)) {
+                    if (canPlaceCover == null || canPlaceCover.test(definition)) {
                         return true;
                     }
                 }
             }
-        } else if (GTToolType.CROWBAR.itemTags.stream().anyMatch(itemStack::is) ||
-                GTToolType.SOFT_MALLET.itemTags.stream().anyMatch(itemStack::is) ||
-                GTToolType.SCREWDRIVER.itemTags.stream().anyMatch(itemStack::is)) {
-                    return hasCoverSupplier == null || hasCoverSupplier.getAsBoolean();
-                }
+        } else if (itemStack.canPerformAction(GTItemAbilities.INTERACT_WITH_COVER) ||
+                itemStack.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
+            return hasCoverSupplier == null || hasCoverSupplier.getAsBoolean();
+        }
         return false;
     }
 }

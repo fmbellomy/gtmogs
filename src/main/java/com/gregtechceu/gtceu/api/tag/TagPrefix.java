@@ -53,8 +53,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
+
 import java.util.*;
 import java.util.function.*;
+import java.util.stream.Collectors;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.Conditions.*;
 
@@ -1154,34 +1157,46 @@ public class TagPrefix {
         return PREFIXES.getOrDefault(prefixName, replacement);
     }
 
-    @SuppressWarnings("unchecked")
-    public TagKey<Item>[] getItemParentTags() {
-        return tags.stream().filter(TagType::isParentTag).map(type -> type.getTag(this, GTMaterials.NULL))
-                .toArray(TagKey[]::new);
+    @Unmodifiable
+    public List<TagKey<Item>> getItemParentTags() {
+        return tags.stream()
+                .filter(TagType::isParentTag)
+                .map(type -> type.getTag(this, GTMaterials.NULL))
+                .toList();
     }
 
-    @SuppressWarnings("unchecked")
-    public TagKey<Item>[] getItemTags(@NotNull Material mat) {
-        return tags.stream().filter(type -> !type.isParentTag()).map(type -> type.getTag(this, mat))
+    @Unmodifiable
+    public List<TagKey<Item>> getItemTags(@NotNull Material mat) {
+        return tags.stream()
+                .filter(type -> !type.isParentTag())
+                .map(type -> type.getTag(this, mat))
                 .filter(Objects::nonNull)
-                .toArray(TagKey[]::new);
+                .toList();
     }
 
-    @SuppressWarnings("unchecked")
-    public TagKey<Item>[] getAllItemTags(@NotNull Material mat) {
-        return tags.stream().map(type -> type.getTag(this, mat)).filter(Objects::nonNull).toArray(TagKey[]::new);
+    @Unmodifiable
+    public List<TagKey<Item>> getAllItemTags(@NotNull Material mat) {
+        return tags.stream()
+                .map(type -> type.getTag(this, mat))
+                .filter(Objects::nonNull)
+                .toList();
     }
 
-    @SuppressWarnings("unchecked")
-    public TagKey<Block>[] getBlockTags(@NotNull Material mat) {
-        return tags.stream().filter(type -> !type.isParentTag()).map(type -> type.getTag(this, mat))
-                .map(itemTagKey -> TagKey.create(Registries.BLOCK, itemTagKey.location())).toArray(TagKey[]::new);
+    @Unmodifiable
+    public List<TagKey<Block>> getBlockTags(@NotNull Material mat) {
+        return tags.stream()
+                .filter(type -> !type.isParentTag())
+                .map(type -> type.getTag(this, mat))
+                .map(itemTagKey -> TagKey.create(Registries.BLOCK, itemTagKey.location()))
+                .toList();
     }
 
-    @SuppressWarnings("unchecked")
-    public TagKey<Block>[] getAllBlockTags(@NotNull Material mat) {
-        return tags.stream().map(type -> type.getTag(this, mat))
-                .map(itemTagKey -> TagKey.create(Registries.BLOCK, itemTagKey.location())).toArray(TagKey[]::new);
+    @Unmodifiable
+    public List<TagKey<Block>> getAllBlockTags(@NotNull Material mat) {
+        return tags.stream()
+                .map(type -> type.getTag(this, mat))
+                .map(itemTagKey -> TagKey.create(Registries.BLOCK, itemTagKey.location()))
+                .toList();
     }
 
     public boolean hasItemTable() {

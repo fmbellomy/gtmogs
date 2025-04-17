@@ -1,8 +1,8 @@
-package com.gregtechceu.gtceu.data.lang;
+package com.gregtechceu.gtceu.data.datagen.lang;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 
-import static com.gregtechceu.gtceu.data.lang.LangHandler.replace;
+import static com.gregtechceu.gtceu.data.datagen.lang.LangHandler.replace;
 
 public class BlockLang {
 
@@ -83,8 +83,8 @@ public class BlockLang {
         replace(provider, "block.gtceu.fusion_casing_mk2", "Fusion Machine Casing MK II");
         replace(provider, "block.gtceu.fusion_casing_mk3", "Fusion Machine Casing MK III");
 
-        provider.add("block.filter_casing.tooltip", "Creates a §aParticle-Free§7 environment");
-        provider.add("block.sterilizing_filter_casing.tooltip", "Creates a §aSterilized§7 environment");
+        provider.add("block.gtceu.filter_casing.tooltip", "Creates a §aParticle-Free§7 environment");
+        provider.add("block.gtceu.sterilizing_filter_casing.tooltip", "Creates a §aSterilized§7 environment");
 
         provider.add("block.gtceu.explosive.breaking_tooltip",
                 "Primes explosion when mined, sneak mine to pick back up");

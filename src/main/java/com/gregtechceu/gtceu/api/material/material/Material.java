@@ -565,6 +565,7 @@ public class Material implements Comparable<Material> {
         return Objects.hashCode(this.getResourceLocation());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     @RemapPrefixForJS("kjs$")
     public static class Builder extends BuilderBase<Material> {
 
@@ -1309,6 +1310,7 @@ public class Material implements Comparable<Material> {
     /**
      * Holds the basic info for a Material, like the name, color, id, etc..
      */
+    @SuppressWarnings("UnusedReturnValue")
     @Accessors(chain = true)
     private static class MaterialInfo {
 

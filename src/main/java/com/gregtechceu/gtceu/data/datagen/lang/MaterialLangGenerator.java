@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.lang;
+package com.gregtechceu.gtceu.data.datagen.lang;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;

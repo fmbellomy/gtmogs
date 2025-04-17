@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.list.AEListGridWidget;
@@ -17,11 +18,13 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import appeng.api.config.Actionable;
 import appeng.api.stacks.AEFluidKey;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@ExtensionMethod(SizedIngredientExtensions.class)
 public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMachineLife {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
@@ -165,26 +169,27 @@ public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMac
 
         @Override
         @Nullable
-        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left,
-                                                       boolean simulate) {
+        public List<SizedFluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedFluidIngredient> left,
+                                                            boolean simulate) {
             if (io != IO.OUT) return left;
             FluidAction action = simulate ? FluidAction.SIMULATE : FluidAction.EXECUTE;
-            for (var it = left.iterator(); it.hasNext();) {
+            for (var it = left.listIterator(); it.hasNext();) {
                 var ingredient = it.next();
-                if (ingredient.isEmpty()) {
+                if (ingredient.ingredient().hasNoFluids()) {
                     it.remove();
                     continue;
                 }
 
-                var fluids = ingredient.getStacks();
+                var fluids = ingredient.getFluids();
                 if (fluids.length == 0 || fluids[0].isEmpty()) {
                     it.remove();
                     continue;
                 }
 
                 FluidStack output = fluids[0];
-                ingredient.shrink(storage.fill(output, action));
-                if (ingredient.getAmount() <= 0) it.remove();
+                ingredient = ingredient.shrink(storage.fill(output, action));
+                if (ingredient.amount() <= 0) it.remove();
+                else it.set(ingredient);
             }
             return left.isEmpty() ? null : left;
         }
@@ -208,7 +213,7 @@ public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMac
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            var key = AEFluidKey.of(resource.getFluid(), resource.getTag());
+            var key = AEFluidKey.of(resource);
             int amount = resource.getAmount();
             int oldValue = GTMath.saturatedCast(internalBuffer.storage.getOrDefault(key, 0));
             int changeValue = Math.min(Integer.MAX_VALUE - oldValue, amount);

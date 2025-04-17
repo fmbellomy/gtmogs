@@ -31,7 +31,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
@@ -244,13 +244,13 @@ public class BufferMachine extends TieredMachine implements IMachineLife, IAutoO
     ///////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.SCREWDRIVER)) {
             if (side == getOutputFacingItems() || side == getOutputFacingFluids()) {
                 return GuiTextures.TOOL_ALLOW_INPUT;
             }
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     ////////////////////////////////

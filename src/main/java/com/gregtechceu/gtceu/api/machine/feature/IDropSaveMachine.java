@@ -23,7 +23,7 @@ public interface IDropSaveMachine extends IMachineFeature {
     }
 
     /**
-     * Saves the contents of the block entity to a compound tag.
+     * Saves the contents of the block entity to a compound create.
      *
      * @param tag The tag to save to.
      */
@@ -34,7 +34,7 @@ public interface IDropSaveMachine extends IMachineFeature {
     }
 
     /**
-     * Loads the contents of the block entity from a compound tag.
+     * Loads the contents of the block entity from a compound create.
      */
     default void loadFromItem(CompoundTag tag) {
         self().holder.loadManagedPersistentData(tag);

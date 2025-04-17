@@ -128,8 +128,8 @@ public class SecondDegreeMaterials {
                 .toolStats(ToolProperty.Builder.of(6.0F, 4.0F, 1024, 3)
                         .addTypes(GTToolType.MORTAR)
                         .attackSpeed(0.3F).enchantability(33)
-                        .enchantment(Enchantments.MOB_LOOTING, 3)
-                        .enchantment(Enchantments.BLOCK_FORTUNE, 3).build())
+                        .enchantment(Enchantments.LOOTING, 3)
+                        .enchantment(Enchantments.FORTUNE, 3).build())
                 .blast(1500, GasTier.LOW)
                 .buildAndRegister();
 
@@ -157,7 +157,7 @@ public class SecondDegreeMaterials {
                 .components(Brass, 7, Aluminium, 1, Cobalt, 1)
                 .toolStats(ToolProperty.Builder.of(2.5F, 2.0F, 1024, 2)
                         .addTypes(GTToolType.MORTAR)
-                        .attackSpeed(-0.2F).enchantability(5).build())
+                        .attackSpeed(5.8F).enchantability(5).build())
                 .rotorStats(100, 120, 2.0f, 256)
                 .itemPipeProperties(2048, 1)
                 .buildAndRegister();
@@ -197,7 +197,7 @@ public class SecondDegreeMaterials {
                 .components(SiliconDioxide, 4, Biotite, 1)
                 .buildAndRegister();
 
-        RedGranite = new Material.Builder(GTCEu.id("granite_red"))
+        RedGranite = new Material.Builder(GTCEu.id("red_granite"))
                 .dust()
                 .color(0xFF0080).iconSet(ROUGH)
                 .flags(NO_SMASHING)

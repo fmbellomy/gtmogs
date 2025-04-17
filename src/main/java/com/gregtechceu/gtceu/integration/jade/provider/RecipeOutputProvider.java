@@ -6,14 +6,15 @@ import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.integration.jade.GTElementHelper;
-import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentUtils;
@@ -56,6 +57,8 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
                 var itemContents = recipe.getOutputContents(ItemRecipeCapability.CAP);
                 var fluidContents = recipe.getOutputContents(FluidRecipeCapability.CAP);
 
+                var ops = GTRegistries.builtinRegistry().createSerializationContext(NbtOps.INSTANCE);
+
                 ListTag itemTags = new ListTag();
                 for (var item : itemContents) {
                     var stacks = ItemRecipeCapability.CAP.of(item.content).getItems();
@@ -63,8 +66,9 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
                     if (stacks[0].isEmpty()) continue;
                     var stack = stacks[0];
 
-                    var itemTag = new CompoundTag();
-                    GTUtil.saveItemStack(stack, itemTag);
+                    CompoundTag itemTag = ItemStack.CODEC.encodeStart(ops, stack)
+                            .map(tag -> (CompoundTag) tag)
+                            .getOrThrow();
                     if (item.chance < item.maxChance) {
                         int count = stack.getCount();
                         double countD = (double) count * recipe.parallels *
@@ -81,13 +85,14 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
 
                 ListTag fluidTags = new ListTag();
                 for (var fluid : fluidContents) {
-                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getStacks();
+                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getFluids();
                     if (stacks.length == 0) continue;
                     if (stacks[0].isEmpty()) continue;
                     var stack = stacks[0];
 
-                    var fluidTag = new CompoundTag();
-                    stack.writeToNBT(fluidTag);
+                    CompoundTag fluidTag = FluidStack.CODEC.encodeStart(ops, stack)
+                            .map(tag -> (CompoundTag) tag)
+                            .getOrThrow();
                     if (fluid.chance < fluid.maxChance) {
                         int amount = stack.getAmount();
                         double amountD = (double) amount * recipe.parallels *
@@ -109,16 +114,16 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block,
                               BlockEntity blockEntity, IPluginConfig config) {
         if (capData.getBoolean("Working")) {
+            var ops = GTRegistries.builtinRegistry().createSerializationContext(NbtOps.INSTANCE);
+
             List<ItemStack> outputItems = new ArrayList<>();
             if (capData.contains("OutputItems", Tag.TAG_LIST)) {
                 ListTag itemTags = capData.getList("OutputItems", Tag.TAG_COMPOUND);
                 if (!itemTags.isEmpty()) {
                     for (Tag tag : itemTags) {
-                        if (tag instanceof CompoundTag tCompoundTag) {
-                            var stack = GTUtil.loadItemStack(tCompoundTag);
-                            if (!stack.isEmpty()) {
-                                outputItems.add(stack);
-                            }
+                        ItemStack stack = ItemStack.CODEC.parse(ops, tag).getOrThrow();
+                        if (!stack.isEmpty()) {
+                            outputItems.add(stack);
                         }
                     }
                 }
@@ -127,11 +132,9 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
             if (capData.contains("OutputFluids", Tag.TAG_LIST)) {
                 ListTag fluidTags = capData.getList("OutputFluids", Tag.TAG_COMPOUND);
                 for (Tag tag : fluidTags) {
-                    if (tag instanceof CompoundTag tCompoundTag) {
-                        var stack = FluidStack.loadFluidStackFromNBT(tCompoundTag);
-                        if (!stack.isEmpty()) {
-                            outputFluids.add(stack);
-                        }
+                    FluidStack stack = FluidStack.CODEC.parse(ops, tag).getOrThrow();
+                    if (!stack.isEmpty()) {
+                        outputFluids.add(stack);
                     }
                 }
             }
@@ -144,7 +147,7 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
     }
 
     private void addItemTooltips(ITooltip iTooltip, List<ItemStack> outputItems) {
-        IElementHelper helper = iTooltip.getElementHelper();
+        IElementHelper helper = IElementHelper.get();
         for (ItemStack itemOutput : outputItems) {
             if (itemOutput != null && !itemOutput.isEmpty()) {
                 int count = itemOutput.getCount();
@@ -175,11 +178,11 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
     }
 
     private Component getItemName(ItemStack stack) {
-        return ComponentUtils.wrapInSquareBrackets(stack.getItem().getDescription()).withStyle(ChatFormatting.WHITE);
+        return ComponentUtils.wrapInSquareBrackets(stack.getHoverName()).withStyle(ChatFormatting.WHITE);
     }
 
     private Component getFluidName(FluidStack stack) {
-        return ComponentUtils.wrapInSquareBrackets(stack.getDisplayName()).withStyle(ChatFormatting.WHITE);
+        return ComponentUtils.wrapInSquareBrackets(stack.getHoverName()).withStyle(ChatFormatting.WHITE);
     }
 
     private JadeFluidObject getFluid(FluidStack stack) {

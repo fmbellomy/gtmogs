@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.core.mixins;
 
-import com.lowdragmc.lowdraglib.core.mixins.MixinPluginShared;
-
 import net.neoforged.fml.loading.LoadingModList;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -22,14 +20,14 @@ public class GregTechMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.rei")) {
+        if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.rei")) {
             return LoadingModList.get().getModFileById("roughlyenoughitems") != null;
-        } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.top")) {
-            return MixinPluginShared.isClassFound("mcjty.theoneprobe.api.ITheOneProbe");
-        } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.jei")) {
-            return MixinPluginShared.isClassFound("mezz.jei.api.IModPlugin");
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.top")) {
+            return LoadingModList.get().getModFileById("theoneprobe") != null;
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.jei")) {
+            return LoadingModList.get().getModFileById("jei") != null;
         } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.emi")) {
-            return MixinPluginShared.isClassFound("dev.emi.emi.api.EmiPlugin");
+            return LoadingModList.get().getModFileById("emi") != null;
         }
         return true;
     }

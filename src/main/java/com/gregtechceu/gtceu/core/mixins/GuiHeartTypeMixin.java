@@ -13,9 +13,9 @@ public class GuiHeartTypeMixin {
 
     @ModifyExpressionValue(method = "forPlayer",
                            at = @At(value = "INVOKE",
-                                    target = "Lnet/minecraft/world/entity/player/Player;hasEffect(Lnet/minecraft/world/effect/MobEffect;)Z",
+                                    target = "Lnet/minecraft/world/entity/player/Player;hasEffect(Lnet/minecraft/core/Holder;)Z",
                                     ordinal = 0))
     private static boolean gtceu$isPoisoned(boolean original, Player player) {
-        return original || player.hasEffect(GTMobEffects.WEAK_POISON.get());
+        return original || player.hasEffect(GTMobEffects.WEAK_POISON);
     }
 }

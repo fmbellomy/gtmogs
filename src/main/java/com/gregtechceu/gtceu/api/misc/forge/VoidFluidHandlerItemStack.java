@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.misc.forge;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -39,7 +39,7 @@ public class VoidFluidHandlerItemStack extends FluidHandlerItemStack {
 
     @Override
     protected void setFluid(FluidStack fluid) {
-        // No NBT tag
+        // No NBT create
     }
 
     @Override

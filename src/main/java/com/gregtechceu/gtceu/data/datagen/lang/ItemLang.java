@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.lang;
+package com.gregtechceu.gtceu.data.datagen.lang;
 
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
@@ -6,8 +6,8 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 
-import static com.gregtechceu.gtceu.data.lang.LangHandler.multilineLang;
-import static com.gregtechceu.gtceu.data.lang.LangHandler.replace;
+import static com.gregtechceu.gtceu.data.datagen.lang.LangHandler.multilineLang;
+import static com.gregtechceu.gtceu.data.datagen.lang.LangHandler.replace;
 import static com.gregtechceu.gtceu.utils.FormattingUtil.toEnglishName;
 
 public class ItemLang {
@@ -347,7 +347,7 @@ public class ItemLang {
         provider.add("item.gtceu.basic_tape.tooltip",
                 "§7Not strong enough for mechanical issues\nCan be used to pick up crates without dropping their items");
         provider.add("item.gtceu.terminal.tooltip",
-                "Shift + R-Click on a controller to automatically build the multi-block");
+                "Shift + R-Click on a controller to automatically build the multiblock");
 
         provider.add("item.gtceu.sus_record.desc", "§7sussy!");
     }

@@ -985,7 +985,7 @@ public class GCYMMachines {
                 return shapeInfo;
             })
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/high_temperature_smelting_casing"),
-                    GTCEu.id("block/multiblock/gcym/mega_blast_furnace"))
+                    GTCEu.id("block/multiblock/gcym/rotary_hearth_furnace"))
             .additionalDisplay((controller, components) -> {
                 if (controller instanceof CoilWorkableElectricMultiblockMachine coilMachine && controller.isFormed()) {
                     components.add(Component.translatable("gtceu.multiblock.blast_furnace.max_temperature",

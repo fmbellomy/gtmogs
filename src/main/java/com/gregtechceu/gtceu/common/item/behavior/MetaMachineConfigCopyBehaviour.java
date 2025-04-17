@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputItem;
 import com.gregtechceu.gtceu.api.machine.feature.IMufflableMachine;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;

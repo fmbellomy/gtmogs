@@ -107,8 +107,8 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
 
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
-        return metaMachine.sideTips(player, pos, state, toolTypes, side);
+                                    ItemStack held, Direction side) {
+        return metaMachine.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     @Override

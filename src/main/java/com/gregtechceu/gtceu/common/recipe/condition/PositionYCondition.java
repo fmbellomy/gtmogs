@@ -66,7 +66,7 @@ public class PositionYCondition extends RecipeCondition<PositionYCondition> {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public PositionYCondition createTemplate() {
         return new PositionYCondition();
     }
 
@@ -80,7 +80,7 @@ public class PositionYCondition extends RecipeCondition<PositionYCondition> {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public PositionYCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         min = buf.readVarInt();
         max = buf.readVarInt();

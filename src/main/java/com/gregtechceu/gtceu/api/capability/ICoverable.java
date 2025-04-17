@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.block.IAppearance;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -24,6 +25,8 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,14 +65,15 @@ public interface ICoverable extends ITickSubscription, IAppearance {
     IFluidHandlerModifiable getFluidHandlerCap(@Nullable Direction side, boolean useCoverCapability);
 
     /**
-     * Its an internal method, you should never call it yourself.
+     * Internal method, do not call yourself.
      * <br>
      * Use {@link ICoverable#removeCover(boolean, Direction, Player)} and
      * {@link ICoverable#placeCoverOnSide(Direction, ItemStack, CoverDefinition, ServerPlayer)} instead
      * 
-     * @param coverBehavior
-     * @param side
+     * @param coverBehavior the cover to set, or {@code null} to remove an existing cover
+     * @param side the side to set the cover for
      */
+    @ApiStatus.Internal
     void setCoverAtSide(@Nullable CoverBehavior coverBehavior, Direction side);
 
     @Nullable
@@ -204,20 +208,11 @@ public interface ICoverable extends ITickSubscription, IAppearance {
 
     @Nullable
     static Direction rayTraceCoverableSide(ICoverable coverable, Player player) {
-        BlockHitResult rayTrace = (BlockHitResult) player.pick(player.blockInteractionRange(), 0, false);
-        if (rayTrace.getType() == HitResult.Type.MISS) {
+        HitResult rayTrace = ToolHelper.getPlayerDefaultRaytrace(player);
+        if (rayTrace.getType() != HitResult.Type.BLOCK) {
             return null;
         }
-        return traceCoverSide(rayTrace);
-    }
-
-    class PrimaryBoxData {
-
-        public final boolean usePlacementGrid;
-
-        public PrimaryBoxData(boolean usePlacementGrid) {
-            this.usePlacementGrid = usePlacementGrid;
-        }
+        return traceCoverSide((BlockHitResult) rayTrace);
     }
 
     @Nullable
@@ -258,10 +253,12 @@ public interface ICoverable extends ITickSubscription, IAppearance {
 
     @Nullable
     @Override
-    default BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                          BlockState sourceState, BlockPos sourcePos) {
-        if (hasCover(side)) {
-            return getCoverAtSide(side).getAppearance(sourceState, sourcePos);
+    default BlockState getBlockAppearance(@NotNull BlockState state, @NotNull BlockAndTintGetter level,
+                                          @NotNull BlockPos pos, @NotNull Direction side,
+                                          @NotNull BlockState sourceState, @NotNull BlockPos sourcePos) {
+        CoverBehavior cover = getCoverAtSide(side);
+        if (cover != null) {
+            return cover.getAppearance(sourceState, sourcePos);
         }
         return null;
     }

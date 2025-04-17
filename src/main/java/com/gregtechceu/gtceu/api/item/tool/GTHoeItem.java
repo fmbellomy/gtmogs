@@ -152,11 +152,6 @@ public class GTHoeItem extends HoeItem implements IGTTool {
         return definition$isValidRepairItem(stack, repairCandidate);
     }
 
-    @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-        return definition$getDefaultAttributeModifiers(stack);
-    }
-
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
         return definition$canDisableShield(shield, shield, entity, attacker);
     }

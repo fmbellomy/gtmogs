@@ -1,10 +1,11 @@
-package com.gregtechceu.gtceu.data.pack;
+package com.gregtechceu.gtceu.common.pack;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.lowdragmc.lowdraglib.Platform;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.SharedConstants;
 import net.minecraft.advancements.Advancement;
@@ -25,7 +26,11 @@ import com.google.gson.JsonObject;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.world.item.crafting.Recipe;
-import net.neoforged.fml.loading.FMLPaths;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.neoforged.neoforge.common.data.DataMapProvider;
+import net.neoforged.neoforge.registries.DataMapLoader;
+import net.neoforged.neoforge.registries.datamaps.DataMapFile;
+import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -88,23 +93,57 @@ public class GTDynamicDataPack implements PackResources {
         }
     }
 
+    public static void addLootTable(ResourceLocation lootTableId, LootTable table, HolderLookup.Provider provider) {
+        JsonElement lootTableJson = LootTable.DIRECT_CODEC
+                .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), table).getOrThrow();
+        byte[] lootTableBytes = lootTableJson.toString().getBytes(StandardCharsets.UTF_8);
+        Path parent = Platform.getGamePath().resolve("gtceu/dumped/data");
+        if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
+            writeJson(lootTableId, "loot_table", parent, lootTableBytes);
+        }
+        if (DATA.containsKey(lootTableId)) {
+            GTCEu.LOGGER.error("duplicated loot table: {}", lootTableId);
+        }
+        DATA.put(getLootTableLocation(lootTableId), lootTableBytes);
+    }
+
+    public static <T, R> void addDataMap(DataMapType<R, T> type, DataMapProvider.Builder<T, R> builder,
+                                         HolderLookup.Provider provider) {
+        ResourceLocation dataMapId = type.id()
+                .withPrefix(DataMapLoader.getFolderLocation(type.registryKey().location()) + "/");
+        JsonElement dataMapJson = DataMapFile.codec(type.registryKey(), type)
+                .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), builder.build().carrier())
+                .getOrThrow();
+        byte[] dataMapBytes = dataMapJson.toString().getBytes(StandardCharsets.UTF_8);
+        Path parent = Platform.getGamePath().resolve("gtceu/dumped/data");
+        if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
+            writeJson(dataMapId, null, parent, dataMapBytes);
+        }
+        if (DATA.containsKey(dataMapId)) {
+            GTCEu.LOGGER.error("duplicated loot table: {}", dataMapId);
+        }
+        DATA.put(dataMapId, dataMapBytes);
+
+    }
+
     /**
-     * if subdir is null, no file ending is appended.
+     * if {@code subDir} is null, no file ending is appended.
      * 
      * @param id     the resource location of the file to be written.
-     * @param subdir a nullable subdirectory for the data.
+     * @param subDir a nullable subdirectory for the data.
      * @param parent the parent folder where to write data to.
      * @param json   the json to write.
      */
     @ApiStatus.Internal
-    public static void writeJson(ResourceLocation id, @Nullable String subdir, Path parent, byte[] json) {
+    public static void writeJson(ResourceLocation id, @Nullable String subDir, Path parent, byte[] json) {
         try {
             Path file;
-            if (subdir != null) {
-                file = parent.resolve(id.getNamespace()).resolve(subdir).resolve(id.getPath() + ".json"); // assume JSON
+            if (subDir != null) {
+                // assume JSON
+                file = parent.resolve(id.getNamespace()).resolve(subDir).resolve(id.getPath() + ".json");
             } else {
-                file = parent.resolve(id.getNamespace()).resolve(id.getPath()); // assume the file type is also appended
-                                                                                // if a full path is given.
+                // assume the file type is also appended if a full path is given.
+                file = parent.resolve(id.getNamespace()).resolve(id.getPath());
             }
             Files.createDirectories(file.getParent());
             try (OutputStream output = Files.newOutputStream(file)) {
@@ -156,7 +195,7 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     @Override
-    public Set<String> getNamespaces(PackType type) {
+    public @NotNull Set<String> getNamespaces(PackType type) {
         return type == PackType.SERVER_DATA ? SERVER_DOMAINS : Set.of();
     }
 
@@ -181,22 +220,18 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     public static ResourceLocation getRecipeLocation(ResourceLocation recipeId) {
-        return ResourceLocation.fromNamespaceAndPath(recipeId.getNamespace(),
-                String.join("", "recipe/", recipeId.getPath(), ".json"));
+        return recipeId.withPath(path -> "recipe/" + path + ".json");
     }
 
     public static ResourceLocation getLootTableLocation(ResourceLocation lootTableId) {
-        return ResourceLocation.fromNamespaceAndPath(lootTableId.getNamespace(),
-                String.join("", "loot_table/", lootTableId.getPath(), ".json"));
+        return lootTableId.withPath(path -> "loot_table/" + path + ".json");
     }
 
     public static ResourceLocation getAdvancementLocation(ResourceLocation advancementId) {
-        return ResourceLocation.fromNamespaceAndPath(advancementId.getNamespace(),
-                String.join("", "advancement/", advancementId.getPath(), ".json"));
+        return advancementId.withPath(path -> "advancement/" + path + ".json");
     }
 
     public static ResourceLocation getTagLocation(String identifier, ResourceLocation tagId) {
-        return ResourceLocation.fromNamespaceAndPath(tagId.getNamespace(),
-                String.join("", "tags/", identifier, "/", tagId.getPath(), ".json"));
+        return tagId.withPath(path -> "tags/" + identifier + "/" + path + ".json");
     }
 }

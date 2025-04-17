@@ -14,7 +14,7 @@ import com.gregtechceu.gtceu.common.commands.arguments.GTRegistryArgument;
 import com.gregtechceu.gtceu.data.loader.BedrockFluidLoader;
 import com.gregtechceu.gtceu.data.loader.BedrockOreLoader;
 import com.gregtechceu.gtceu.data.loader.GTOreLoader;
-import com.gregtechceu.gtceu.data.pack.GTDynamicDataPack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;

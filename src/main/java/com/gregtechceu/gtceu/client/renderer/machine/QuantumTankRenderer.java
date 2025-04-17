@@ -8,7 +8,7 @@ import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.common.machine.storage.CreativeTankMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.client.utils.RenderBufferUtils;

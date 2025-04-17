@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;

@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.pack;
+package com.gregtechceu.gtceu.common.pack;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static com.gregtechceu.gtceu.data.pack.GTDynamicDataPack.writeJson;
+import static com.gregtechceu.gtceu.common.pack.GTDynamicDataPack.writeJson;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

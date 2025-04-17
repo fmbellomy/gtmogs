@@ -14,6 +14,7 @@ import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.pipenet.*;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -339,7 +340,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     @Override
     public boolean shouldRenderGrid(Player player, BlockPos pos, BlockState state, ItemStack held,
                                     Set<GTToolType> toolTypes) {
-        if (toolTypes.contains(getPipeTuneTool())) return true;
+        if (toolTypes.contains(getPipeTuneTool()) || hasCorrectAction(held)) return true;
         for (CoverBehavior cover : coverContainer.getCovers()) {
             if (cover.shouldRenderGrid(player, pos, state, held, toolTypes)) return true;
         }
@@ -351,9 +352,9 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
     }
 
     @Override
-    public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
-        if (toolTypes.contains(getPipeTuneTool())) {
+    public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
+                                              ItemStack held, Direction side) {
+        if (toolTypes.contains(getPipeTuneTool()) || hasCorrectAction(held)) {
             if (player.isShiftKeyDown() && this.canHaveBlockedFaces()) {
                 return getPipeTexture(isBlocked(side));
             } else {
@@ -362,13 +363,13 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
         }
         var cover = coverContainer.getCoverAtSide(side);
         if (cover != null) {
-            return cover.sideTips(player, pos, state, toolTypes, side);
+            return cover.sideTips(player, pos, state, toolTypes, held, side);
         }
         return null;
     }
 
     @Override
-    public Pair<GTToolType, ItemInteractionResult> onToolClick(Set<GTToolType> toolTypes, ItemStack itemStack,
+    public Pair<GTToolType, ItemInteractionResult> onToolClick(Set<GTToolType> toolTypes, ItemStack held,
                                                                UseOnContext context) {
         // the side hit from the machine grid
         var playerIn = context.getPlayer();
@@ -384,18 +385,18 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
         // Prioritize covers where they apply (Screwdriver, Soft Mallet)
         if (toolTypes.isEmpty() && playerIn.isShiftKeyDown()) {
             if (coverBehavior != null) {
-                return Pair.of(null, coverBehavior.onScrewdriverClick(playerIn, hand, hitResult));
+                return Pair.of(null, coverBehavior.onScrewdriverClick(playerIn, hand, held, hitResult));
             }
         }
-        if (toolTypes.contains(GTToolType.SCREWDRIVER)) {
+        if (toolTypes.contains(GTToolType.SCREWDRIVER) || held.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SCREWDRIVER, coverBehavior.onScrewdriverClick(playerIn, hand, hitResult));
+                return Pair.of(GTToolType.SCREWDRIVER, coverBehavior.onScrewdriverClick(playerIn, hand, held, hitResult));
             }
-        } else if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
+        } else if (toolTypes.contains(GTToolType.SOFT_MALLET) || held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SOFT_MALLET, coverBehavior.onSoftMalletClick(playerIn, hand, hitResult));
+                return Pair.of(GTToolType.SOFT_MALLET, coverBehavior.onSoftMalletClick(playerIn, hand, held, hitResult));
             }
-        } else if (toolTypes.contains(getPipeTuneTool())) {
+        } else if (toolTypes.contains(getPipeTuneTool()) || hasCorrectAction(held)) {
             if (playerIn.isShiftKeyDown() && this.canHaveBlockedFaces()) {
                 boolean isBlocked = this.isBlocked(gridSide);
                 this.setBlocked(gridSide, !isBlocked);
@@ -405,7 +406,7 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
             }
             playerIn.swing(hand);
             return Pair.of(getPipeTuneTool(), ItemInteractionResult.CONSUME);
-        } else if (toolTypes.contains(GTToolType.CROWBAR)) {
+        } else if (toolTypes.contains(GTToolType.CROWBAR) || held.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
             if (coverBehavior != null) {
                 if (!isRemote()) {
                     getCoverContainer().removeCover(gridSide, playerIn);
@@ -428,6 +429,10 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
 
     public GTToolType getPipeTuneTool() {
         return GTToolType.WRENCH;
+    }
+
+    public boolean hasCorrectAction(ItemStack stack) {
+        return stack.canPerformAction(GTItemAbilities.WRENCH_CONNECT);
     }
 
     @Override

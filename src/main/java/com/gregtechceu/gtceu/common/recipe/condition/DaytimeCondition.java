@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 @Getter
 @NoArgsConstructor
-public class DaytimeCondition extends RecipeCondition {
+public class DaytimeCondition extends RecipeCondition<DaytimeCondition> {
 
     public static final MapCodec<DaytimeCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -29,7 +29,7 @@ public class DaytimeCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<DaytimeCondition> getType() {
         return GTRecipeConditions.DAYTIME;
     }
 
@@ -49,7 +49,7 @@ public class DaytimeCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public DaytimeCondition createTemplate() {
         return new DaytimeCondition();
     }
 }

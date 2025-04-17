@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -26,9 +27,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -221,15 +222,18 @@ public class WorldAcceleratorMachine extends TieredEnergyMachine implements ICon
 
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             return isWorkingEnabled ? GuiTextures.TOOL_PAUSE : GuiTextures.TOOL_START;
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
-    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                       BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
         var controllable = GTCapabilityHelper.getControllable(getLevel(), getPos(), gridSide);
         if (controllable != null) {
             if (!isRemote()) {
@@ -244,7 +248,7 @@ public class WorldAcceleratorMachine extends TieredEnergyMachine implements ICon
 
     @Override
     protected @NotNull ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand,
-                                                                Direction gridSide, BlockHitResult hitResult) {
+                                                                ItemStack held, Direction gridSide, BlockHitResult hitResult) {
         if (!isRemote()) {
             isRandomTickMode = !isRandomTickMode;
             playerIn.sendSystemMessage(Component.translatable(isRandomTickMode ?

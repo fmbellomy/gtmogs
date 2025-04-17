@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
@@ -29,6 +30,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
 import com.google.common.collect.ImmutableSet;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
@@ -41,6 +43,11 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
     public static final StreamCodec<ByteBuf, HarvestCropsBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected HarvestCropsBehavior() {/**/}
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == GTItemAbilities.HOE_HARVEST;
+    }
 
     @NotNull
     @Override
@@ -59,16 +66,13 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
 
         Set<BlockPos> blocks;
 
-        if (aoeDefinition == AoESymmetrical.none()) {
+        if (aoeDefinition.isNone()) {
             blocks = ImmutableSet.of(pos);
         } else {
             HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
 
-            if (rayTraceResult == null) return InteractionResult.PASS;
             if (rayTraceResult.getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
             if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                return InteractionResult.PASS;
-            if (blockHitResult.getDirection() == null)
                 return InteractionResult.PASS;
 
             blocks = ToolHelper.iterateAoE(stack, aoeDefinition, player.level(), player, rayTraceResult,

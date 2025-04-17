@@ -14,8 +14,6 @@ import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.misc.alloyblast.CustomAlloyBlastRecipeProducer;
 
-import net.neoforged.bus.api.SubscribeEvent;
-
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -23,10 +21,8 @@ import java.util.List;
 /**
  * Listen to PostMaterialEvent instead of doing this directly because it's a lot cleaner this way.
  */
-// @Mod.EventBusSubscriber(modid = GTCEu.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class AlloyBlastPropertyAddition {
 
-    @SubscribeEvent
     public static void addAlloyBlastProperties(PostMaterialEvent event) {
         for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
             if (!material.hasFlag(MaterialFlags.DISABLE_ALLOY_PROPERTY)) {

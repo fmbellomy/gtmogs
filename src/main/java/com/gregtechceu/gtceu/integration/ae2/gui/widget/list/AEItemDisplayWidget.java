@@ -2,6 +2,8 @@ package com.gregtechceu.gtceu.integration.ae2.gui.widget.list;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 
+import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
+import com.gregtechceu.gtceu.utils.GTMath;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
@@ -18,11 +20,6 @@ import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlot
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawText;
 
-/**
- * @Author GlodBlock
- * @Description Display a certain {@link appeng.api.stacks.GenericStack} element.
- * @Date 2023/4/19-21:23
- */
 public class AEItemDisplayWidget extends Widget {
 
     private final AEListGridWidget gridWidget;
@@ -44,8 +41,8 @@ public class AEItemDisplayWidget extends Widget {
         int stackX = position.x + 1;
         int stackY = position.y + 1;
         if (item != null) {
-            ItemStack realStack = item.what() instanceof AEItemKey key ? new ItemStack(key.getItem()) : ItemStack.EMPTY;
-            drawItemStack(graphics, realStack, stackX, stackY, -1, null);
+            ItemStack itemStack = AEUtil.toItemStack(item);
+            drawItemStack(graphics, itemStack, stackX, stackY, -1, null);
             String amountStr = String.format("x%,d", item.amount());
             drawText(graphics, amountStr, stackX + 20, stackY + 5, 1, 0xFFFFFFFF);
         }
@@ -59,8 +56,8 @@ public class AEItemDisplayWidget extends Widget {
         if (isMouseOverElement(mouseX, mouseY)) {
             GenericStack item = this.gridWidget.getAt(this.index);
             if (item != null) {
-                graphics.renderTooltip(Minecraft.getInstance().font, GenericStack.wrapInItemStack(item), mouseX,
-                        mouseY);
+                ItemStack itemStack = AEUtil.toItemStack(item);
+                graphics.renderTooltip(Minecraft.getInstance().font, itemStack, mouseX, mouseY);
             }
         }
     }

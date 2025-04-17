@@ -5,9 +5,10 @@ import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
 import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
@@ -18,11 +19,6 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @Author GlodBlock
- * @Description A display only widget for {@link KeyStorage}
- * @Date 2023/4/19-0:18
- */
 public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
 
     protected final KeyStorage list;
@@ -68,7 +64,7 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
         }
     }
 
-    protected void writeListChange(FriendlyByteBuf buffer) {
+    protected void writeListChange(RegistryFriendlyByteBuf buffer) {
         this.changeMap.clear();
 
         // Remove
@@ -107,7 +103,7 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
         }
     }
 
-    protected void readListChange(FriendlyByteBuf buffer) {
+    protected void readListChange(RegistryFriendlyByteBuf buffer) {
         int size = buffer.readVarInt();
         for (int i = 0; i < size; i++) {
             var key = fromPacket(buffer);
@@ -134,9 +130,9 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
         }
     }
 
-    protected abstract void toPacket(FriendlyByteBuf buffer, AEKey key);
+    protected abstract void toPacket(RegistryFriendlyByteBuf buffer, AEKey key);
 
-    protected abstract AEKey fromPacket(FriendlyByteBuf buffer);
+    protected abstract AEKey fromPacket(RegistryFriendlyByteBuf buffer);
 
     protected abstract Widget createDisplayWidget(int x, int y, int index);
 
@@ -156,7 +152,7 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
         super.readUpdateInfo(id, buffer);
         if (id == ROW_CHANGE_ID) {
             int slotsToAdd = buffer.readVarInt();
@@ -168,7 +164,7 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
     }
 
     @Override
-    public void writeInitialData(FriendlyByteBuf buffer) {
+    public void writeInitialData(RegistryFriendlyByteBuf buffer) {
         super.writeInitialData(buffer);
         if (this.list == null) return;
         int slotRowsRequired = Math.max(this.slotAmountY, list.storage.size());
@@ -181,7 +177,7 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
 
     @Override
     @OnlyIn(Dist.CLIENT)
-    public void readInitialData(FriendlyByteBuf buffer) {
+    public void readInitialData(RegistryFriendlyByteBuf buffer) {
         super.readInitialData(buffer);
         if (this.list == null) return;
         this.modifySlotRows(buffer.readVarInt());
@@ -195,12 +191,12 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
         }
 
         @Override
-        protected void toPacket(FriendlyByteBuf buffer, AEKey key) {
+        protected void toPacket(RegistryFriendlyByteBuf buffer, AEKey key) {
             key.writeToPacket(buffer);
         }
 
         @Override
-        protected AEKey fromPacket(FriendlyByteBuf buffer) {
+        protected AEKey fromPacket(RegistryFriendlyByteBuf buffer) {
             return AEItemKey.fromPacket(buffer);
         }
 
@@ -217,12 +213,12 @@ public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
         }
 
         @Override
-        protected void toPacket(FriendlyByteBuf buffer, AEKey key) {
+        protected void toPacket(RegistryFriendlyByteBuf buffer, AEKey key) {
             key.writeToPacket(buffer);
         }
 
         @Override
-        protected AEKey fromPacket(FriendlyByteBuf buffer) {
+        protected AEKey fromPacket(RegistryFriendlyByteBuf buffer) {
             return AEFluidKey.fromPacket(buffer);
         }
 

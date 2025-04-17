@@ -15,6 +15,8 @@ import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import lombok.Getter;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -91,20 +93,20 @@ public final class ProxySlotRecipeHandler {
     }
 
     @Getter
-    private static class ProxyItemRecipeHandler extends NotifiableRecipeHandlerTrait<Ingredient> {
+    private static class ProxyItemRecipeHandler extends NotifiableRecipeHandlerTrait<SizedIngredient> {
 
-        private IRecipeHandlerTrait<Ingredient> proxy = null;
+        private IRecipeHandlerTrait<SizedIngredient> proxy = null;
         private ISubscription proxySub = null;
 
         private final IO handlerIO = IO.IN;
-        private final RecipeCapability<Ingredient> capability = ItemRecipeCapability.CAP;
+        private final RecipeCapability<SizedIngredient> capability = ItemRecipeCapability.CAP;
         private final boolean isDistinct = true;
 
         public ProxyItemRecipeHandler(MetaMachine machine) {
             super(machine);
         }
 
-        public void setProxy(IRecipeHandlerTrait<Ingredient> proxy) {
+        public void setProxy(IRecipeHandlerTrait<SizedIngredient> proxy) {
             this.proxy = proxy;
             if (proxySub != null) {
                 proxySub.unsubscribe();
@@ -116,7 +118,7 @@ public final class ProxySlotRecipeHandler {
         }
 
         @Override
-        public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, boolean simulate) {
+        public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left, boolean simulate) {
             if (proxy == null) return left;
             return proxy.handleRecipeInner(io, recipe, left, simulate);
         }
@@ -146,20 +148,20 @@ public final class ProxySlotRecipeHandler {
     }
 
     @Getter
-    private static class ProxyFluidRecipeHandler extends NotifiableRecipeHandlerTrait<FluidIngredient> {
+    private static class ProxyFluidRecipeHandler extends NotifiableRecipeHandlerTrait<SizedFluidIngredient> {
 
-        private IRecipeHandlerTrait<FluidIngredient> proxy = null;
+        private IRecipeHandlerTrait<SizedFluidIngredient> proxy = null;
         private ISubscription proxySub = null;
 
         private final IO handlerIO = IO.IN;
-        private final RecipeCapability<FluidIngredient> capability = FluidRecipeCapability.CAP;
+        private final RecipeCapability<SizedFluidIngredient> capability = FluidRecipeCapability.CAP;
         private final boolean isDistinct = true;
 
         public ProxyFluidRecipeHandler(MetaMachine machine) {
             super(machine);
         }
 
-        public void setProxy(IRecipeHandlerTrait<FluidIngredient> proxy) {
+        public void setProxy(IRecipeHandlerTrait<SizedFluidIngredient> proxy) {
             this.proxy = proxy;
             if (proxySub != null) {
                 proxySub.unsubscribe();
@@ -171,7 +173,7 @@ public final class ProxySlotRecipeHandler {
         }
 
         @Override
-        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left,
+        public List<SizedFluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedFluidIngredient> left,
                                                        boolean simulate) {
             if (proxy == null) return left;
             return proxy.handleRecipeInner(io, recipe, left, simulate);

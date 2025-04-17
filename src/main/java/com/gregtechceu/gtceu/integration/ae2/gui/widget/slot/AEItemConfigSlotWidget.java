@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.integration.ae2.gui.widget.ConfigWidget;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAESlot;
 import com.gregtechceu.gtceu.integration.ae2.slot.IConfigurableSlot;
 
+import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
 import com.lowdragmc.lowdraglib.gui.util.TextFormattingUtil;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
@@ -13,6 +14,7 @@ import com.lowdragmc.lowdraglib.utils.Size;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -24,11 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringFixedCorner;
 
-/**
- * @Author GlodBlock
- * @Description A configurable slot for {@link ItemStack}
- * @Date 2023/4/22-0:48
- */
 public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhostItemTarget {
 
     public AEItemConfigSlotWidget(int x, int y, ConfigWidget widget, int index) {
@@ -104,7 +101,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
                 ItemStack item = this.gui.getModularUIContainer().getCarried();
 
                 if (!item.isEmpty()) {
-                    writeClientAction(UPDATE_ID, buf -> buf.writeItem(item));
+                    writeClientAction(UPDATE_ID, buf -> ItemStack.STREAM_CODEC.encode(buf, item));
                 }
 
                 if (!parentWidget.isStocking()) {
@@ -130,7 +127,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
     }
 
     @Override
-    public void handleClientAction(int id, FriendlyByteBuf buffer) {
+    public void handleClientAction(int id, RegistryFriendlyByteBuf buffer) {
         super.handleClientAction(id, buffer);
         IConfigurableSlot slot = this.parentWidget.getConfig(this.index);
         if (id == REMOVE_ID) {
@@ -139,13 +136,13 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             writeUpdateInfo(REMOVE_ID, buf -> {});
         }
         if (id == UPDATE_ID) {
-            ItemStack item = buffer.readItem();
+            ItemStack item = ItemStack.STREAM_CODEC.decode(buffer);
             var stack = GenericStack.fromItemStack(item);
             if (!isStackValidForSlot(stack)) return;
             slot.setConfig(stack);
             this.parentWidget.enableAmount(this.index);
             if (!item.isEmpty()) {
-                writeUpdateInfo(UPDATE_ID, buf -> buf.writeItem(item));
+                writeUpdateInfo(UPDATE_ID, buf -> ItemStack.STREAM_CODEC.encode(buf, item));
             }
         }
         if (id == AMOUNT_CHANGE_ID) {
@@ -157,12 +154,8 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
         }
         if (id == PICK_UP_ID) {
             if (slot.getStock() != null && this.gui.getModularUIContainer().getCarried() == ItemStack.EMPTY &&
-                    slot.getStock().what() instanceof AEItemKey key) {
-                ItemStack stack = new ItemStack(key.getItem());
-                stack.setCount(Math.min((int) slot.getStock().amount(), stack.getMaxStackSize()));
-                if (key.hasTag()) {
-                    stack.setTag(key.getTag().copy());
-                }
+                    slot.getStock().what() instanceof AEItemKey) {
+                ItemStack stack = AEUtil.toItemStack(slot.getStock());
                 this.gui.getModularUIContainer().setCarried(stack);
                 GenericStack stack1 = ExportOnlyAESlot.copy(slot.getStock(),
                         Math.max(0, (slot.getStock().amount() - stack.getCount())));
@@ -174,15 +167,15 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
         super.readUpdateInfo(id, buffer);
         IConfigurableSlot slot = this.parentWidget.getDisplay(this.index);
         if (id == REMOVE_ID) {
             slot.setConfig(null);
         }
         if (id == UPDATE_ID) {
-            ItemStack item = buffer.readItem();
-            slot.setConfig(new GenericStack(AEItemKey.of(item.getItem(), item.getTag()), item.getCount()));
+            ItemStack item = ItemStack.STREAM_CODEC.decode(buffer);
+            slot.setConfig(new GenericStack(AEItemKey.of(item), item.getCount()));
         }
         if (id == AMOUNT_CHANGE_ID) {
             if (slot.getConfig() != null) {
@@ -192,11 +185,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
         }
         if (id == PICK_UP_ID) {
             if (slot.getStock() != null && slot.getStock().what() instanceof AEItemKey key) {
-                ItemStack stack = new ItemStack(key.getItem());
-                stack.setCount(Math.min((int) slot.getStock().amount(), stack.getMaxStackSize()));
-                if (key.hasTag()) {
-                    stack.setTag(key.getTag().copy());
-                }
+                ItemStack stack = AEUtil.toItemStack(slot.getStock());
                 this.gui.getModularUIContainer().setCarried(stack);
                 GenericStack stack1 = ExportOnlyAESlot.copy(slot.getStock(),
                         Math.max(0, (slot.getStock().amount() - stack.getCount())));
@@ -216,26 +205,26 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
     @OnlyIn(Dist.CLIENT)
     @Override
     public void acceptItem(ItemStack itemStack) {
-        writeClientAction(UPDATE_ID, buf -> buf.writeItem(itemStack));
+        writeClientAction(UPDATE_ID, buf -> ItemStack.STREAM_CODEC.encode(buf, itemStack));
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public boolean mouseWheelMove(double mouseX, double mouseY, double wheelDelta) {
+    public boolean mouseWheelMove(double mouseX, double mouseY, double scrollX, double scrollY) {
         // Only allow the amount scrolling if not stocking, as amount is useless for stocking
         if (parentWidget.isStocking()) return false;
         IConfigurableSlot slot = this.parentWidget.getDisplay(this.index);
         Rect2i rectangle = toRectangleBox();
         rectangle.setHeight(rectangle.getHeight() / 2);
-        if (slot.getConfig() == null || wheelDelta == 0 || !rectangle.contains((int) mouseX, (int) mouseY)) {
+        if (slot.getConfig() == null || scrollY == 0 || !rectangle.contains((int) mouseX, (int) mouseY)) {
             return false;
         }
         GenericStack stack = slot.getConfig();
         long amt;
         if (isCtrlDown()) {
-            amt = wheelDelta > 0 ? stack.amount() * 2L : stack.amount() / 2L;
+            amt = scrollY > 0 ? stack.amount() * 2L : stack.amount() / 2L;
         } else {
-            amt = wheelDelta > 0 ? stack.amount() + 1L : stack.amount() - 1L;
+            amt = scrollY > 0 ? stack.amount() + 1L : stack.amount() - 1L;
         }
         if (amt > 0 && amt < Integer.MAX_VALUE + 1L) {
             writeClientAction(AMOUNT_CHANGE_ID, buf -> buf.writeVarLong(amt));

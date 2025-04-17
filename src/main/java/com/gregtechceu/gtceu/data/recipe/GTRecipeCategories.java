@@ -42,7 +42,7 @@ public class GTRecipeCategories {
         if (GTCEu.Mods.isKubeJSLoaded()) {
             GTRegistryInfo.registerFor(GTRegistries.RECIPE_CATEGORIES.getRegistryName());
         }
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.RECIPE_CATEGORIES, GTRecipeCategory.class));
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.RECIPE_CATEGORIES));
         GTRegistries.RECIPE_CATEGORIES.freeze();
     }
 

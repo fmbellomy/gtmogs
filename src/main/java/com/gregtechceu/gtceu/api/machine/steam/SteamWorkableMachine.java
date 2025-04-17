@@ -16,6 +16,7 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
@@ -23,12 +24,12 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -38,8 +39,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class SteamWorkableMachine extends SteamMachine
                                            implements IRecipeLogicMachine, IMufflableMachine, IMachineLife {
@@ -138,14 +137,17 @@ public abstract class SteamWorkableMachine extends SteamMachine
     }
 
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                  BlockHitResult hitResult) {
+    protected @NotNull ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                           Direction gridSide, BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
+            return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
+        }
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
-            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
             setOutputFacing(gridSide);
             return ItemInteractionResult.CONSUME;
         }
-        return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
+        return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
     }
 
     @Override
@@ -175,7 +177,7 @@ public abstract class SteamWorkableMachine extends SteamMachine
     //////////////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.WRENCH)) {
             if (!player.isShiftKeyDown()) {
                 if (!hasFrontFacing() || side != getFrontFacing()) {
@@ -183,6 +185,6 @@ public abstract class SteamWorkableMachine extends SteamMachine
                 }
             }
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 }

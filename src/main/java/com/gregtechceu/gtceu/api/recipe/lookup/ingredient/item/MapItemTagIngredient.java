@@ -27,6 +27,6 @@ public class MapItemTagIngredient extends AbstractMapIngredient {
 
     @Override
     public String toString() {
-        return "MapItemTagIngredient{" + "tag=" + tag.location() + "}";
+        return "MapItemTagIngredient{" + "create=" + tag.location() + "}";
     }
 }

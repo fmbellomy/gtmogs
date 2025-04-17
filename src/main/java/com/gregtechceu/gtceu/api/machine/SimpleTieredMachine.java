@@ -20,7 +20,7 @@ import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
@@ -42,19 +42,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.google.common.collect.Tables;
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * @author KilaBash
@@ -404,7 +401,7 @@ public class SimpleTieredMachine extends WorkableTieredMachine
     //////////////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.WRENCH)) {
             if (!player.isShiftKeyDown()) {
                 if (!hasFrontFacing() || side != getFrontFacing()) {
@@ -417,6 +414,6 @@ public class SimpleTieredMachine extends WorkableTieredMachine
                 return GuiTextures.TOOL_ALLOW_INPUT;
             }
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 }

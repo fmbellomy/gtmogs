@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.machine.trait.ConverterTrait;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
@@ -17,9 +18,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -70,9 +71,12 @@ public class ConverterMachine extends TieredEnergyMachine {
     // ****** Interaction ******//
     //////////////////////////////////////
     @Override
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, Direction facing,
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction facing,
                                                    BlockHitResult hitResult) {
         if (!isRemote()) {
+            if (!held.canPerformAction(GTItemAbilities.MALLET_CONFIGURE)) {
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            }
             if (getConverterTrait().isFeToEu()) {
                 setFeToEu(false);
                 playerIn.sendSystemMessage(
@@ -109,11 +113,11 @@ public class ConverterMachine extends TieredEnergyMachine {
 
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             return this.isFeToEu() ? GuiTextures.TOOL_SWITCH_CONVERTER_NATIVE : GuiTextures.TOOL_SWITCH_CONVERTER_EU;
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     @Override

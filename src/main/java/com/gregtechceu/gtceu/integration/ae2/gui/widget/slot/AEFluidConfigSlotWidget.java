@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.integration.ae2.gui.widget.slot;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.misc.IGhostFluidTarget;
+import com.gregtechceu.gtceu.core.mixins.FluidStackAccessor;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.ConfigWidget;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEFluidSlot;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAESlot;
@@ -11,14 +12,12 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
-import com.lowdragmc.lowdraglib.side.fluid.forge.FluidHelperImpl;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
@@ -38,11 +37,6 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringFixedCorner;
 
-/**
- * @Author GlodBlock
- * @Description A configurable slot for {@link FluidStack}
- * @Date 2023/4/21-0:50
- */
 public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhostFluidTarget {
 
     public AEFluidConfigSlotWidget(int x, int y, ConfigWidget widget, int index) {
@@ -67,8 +61,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
         if (config != null) {
             var stack = AEUtil.toFluidStack(config);
             if (!stack.isEmpty()) {
-                DrawerHelper.drawFluidForGui(graphics, FluidHelperImpl.toFluidStack(stack), config.amount(), stackX,
-                        stackY, 16, 16);
+                DrawerHelper.drawFluidForGui(graphics, stack, stackX, stackY, 16, 16);
                 if (!parentWidget.isStocking()) {
                     String amountStr = FormattingUtil.formatNumberReadable(config.amount(), true,
                             FormattingUtil.DECIMAL_FORMAT_0F, "B");
@@ -79,9 +72,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
         if (stock != null) {
             var stack = AEUtil.toFluidStack(stock);
             if (!stack.isEmpty()) {
-                DrawerHelper.drawFluidForGui(graphics, FluidHelperImpl.toFluidStack(stack), stock.amount(), stackX,
-                        stackY + 18, 16,
-                        16);
+                DrawerHelper.drawFluidForGui(graphics, stack, stackX, stackY + 18, 16, 16);
                 String amountStr = FormattingUtil.formatNumberReadable(stock.amount(), true,
                         FormattingUtil.DECIMAL_FORMAT_0F, "B");
                 drawStringFixedCorner(graphics, amountStr, stackX + 17, stackY + 18 + 17, 16777215, true, 0.5f);
@@ -126,7 +117,9 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
             } else if (button == 0) {
                 // Left click to set/select
                 ItemStack hold = this.gui.getModularUIContainer().getCarried();
-                FluidUtil.getFluidContained(hold).ifPresent(f -> writeClientAction(UPDATE_ID, f::writeToPacket));
+                FluidUtil.getFluidContained(hold)
+                        .ifPresent(f -> writeClientAction(UPDATE_ID,
+                                buf -> FluidStack.STREAM_CODEC.encode(buf, f)));
 
                 if (!parentWidget.isStocking()) {
                     this.parentWidget.enableAmountClient(this.index);
@@ -151,7 +144,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
     }
 
     @Override
-    public void handleClientAction(int id, FriendlyByteBuf buffer) {
+    public void handleClientAction(int id, RegistryFriendlyByteBuf buffer) {
         super.handleClientAction(id, buffer);
         IConfigurableSlot slot = this.parentWidget.getConfig(this.index);
         if (id == REMOVE_ID) {
@@ -160,13 +153,13 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
             writeUpdateInfo(REMOVE_ID, buf -> {});
         }
         if (id == UPDATE_ID) {
-            FluidStack fluid = FluidStack.readFromPacket(buffer);
+            FluidStack fluid = FluidStack.STREAM_CODEC.decode(buffer);
             var stack = AEUtil.fromFluidStack(fluid);
             if (!isStackValidForSlot(stack)) return;
             slot.setConfig(stack);
             this.parentWidget.enableAmount(this.index);
             if (fluid != FluidStack.EMPTY) {
-                writeUpdateInfo(UPDATE_ID, fluid::writeToPacket);
+                writeUpdateInfo(UPDATE_ID, buf -> FluidStack.STREAM_CODEC.encode(buf, fluid));
             }
         }
         if (id == AMOUNT_CHANGE_ID) {
@@ -189,15 +182,14 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
         super.readUpdateInfo(id, buffer);
         IConfigurableSlot slot = this.parentWidget.getDisplay(this.index);
         if (id == REMOVE_ID) {
             slot.setConfig(null);
         }
         if (id == UPDATE_ID) {
-            FluidStack fluid = new FluidStack(BuiltInRegistries.FLUID.get(buffer.readResourceLocation()),
-                    buffer.readVarInt());
+            FluidStack fluid = FluidStack.STREAM_CODEC.decode(buffer);
             slot.setConfig(new GenericStack(AEFluidKey.of(fluid.getFluid()), fluid.getAmount()));
         }
         if (id == AMOUNT_CHANGE_ID) {
@@ -214,8 +206,9 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
                 gui.getModularUIContainer().setCarried(currentStack);
 
                 FluidStack stack = new FluidStack(key.getFluid(), GTMath.saturatedCast(slot.getStock().amount()));
-                if (key.hasTag()) {
-                    stack.setTag(key.getTag().copy());
+                // this is inverted for some reason
+                if (!key.hasComponents()) {
+                    stack.applyComponents(key.toStack(1).getComponentsPatch());
                 }
                 GenericStack stack1 = ExportOnlyAESlot.copy(slot.getStock(),
                         Math.max(0, (slot.getStock().amount() - stack.getAmount())));
@@ -235,35 +228,33 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
     @OnlyIn(Dist.CLIENT)
     @Override
     public void acceptFluid(FluidStack fluidStack) {
-        if (fluidStack.getRawFluid() != Fluids.EMPTY && fluidStack.getAmount() <= 0L) {
+        // noinspection UnclearExpression
+        if (((FluidStackAccessor) (Object) fluidStack).getRawFluid() != Fluids.EMPTY && fluidStack.getAmount() <= 0L) {
             fluidStack.setAmount(1000);
         }
 
         if (!fluidStack.isEmpty()) {
-            writeClientAction(UPDATE_ID, fluidStack::writeToPacket);
+            writeClientAction(UPDATE_ID, buf -> FluidStack.STREAM_CODEC.encode(buf, fluidStack));
         }
     }
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public boolean mouseWheelMove(double mouseX, double mouseY, double wheelDelta) {
+    public boolean mouseWheelMove(double mouseX, double mouseY, double scrollX, double scrollY) {
         // Only allow the amount scrolling if not stocking, as amount is useless for stocking
         if (parentWidget.isStocking()) return false;
         IConfigurableSlot slot = this.parentWidget.getDisplay(this.index);
         Rect2i rectangle = toRectangleBox();
         rectangle.setHeight(rectangle.getHeight() / 2);
-        if (slot.getConfig() == null || wheelDelta == 0 || !rectangle.contains((int) mouseX, (int) mouseY)) {
+        if (slot.getConfig() == null || scrollY == 0 || !rectangle.contains((int) mouseX, (int) mouseY)) {
             return false;
         }
-        FluidStack fluid = slot.getConfig().what() instanceof AEFluidKey fluidKey ?
-                new FluidStack(fluidKey.getFluid(), GTMath.saturatedCast(slot.getConfig().amount()),
-                        fluidKey.getTag()) :
-                FluidStack.EMPTY;
+        FluidStack fluid = AEUtil.toFluidStack(slot.getConfig());
         long amt;
         if (isCtrlDown()) {
-            amt = wheelDelta > 0 ? fluid.getAmount() * 2L : fluid.getAmount() / 2L;
+            amt = scrollY > 0 ? fluid.getAmount() * 2L : fluid.getAmount() / 2L;
         } else {
-            amt = wheelDelta > 0 ? fluid.getAmount() + 1L : fluid.getAmount() - 1L;
+            amt = scrollY > 0 ? fluid.getAmount() + 1L : fluid.getAmount() - 1L;
         }
 
         if (amt > 0 && amt < Integer.MAX_VALUE + 1L) {
@@ -280,7 +271,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
         if (fluidTank == null) return -1;
         Player player = gui.entityPlayer;
         ItemStack currentStack = gui.getModularUIContainer().getCarried();
-        var handler = FluidUtil.getFluidHandler(currentStack).resolve().orElse(null);
+        var handler = FluidUtil.getFluidHandler(currentStack).orElse(null);
         if (handler == null) return -1;
         int maxAttempts = isShiftKeyDown ? currentStack.getCount() : 1;
 
@@ -288,11 +279,11 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
             boolean performedFill = false;
             FluidStack initialFluid = fluidTank.getFluid();
             for (int i = 0; i < maxAttempts; i++) {
-                FluidActionResult result = FluidUtil.tryFillContainer(currentStack, fluidTank, Integer.MAX_VALUE, null,
-                        false);
+                FluidActionResult result = FluidUtil.tryFillContainer(currentStack, fluidTank,
+                        Integer.MAX_VALUE, null, false);
                 if (!result.isSuccess()) break;
-                ItemStack remainingStack = FluidUtil
-                        .tryFillContainer(currentStack, fluidTank, Integer.MAX_VALUE, null, true).getResult();
+                ItemStack remainingStack = FluidUtil.tryFillContainer(currentStack, fluidTank,
+                        Integer.MAX_VALUE, null, true).getResult();
                 currentStack.shrink(1);
                 performedFill = true;
                 if (!remainingStack.isEmpty() && !player.addItem(remainingStack)) {

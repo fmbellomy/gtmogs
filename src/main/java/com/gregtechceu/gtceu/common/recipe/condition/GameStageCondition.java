@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class GameStageCondition extends RecipeCondition {
+public class GameStageCondition extends RecipeCondition<GameStageCondition> {
 
     public static final MapCodec<GameStageCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -40,7 +40,7 @@ public class GameStageCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<GameStageCondition> getType() {
         return GTRecipeConditions.GAMESTAGE;
     }
 
@@ -64,7 +64,7 @@ public class GameStageCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public RecipeCondition<GameStageCondition> createTemplate() {
         return new GameStageCondition();
     }
 
@@ -76,7 +76,7 @@ public class GameStageCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public GameStageCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         stageName = buf.readUtf();
         return this;

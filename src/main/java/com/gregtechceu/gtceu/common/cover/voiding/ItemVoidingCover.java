@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.gui.widget.ToggleButtonWidget;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.common.cover.ConveyorCover;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -104,7 +105,10 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
     }
 
     @Override
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
         if (!isRemote()) {
             setWorkingEnabled(!isWorkingEnabled);
             playerIn.sendSystemMessage(Component.translatable(isWorkingEnabled() ?
@@ -123,8 +127,8 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
 
     @Override
     public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                              Direction side) {
-        var superTips = super.sideTips(player, pos, state, toolTypes, side);
+                                              ItemStack held, Direction side) {
+        var superTips = super.sideTips(player, pos, state, toolTypes, held, side);
         if (superTips != null) return superTips;
         if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             return isWorkingEnabled() ? GuiTextures.TOOL_START : GuiTextures.TOOL_PAUSE;

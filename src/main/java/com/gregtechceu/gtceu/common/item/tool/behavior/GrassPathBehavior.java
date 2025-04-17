@@ -29,6 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -36,14 +37,15 @@ import java.util.Set;
 
 public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
 
-    public static final GrassPathBehavior INSTANCE = create();
+    public static final GrassPathBehavior INSTANCE = new GrassPathBehavior();
     public static final Codec<GrassPathBehavior> CODEC = Codec.unit(INSTANCE);
     public static final StreamCodec<ByteBuf, GrassPathBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected GrassPathBehavior() {/**/}
 
-    protected static GrassPathBehavior create() {
-        return new GrassPathBehavior();
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == ItemAbilities.SHOVEL_FLATTEN;
     }
 
     @NotNull
@@ -61,20 +63,16 @@ public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
         Set<BlockPos> blocks;
-        // only attempt to till if the center block is tillable
+        // only attempt to flatten if the center block is flattenable
         if (level.getBlockState(pos.above()).isAir() && isBlockPathConvertible(stack, level, player, pos, context)) {
-            if (aoeDefinition == AoESymmetrical.none()) {
+            if (aoeDefinition.isNone()) {
                 blocks = ImmutableSet.of(pos);
             } else {
                 HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
 
-                if (rayTraceResult == null)
-                    return InteractionResult.PASS;
                 if (rayTraceResult.getType() != HitResult.Type.BLOCK)
                     return InteractionResult.PASS;
                 if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                    return InteractionResult.PASS;
-                if (blockHitResult.getDirection() == null)
                     return InteractionResult.PASS;
 
                 blocks = getPathConvertibleBlocks(stack, aoeDefinition, level, player, rayTraceResult);

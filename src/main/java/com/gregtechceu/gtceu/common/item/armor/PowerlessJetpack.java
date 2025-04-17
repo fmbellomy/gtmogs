@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTArmor;
 import com.gregtechceu.gtceu.api.recipe.content.SerializerFluidIngredient;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 

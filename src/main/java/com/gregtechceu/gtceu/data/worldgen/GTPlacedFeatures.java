@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.worldgen.modifier.BiomePlacement;
 import com.gregtechceu.gtceu.common.worldgen.modifier.RubberTreeChancePlacement;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +15,7 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.*;
+import net.neoforged.neoforge.common.Tags;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ public class GTPlacedFeatures {
 
         PlacementUtils.register(ctx, RUBBER_CHECKED, featureLookup.getOrThrow(GTConfiguredFeatures.RUBBER),
                 new BiomePlacement(List.of(
-                        new BiomeWeightModifier(() -> biomeLookup.getOrThrow(CustomTags.IS_SWAMP), 50))),
+                        new BiomeWeightModifier(() -> biomeLookup.getOrThrow(Tags.Biomes.IS_SWAMP), 50))),
                 RubberTreeChancePlacement.INSTANCE,
                 InSquarePlacement.spread(),
                 SurfaceWaterDepthFilter.forMaxDepth(0),

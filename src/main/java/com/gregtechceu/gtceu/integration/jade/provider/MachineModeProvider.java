@@ -31,7 +31,7 @@ public class MachineModeProvider implements IBlockComponentProvider, IServerData
             if (blockAccessor.showDetails()) {
                 iTooltip.add(Component.translatable("gtceu.top.machine_mode"));
                 for (int i = 0; i < recipeTypesTagList.size(); i++) {
-                    ResourceLocation recipeType = new ResourceLocation(recipeTypesTagList.getString(i));
+                    ResourceLocation recipeType = ResourceLocation.parse(recipeTypesTagList.getString(i));
                     MutableComponent text;
                     if (currentRecipeTypeIndex == i) {
                         text = Component.literal(" > ").withStyle(ChatFormatting.BLUE);
@@ -43,7 +43,7 @@ public class MachineModeProvider implements IBlockComponentProvider, IServerData
                     iTooltip.add(text);
                 }
             } else {
-                ResourceLocation recipeType = new ResourceLocation(
+                ResourceLocation recipeType = ResourceLocation.parse(
                         recipeTypesTagList.getString(currentRecipeTypeIndex));
                 iTooltip.add(Component.translatable("gtceu.top.machine_mode").append(
                         Component.translatable("%s.%s".formatted(recipeType.getNamespace(), recipeType.getPath()))));

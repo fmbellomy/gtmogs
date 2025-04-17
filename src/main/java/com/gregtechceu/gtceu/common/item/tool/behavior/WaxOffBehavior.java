@@ -29,6 +29,7 @@ import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -46,6 +47,11 @@ public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
         return new WaxOffBehavior();
     }
 
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == ItemAbilities.AXE_WAX_OFF;
+    }
+
     @NotNull
     @Override
     public InteractionResult onItemUse(UseOnContext context) {
@@ -60,7 +66,7 @@ public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
         Set<BlockPos> blocks;
         // only attempt to strip if the center block is strippable
         if (isBlockUnWaxable(stack, level, player, pos, context)) {
-            if (aoeDefinition == AoESymmetrical.none()) {
+            if (aoeDefinition.isNone()) {
                 blocks = ImmutableSet.of(pos);
             } else {
                 HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);

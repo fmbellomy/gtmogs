@@ -415,7 +415,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
                     .initialProperties(() -> Blocks.DISPENSER)
                     .properties(BlockBehaviour.Properties::noLootTable)
                     .addLayer(() -> RenderType::cutoutMipped)
-                    // .tag(GTToolType.WRENCH.harvestTag)
+                    // .create(GTToolType.WRENCH.harvestTag)
                     .blockstate(NonNullBiConsumer.noop())
                     .properties(builder.blockProp)
                     .onRegister(b -> Arrays.stream(builder.abilities).forEach(a -> a.register(builder.tier, b)));

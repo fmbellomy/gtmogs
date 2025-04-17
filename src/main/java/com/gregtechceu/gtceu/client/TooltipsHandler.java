@@ -12,7 +12,7 @@ import com.gregtechceu.gtceu.api.fluid.GTFluid;
 import com.gregtechceu.gtceu.data.fluid.GTFluids;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;

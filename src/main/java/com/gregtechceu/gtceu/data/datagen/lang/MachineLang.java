@@ -1,8 +1,8 @@
-package com.gregtechceu.gtceu.data.lang;
+package com.gregtechceu.gtceu.data.datagen.lang;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 
-import static com.gregtechceu.gtceu.data.lang.LangHandler.*;
+import static com.gregtechceu.gtceu.data.datagen.lang.LangHandler.*;
 
 public class MachineLang {
 

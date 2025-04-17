@@ -19,10 +19,11 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -224,8 +225,8 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
     }
 
     @Override
-    protected InteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                   BlockHitResult hitResult) {
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+                                                       BlockHitResult hitResult) {
         if (!isRemote()) {
             setAutoPull(!autoPull);
             if (autoPull) {
@@ -236,7 +237,7 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
                         Component.translatable("gtceu.machine.me.stocking_auto_pull_disabled"));
             }
         }
-        return InteractionResult.sidedSuccess(isRemote());
+        return ItemInteractionResult.sidedSuccess(isRemote());
     }
 
     ////////////////////////////////
@@ -244,9 +245,9 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
     ////////////////////////////////
 
     @Override
-    protected CompoundTag writeConfigToTag() {
+    protected CompoundTag writeConfigToTag(HolderLookup.Provider provider) {
         if (!autoPull) {
-            CompoundTag tag = super.writeConfigToTag();
+            CompoundTag tag = super.writeConfigToTag(provider);
             tag.putBoolean("AutoPull", false);
             return tag;
         }
@@ -259,7 +260,7 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
     }
 
     @Override
-    protected void readConfigFromTag(CompoundTag tag) {
+    protected void readConfigFromTag(HolderLookup.Provider provider, CompoundTag tag) {
         if (tag.getBoolean("AutoPull")) {
             // if being set to auto-pull, no need to read the configured slots
             this.setAutoPull(true);
@@ -268,7 +269,7 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
         }
         // set auto pull first to avoid issues with clearing the config after reading from the data stick
         this.setAutoPull(false);
-        super.readConfigFromTag(tag);
+        super.readConfigFromTag(provider, tag);
     }
 
     private class ExportOnlyAEStockingItemList extends ExportOnlyAEItemList {

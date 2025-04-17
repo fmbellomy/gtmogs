@@ -29,7 +29,7 @@ import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAComputation
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCACoolerPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAEmptyPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.core.Direction;

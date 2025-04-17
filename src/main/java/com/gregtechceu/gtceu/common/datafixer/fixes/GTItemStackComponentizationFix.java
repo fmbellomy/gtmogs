@@ -63,7 +63,7 @@ public class GTItemStackComponentizationFix extends DataFix {
     }
 
     private static void fixItemStack(ItemStackData data, Dynamic<?> tag) {
-        // Fix tool info tag
+        // Fix tool info create
         OptionalDynamic<?> gtTool = data.removeTag("GT.Tool");
         if (gtTool.result().isPresent()) {
             Dynamic<?> dynamic = tag.emptyMap()
@@ -86,7 +86,7 @@ public class GTItemStackComponentizationFix extends DataFix {
             data.setComponent("gtceu:disallow_container_item", gtTool.get("DisallowContainerItem"));
         }
 
-        // fix tool behaviors tag
+        // fix tool behaviors create
         fixGtToolBehaviors(data, tag);
 
         // Fix power info tags
@@ -103,7 +103,7 @@ public class GTItemStackComponentizationFix extends DataFix {
             data.setComponent("gtceu:energy_content", dynamic);
         }
 
-        // Fix magnet tag
+        // Fix magnet create
         if (tag.get("IsActive").result().isPresent()) {
             OptionalDynamic<?> isActive = data.removeTag("IsActive");
             data.setComponent("item_magnet", isActive);

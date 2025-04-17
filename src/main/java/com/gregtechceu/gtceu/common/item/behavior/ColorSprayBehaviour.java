@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.item.component.IDurabilityBar;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.utils.BreadthFirstBlockSearch;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 
@@ -18,8 +17,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
@@ -362,12 +359,12 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
                 return true;
             }
         }
-        if (block.defaultBlockState().is(CustomTags.CONCRETE_BLOCK)) {
+        if (block.defaultBlockState().is(Tags.Blocks.CONCRETES)) {
             if (recolorBlockNoState(CONCRETE_MAP, this.color, world, pos)) {
                 return true;
             }
         }
-        if (block.defaultBlockState().is(CustomTags.CONCRETE_POWDER_BLOCK)) {
+        if (block.defaultBlockState().is(BlockTags.CONCRETE_POWDER)) {
             if (recolorBlockNoState(CONCRETE_POWDER_MAP, this.color, world, pos)) {
                 return true;
             }
@@ -425,11 +422,11 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
             world.setBlock(pos, Blocks.WHITE_CARPET.defaultBlockState(), 3);
             return true;
         }
-        if (block.defaultBlockState().is(CustomTags.CONCRETE_BLOCK) && block != Blocks.WHITE_CONCRETE) {
+        if (block.defaultBlockState().is(Tags.Blocks.CONCRETES) && block != Blocks.WHITE_CONCRETE) {
             world.setBlock(pos, Blocks.WHITE_CONCRETE.defaultBlockState(), 3);
             return true;
         }
-        if (block.defaultBlockState().is(CustomTags.CONCRETE_POWDER_BLOCK) && block != Blocks.WHITE_CONCRETE_POWDER) {
+        if (block.defaultBlockState().is(BlockTags.CONCRETE_POWDER) && block != Blocks.WHITE_CONCRETE_POWDER) {
             world.setBlock(pos, Blocks.WHITE_CONCRETE_POWDER.defaultBlockState(), 3);
             return true;
         }

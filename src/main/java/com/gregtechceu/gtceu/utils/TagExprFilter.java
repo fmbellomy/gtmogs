@@ -105,7 +105,7 @@ public class TagExprFilter {
                 if (value == null || value.isEmpty()) return false;
                 if (value.equals("$") && input.isEmpty()) return true;
                 if (!value.contains(":") && !value.startsWith("*")) {
-                    value = "forge:" + value;
+                    value = "c:" + value;
                 }
 
                 String val = quote(value);

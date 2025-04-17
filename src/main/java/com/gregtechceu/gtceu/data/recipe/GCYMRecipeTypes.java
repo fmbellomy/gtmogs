@@ -22,10 +22,6 @@ import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.MULTIBLOCK;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.register;
 import static com.lowdragmc.lowdraglib.gui.texture.ProgressTexture.FillDirection.LEFT_TO_RIGHT;
 
-/**
- * @author Rundas
- * @implNote Gregicality Multiblocks Recipe Types
- */
 public class GCYMRecipeTypes {
 
     //////////////////////////////////////

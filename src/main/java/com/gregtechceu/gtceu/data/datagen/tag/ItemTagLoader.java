@@ -9,14 +9,16 @@ import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
+
+import java.util.Objects;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
@@ -24,42 +26,32 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 public class ItemTagLoader {
 
     public static void init(RegistrateTagsProvider<Item> provider) {
-        create(provider, CustomTags.CONCRETE_ITEM, Items.WHITE_CONCRETE, Items.ORANGE_CONCRETE, Items.MAGENTA_CONCRETE,
-                Items.LIGHT_BLUE_CONCRETE, Items.YELLOW_CONCRETE, Items.LIME_CONCRETE, Items.PINK_CONCRETE,
-                Items.GRAY_CONCRETE, Items.LIGHT_GRAY_CONCRETE, Items.CYAN_CONCRETE, Items.PURPLE_CONCRETE,
-                Items.BLUE_CONCRETE, Items.BROWN_CONCRETE, Items.GREEN_CONCRETE, Items.RED_CONCRETE,
-                Items.BLACK_CONCRETE);
-        create(provider, CustomTags.CONCRETE_POWDER_ITEM, Items.WHITE_CONCRETE_POWDER, Items.ORANGE_CONCRETE_POWDER,
-                Items.MAGENTA_CONCRETE_POWDER, Items.LIGHT_BLUE_CONCRETE_POWDER, Items.YELLOW_CONCRETE_POWDER,
-                Items.LIME_CONCRETE_POWDER, Items.PINK_CONCRETE_POWDER, Items.GRAY_CONCRETE_POWDER,
-                Items.LIGHT_GRAY_CONCRETE_POWDER, Items.CYAN_CONCRETE_POWDER, Items.PURPLE_CONCRETE_POWDER,
-                Items.BLUE_CONCRETE_POWDER, Items.BROWN_CONCRETE_POWDER, Items.GREEN_CONCRETE_POWDER,
-                Items.RED_CONCRETE_POWDER, Items.BLACK_CONCRETE_POWDER);
-        create(provider, lens, Color.White, GTMaterialItems.MATERIAL_ITEMS.get(lens, Glass).get());
-        create(provider, lens, Color.White, GTMaterialItems.MATERIAL_ITEMS.get(lens, NetherStar).get());
-        create(provider, lens, Color.LightBlue, GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).get());
-        create(provider, lens, Color.Red, GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).get());
-        create(provider, lens, Color.Green, GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).get());
-        create(provider, lens, Color.Blue, GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).get());
-        create(provider, lens, Color.Purple, GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).get());
+        addTag(provider, lens, Color.White)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Glass).getKey())
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, NetherStar).getKey());
+        addTag(provider, lens, Color.LightBlue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).getKey());
+        addTag(provider, lens, Color.Red).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).getKey());
+        addTag(provider, lens, Color.Green).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).getKey());
+        addTag(provider, lens, Color.Blue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).getKey());
+        addTag(provider, lens, Color.Purple).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).getKey());
 
-        create(provider, CustomTags.PISTONS, Items.PISTON, Items.STICKY_PISTON);
+        provider.addTag(CustomTags.PISTONS)
+                        .add(Items.PISTON.builtInRegistryHolder().key())
+                        .add(Items.STICKY_PISTON.builtInRegistryHolder().key());
+        provider.addTag(CustomTags.BRICKS_FIREBRICK).add(GTItems.FIRECLAY_BRICK.getKey());
+        provider.addTag(Tags.Items.BRICKS).addTag(CustomTags.BRICKS_FIREBRICK);
 
         create(provider, dye, Color.Brown, GTMaterialItems.MATERIAL_ITEMS.get(dust, MetalMixture).get());
 
         // add treated wood stick to vanilla sticks tag
         // noinspection DataFlowIssue ChemicalHelper#getTag can't return null with treated wood rod
         provider.addTag(Tags.Items.RODS_WOODEN)
-                .add(TagEntry.element(GTMaterialItems.MATERIAL_ITEMS.get(TagPrefix.rod, TreatedWood).getId()));
-
-        // todo match ae2 certus quartz tag
-        // OreDictionary.registerUnificationEntry("crystalCertusQuartz", ChemicalHelper.get(TagPrefix.gem,
-        // GTMaterials.CertusQuartz));
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(TagPrefix.rod, TreatedWood).getKey());
 
         // add treated and untreated wood plates to vanilla planks tag
         provider.addTag(ItemTags.PLANKS)
-                .add(TagEntry.element(GTMaterialItems.MATERIAL_ITEMS.get(plate, TreatedWood).getId()))
-                .add(TagEntry.element(GTMaterialItems.MATERIAL_ITEMS.get(plate, Wood).getId()));
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, TreatedWood).getKey())
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, Wood).getKey());
 
         provider.addTag(CustomTags.CIRCUITS)
                 .addTag(CustomTags.ULV_CIRCUITS)
@@ -155,6 +147,12 @@ public class ItemTagLoader {
                 .addOptional(GTItems.SENSOR_OpV.getId());
     }
 
+    private static TagsProvider.TagAppender<Item> addTag(RegistrateTagsProvider<Item> provider,
+                                                         TagPrefix prefix, Material material) {
+        return provider.addTag(Objects.requireNonNull(ChemicalHelper.getTag(prefix, material),
+                "%s/%s doesn't have any tags!".formatted(prefix, material)));
+    }
+
     private static void create(RegistrateTagsProvider<Item> provider, TagPrefix prefix, Material material,
                                Item... rls) {
         create(provider, ChemicalHelper.getTag(prefix, material), rls);
@@ -164,6 +162,14 @@ public class ItemTagLoader {
         var builder = provider.addTag(tagKey);
         for (ResourceLocation rl : rls) {
             builder.addOptional(rl);
+        }
+    }
+
+    @SafeVarargs
+    public static void create(RegistrateTagsProvider<Item> provider, TagKey<Item> tagKey, TagKey<Item>... rls) {
+        var builder = provider.addTag(tagKey);
+        for (TagKey<Item> tag : rls) {
+            builder.addTag(tag);
         }
     }
 

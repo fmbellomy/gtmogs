@@ -15,9 +15,9 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import lombok.Getter;
 import lombok.Setter;
@@ -121,7 +121,7 @@ public class TransformerMachine extends TieredEnergyMachine implements IControll
     }
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (!isRemote()) {
             setTransformUp(!isTransformUp());

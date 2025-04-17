@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.attachment;
+package com.gregtechceu.gtceu.data.misc;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.capability.MedicalConditionTracker;

@@ -1,13 +1,11 @@
 package com.gregtechceu.gtceu.data.sound;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.addon.AddonFinder;
-import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.fml.ModLoader;
-import net.neoforged.neoforge.registries.ForgeRegistries;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
@@ -59,8 +57,7 @@ public class GTSoundEntries {
     public static final SoundEntry METAL_PIPE = REGISTRATE.sound("metal_pipe").build();
 
     public static void init() {
-        AddonFinder.getAddons().forEach(IGTAddon::registerSounds);
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.SOUNDS, SoundEntry.class));
+        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.SOUNDS));
         GTRegistries.SOUNDS.values().forEach(SoundEntry::prepare);
         registerSounds();
 
@@ -69,7 +66,8 @@ public class GTSoundEntries {
 
     private static void registerSounds() {
         for (SoundEntry entry : GTRegistries.SOUNDS) {
-            entry.register(soundEvent -> ForgeRegistries.SOUND_EVENTS.register(soundEvent.getLocation(), soundEvent));
+            entry.register(soundEvent ->
+                    GTRegistries.register(BuiltInRegistries.SOUND_EVENT, soundEvent.getLocation(), soundEvent));
         }
     }
 }

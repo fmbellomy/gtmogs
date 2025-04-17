@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.lang;
+package com.gregtechceu.gtceu.data.datagen.lang;
 
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -224,8 +224,8 @@ public class LangHandler {
         provider.add("item.gtceu.tool.hv_wrench.tooltip", "§8Hold left click to dismantle Machines");
         replace(provider, "item.gtceu.tool.iv_wrench", "%s Wrench (IV)");
         provider.add("item.gtceu.tool.iv_wrench.tooltip", "§8Hold left click to dismantle Machines");
-        replace(provider, "item.gtceu.tool.buzzsaw", "%s Buzzsaw (LV)");
-        provider.add("item.gtceu.tool.buzzsaw.tooltip", "§8Not suitable for harvesting Blocks");
+        replace(provider, "item.gtceu.tool.lv_buzzsaw", "%s Buzzsaw (LV)");
+        provider.add("item.gtceu.tool.lv_buzzsaw.tooltip", "§8Not suitable for harvesting Blocks");
         replace(provider, "item.gtceu.tool.lv_screwdriver", "%s Screwdriver (LV)");
         provider.add("item.gtceu.tool.lv_screwdriver.tooltip", "§8Adjusts Covers and Machines");
         replace(provider, "item.gtceu.tool.plunger", "%s Plunger");
@@ -240,8 +240,7 @@ public class LangHandler {
         provider.add("item.gtceu.tool.tooltip.harvest_level", "§eHarvest Level %s");
         provider.add("item.gtceu.tool.tooltip.harvest_level_extra", "§eHarvest Level %s §f(%s§f)");
         multiLang(provider, "item.gtceu.tool.harvest_level", "§8Wood", "§7Stone", "§aIron", "§bDiamond",
-                "§dNetherite",
-                "§9Duranium", "§cNeutronium");
+                "§dNetherite", "§9Duranium", "§cNeutronium");
         provider.add("item.gtceu.tool.tooltip.repair_info", "§8Hold SHIFT to show Repair Info");
         provider.add("item.gtceu.tool.tooltip.repair_material", "§8Repair with: §f§a%s");
         provider.add("item.gtceu.tool.aoe.rows", "Rows");
@@ -340,7 +339,7 @@ public class LangHandler {
                         §6*§r for wildcard
                         §6$§r for untagged
                         §bTags come in the form 'namespace:tag/subtype'.
-                        The 'forge:' namespace is assumed if one isn't provided.
+                        The 'c:' namespace is assumed if one isn't provided.
                         §bExample: §6*dusts/gold | (gtceu:circuits & !*lv)
                         This matches all gold dusts or all circuits except LV ones""");
         provider.add("cover.tag_filter.test_slot.info",
@@ -376,11 +375,11 @@ public class LangHandler {
                 "§cWARNING!§7 Setting this to \"Enabled\" means that fluids or items WILL be voided.");
         provider.add("cover.voiding.message.disabled", "Voiding Cover Disabled");
         provider.add("cover.voiding.message.enabled", "Voiding Cover Enabled");
-        provider.add("cover.item_smart_filter.title", "Smart Item Filter");
-        provider.add("cover.item_smart_filter.filtering_mode.electrolyzer", "Electrolyzer");
-        provider.add("cover.item_smart_filter.filtering_mode.centrifuge", "Centrifuge");
-        provider.add("cover.item_smart_filter.filtering_mode.sifter", "Sifter");
-        multilineLang(provider, "cover.item_smart_filter.filtering_mode.description",
+        provider.add("cover.smart_item_filter.title", "Smart Item Filter");
+        provider.add("cover.smart_item_filter.filtering_mode.electrolyzer", "Electrolyzer");
+        provider.add("cover.smart_item_filter.filtering_mode.centrifuge", "Centrifuge");
+        provider.add("cover.smart_item_filter.filtering_mode.sifter", "Sifter");
+        multilineLang(provider, "cover.smart_item_filter.filtering_mode.description",
                 "Select Machine this Smart Filter will use for filtering.\nIt will automatically pick right portions of items for robotic arm.");
         provider.add("cover.conveyor.title", "Conveyor Cover Settings (%s)");
         provider.add("cover.conveyor.transfer_rate", "§7items/sec");
@@ -499,8 +498,9 @@ public class LangHandler {
 
         replace(provider, "item.gtceu.bucket", "%s Bucket");
         replace(provider, GTMaterials.FullersEarth.getUnlocalizedName(), "Fuller's Earth");
-        replace(provider, GTMaterials.Cooperite.getUnlocalizedName(), "Sheldonite"); // greg's humor is now on
-                                                                                     // 1.19...
+        // greg's humor is now on 1.21...
+        replace(provider, GTMaterials.Cooperite.getUnlocalizedName(), "Sheldonite");
+
         replace(provider, GTMaterials.HSSG.getUnlocalizedName(), "HSS-G");
         replace(provider, GTMaterials.HSSE.getUnlocalizedName(), "HSS-E");
         replace(provider, GTMaterials.HSSS.getUnlocalizedName(), "HSS-S");
@@ -512,12 +512,6 @@ public class LangHandler {
         replace(provider, GTMaterials.TungstenSteel.getUnlocalizedName(), "Tungstensteel");
         replace(provider, GTMaterials.Iron3Chloride.getUnlocalizedName(), "Iron III Chloride");
         replace(provider, GTMaterials.Iron2Chloride.getUnlocalizedName(), "Iron II Chloride");
-        replace(provider, GTMaterials.HeavyOil.getUnlocalizedName(), "Heavy Oil");
-        replace(provider, "block.gtceu.oil_heavy", "Heavy Oil");
-        replace(provider, GTMaterials.LightOil.getUnlocalizedName(), "Light Oil");
-        replace(provider, "block.gtceu.oil_light", "Light Oil");
-        replace(provider, GTMaterials.RawOil.getUnlocalizedName(), "Raw Oil");
-        replace(provider, "block.gtceu.oil_medium", "Raw Oil");
 
         replace(provider, GTMaterials.HydroCrackedButadiene.getUnlocalizedName(), "Hydro-Cracked Butadiene");
         replace(provider, GTMaterials.HydroCrackedButane.getUnlocalizedName(), "Hydro-Cracked Butane");

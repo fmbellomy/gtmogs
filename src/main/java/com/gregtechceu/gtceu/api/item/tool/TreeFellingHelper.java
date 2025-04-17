@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.item.tool;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -93,9 +94,9 @@ public class TreeFellingHelper {
                         iterator.remove();
                         continue;
                     }
-                    if (helper.tick % ConfigHolder.INSTANCE.tools.treeFellingDelay == 0)
-                        ToolHelper.breakBlockRoutine(helper.player, helper.tool,
-                                helper.orderedBlocks.removeLast(), true);
+                    if (helper.tick % ConfigHolder.INSTANCE.tools.treeFellingDelay == 0) {
+                        ToolHelper.destroyBlock(helper.player, helper.tool, helper.orderedBlocks.removeLast(), true);
+                    }
                     helper.tick++;
                 }
             }

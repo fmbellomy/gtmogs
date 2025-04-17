@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.recipe.lookup.GTRecipeLookup;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
-import com.gregtechceu.gtceu.core.mixins.RecipeManagerInvoker;
 import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 

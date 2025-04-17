@@ -3,8 +3,6 @@ package com.gregtechceu.gtceu.data.loader;
 import com.google.gson.*;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.addon.AddonFinder;
-import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.worldgen.GTBedrockFluids;
@@ -47,7 +45,7 @@ public class BedrockFluidLoader extends SimpleJsonResourceReloadListener {
 
         GTBedrockFluids.init();
         ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.BEDROCK_FLUID_DEFINITIONS));
-        if (GTCEu.isKubeJSLoaded()) {
+        if (GTCEu.Mods.isKubeJSLoaded()) {
             KJSCallWrapper.fireKJSEvent();
         }
         RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
@@ -72,7 +70,7 @@ public class BedrockFluidLoader extends SimpleJsonResourceReloadListener {
     }
 
     public static BedrockFluidDefinition fromJson(ResourceLocation id, JsonObject json, RegistryOps<JsonElement> ops) {
-        return BedrockFluidDefinition.FULL_CODEC.parse(ops, json).getOrThrow(false, LOGGER::error);
+        return BedrockFluidDefinition.FULL_CODEC.parse(ops, json).getOrThrow();
     }
 
     public static final class KJSCallWrapper {

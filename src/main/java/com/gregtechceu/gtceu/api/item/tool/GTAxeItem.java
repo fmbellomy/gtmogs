@@ -120,11 +120,6 @@ public class GTAxeItem extends AxeItem implements IGTTool {
     }
 
     @Override
-    public Set<GTToolType> getToolClasses(ItemStack stack) {
-        return Set.of(this.toolType);
-    }
-
-    @Override
     public float getDestroySpeed(ItemStack stack, BlockState state) {
         return definition$getDestroySpeed(stack, state);
     }
@@ -151,11 +146,6 @@ public class GTAxeItem extends AxeItem implements IGTTool {
     @Override
     public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         return definition$isValidRepairItem(stack, repairCandidate);
-    }
-
-    @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-        return definition$getDefaultAttributeModifiers(stack);
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {

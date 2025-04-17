@@ -12,11 +12,17 @@ import com.gregtechceu.gtceu.data.recipe.generated.*;
 import com.gregtechceu.gtceu.data.recipe.misc.*;
 import com.gregtechceu.gtceu.data.recipe.serialized.chemistry.ChemistryRecipes;
 
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.block.ComposterBlock;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.neoforged.neoforge.common.conditions.ICondition;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -35,9 +41,19 @@ public class GTRecipes {
      * to respond to a config option in ConfigHolder.
      */
     public static void recipeAddition(RecipeOutput originalConsumer) {
-        RecipeOutput consumer = recipe -> {
-            if (!RECIPE_FILTERS.contains(recipe.getId())) {
-                originalConsumer.accept(recipe);
+        RecipeOutput consumer = new RecipeOutput() {
+            @Override
+            public Advancement.@NotNull Builder advancement() {
+                return originalConsumer.advancement();
+            }
+
+            @Override
+            public void accept(@NotNull ResourceLocation id, @NotNull Recipe<?> recipe,
+                               @Nullable AdvancementHolder advancement, ICondition @NotNull ... conditions) {
+                if (!RECIPE_FILTERS.contains(id)) {
+                    originalConsumer.accept(id, recipe, advancement, conditions);
+                }
+
             }
         };
 
@@ -104,10 +120,11 @@ public class GTRecipes {
      *
      * This is also where any recipe removals should happen.
      */
-    public static void recipeRemoval() {
+    public static void recipeRemoval(Consumer<ResourceLocation> registry) {
+        final Consumer<ResourceLocation> actualConsumer = registry.andThen(RECIPE_FILTERS::add);
         RECIPE_FILTERS.clear();
 
-        RecipeRemoval.init(RECIPE_FILTERS::add);
-        AddonFinder.getAddons().forEach(addon -> addon.removeRecipes(RECIPE_FILTERS::add));
+        RecipeRemoval.init(actualConsumer);
+        AddonFinder.getAddons().forEach(addon -> addon.removeRecipes(actualConsumer));
     }
 }

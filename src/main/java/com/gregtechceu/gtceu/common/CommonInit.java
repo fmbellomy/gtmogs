@@ -27,6 +27,8 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.common.block.*;
 import com.gregtechceu.gtceu.common.item.DrumMachineItem;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.datafixer.GTDataFixers;
+import com.gregtechceu.gtceu.data.item.GTArmorMaterials;
 import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.misc.GTDimensionMarkers;
 import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
@@ -39,24 +41,25 @@ import com.gregtechceu.gtceu.data.item.GTFoods;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
-import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.core.mixins.AbstractRegistrateAccessor;
 import com.gregtechceu.gtceu.data.datagen.GTRegistrateDatagen;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.data.lang.MaterialLangGenerator;
+import com.gregtechceu.gtceu.data.datagen.lang.MaterialLangGenerator;
 import com.gregtechceu.gtceu.data.loot.ChestGenHooks;
-import com.gregtechceu.gtceu.data.loot.DungeonLootLoader;
 import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.data.material.GTElements;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.pack.GTDynamicDataPack;
-import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
-import com.gregtechceu.gtceu.data.pack.GTPackSource;
+import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.common.pack.GTPackSource;
 import com.gregtechceu.gtceu.data.recipe.*;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.gregtechceu.gtceu.data.tools.GTToolTiers;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
@@ -70,6 +73,7 @@ import com.lowdragmc.lowdraglib.gui.factory.UIFactory;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.EventPriority;
@@ -101,12 +105,12 @@ public class CommonInit {
     public static void init(final IEventBus modBus) {
         modBus.register(CommonInit.class);
 
-        GTCEu.LOGGER.info("GTCEu common proxy init!");
         UIFactory.register(MachineUIFactory.INSTANCE);
         UIFactory.register(CoverUIFactory.INSTANCE);
         UIFactory.register(GTUIEditorFactory.INSTANCE);
         GTRecipeCapabilities.init();
         GTRecipeConditions.init();
+        GTToolTiers.init();
         GTElements.init();
         MaterialIconSet.init();
         MaterialIconType.init();
@@ -126,14 +130,15 @@ public class CommonInit {
         GTMachines.init();
 
         GTFoods.init();
+        GTToolBehaviors.init();
+        GTDataComponents.DATA_COMPONENTS.register(modBus);
+        GTArmorMaterials.ARMOR_MATERIALS.register(modBus);
         GTItems.init();
         GTDimensionMarkers.init();
         ChanceLogic.init();
         WaypointManager.init();
-        AddonFinder.getAddons().forEach(IGTAddon::initializeAddon);
-
-        // fabric exclusive, squeeze this in here to register before stuff is used
-        GTRegistration.REGISTRATE.registerRegistrate();
+        AddonFinder.getAddons().forEach(IGTAddon::gtFinishedLoading);
+        GTIngredientTypes.INGREDIENT_TYPES.register(modBus);
 
         GTRegistrateDatagen.init();
         // Register all material manager registries, for materials with mod ids.
@@ -143,13 +148,8 @@ public class CommonInit {
             if (accessor.getDoDatagen().get()) {
                 List<NonNullConsumer<? extends RegistrateProvider>> providers = Multimaps.asMap(accessor.getDatagens())
                         .get(ProviderType.LANG);
-                if (providers.isEmpty()) {
-                    providers.add(
-                            (provider) -> MaterialLangGenerator.generate((RegistrateLangProvider) provider, registry));
-                } else {
-                    providers.addFirst(
-                            (provider) -> MaterialLangGenerator.generate((RegistrateLangProvider) provider, registry));
-                }
+                providers.addFirst(
+                        (provider) -> MaterialLangGenerator.generate((RegistrateLangProvider) provider, registry));
             }
 
             registry.getRegistrate()
@@ -163,10 +163,10 @@ public class CommonInit {
         IndicatorGenerators.registerAddonGenerators();
 
         GTFeatures.init();
-        GTFeatures.register();
         CustomBlockRotations.init();
         KeyBind.init();
         MachineOwner.init();
+        GTDataFixers.init();
 
         FusionReactorMachine.registerFusionTier(GTValues.LuV, " (MKI)");
         FusionReactorMachine.registerFusionTier(GTValues.ZPM, " (MKII)");
@@ -271,8 +271,8 @@ public class CommonInit {
             } else if (item instanceof DrumMachineItem drum) {
                 drum.attachCapabilities(event);
             } else if (item instanceof GTBucketItem bucket) {
-                event.registerItem(Capabilities.FluidHandler.ITEM, (stack, ctx) -> new FluidBucketWrapper(stack),
-                        bucket);
+                event.registerItem(Capabilities.FluidHandler.ITEM,
+                        (stack, ctx) -> new FluidBucketWrapper(stack), bucket);
             }
         }
     }
@@ -291,15 +291,7 @@ public class CommonInit {
             // Clear old data
             GTDynamicDataPack.clearServer();
 
-            // MOVED TO ReloadableServerResourcesMixin
-            //long startTime = System.currentTimeMillis();
-            //ItemMaterialData.reinitializeMaterialData();
-            //GTCraftingComponents.init();
-            //GTRecipes.recipeRemoval();
-            //GTRecipes.recipeAddition(GTDynamicDataPack::addRecipe);
-            // Initialize dungeon loot additions
-            DungeonLootLoader.init();
-            //GTCEu.LOGGER.info("GregTech Data loading took {}ms", System.currentTimeMillis() - startTime);
+            // LOADING MOVED TO ReloadableServerResourcesMixin
 
             event.addRepositorySource(new GTPackSource("gtceu:dynamic_data",
                     event.getPackType(),

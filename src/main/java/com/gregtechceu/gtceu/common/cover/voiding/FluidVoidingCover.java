@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.common.cover.PumpCover;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -111,7 +112,10 @@ public class FluidVoidingCover extends PumpCover {
     }
 
     @Override
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
         if (!isRemote()) {
             setWorkingEnabled(!isWorkingEnabled);
             playerIn.sendSystemMessage(Component.translatable(isWorkingEnabled() ?
@@ -130,11 +134,11 @@ public class FluidVoidingCover extends PumpCover {
 
     @Override
     public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                              Direction side) {
+                                              ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
             return isWorkingEnabled() ? GuiTextures.TOOL_START : GuiTextures.TOOL_PAUSE;
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
     //////////////////////////////////////

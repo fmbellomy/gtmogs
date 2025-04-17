@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.recipe.misc.RecyclingRecipes;
 import com.gregtechceu.gtceu.data.recipe.misc.WoodMachineRecipes;
-import com.gregtechceu.gtceu.data.datagen.tag.TagsHandler;
+import com.gregtechceu.gtceu.data.datagen.TagsHandler;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 import com.gregtechceu.gtceu.utils.memoization.MemoizedBlockSupplier;
 
@@ -32,7 +32,6 @@ import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.ApiStatus;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class ItemMaterialData {

@@ -60,35 +60,35 @@ public interface IGTToolDefinition {
     /**
      * Tool Stat
      */
-    default int getBaseDurability(ItemStack stack) {
+    default int getBaseDurability() {
         return 0;
     }
 
-    default float getDurabilityMultiplier(ItemStack stack) {
+    default float getDurabilityMultiplier() {
         return 1f;
     }
 
-    default int getBaseQuality(ItemStack stack) {
+    default int getBaseQuality() {
         return 0;
     }
 
-    default float getBaseDamage(ItemStack stack) {
+    default float getBaseDamage() {
         return 1.0F;
     }
 
-    default float getBaseEfficiency(ItemStack stack) {
+    default float getBaseEfficiency() {
         return 1.0F;
     }
 
-    default float getEfficiencyMultiplier(ItemStack stack) {
+    default float getEfficiencyMultiplier() {
         return 1.0F;
     }
 
-    default float getAttackSpeed(ItemStack stack) {
+    default float getAttackSpeed() {
         return 0.0F;
     }
 
-    default AoESymmetrical getAoEDefinition(ItemStack stack) {
+    default AoESymmetrical getAoEDefinition() {
         return AoESymmetrical.none();
     }
 
@@ -99,7 +99,7 @@ public interface IGTToolDefinition {
         return true;
     }
 
-    TagKey<Item>[] getValidEnchantmentTags();
+    List<TagKey<Item>> getValidEnchantmentTags();
 
     Object2IntMap<ResourceKey<Enchantment>> getDefaultEnchantments();
 

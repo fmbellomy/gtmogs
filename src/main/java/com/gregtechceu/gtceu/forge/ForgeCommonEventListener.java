@@ -5,7 +5,9 @@ import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
+import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.material.material.Material;
@@ -141,10 +143,9 @@ public class ForgeCommonEventListener {
         }
     }
 
-    /*
     @SubscribeEvent
     public static void onBlockStartBreak(BlockEvent.BreakEvent event) {
-        if (ToolHelper.isAoeBreakingBlocks.get()) {
+        if (ToolHelper.IS_AOE_BREAKING_BLOCKS.get()) {
             return;
         }
 
@@ -155,8 +156,6 @@ public class ForgeCommonEventListener {
             }
         }
     }
-
-     */
 
     @SubscribeEvent
     public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {

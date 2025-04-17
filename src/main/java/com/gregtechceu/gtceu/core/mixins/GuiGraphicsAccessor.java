@@ -14,7 +14,7 @@ public interface GuiGraphicsAccessor {
     @Invoker("<init>")
     static GuiGraphics create(Minecraft client, PoseStack matrices,
                               MultiBufferSource.BufferSource vertexConsumerProvider) {
-        return null;
+        throw new AssertionError();
     }
 
     @Invoker

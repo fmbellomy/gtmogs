@@ -155,7 +155,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     //////////////////////////////////////
     // ******* Interaction *******//
     //////////////////////////////////////
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
         if (this instanceof IUICover) {
             if (playerIn instanceof ServerPlayer serverPlayer) {
                 CoverUIFactory.INSTANCE.openUI(this, serverPlayer);
@@ -166,7 +166,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
@@ -201,7 +201,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
 
     @Override
     public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                              ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.CROWBAR)) {
             return GuiTextures.TOOL_REMOVE_COVER;
         }

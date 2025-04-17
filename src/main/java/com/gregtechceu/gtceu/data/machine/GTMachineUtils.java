@@ -51,7 +51,7 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.utils.BlockInfo;

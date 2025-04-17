@@ -276,8 +276,8 @@ public class VanillaRecipeHelper {
                     case ItemStack itemStack -> builder.define(sign, itemStack);
                     case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.define(sign, (TagKey<Item>) key);
                     case TagPrefix prefix -> {
-                        if (prefix.getItemParentTags().length > 0) {
-                            builder.define(sign, prefix.getItemParentTags()[0]);
+                        if (!prefix.getItemParentTags().isEmpty()) {
+                            builder.define(sign, prefix.getItemParentTags().getFirst());
                         }
                     }
                     case ItemLike itemLike -> builder.define(sign, itemLike);
@@ -293,7 +293,7 @@ public class VanillaRecipeHelper {
             }
         }
         for (Character c : set) {
-            builder.define(c, ToolHelper.getToolFromSymbol(c).itemTags.get(0));
+            builder.define(c, ToolHelper.getToolFromSymbol(c).itemTags.getFirst());
         }
         builder.save(provider);
 
@@ -433,8 +433,8 @@ public class VanillaRecipeHelper {
                     case ItemStack itemStack -> builder.define(sign, itemStack);
                     case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.define(sign, (TagKey<Item>) key);
                     case TagPrefix prefix -> {
-                        if (prefix.getItemParentTags().length > 0) {
-                            builder.define(sign, prefix.getItemParentTags()[0]);
+                        if (!prefix.getItemParentTags().isEmpty()) {
+                            builder.define(sign, prefix.getItemParentTags().getFirst());
                         }
                     }
                     case ItemLike itemLike -> builder.define(sign, itemLike);

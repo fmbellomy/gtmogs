@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.data.datagen;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.registrate.SoundEntryBuilder;
 import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
-import com.gregtechceu.gtceu.data.jukebox.GTJukeboxSongs;
+import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
 import com.gregtechceu.gtceu.data.worldgen.GTBiomeModifiers;
 import com.gregtechceu.gtceu.data.worldgen.GTConfiguredFeatures;
 import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;

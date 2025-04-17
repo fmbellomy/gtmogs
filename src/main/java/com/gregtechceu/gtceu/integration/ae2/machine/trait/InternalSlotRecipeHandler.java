@@ -9,9 +9,11 @@ import com.gregtechceu.gtceu.integration.ae2.machine.MEPatternBufferPartMachine.
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import lombok.Getter;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,13 +55,13 @@ public final class InternalSlotRecipeHandler {
     }
 
     @Getter
-    private static class SlotItemRecipeHandler extends NotifiableRecipeHandlerTrait<Ingredient> {
+    private static class SlotItemRecipeHandler extends NotifiableRecipeHandlerTrait<SizedIngredient> {
 
         private final InternalSlot slot;
         private final int priority;
 
         private final int size = 81;
-        private final RecipeCapability<Ingredient> capability = ItemRecipeCapability.CAP;
+        private final RecipeCapability<SizedIngredient> capability = ItemRecipeCapability.CAP;
         private final IO handlerIO = IO.IN;
         private final boolean isDistinct = true;
 
@@ -71,7 +73,7 @@ public final class InternalSlotRecipeHandler {
         }
 
         @Override
-        public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left, boolean simulate) {
+        public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left, boolean simulate) {
             if (io != IO.IN || slot.isItemEmpty()) return left;
             return slot.handleItemInternal(left, simulate);
         }
@@ -88,13 +90,13 @@ public final class InternalSlotRecipeHandler {
     }
 
     @Getter
-    private static class SlotFluidRecipeHandler extends NotifiableRecipeHandlerTrait<FluidIngredient> {
+    private static class SlotFluidRecipeHandler extends NotifiableRecipeHandlerTrait<SizedFluidIngredient> {
 
         private final InternalSlot slot;
         private final int priority;
 
         private final int size = 81;
-        private final RecipeCapability<FluidIngredient> capability = FluidRecipeCapability.CAP;
+        private final RecipeCapability<SizedFluidIngredient> capability = FluidRecipeCapability.CAP;
         private final IO handlerIO = IO.IN;
         private final boolean isDistinct = true;
 
@@ -106,7 +108,7 @@ public final class InternalSlotRecipeHandler {
         }
 
         @Override
-        public List<FluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<FluidIngredient> left,
+        public List<SizedFluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedFluidIngredient> left,
                                                        boolean simulate) {
             if (io != IO.IN || slot.isFluidEmpty()) return left;
             return slot.handleFluidInternal(left, simulate);

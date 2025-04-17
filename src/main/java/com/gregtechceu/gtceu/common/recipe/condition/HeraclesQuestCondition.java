@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.recipe.condition;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
@@ -22,7 +23,7 @@ import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
-public class HeraclesQuestCondition extends RecipeCondition {
+public class HeraclesQuestCondition extends RecipeCondition<HeraclesQuestCondition> {
 
     public static final MapCodec<HeraclesQuestCondition> CODEC = RecordCodecBuilder
             .mapCodec(instance -> RecipeCondition.isReverse(instance)
@@ -43,7 +44,7 @@ public class HeraclesQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeConditionType<?> getType() {
+    public RecipeConditionType<HeraclesQuestCondition> getType() {
         return GTRecipeConditions.HERACLES_QUEST;
     }
 
@@ -64,7 +65,7 @@ public class HeraclesQuestCondition extends RecipeCondition {
         if (owner == null) return false;
         for (var player : owner.getMembers()) {
             QuestsProgress questsProgress = QuestProgressHandler
-                    .getProgress(ServerLifecycleHooks.getCurrentServer(), player);
+                    .getProgress(GTCEu.getMinecraftServer(), player);
             var progress = questsProgress.getProgress(questId);
             if (progress != null && (progress.isComplete() || QuestHandler.get(questId).tasks().isEmpty())) {
                 return true;
@@ -74,7 +75,7 @@ public class HeraclesQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public HeraclesQuestCondition createTemplate() {
         return new HeraclesQuestCondition();
     }
 
@@ -86,7 +87,7 @@ public class HeraclesQuestCondition extends RecipeCondition {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public HeraclesQuestCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
         questId = buf.readUtf();
         return this;

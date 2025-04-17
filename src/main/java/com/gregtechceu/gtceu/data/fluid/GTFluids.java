@@ -54,8 +54,7 @@ public class GTFluids {
     }
 
     public static void handleNonMaterialFluids(@NotNull Material material, @NotNull Fluid fluid) {
-        var property = material.getProperty(PropertyKey.FLUID);
-        property.getStorage().store(FluidStorageKeys.LIQUID, () -> fluid, null);
+        handleNonMaterialFluids(material, () -> fluid);
     }
 
     public static void handleNonMaterialFluids(@NotNull Material material, @NotNull Supplier<Fluid> fluid) {

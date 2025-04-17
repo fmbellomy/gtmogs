@@ -9,6 +9,7 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -133,7 +134,7 @@ public abstract class ConfigWidget extends WidgetGroup {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buffer) {
         super.readUpdateInfo(id, buffer);
         if (id == UPDATE_ID) {
             int size = buffer.readVarInt();

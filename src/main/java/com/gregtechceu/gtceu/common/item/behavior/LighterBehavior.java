@@ -1,11 +1,12 @@
 package com.gregtechceu.gtceu.common.item.behavior;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.item.component.IAbilityItem;
 import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IDurabilityBar;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.common.block.explosive.GTExplosiveBlock;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 
 import net.minecraft.advancements.CriteriaTriggers;
@@ -29,6 +30,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
@@ -42,10 +45,8 @@ import javax.annotation.Nullable;
 
 import static net.minecraft.world.level.block.AbstractCandleBlock.LIT;
 
-public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddInformation {
+public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddInformation, IAbilityItem {
 
-    public static final String LIGHTER_OPEN = "lighterOpen";
-    private static final String USES_LEFT = "usesLeft";
     private static final Pair<Integer, Integer> DURABILITY_BAR_COLORS = GradientUtil.getGradient(0xF07F1D, 10);
     private final ResourceLocation overrideLocation;
     private final boolean usesFluid;
@@ -71,6 +72,11 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
         this.usesFluid = useFluid;
         this.hasMultipleUses = hasMultipleUses;
         this.canOpen = canOpen;
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return ItemAbilities.DEFAULT_FLINT_ACTIONS.contains(action);
     }
 
     @Override

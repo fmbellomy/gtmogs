@@ -10,9 +10,9 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import lombok.Getter;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -91,8 +91,8 @@ public class ExportOnlyAEItemList extends NotifiableItemStackHandler implements 
     }
 
     @Override
-    public List<Ingredient> handleRecipeInner(IO io, GTRecipe recipe, List<Ingredient> left,
-                                              boolean simulate) {
+    public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left,
+                                                   boolean simulate) {
         return NotifiableItemStackHandler.handleRecipe(io, recipe, left, simulate, this.handlerIO, getHandler());
     }
 
