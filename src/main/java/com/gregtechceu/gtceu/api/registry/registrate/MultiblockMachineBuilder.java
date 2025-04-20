@@ -23,8 +23,7 @@ import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import dev.latvian.mods.kubejs.client.LangKubeEvent;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.tterrag.registrate.AbstractRegistrate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -39,7 +38,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
@@ -54,10 +52,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Accessors(chain = true, fluent = true)
 public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDefinition> {
 
@@ -75,28 +69,20 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     @Setter
     private Comparator<IMultiPart> partSorter = (a, b) -> 0;
     @Setter
+    @Nullable
     private TriFunction<IMultiController, IMultiPart, Direction, BlockState> partAppearance;
     @Getter
     @Setter
     private BiConsumer<IMultiController, List<Component>> additionalDisplay = (m, l) -> {};
 
-    protected MultiblockMachineBuilder(Registrate registrate, String name,
-                                       Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
-                                       BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
-                                       BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                                       TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
+    public MultiblockMachineBuilder(AbstractRegistrate<?> registrate, String name,
+                                    Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
+                                    BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
+                                    BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
+                                    TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
         super(registrate, name, MultiblockMachineDefinition::createDefinition, metaMachine::apply, blockFactory,
                 itemFactory, blockEntityFactory);
         allowExtendedFacing(true);
-    }
-
-    public static MultiblockMachineBuilder createMulti(Registrate registrate, String name,
-                                                       Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
-                                                       BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
-                                                       BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                                                       TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        return new MultiblockMachineBuilder(registrate, name, metaMachine, blockFactory, itemFactory,
-                blockEntityFactory);
     }
 
     public MultiblockMachineBuilder shapeInfo(Function<MultiblockMachineDefinition, MultiblockShapeInfo> shape) {
@@ -167,12 +153,12 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder blockBuilder(Consumer<BlockBuilder<? extends Block, ?>> blockBuilder) {
+    public MultiblockMachineBuilder blockBuilder(@Nullable Consumer<BlockBuilder<? extends Block, ?>> blockBuilder) {
         return (MultiblockMachineBuilder) super.blockBuilder(blockBuilder);
     }
 
     @Override
-    public MultiblockMachineBuilder itemBuilder(Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder) {
+    public MultiblockMachineBuilder itemBuilder(@Nullable Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder) {
         return (MultiblockMachineBuilder) super.itemBuilder(itemBuilder);
     }
 
@@ -253,12 +239,12 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder tooltipBuilder(BiConsumer<ItemStack, List<Component>> tooltipBuilder) {
+    public MultiblockMachineBuilder tooltipBuilder(@Nullable BiConsumer<ItemStack, List<Component>> tooltipBuilder) {
         return (MultiblockMachineBuilder) super.tooltipBuilder(tooltipBuilder);
     }
 
     @Override
-    public MultiblockMachineBuilder appearance(Supplier<BlockState> state) {
+    public MultiblockMachineBuilder appearance(@Nullable Supplier<BlockState> state) {
         return (MultiblockMachineBuilder) super.appearance(state);
     }
 
@@ -268,7 +254,7 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder langValue(String langValue) {
+    public MultiblockMachineBuilder langValue(@Nullable String langValue) {
         return (MultiblockMachineBuilder) super.langValue(langValue);
     }
 
@@ -379,20 +365,15 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public void generateLang(LangKubeEvent lang) {
-        super.generateLang(lang);
-        if (langValue() != null) {
-            lang.add(GTCEu.MOD_ID, value.getDescriptionId(), value.getLangValue());
-        }
-    }
-
-    @Override
     @HideFromJS
     public MultiblockMachineDefinition register() {
-        var definition = (MultiblockMachineDefinition) super.register();
+        var definition = super.register();
         definition.setGenerator(generator);
+        //noinspection ConstantValue it can be null by mistake.
         if (pattern == null) {
-            throw new IllegalStateException("missing pattern while creating multiblock " + name);
+            GTCEu.LOGGER.error(
+                    "missing pattern while creating multiblock {}, something's likely gone very wrong! Check the full log.",
+                    name);
         }
         definition.setPatternFactory(GTMemoizer.memoize(() -> pattern.apply(definition)));
         definition.setShapes(() -> shapeInfos.stream().map(factory -> factory.apply(definition))
@@ -408,6 +389,6 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
         }
         definition.setPartAppearance(partAppearance);
         definition.setAdditionalDisplay(additionalDisplay);
-        return value = definition;
+        return definition;
     }
 }

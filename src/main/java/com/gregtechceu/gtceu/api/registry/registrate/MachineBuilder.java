@@ -25,7 +25,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.tterrag.registrate.AbstractRegistrate;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -41,7 +41,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.providers.ProviderType;
@@ -60,20 +59,17 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Accessors(chain = true, fluent = true)
-public class MachineBuilder<DEFINITION extends MachineDefinition> extends BuilderBase<DEFINITION> {
+public class MachineBuilder<DEFINITION extends MachineDefinition> {
 
-    protected final Registrate registrate;
+    protected final AbstractRegistrate<?> registrate;
     protected final String name;
     protected final BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory;
     protected final BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory;
@@ -106,13 +102,15 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     @Setter
     private NonNullUnaryOperator<Item.Properties> itemProp = p -> p;
     @Setter
+    @Nullable
     private Consumer<BlockBuilder<? extends Block, ?>> blockBuilder;
     @Setter
+    @Nullable
     private Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder;
     @Setter
     private NonNullConsumer<BlockEntityType<BlockEntity>> onBlockEntityRegister = MetaMachineBlockEntity::onBlockEntityRegister;
     @Getter // getter for KJS
-    private GTRecipeType[] recipeTypes;
+    private GTRecipeType @Nullable [] recipeTypes;
     @Getter
     @Setter // getter for KJS
     private int tier;
@@ -126,6 +124,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     private PartAbility[] abilities = new PartAbility[0];
     private final List<Component> tooltips = new ArrayList<>();
     @Setter
+    @Nullable
     private BiConsumer<ItemStack, List<Component>> tooltipBuilder;
     private RecipeModifier recipeModifier = new RecipeModifierList(GTRecipeModifiers.OC_NON_PERFECT);
     @Setter
@@ -151,6 +150,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     private boolean regressWhenWaiting = true;
 
     @Setter
+    @Nullable
     private Supplier<BlockState> appearance;
     @Getter // getter for KJS
     @Setter
@@ -158,15 +158,15 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     private EditableMachineUI editableUI;
     @Getter // getter for KJS
     @Setter
+    @Nullable
     private String langValue = null;
 
-    protected MachineBuilder(Registrate registrate, String name,
+    public MachineBuilder(AbstractRegistrate<?> registrate, String name,
                              Function<ResourceLocation, DEFINITION> definition,
                              Function<IMachineBlockEntity, MetaMachine> machine,
                              BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
                              BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
                              TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        super(ResourceLocation.fromNamespaceAndPath(registrate.getModid(), name));
         this.registrate = registrate;
         this.name = name;
         this.machine = machine;
@@ -187,17 +187,6 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
             this.recipeTypes = ArrayUtils.add(this.recipeTypes, type);
         }
         return this;
-    }
-
-    public static <
-            DEFINITION extends MachineDefinition> MachineBuilder<DEFINITION> create(Registrate registrate, String name,
-                                                                                    Function<ResourceLocation, DEFINITION> definitionFactory,
-                                                                                    Function<IMachineBlockEntity, MetaMachine> metaMachine,
-                                                                                    BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
-                                                                                    BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                                                                                    TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        return new MachineBuilder<>(registrate, name, definitionFactory, metaMachine, blockFactory, itemFactory,
-                blockEntityFactory);
     }
 
     public MachineBuilder<DEFINITION> modelRenderer(Supplier<ResourceLocation> model) {
@@ -261,7 +250,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     }
 
     public MachineBuilder<DEFINITION> tooltips(Component... components) {
-        tooltips.addAll(Arrays.stream(components).filter(Objects::nonNull).toList());
+        tooltips.addAll(Arrays.stream(components).toList());
         return this;
     }
 
@@ -324,7 +313,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     }
 
     @HideFromJS
-    public DEFINITION register() {
+    public @NotNull DEFINITION register() {
         var definition = createDefinition();
 
         var blockBuilder = BlockBuilderWrapper.makeBlockBuilder(this, definition);
@@ -375,7 +364,9 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
         }
         if (recipeTypes != null) {
             for (GTRecipeType type : recipeTypes) {
-                if (type != null && type.getIconSupplier() == null) {
+                Objects.requireNonNull(type, "Cannot use null recipe type for machine %s:%s"
+                        .formatted(registrate.getModid(), this.name));
+                if (type.getIconSupplier() == null) {
                     type.setIconSupplier(definition::asStack);
                 }
             }
@@ -400,10 +391,9 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
     static class BlockBuilderWrapper {
 
         @SuppressWarnings("removal")
-        public static <
-                DEFINITION extends MachineDefinition> BlockBuilder<Block, Registrate> makeBlockBuilder(MachineBuilder<DEFINITION> builder,
-                                                                                                       DEFINITION definition) {
-            return builder.registrate.block(builder.name, properties -> {
+        public static <D extends MachineDefinition> BlockBuilder<Block, MachineBuilder<D>> makeBlockBuilder(MachineBuilder<D> builder,
+                                                                                                            D definition) {
+            return builder.registrate.block(builder, builder.name, properties -> {
                 RotationState.set(builder.rotationState);
                 MachineDefinition.setBuilt(definition);
                 var b = builder.blockFactory.apply(properties, definition);
@@ -415,7 +405,6 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
                     .initialProperties(() -> Blocks.DISPENSER)
                     .properties(BlockBehaviour.Properties::noLootTable)
                     .addLayer(() -> RenderType::cutoutMipped)
-                    // .create(GTToolType.WRENCH.harvestTag)
                     .blockstate(NonNullBiConsumer.noop())
                     .properties(builder.blockProp)
                     .onRegister(b -> Arrays.stream(builder.abilities).forEach(a -> a.register(builder.tier, b)));
@@ -424,12 +413,9 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> extends Builde
 
     static class ItemBuilderWrapper {
 
-        public static <
-                DEFINITION extends MachineDefinition> ItemBuilder<MetaMachineItem, Registrate> makeItemBuilder(MachineBuilder<DEFINITION> builder,
-                                                                                                               BlockEntry<Block> block) {
-            return builder.registrate
-                    .item(builder.name,
-                            properties -> builder.itemFactory.apply((IMachineBlock) block.get(), properties))
+        public static <D extends MachineDefinition> ItemBuilder<MetaMachineItem, MachineBuilder<D>> makeItemBuilder(MachineBuilder<D> builder,
+                                                                                                                    BlockEntry<Block> block) {
+            return builder.registrate.item(builder, builder.name, properties -> builder.itemFactory.apply((IMachineBlock) block.get(), properties))
                     .setData(ProviderType.LANG, NonNullBiConsumer.noop()) // do not gen any lang keys
                     .model(NonNullBiConsumer.noop())
                     .color(() -> () -> builder.itemColor::apply)
