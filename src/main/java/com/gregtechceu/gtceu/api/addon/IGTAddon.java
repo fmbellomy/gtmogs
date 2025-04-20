@@ -14,23 +14,15 @@ public interface IGTAddon {
 
     /**
      * @return this addon's GTRegistrate instance.
-     *         remember to call{@link GTRegistrate#registerEventListeners} in your mod class!
      */
     GTRegistrate getRegistrate();
 
     /**
-     * This runs after GTCEu has set up it's content.
+     * This runs after GTCEu has set up it's content. Set up GT loading-dependent (but NOT ones dependent on
      * @apiNote DO NOT REGISTER ANY OF YOUR OWN CONTENT HERE, AS IF YOU DO, IT'LL REGISTER AS IF GTCEu REGISTERED IT
      *          AND YOUR DATAGEN AND EVENTS WILL <b><i>NOT</i></b> WORK AS EXPECTED, IF AT ALL.
      */
-    void gtFinishedLoading();
-
-    /**
-     * this addon's Mod id.
-     * 
-     * @return the Mod ID this addon uses for content.
-     */
-    String addonModId();
+    void gtInitComplete();
 
     /**
      * Call init on your custom TagPrefix class(es) here
