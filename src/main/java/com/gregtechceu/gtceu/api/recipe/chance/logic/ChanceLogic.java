@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.recipe.chance.logic;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.recipe.chance.boost.ChanceBoostFunction;
@@ -7,7 +8,6 @@ import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import net.minecraft.network.chat.Component;
-import net.neoforged.fml.ModLoader;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -177,7 +177,7 @@ public abstract class ChanceLogic {
     };
 
     public ChanceLogic(String id) {
-        GTRegistries.CHANCE_LOGICS.register(id, this);
+        GTRegistries.CHANCE_LOGICS.register(GTCEu.id(id), this);
     }
 
     /**
@@ -270,7 +270,7 @@ public abstract class ChanceLogic {
 
     @ApiStatus.Internal
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent<>(GTRegistries.CHANCE_LOGICS, ChanceLogic.class));
+        GTCEuAPI.postRegisterEvent(GTRegistries.CHANCE_LOGICS);
         GTRegistries.CHANCE_LOGICS.freeze();
     }
 }

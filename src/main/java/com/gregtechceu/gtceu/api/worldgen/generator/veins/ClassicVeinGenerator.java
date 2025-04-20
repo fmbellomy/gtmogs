@@ -3,12 +3,13 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
 import com.mojang.serialization.MapCodec;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.ExtraCodecs;
@@ -41,6 +42,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Accessors(fluent = true, chain = true)
+@NoArgsConstructor
 public class ClassicVeinGenerator extends VeinGenerator {
 
     public static final MapCodec<ClassicVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -65,10 +67,6 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
     @Setter
     private RuleTest[] rules;
-
-    public ClassicVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public ClassicVeinGenerator(Layer primary, Layer secondary, Layer between, Layer sporadic, int yRadius) {
         this.primary = primary;
@@ -101,7 +99,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
@@ -143,7 +141,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
     }
 
     private void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed,
-                            GTOreDefinition entry,
+                            OreVeinDefinition entry,
                             BlockPos blockPos, BlockPos lowestPos) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
         int x = SectionPos.sectionRelative(blockPos.getX());
@@ -253,7 +251,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
         public int layers;
 
         public void place(BlockState blockState, BulkSectionAccess access, LevelChunkSection section, long randomSeed,
-                          GTOreDefinition entry, BlockPos pos) {
+                          OreVeinDefinition entry, BlockPos pos) {
             RandomSource random = new XoroshiroRandomSource(randomSeed);
             int x = SectionPos.sectionRelative(pos.getX());
             int y = SectionPos.sectionRelative(pos.getY());

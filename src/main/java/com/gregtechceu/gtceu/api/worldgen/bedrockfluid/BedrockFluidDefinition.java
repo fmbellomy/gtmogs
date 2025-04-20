@@ -2,12 +2,14 @@ package com.gregtechceu.gtceu.api.worldgen.bedrockfluid;
 
 import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.utils.RegistryUtil;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.RegistryFixedCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -28,11 +30,11 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class BedrockFluidDefinition {
-
+    // spotless:off
     public static final MapCodec<Pair<Integer, Integer>> YIELD = Codec.mapPair(Codec.INT.fieldOf("min"),
             Codec.INT.fieldOf("max"));
 
-    public static final Codec<BedrockFluidDefinition> FULL_CODEC = RecordCodecBuilder.create(
+    public static final Codec<BedrockFluidDefinition> DIRECT_CODEC = RecordCodecBuilder.create(
             instance -> instance.group(
                     Codec.INT.fieldOf("weight").forGetter(ft -> ft.weight),
                     YIELD.fieldOf("yield").forGetter(ft -> Pair.of(ft.minimumYield, ft.maximumYield)),
@@ -50,7 +52,8 @@ public class BedrockFluidDefinition {
                                      yield.getFirst(), yield.getSecond(), depletionAmount, depletionChance,
                                      depletedYield, () -> storedFluid, biomeWeightModifier,
                                      new HashSet<>(dimensionFilter))));
-
+    public static final Codec<Holder<BedrockFluidDefinition>> CODEC = RegistryFixedCodec.create(GTRegistries.BEDROCK_FLUID_REGISTRY);
+    // spotless:on
     @Getter
     @Setter
     private int weight; // weight value for determining which vein will appear
@@ -82,7 +85,6 @@ public class BedrockFluidDefinition {
                                   Set<ResourceKey<Level>> dimensionFilter) {
         this(weight, minimumYield, maximumYield, depletionAmount, depletionChance, depletedYield, storedFluid,
                 originalModifiers, dimensionFilter);
-        GTRegistries.BEDROCK_FLUID_DEFINITIONS.register(name, this);
     }
 
     public BedrockFluidDefinition(int weight, int minimumYield, int maximumYield, int depletionAmount,
@@ -134,14 +136,13 @@ public class BedrockFluidDefinition {
         };
     }
 
-    public static Builder builder(ResourceLocation name) {
-        return new Builder(name);
+    public static Builder builder() {
+        return new Builder();
     }
 
     @Accessors(chain = true, fluent = true)
     public static class Builder {
 
-        private final ResourceLocation name;
         @Setter
         private int weight; // weight value for determining which vein will appear
         @Setter
@@ -157,12 +158,10 @@ public class BedrockFluidDefinition {
         private Set<ResourceKey<Level>> dimensions;
         private final List<BiomeWeightModifier> biomes = new LinkedList<>();
 
-        private Builder(ResourceLocation name) {
-            this.name = name;
-        }
+        private Builder() {}
 
-        public Builder copy(ResourceLocation name) {
-            var copied = new Builder(name);
+        public Builder copy() {
+            var copied = new Builder();
             copied.weight = weight;
             copied.minimumYield = minimumYield;
             copied.maximumYield = maximumYield;
@@ -212,9 +211,7 @@ public class BedrockFluidDefinition {
         }
 
         public BedrockFluidDefinition register() {
-            var definition = build();
-            GTRegistries.BEDROCK_FLUID_DEFINITIONS.registerOrOverride(name, definition);
-            return definition;
+            return build();
         }
     }
 }

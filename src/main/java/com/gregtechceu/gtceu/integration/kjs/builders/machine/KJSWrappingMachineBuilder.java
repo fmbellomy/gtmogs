@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.machine;
 
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
-import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import net.minecraft.resources.ResourceLocation;
 
-import dev.latvian.mods.kubejs.client.LangEventJS;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.util.Arrays;
 public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
 
     @HideFromJS
-    @Getter(onMethod_ = @HideFromJS)
+    @Getter
     private final KJSTieredMachineBuilder tieredBuilder;
 
     public KJSWrappingMachineBuilder(ResourceLocation id, KJSTieredMachineBuilder tieredBuilder) {
@@ -49,14 +49,15 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
     }
 
     @Override
-    public void generateLang(LangEventJS lang) {
+    public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
         tieredBuilder.generateLang(lang);
     }
 
     @Override
-    public MachineDefinition register() {
-        tieredBuilder.register();
+    public MachineDefinition createObject() {
+        tieredBuilder.createObject();
+        //noinspection DataFlowIssue
         for (var def : tieredBuilder.get()) {
             if (def != null) {
                 return value = def;

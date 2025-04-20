@@ -8,8 +8,19 @@ neoForge {
     }
 
     // This line is optional. Access Transformers are automatically detected
-    accessTransformers = project.files('src/main/resources/META-INF/accesstransformer.cfg')
-    validateAccessTransformers = true
+    accessTransformers {
+        var file = project.file('src/main/resources/META-INF/accesstransformer.cfg')
+        from(file)
+        publish(file)
+    }
+    // I'd have it on but it just doesn't work :( (fails on some neoforge classes)
+    // validateAccessTransformers = true
+
+    interfaceInjectionData {
+        var file = project.file('injected_interfaces/interfaces.json')
+        from(file)
+        publish file
+    }
 
     addModdingDependenciesTo(sourceSets.test)
 //    addModdingDependenciesTo(sourceSets.extra)

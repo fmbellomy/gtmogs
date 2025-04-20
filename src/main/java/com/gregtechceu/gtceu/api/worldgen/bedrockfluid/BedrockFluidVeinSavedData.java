@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -22,10 +22,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Objects;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class BedrockFluidVeinSavedData extends SavedData {
 
     public static final int VEIN_CHUNK_SIZE = 8; // veins are 8x8 chunk squares
@@ -55,7 +51,8 @@ public class BedrockFluidVeinSavedData extends SavedData {
         for (int i = 0; i < list.size(); ++i) {
             CompoundTag compoundTag = list.getCompound(i);
             var chunkPos = new ChunkPos(compoundTag.getLong("p"));
-            veinFluids.put(chunkPos, FluidVeinWorldEntry.readFromNBT(compoundTag.getCompound("d")));
+            veinFluids.put(chunkPos, FluidVeinWorldEntry.readFromNBT(compoundTag.getCompound("d"),
+                    serverLevel.registryAccess()));
         }
     }
 
@@ -86,7 +83,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
     public FluidVeinWorldEntry getFluidVeinWorldEntry(int chunkX, int chunkZ) {
         ChunkPos pos = new ChunkPos(chunkX, chunkZ);
         if (!veinFluids.containsKey(pos)) {
-            BedrockFluidDefinition definition = null;
+            Holder<BedrockFluidDefinition> definition = null;
             int query = RandomSource
                     .create(Objects.hash(serverLevel.getSeed(), getVeinCoord(chunkX), getVeinCoord(chunkZ)))
                     .nextInt();
@@ -94,7 +91,11 @@ public class BedrockFluidVeinSavedData extends SavedData {
             int totalWeight = getTotalWeight(biome);
             if (totalWeight > 0) {
                 int weight = Math.abs(query % totalWeight);
-                for (var fluidDefinition : GTRegistries.BEDROCK_FLUID_DEFINITIONS) {
+                var registry = serverLevel.registryAccess()
+                        .registryOrThrow(GTRegistries.BEDROCK_FLUID_REGISTRY)
+                        .asHolderIdMap();
+                for (var holder : registry) {
+                    var fluidDefinition = holder.value();
                     int veinWeight = fluidDefinition.getWeight() +
                             fluidDefinition.getBiomeWeightModifier().apply(biome);
                     if (veinWeight > 0 && (fluidDefinition.getDimensionFilter() == null ||
@@ -102,7 +103,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
                                     dim -> WorldGeneratorUtils.isSameDimension(dim, serverLevel.dimension())))) {
                         weight -= veinWeight;
                         if (weight < 0) {
-                            definition = fluidDefinition;
+                            definition = holder;
                             break;
                         }
                     }
@@ -113,13 +114,14 @@ public class BedrockFluidVeinSavedData extends SavedData {
 
             int maximumYield = 0;
             if (definition != null) {
-                if (definition.getMaximumYield() - definition.getMinimumYield() <= 0) {
-                    maximumYield = definition.getMinimumYield();
+                var value = definition.value();
+                if (value.getMaximumYield() - value.getMinimumYield() <= 0) {
+                    maximumYield = value.getMinimumYield();
                 } else {
-                    maximumYield = random.nextInt(definition.getMaximumYield() - definition.getMinimumYield()) +
-                            definition.getMinimumYield();
+                    maximumYield = random.nextInt(value.getMaximumYield() - value.getMinimumYield()) +
+                            value.getMinimumYield();
                 }
-                maximumYield = Math.min(maximumYield, definition.getMaximumYield());
+                maximumYield = Math.min(maximumYield, value.getMaximumYield());
             }
             veinFluids.put(pos, new FluidVeinWorldEntry(definition, maximumYield, MAXIMUM_VEIN_OPERATIONS));
             setDirty();
@@ -136,7 +138,8 @@ public class BedrockFluidVeinSavedData extends SavedData {
     public int getTotalWeight(Holder<Biome> biome) {
         return biomeWeights.computeIfAbsent(biome, b -> {
             int totalWeight = 0;
-            for (var definition : GTRegistries.BEDROCK_FLUID_DEFINITIONS) {
+            for (var definition : serverLevel.registryAccess()
+                    .registryOrThrow(GTRegistries.BEDROCK_FLUID_REGISTRY)) {
                 if (definition.getDimensionFilter() == null || definition.getDimensionFilter().stream()
                         .anyMatch(dim -> WorldGeneratorUtils.isSameDimension(dim, serverLevel.dimension()))) {
                     totalWeight += definition.getBiomeWeightModifier().apply(biome);
@@ -168,7 +171,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
     public int getDepletedFluidYield(int chunkX, int chunkZ) {
         FluidVeinWorldEntry info = getFluidVeinWorldEntry(chunkX, chunkZ);
         if (info.getDefinition() == null) return 0;
-        return info.getDefinition().getDepletedYield();
+        return info.getDefinition().value().getDepletedYield();
     }
 
     /**
@@ -193,7 +196,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
     public Fluid getFluidInChunk(int chunkX, int chunkZ) {
         FluidVeinWorldEntry info = getFluidVeinWorldEntry(chunkX, chunkZ);
         if (info.getDefinition() == null) return null;
-        return info.getDefinition().getStoredFluid().get();
+        return info.getDefinition().value().getStoredFluid().get();
     }
 
     /**
@@ -215,10 +218,12 @@ public class BedrockFluidVeinSavedData extends SavedData {
             return;
         }
 
-        BedrockFluidDefinition definition = info.getDefinition();
+        if (info.getDefinition() == null)
+            return;
 
+        BedrockFluidDefinition definition = info.getDefinition().value();
         // prevent division by zero, veins that never deplete don't need updating
-        if (definition == null || definition.getDepletionChance() == 0)
+        if (definition.getDepletionChance() == 0)
             return;
 
         if (definition.getDepletionChance() == 100 || GTValues.RNG.nextInt(100) <= definition.getDepletionChance()) {

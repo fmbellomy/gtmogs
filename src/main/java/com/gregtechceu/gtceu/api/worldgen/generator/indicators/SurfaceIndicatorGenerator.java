@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.api.worldgen.generator.indicators;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
@@ -10,7 +9,7 @@ import com.gregtechceu.gtceu.api.worldgen.ores.OreIndicatorPlacer;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.MethodsReturnNonnullByDefault;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -43,10 +42,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NoArgsConstructor
 public class SurfaceIndicatorGenerator extends IndicatorGenerator {
 
     public static final MapCodec<SurfaceIndicatorGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -61,10 +57,6 @@ public class SurfaceIndicatorGenerator extends IndicatorGenerator {
     private IntProvider radius = ConstantInt.of(5);
     private FloatProvider density = ConstantFloat.of(0.2f);
     private IndicatorPlacement placement = IndicatorPlacement.SURFACE;
-
-    public SurfaceIndicatorGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public SurfaceIndicatorGenerator(Either<BlockState, Material> block, IntProvider radius, FloatProvider density,
                                      IndicatorPlacement placement) {

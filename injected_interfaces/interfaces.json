@@ -1,0 +1,5 @@
+{
+    "net/minecraft/core/MappedRegistry": [
+        "com/gregtechceu/gtceu/core/mixins/MappedRegistryAccessor<T>"
+    ]
+}

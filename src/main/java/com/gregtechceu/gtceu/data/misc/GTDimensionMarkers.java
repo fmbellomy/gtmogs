@@ -1,10 +1,8 @@
 package com.gregtechceu.gtceu.data.misc;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -12,7 +10,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.fml.ModLoader;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
 import org.jetbrains.annotations.Nullable;
@@ -71,10 +68,7 @@ public class GTDimensionMarkers {
     }
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.DIMENSION_MARKERS));
-        if (GTCEu.Mods.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistries.DIMENSION_MARKERS.getRegistryName());
-        }
+        GTCEuAPI.postRegisterEvent(GTRegistries.DIMENSION_MARKERS);
         GTRegistries.DIMENSION_MARKERS.freeze();
     }
 }

@@ -6,10 +6,13 @@ import com.gregtechceu.gtceu.data.datagen.tag.*;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 
 import com.tterrag.registrate.providers.ProviderType;
+import net.minecraft.data.DataProvider;
 
 public class GTRegistrateDatagen {
 
     public static void init() {
+        DataProvider.INDENT_WIDTH.set(4);
+
         GTRegistration.REGISTRATE.addDataGenerator(ProviderType.ITEM_TAGS, ItemTagLoader::init);
         GTRegistration.REGISTRATE.addDataGenerator(ProviderType.BLOCK_TAGS, BlockTagLoader::init);
         GTRegistration.REGISTRATE.addDataGenerator(ProviderType.FLUID_TAGS, FluidTagLoader::init);

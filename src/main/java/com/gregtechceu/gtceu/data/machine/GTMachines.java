@@ -31,7 +31,6 @@ import com.gregtechceu.gtceu.common.pipelike.item.longdistance.LDItemEndpointMac
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
@@ -40,7 +39,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.fml.ModLoader;
 
 import com.google.common.math.IntMath;
 import it.unimi.dsi.fastutil.Pair;
@@ -1091,10 +1089,7 @@ public class GTMachines {
             GTAEMachines.init();
         }
 
-        if (GTCEu.Mods.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistries.MACHINES.getRegistryName());
-        }
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.MACHINES));
+        GTCEuAPI.postRegisterEvent(GTRegistries.MACHINES);
         GTRegistries.MACHINES.freeze();
     }
 

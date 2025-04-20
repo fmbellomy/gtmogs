@@ -6,9 +6,6 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
-
-import net.neoforged.fml.ModLoader;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -39,10 +36,7 @@ public class GTRecipeCategories {
     }
 
     public static void init() {
-        if (GTCEu.Mods.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistries.RECIPE_CATEGORIES.getRegistryName());
-        }
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.RECIPE_CATEGORIES));
+        GTCEuAPI.postRegisterEvent(GTRegistries.RECIPE_CATEGORIES);
         GTRegistries.RECIPE_CATEGORIES.freeze();
     }
 

@@ -9,7 +9,7 @@ import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.common.recipe.event.CraftingComponentModificationEvent;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuServerEvents;
-import com.gregtechceu.gtceu.integration.kjs.events.CraftingComponentsEventJS;
+import com.gregtechceu.gtceu.integration.kjs.events.CraftingComponentsKubeEvent;
 
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.Tags;
@@ -759,7 +759,7 @@ public class GTCraftingComponents {
     private static final class KJSCallWrapper {
 
         private static void craftingComponentModification() {
-            GTCEuServerEvents.CRAFTING_COMPONENTS.post(new CraftingComponentsEventJS());
+            GTCEuServerEvents.CRAFTING_COMPONENTS.post(new CraftingComponentsKubeEvent());
         }
     }
 }

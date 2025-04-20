@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.api.worldgen.ores;
 
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.RandomSource;
@@ -21,7 +20,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Responsible for placing ores of surrounding veins for the current chunk.
@@ -30,8 +28,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * Surrounding veins are resolved from the {@link OreGenCache} and placed using each block position's
  * {@link OreBlockPlacer}.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class OrePlacer {
 
     @Getter

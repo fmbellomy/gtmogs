@@ -1,43 +1,31 @@
 package com.gregtechceu.gtceu.common.commands;
 
-import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
-import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
-import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OrePlacer;
 import com.gregtechceu.gtceu.api.gui.factory.GTUIEditorFactory;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.registry.GTRegistry;
-import com.gregtechceu.gtceu.common.commands.arguments.GTRegistryArgument;
-import com.gregtechceu.gtceu.data.loader.BedrockFluidLoader;
-import com.gregtechceu.gtceu.data.loader.BedrockOreLoader;
-import com.gregtechceu.gtceu.data.loader.GTOreLoader;
-import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
+import com.gregtechceu.gtceu.core.mixins.ResourceKeyArgumentAccessor;
 
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
-import com.google.gson.JsonElement;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.JsonOps;
-
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
 
 import static net.minecraft.commands.Commands.*;
 
@@ -45,6 +33,9 @@ public class GTCommands {
 
     private static final Dynamic2CommandExceptionType VEIN_PLACE_FAILURE = new Dynamic2CommandExceptionType(
             (id, sourcePos) -> Component.translatable("command.gtceu.place_vein.failure", id, sourcePos)
+    );
+    private static final DynamicCommandExceptionType ERROR_INVALID_VEIN = new DynamicCommandExceptionType(
+            id -> Component.translatableEscape("command.gtceu.place_vein.invalid", id)
     );
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
@@ -57,25 +48,24 @@ public class GTCommands {
                                             context.getSource().getPlayerOrException());
                                     return 1;
                                 }))
-                        .then(literal("dump_data")
-                                .then(literal("bedrock_fluid_veins")
-                                        .executes(context -> dumpDataRegistry(context,
-                                                GTRegistries.BEDROCK_FLUID_DEFINITIONS,
-                                                BedrockFluidDefinition.FULL_CODEC,
-                                                BedrockFluidLoader.FOLDER)))
-                                .then(literal("bedrock_ore_veins")
-                                        .executes(context -> dumpDataRegistry(context,
-                                                GTRegistries.BEDROCK_ORE_DEFINITIONS,
-                                                BedrockOreDefinition.FULL_CODEC,
-                                                BedrockOreLoader.FOLDER)))
-                                .then(literal("ore_veins")
-                                        .executes(context -> dumpDataRegistry(context,
-                                                GTRegistries.ORE_VEINS,
-                                                GTOreDefinition.FULL_CODEC,
-                                                GTOreLoader.FOLDER))))
+                        //.then(literal("dump_data")
+                        //        .then(literal("bedrock_fluid_veins")
+                        //                .executes(context -> dumpDataRegistry(context,
+                        //                        GTRegistries.BEDROCK_FLUID_DEFINITIONS,
+                        //                        BedrockFluidDefinition.CODEC,
+                        //                        BedrockFluidLoader.FOLDER)))
+                        //        .then(literal("bedrock_ore_veins")
+                        //                .executes(context -> dumpDataRegistry(context,
+                        //                        GTRegistries.BEDROCK_ORE_DEFINITIONS,
+                        //                        BedrockOreDefinition.CODEC,
+                        //                        BedrockOreLoader.FOLDER)))
+                        //        .then(literal("ore_veins")
+                        //                .executes(context -> dumpDataRegistry(context,
+                        //                        GTRegistries.ORE_VEINS,
+                        //                        OreVeinDefinition.DIRECT_CODEC,
+                        //                        GTOreLoader.FOLDER))))
                         .then(literal("place_vein")
-                                .then(argument("vein",
-                                        GTRegistryArgument.registry(GTRegistries.ORE_VEINS, ResourceLocation.class))
+                                .then(argument("vein", ResourceKeyArgument.key(GTRegistries.ORE_VEIN_REGISTRY))
                                         .executes(context -> GTCommands.placeVein(context,
                                                 BlockPos.containing(context.getSource().getPosition())))
                                         .then(argument("position", BlockPosArgument.blockPos())
@@ -83,34 +73,35 @@ public class GTCommands {
                                                         BlockPosArgument.getBlockPos(context, "position")))))));
     }
 
-    private static <T> int dumpDataRegistry(CommandContext<CommandSourceStack> context,
-                                            GTRegistry<ResourceLocation, T> registry, Codec<T> codec, String folder) {
-        Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/data");
-        var ops = RegistryOps.create(JsonOps.INSTANCE, context.getSource().registryAccess());
-        int dumpedCount = 0;
-        for (ResourceLocation id : registry.keys()) {
-            T entry = registry.get(id);
-            JsonElement json = codec.encodeStart(ops, entry).getOrThrow();
-            GTDynamicDataPack.writeJson(id, folder, parent, json.toString().getBytes(StandardCharsets.UTF_8));
-            dumpedCount++;
-        }
-        final int result = dumpedCount;
-        context.getSource().sendSuccess(
-                () -> Component.translatable("command.gtceu.dump_data.success", result,
-                        registry.getRegistryName().toString(), parent.toString()),
-                true);
-        return result;
-    }
+    //private static <T> int dumpDataRegistry(CommandContext<CommandSourceStack> context,
+    //                                        GTRegistry<ResourceLocation, T> registry, Codec<T> codec, String folder) {
+    //    Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/data");
+    //    var ops = RegistryOps.create(JsonOps.INSTANCE, context.getSource().registryAccess());
+    //    int dumpedCount = 0;
+    //    for (ResourceLocation id : registry.keys()) {
+    //        T entry = registry.get(id);
+    //        JsonElement json = codec.encodeStart(ops, entry).getOrThrow();
+    //        GTDynamicDataPack.writeJson(id, folder, parent, json.toString().getBytes(StandardCharsets.UTF_8));
+    //        dumpedCount++;
+    //    }
+    //    final int result = dumpedCount;
+    //    context.getSource().sendSuccess(
+    //            () -> Component.translatable("command.gtceu.dump_data.success", result,
+    //                    registry.getRegistryName().toString(), parent.toString()),
+    //            true);
+    //    return result;
+    //}
 
     private static int placeVein(CommandContext<CommandSourceStack> context,
                                  BlockPos sourcePos) throws CommandSyntaxException {
-        GTOreDefinition vein = context.getArgument("vein", GTOreDefinition.class);
-        ResourceLocation id = GTRegistries.ORE_VEINS.getKey(vein);
+        Holder.Reference<OreVeinDefinition> vein = ResourceKeyArgumentAccessor.callResolveKey(context, "vein",
+                GTRegistries.ORE_VEIN_REGISTRY, ERROR_INVALID_VEIN);
+        ResourceLocation id = vein.key().location();
 
         ChunkPos chunkPos = new ChunkPos(sourcePos);
         ServerLevel level = context.getSource().getLevel();
 
-        GeneratedVeinMetadata metadata = new GeneratedVeinMetadata(id, chunkPos, sourcePos, vein);
+        GeneratedVeinMetadata metadata = new GeneratedVeinMetadata(chunkPos, sourcePos, vein);
         RandomSource random = level.random;
 
         OrePlacer placer = new OrePlacer();

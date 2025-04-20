@@ -1,10 +1,14 @@
 package com.gregtechceu.gtceu.common.network.packets.prospecting;
 
+import com.google.common.collect.Table;
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.integration.map.cache.client.GTClientCache;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,11 +22,11 @@ public class SPacketProspectOre extends SPacketProspect<GeneratedVeinMetadata> {
 
     public static final ResourceLocation ID = GTCEu.id("prospect_ore");
     public static final Type<SPacketProspectOre> TYPE = new Type<>(ID);
-    public static final StreamCodec<FriendlyByteBuf, SPacketProspectOre> CODEC = StreamCodec
+    public static final StreamCodec<RegistryFriendlyByteBuf, SPacketProspectOre> CODEC = StreamCodec
             .ofMember(SPacketProspectOre::encode, SPacketProspectOre::decode);
 
-    public SPacketProspectOre() {
-        super();
+    public SPacketProspectOre(Table<ResourceKey<Level>, BlockPos, GeneratedVeinMetadata> data) {
+        super(data);
     }
 
     public SPacketProspectOre(ResourceKey<Level> key, Collection<GeneratedVeinMetadata> veins) {
@@ -30,11 +34,11 @@ public class SPacketProspectOre extends SPacketProspect<GeneratedVeinMetadata> {
     }
 
     @Override
-    public void encodeData(FriendlyByteBuf buf, GeneratedVeinMetadata data) {
+    public void encodeData(RegistryFriendlyByteBuf buf, GeneratedVeinMetadata data) {
         data.writeToPacket(buf);
     }
 
-    public static SPacketProspectOre decode(FriendlyByteBuf buf) {
+    public static SPacketProspectOre decode(RegistryFriendlyByteBuf buf) {
         return SPacketProspect.decode(buf, GeneratedVeinMetadata::readFromPacket, SPacketProspectOre::new);
     }
 

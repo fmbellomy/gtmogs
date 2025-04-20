@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.common.pack;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
-import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.Platform;
@@ -42,11 +41,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
 public class GTDynamicDataPack implements PackResources {
 
     protected static final ObjectSet<String> SERVER_DOMAINS = new ObjectOpenHashSet<>();
@@ -59,7 +54,7 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     public GTDynamicDataPack(PackLocationInfo info) {
-        this(info, AddonFinder.getAddons().stream().map(IGTAddon::addonModId).collect(Collectors.toSet()));
+        this(info, AddonFinder.getAddons().keySet());
     }
 
     public GTDynamicDataPack(PackLocationInfo info, Collection<String> domains) {

@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.ores;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -20,7 +19,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Used for caching ore veins between generated chunks.
@@ -28,8 +26,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * <p>
  * Uses the {@link OreGenerator} to generate new veins in case no vein is cached for a queried chunk.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class OreGenCache {
 
     @Getter

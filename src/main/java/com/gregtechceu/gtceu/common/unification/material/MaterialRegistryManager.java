@@ -60,8 +60,8 @@ public final class MaterialRegistryManager implements IMaterialRegistryManager {
 
     @NotNull
     @Override
-    public MaterialRegistry getRegistry(@NotNull String modid) {
-        MaterialRegistry registry = registries.get(modid);
+    public MaterialRegistry getRegistry(@NotNull String modId) {
+        MaterialRegistry registry = registries.get(modId);
         return registry != null ? registry : gregtechRegistry;
     }
 

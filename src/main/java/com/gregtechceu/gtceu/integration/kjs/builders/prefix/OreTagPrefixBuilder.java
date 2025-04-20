@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.integration.kjs.builders.prefix;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.core.mixins.BlockBehaviourAccessor;
 import com.gregtechceu.gtceu.integration.kjs.built.KJSTagPrefix;
 
 import net.minecraft.resources.ResourceLocation;
@@ -49,8 +48,7 @@ public class OreTagPrefixBuilder extends TagPrefixBuilder {
         validate(this.id,
                 errorIfNull(stateSupplier, "stateSupplier"),
                 onlySetDefault(templateProperties, () -> {
-                    templateProperties = () -> GTBlocks.copy(
-                            stateSupplier.get().getBlock().properties(),
+                    templateProperties = () -> GTBlocks.copy(stateSupplier.get().getBlock().properties(),
                             BlockBehaviour.Properties.of());
                 }),
                 errorIfNull(baseModelLocation, "baseModelLocation"));

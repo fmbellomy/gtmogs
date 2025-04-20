@@ -310,20 +310,12 @@ public class GTModels {
         for (var material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
             var fluidProperty = material.getProperty(PropertyKey.FLUID);
             if (fluidProperty == null) continue;
-            MaterialIconSet iconSet = material.getMaterialIconSet();
 
             for (FluidStorageKey key : FluidStorageKey.allKeys()) {
                 FluidStorage storage = fluidProperty.getStorage();
                 // fluid block models.
                 FluidStorage.FluidEntry fluidEntry = storage.getEntry(key);
                 if (fluidEntry != null && fluidEntry.getBuilder() != null) {
-                    if (fluidEntry.getBuilder().still() == null) {
-                        ResourceLocation foundTexture = key.getIconType().getBlockTexturePath(iconSet, false);
-                        fluidEntry.getBuilder().still(foundTexture);
-                    }
-                    if (fluidEntry.getBuilder().flowing() == null) {
-                        fluidEntry.getBuilder().flowing(fluidEntry.getBuilder().still());
-                    }
                     MixinHelpers.addFluidTexture(material, fluidEntry);
                 }
 

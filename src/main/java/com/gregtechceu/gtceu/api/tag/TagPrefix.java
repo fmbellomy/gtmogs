@@ -17,7 +17,8 @@ import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
+import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
+import com.gregtechceu.gtceu.integration.kjs.events.TagPrefixKubeEvent;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreByProduct;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
@@ -57,7 +58,6 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
 import java.util.function.*;
-import java.util.stream.Collectors;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.Conditions.*;
 
@@ -74,9 +74,9 @@ public class TagPrefix {
             prefix -> DataResult.success(prefix.name));
 
     public static void init() {
-        AddonFinder.getAddons().forEach(IGTAddon::registerTagPrefixes);
+        AddonFinder.getAddonList().forEach(IGTAddon::registerTagPrefixes);
         if (GTCEu.Mods.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistryInfo.TAG_PREFIX.registryKey);
+            KJSCallWrapper.postEvent();
         }
     }
 
@@ -1325,5 +1325,12 @@ public class TagPrefix {
     @Override
     public String toString() {
         return name;
+    }
+
+    private static final class KJSCallWrapper {
+
+        private static void postEvent() {
+            GTCEuStartupEvents.TAG_PREFIXES.post(new TagPrefixKubeEvent());
+        }
     }
 }

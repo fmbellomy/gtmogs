@@ -12,11 +12,12 @@ import com.gregtechceu.gtceu.common.block.BatteryBlock;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.gregtechceu.gtceu.core.mixins.neoforge.RegisterEventAccessor;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.bus.api.Event;
-import net.neoforged.fml.event.IModBusEvent;
+import net.neoforged.fml.ModLoader;
 
 import lombok.Getter;
+import net.neoforged.neoforge.registries.RegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
@@ -49,31 +50,19 @@ public class GTCEuAPI {
     public static void initializeHighTier() {
         if (highTierInitialized) throw new IllegalStateException("High-Tier is already initialized.");
         highTier = ConfigHolder.INSTANCE.machines.highTierContent ||
-                AddonFinder.getAddons().stream().anyMatch(IGTAddon::requiresHighTier) || GTCEu.isDev();
+                AddonFinder.getAddonList().stream().anyMatch(IGTAddon::requiresHighTier) || GTCEu.isDev();
         highTierInitialized = true;
 
         if (isHighTier()) GTCEu.LOGGER.info("High-Tier is Enabled.");
         else GTCEu.LOGGER.info("High-Tier is Disabled.");
     }
 
-    public static class RegisterEvent extends Event implements IModBusEvent {
-
-        @Getter
-        private final GTRegistry<?, ?> registry;
-
-        public RegisterEvent(GTRegistry<?, ?> registry) {
-            this.registry = registry;
-        }
-
-        public <K, V> void register(K key, V value) {
-            // noinspection unchecked
-            ((GTRegistry<K, V>) registry).register(key, value);
-        }
-
-        public <K, V> void register(GTRegistry<K, V> registry, Runnable runnable) {
-            if (registry == this.registry) {
-                runnable.run();
-            }
-        }
+    /**
+     * Post the register event for a specific (GT) registry. Internal use only, do not attempt to call this.
+     */
+    @ApiStatus.Internal
+    public static <T> void postRegisterEvent(GTRegistry<T> registry) {
+        RegisterEvent registerEvent = RegisterEventAccessor.create(registry.key(), registry);
+        ModLoader.postEventWrapContainerInModOrder(registerEvent);
     }
 }

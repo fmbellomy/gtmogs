@@ -1,21 +1,17 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.component.IDataItem;
-import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.ResearchData;
 import com.gregtechceu.gtceu.api.recipe.ResearchRecipeBuilder;
-import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.ingredient.*;
@@ -25,51 +21,48 @@ import com.gregtechceu.gtceu.common.recipe.condition.*;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.CapabilityMap;
-import com.gregtechceu.gtceu.integration.kjs.recipe.components.ExtendedOutputItem;
+import com.gregtechceu.gtceu.integration.kjs.recipe.components.CapabilityMapComponent;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.GTRecipeComponents;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
+import dev.ftb.mods.ftbquests.quest.QuestObjectBase;
+import dev.latvian.mods.kubejs.error.KubeRuntimeException;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.UniformInt;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.Recipe;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import dev.ftb.mods.ftbquests.quest.QuestObjectBase;
-import dev.latvian.mods.kubejs.fluid.FluidStackJS;
-import dev.latvian.mods.kubejs.fluid.InputFluid;
-import dev.latvian.mods.kubejs.item.InputItem;
-import dev.latvian.mods.kubejs.item.OutputItem;
-import dev.latvian.mods.kubejs.recipe.RecipeExceptionJS;
-import dev.latvian.mods.kubejs.recipe.RecipeJS;
+import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
+import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
+import dev.latvian.mods.kubejs.recipe.component.ComponentRole;
 import dev.latvian.mods.kubejs.recipe.component.TimeComponent;
+import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
-import dev.latvian.mods.kubejs.util.ConsoleJS;
+import dev.latvian.mods.kubejs.util.KubeResourceLocation;
+import dev.latvian.mods.kubejs.util.TickDuration;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public interface GTRecipeSchema {
 
-    @SuppressWarnings({ "unused", "UnusedReturnValue" })
+    @SuppressWarnings({ "unused", "UnusedReturnValue", "DataFlowIssue" })
     @Accessors(chain = true, fluent = true)
-    class GTRecipeJS extends RecipeJS {
+    class GTKubeRecipe extends KubeRecipe {
 
         @Setter
         public boolean perTick;
@@ -82,7 +75,7 @@ public interface GTRecipeSchema {
         @Getter
         private ResourceLocation idWithoutType;
         @Setter
-        public Consumer<GTRecipeJS> onSave;
+        public Consumer<GTKubeRecipe> onSave;
         @Getter
         private final Collection<GTRecipeBuilder.ResearchRecipeEntry> researchRecipeEntries = new ArrayList<>();
         private boolean generatingRecipes = true;
@@ -95,16 +88,17 @@ public interface GTRecipeSchema {
 
         @HideFromJS
         @Override
-        public GTRecipeJS id(ResourceLocation _id) {
-            this.idWithoutType = new ResourceLocation(
-                    _id.getNamespace().equals("minecraft") ? this.type.id.getNamespace() : _id.getNamespace(),
-                    _id.getPath());
-            this.id = new ResourceLocation(idWithoutType.getNamespace(),
+        public GTKubeRecipe id(KubeResourceLocation _id) {
+            this.idWithoutType = ResourceLocation.fromNamespaceAndPath(
+                    _id.wrapped().getNamespace().equals("kubejs") ? this.type.id.getNamespace() :
+                            _id.wrapped().getNamespace(),
+                    _id.wrapped().getPath());
+            this.id = ResourceLocation.fromNamespaceAndPath(idWithoutType.getNamespace(),
                     "%s/%s".formatted(this.type.id.getPath(), idWithoutType.getPath()));
             return this;
         }
 
-        public <T> GTRecipeJS input(RecipeCapability<T> capability, Object... obj) {
+        public <T> GTKubeRecipe input(RecipeCapability<T> capability, Object... obj) {
             CapabilityMap map;
             if (perTick) {
                 if (getValue(ALL_TICK_INPUTS) == null) setValue(ALL_TICK_INPUTS, new CapabilityMap());
@@ -114,13 +108,6 @@ public interface GTRecipeSchema {
                 map = getValue(ALL_INPUTS);
             }
             if (map != null) {
-                var recipeType = GTRegistries.RECIPE_TYPES.get(this.type.id);
-                if (map.get(capability) != null &&
-                        map.get(capability).length + obj.length > recipeType.getMaxInputs(capability)) {
-                    ConsoleJS.SERVER.warn(String.format(
-                            "Trying to add more inputs than RecipeType can support, id: %s, Max %s%sInputs: %s",
-                            id, (perTick ? "Tick " : ""), capability.name, recipeType.getMaxInputs(capability)));
-                }
                 for (Object object : obj) {
                     map.add(capability, new Content(object, chance, maxChance, tierChanceBoost));
                 }
@@ -129,7 +116,7 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public <T> GTRecipeJS output(RecipeCapability<T> capability, Object... obj) {
+        public <T> GTKubeRecipe output(RecipeCapability<T> capability, Object... obj) {
             CapabilityMap map;
             if (perTick) {
                 if (getValue(ALL_TICK_OUTPUTS) == null) setValue(ALL_TICK_OUTPUTS, new CapabilityMap());
@@ -141,7 +128,7 @@ public interface GTRecipeSchema {
             if (map != null) {
                 var recipeType = GTRegistries.RECIPE_TYPES.get(this.type.id);
                 if (map.get(capability) != null &&
-                        map.get(capability).length + obj.length > recipeType.getMaxOutputs(capability)) {
+                        map.get(capability).size() + obj.length > recipeType.getMaxOutputs(capability)) {
                     ConsoleJS.SERVER.warn(String.format(
                             "Trying to add more outputs than RecipeType can support, id: %s, Max %s%sOutputs: %s",
                             id, (perTick ? "Tick " : ""), capability.name, recipeType.getMaxOutputs(capability)));
@@ -154,25 +141,19 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS addCondition(RecipeCondition condition) {
-            setValue(CONDITIONS, ArrayUtils.add(getValue(CONDITIONS), condition));
+        public GTKubeRecipe addCondition(RecipeCondition<?> condition) {
+            getValue(CONDITIONS).add(condition);
             save();
             return this;
         }
 
-        public GTRecipeJS category(GTRecipeCategory category) {
-            setValue(CATEGORY, category.registryKey);
-            save();
-            return this;
-        }
-
-        public GTRecipeJS inputEU(long eu) {
+        public GTKubeRecipe inputEU(long eu) {
             return input(EURecipeCapability.CAP, eu);
         }
 
-        public GTRecipeJS EUt(long eu) {
+        public GTKubeRecipe EUt(long eu) {
             if (eu == 0) {
-                throw new RecipeExceptionJS(String.format("EUt can't be explicitly set to 0, id: %s", id));
+                throw new KubeRuntimeException(String.format("EUt can't be explicitly set to 0, id: %s", id));
             }
             var lastPerTick = perTick;
             perTick = true;
@@ -185,17 +166,17 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS outputEU(long eu) {
+        public GTKubeRecipe outputEU(long eu) {
             return output(EURecipeCapability.CAP, eu);
         }
 
-        public GTRecipeJS inputCWU(int cwu) {
+        public GTKubeRecipe inputCWU(int cwu) {
             return input(CWURecipeCapability.CAP, cwu);
         }
 
-        public GTRecipeJS CWUt(int cwu) {
+        public GTKubeRecipe CWUt(int cwu) {
             if (cwu == 0) {
-                throw new RecipeExceptionJS(String.format("CWUt can't be explicitly set to 0, id: %s", id));
+                throw new KubeRuntimeException(String.format("CWUt can't be explicitly set to 0, id: %s", id));
             }
             var lastPerTick = perTick;
             perTick = true;
@@ -208,165 +189,49 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS totalCWU(int cwu) {
+        public GTKubeRecipe totalCWU(int cwu) {
             this.durationIsTotalCWU(true);
             this.hideDuration(true);
-            this.setValue(GTRecipeSchema.DURATION, (long) cwu);
+            this.setValue(GTRecipeSchema.DURATION, new TickDuration(cwu));
             return this;
         }
 
-        public GTRecipeJS outputCWU(int cwu) {
+        public GTKubeRecipe outputCWU(int cwu) {
             return output(CWURecipeCapability.CAP, cwu);
         }
 
-        public GTRecipeJS itemInputs(InputItem... inputs) {
-            return inputItems(inputs);
-        }
-
-        public GTRecipeJS itemInput(MaterialEntry input) {
-            return inputItems(input);
-        }
-
-        public GTRecipeJS itemInput(MaterialEntry input, int count) {
-            return inputItems(input, count);
-        }
-
-        public GTRecipeJS inputItems(InputItem... inputs) {
-            for (var stack : inputs) {
-                var matStack = ChemicalHelper.getMaterialStack(stack.ingredient);
-                if (!matStack.isEmpty()) {
-                    itemMaterialStacks.add(new MaterialStack(matStack.material(), matStack.amount() * stack.count));
-                }
-            }
+        public GTKubeRecipe inputItems(SizedIngredient... inputs) {
             return input(ItemRecipeCapability.CAP, (Object[]) inputs);
         }
 
-        public GTRecipeJS inputItems(ItemStack... inputs) {
-            for (ItemStack itemStack : inputs) {
-                var matStack = ChemicalHelper.getMaterialStack(itemStack);
-                if (!matStack.isEmpty()) {
-                    itemMaterialStacks
-                            .add(new MaterialStack(matStack.material(), matStack.amount() * itemStack.getCount()));
-                }
-                if (itemStack.isEmpty()) {
-                    throw new RecipeExceptionJS(String.format("Input items is empty, id: %s", id));
-                }
-            }
-            return input(ItemRecipeCapability.CAP,
-                    Arrays.stream(inputs)
-                            .map(stack -> InputItem.of(SizedIngredient.create(
-                                    stack.hasTag() ? DataComponentIngredient.of(true, stack) : Ingredient.of(stack),
-                                    stack.getCount()), stack.getCount()))
-                            .toArray());
-        }
-
-        public GTRecipeJS inputItems(TagKey<Item> tag, int amount) {
-            return inputItems(InputItem.of(SizedIngredient.create(tag, amount)));
-        }
-
-        public GTRecipeJS inputItems(Item input, int amount) {
-            return inputItems(new ItemStack(input, amount));
-        }
-
-        public GTRecipeJS inputItems(Item input) {
-            return inputItems(InputItem.of(Ingredient.of(input), 1));
-        }
-
-        public GTRecipeJS inputItems(Supplier<? extends Item> input) {
-            return inputItems(InputItem.of(Ingredient.of(input.get()), 1));
-        }
-
-        public GTRecipeJS inputItems(Supplier<? extends Item> input, int amount) {
-            return inputItems(new ItemStack(input.get(), amount));
-        }
-
-        public GTRecipeJS inputItems(TagPrefix orePrefix, Material material) {
-            return inputItems(orePrefix, material, 1);
-        }
-
-        public GTRecipeJS inputItems(MaterialEntry input) {
-            return inputItems(input.tagPrefix(), input.material(), 1);
-        }
-
-        public GTRecipeJS inputItems(MaterialEntry input, int count) {
-            return inputItems(input.tagPrefix(), input.material(), count);
-        }
-
-        public GTRecipeJS inputItems(TagPrefix orePrefix, Material material, int count) {
-            itemMaterialStacks.add(new MaterialStack(material, orePrefix.getMaterialAmount(material) * count));
-            return inputItems(ChemicalHelper.getTag(orePrefix, material), count);
-        }
-
-        public GTRecipeJS inputItems(MachineDefinition machine) {
-            return inputItems(machine, 1);
-        }
-
-        public GTRecipeJS inputItems(MachineDefinition machine, int count) {
-            return inputItems(machine.asStack(count));
-        }
-
-        public GTRecipeJS itemOutputs(ExtendedOutputItem... outputs) {
-            return outputItems(outputs);
-        }
-
-        public GTRecipeJS itemOutput(MaterialEntry materialEntry) {
-            return outputItems(materialEntry.tagPrefix(), materialEntry.material());
-        }
-
-        public GTRecipeJS itemOutput(MaterialEntry materialEntry, int count) {
-            return outputItems(materialEntry.tagPrefix(), materialEntry.material(), count);
-        }
-
-        public GTRecipeJS outputItems(ExtendedOutputItem... outputs) {
-            for (ExtendedOutputItem itemStack : outputs) {
-                if (itemStack.isEmpty()) {
-                    throw new RecipeExceptionJS(String.format("Output items is empty, id: %s", id));
-                }
-            }
+        public GTKubeRecipe outputItems(SizedIngredient... outputs) {
             return output(ItemRecipeCapability.CAP, (Object[]) outputs);
         }
 
-        public GTRecipeJS outputItems(Item input, int amount) {
-            return outputItems(ExtendedOutputItem.of(new ItemStack(input, amount)));
+        public GTKubeRecipe inputFluids(SizedFluidIngredient... inputs) {
+            return input(FluidRecipeCapability.CAP, (Object[]) inputs);
         }
 
-        public GTRecipeJS outputItems(Item input) {
-            return outputItems(ExtendedOutputItem.of(new ItemStack(input)));
+        public GTKubeRecipe itemOutputsRanged(SizedIngredient ingredient, int min, int max) {
+            return output(ItemRecipeCapability.CAP, new SizedIngredient(
+                    new IntProviderIngredient(ingredient.ingredient(), UniformInt.of(min, max)).toVanilla(), 1));
         }
 
-        public GTRecipeJS outputItems(TagPrefix orePrefix, Material material) {
-            return outputItems(orePrefix, material, 1);
+        public GTKubeRecipe outputItemsRanged(Ingredient ingredient, int min, int max) {
+            return output(ItemRecipeCapability.CAP,
+                    new SizedIngredient(new IntProviderIngredient(ingredient, UniformInt.of(min, max)).toVanilla(), 1));
         }
 
-        public GTRecipeJS outputItems(TagPrefix orePrefix, Material material, int count) {
-            return outputItems(ExtendedOutputItem.of(ChemicalHelper.get(orePrefix, material, count)));
+        public GTKubeRecipe outputItemsRanged(ItemStack stack, int min, int max) {
+            return output(ItemRecipeCapability.CAP,
+                    new IntProviderIngredient(Ingredient.of(stack), UniformInt.of(min, max)));
         }
 
-        public GTRecipeJS outputItems(MachineDefinition machine) {
-            return outputItems(machine, 1);
-        }
-
-        public GTRecipeJS outputItems(MachineDefinition machine, int count) {
-            return outputItems(new ExtendedOutputItem(machine.asStack(count)));
-        }
-
-        public GTRecipeJS itemOutputsRanged(ExtendedOutputItem ingredient, int min, int max) {
-            return outputItemsRanged(ingredient.ingredient.getInner(), min, max);
-        }
-
-        public GTRecipeJS outputItemsRanged(Ingredient ingredient, int min, int max) {
-            return output(ItemRecipeCapability.CAP, new IntProviderIngredient(ingredient, UniformInt.of(min, max)));
-        }
-
-        public GTRecipeJS outputItemsRanged(ItemStack stack, int min, int max) {
-            return outputItemsRanged(Ingredient.of(stack), min, max);
-        }
-
-        public GTRecipeJS outputItemsRanged(TagPrefix orePrefix, Material material, int min, int max) {
+        public GTKubeRecipe outputItemsRanged(TagPrefix orePrefix, Material material, int min, int max) {
             return outputItemsRanged(ChemicalHelper.get(orePrefix, material), min, max);
         }
 
-        public GTRecipeJS notConsumable(InputItem itemStack) {
+        public GTKubeRecipe notConsumableItem(SizedIngredient itemStack) {
             int lastChance = this.chance;
             this.chance = 0;
             inputItems(itemStack);
@@ -374,34 +239,26 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS notConsumable(TagPrefix orePrefix, Material material) {
+        public GTKubeRecipe notConsumableItem(TagPrefix orePrefix, Material material) {
             int lastChance = this.chance;
             this.chance = 0;
-            inputItems(orePrefix, material);
+            inputItems(SizedIngredient.of(ChemicalHelper.get(orePrefix, material).getItem(), 1));
             this.chance = lastChance;
             return this;
         }
 
-        public GTRecipeJS notConsumableFluid(GTRecipeComponents.FluidIngredientJS fluid) {
-            int lastChance = this.chance;
-            this.chance = 0;
-            inputFluids(fluid);
-            this.chance = lastChance;
-            return this;
-        }
-
-        public GTRecipeJS circuit(int configuration) {
+        public GTKubeRecipe circuit(int configuration) {
             if (configuration < 0 || configuration > IntCircuitBehaviour.CIRCUIT_MAX) {
-                throw new RecipeExceptionJS(String.format("Circuit configuration must be in the bounds 0 - 32"));
+                throw new KubeRuntimeException("Circuit configuration must be in the bounds 0 - 32");
             }
-            return notConsumable(InputItem.of(IntCircuitIngredient.circuit(configuration), 1));
+            return notConsumableItem(new SizedIngredient(IntCircuitIngredient.circuit(configuration), 1));
         }
 
-        public GTRecipeJS chancedInput(InputItem stack, int chance, int tierChanceBoost) {
+        public GTKubeRecipe chancedInput(SizedIngredient stack, int chance, int tierChanceBoost) {
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             int lastChance = this.chance;
             int lastTierChanceBoost = this.tierChanceBoost;
@@ -413,12 +270,12 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedFluidInput(GTRecipeComponents.FluidIngredientJS stack, int chance,
+        public GTKubeRecipe chancedFluidInput(SizedFluidIngredient stack, int chance,
                                             int tierChanceBoost) {
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             int lastChance = this.chance;
             int lastTierChanceBoost = this.tierChanceBoost;
@@ -430,11 +287,11 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedOutput(ExtendedOutputItem stack, int chance, int tierChanceBoost) {
+        public GTKubeRecipe chancedOutput(SizedIngredient stack, int chance, int tierChanceBoost) {
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             int lastChance = this.chance;
             int lastTierChanceBoost = this.tierChanceBoost;
@@ -446,24 +303,26 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedOutput(TagPrefix tag, Material mat, int chance, int tierChanceBoost) {
-            return chancedOutput(ExtendedOutputItem.of(ChemicalHelper.get(tag, mat)), chance, tierChanceBoost);
+        public GTKubeRecipe chancedOutput(TagPrefix tag, Material mat, int chance, int tierChanceBoost) {
+            return chancedOutput(SizedIngredient.of(ChemicalHelper.get(tag, mat).getItem(), 1),
+                    chance, tierChanceBoost);
         }
 
-        public GTRecipeJS chancedOutput(TagPrefix tag, Material mat, int count, int chance, int tierChanceBoost) {
-            return chancedOutput(ExtendedOutputItem.of(ChemicalHelper.get(tag, mat, count)), chance, tierChanceBoost);
+        public GTKubeRecipe chancedOutput(TagPrefix tag, Material mat, int count, int chance, int tierChanceBoost) {
+            return chancedOutput(SizedIngredient.of(ChemicalHelper.get(tag, mat).getItem(), count),
+                    chance, tierChanceBoost);
         }
 
-        public GTRecipeJS chancedOutput(ExtendedOutputItem stack, String fraction, int tierChanceBoost) {
-            if (stack.isEmpty()) {
+        public GTKubeRecipe chancedOutput(SizedIngredient stack, String fraction, int tierChanceBoost) {
+            if (stack.count() == 0 || stack.ingredient().isEmpty()) {
                 return this;
             }
 
             String[] split = fraction.split("/");
             if (split.length > 2) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
-                        fraction, new Throwable()));
+                        fraction));
             }
 
             int chance;
@@ -473,9 +332,9 @@ public interface GTRecipeSchema {
                 try {
                     chance = (int) Double.parseDouble(split[0]);
                 } catch (NumberFormatException e) {
-                    throw new RecipeExceptionJS(String.format(
+                    throw new KubeRuntimeException(String.format(
                             "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
-                            fraction, new Throwable()));
+                            fraction));
                 }
                 return chancedOutput(stack, chance, tierChanceBoost);
             }
@@ -483,20 +342,20 @@ public interface GTRecipeSchema {
                 chance = Integer.parseInt(split[0]);
                 maxChance = Integer.parseInt(split[1]);
             } catch (NumberFormatException e) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
-                        fraction, new Throwable()));
+                        fraction));
             }
 
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             if (chance >= maxChance || maxChance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Max Chance cannot be less or equal to Chance or more than %s, Actual: %s, id: %s",
-                        ChanceLogic.getMaxChancedValue(), maxChance, id, new Throwable()));
+                        ChanceLogic.getMaxChancedValue(), maxChance, id));
             }
 
             int scalar = Math.floorDiv(ChanceLogic.getMaxChancedValue(), maxChance);
@@ -517,21 +376,21 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedOutput(TagPrefix prefix, Material material, int count, String fraction,
-                                        int tierChanceBoost) {
-            return chancedOutput(ExtendedOutputItem.of(ChemicalHelper.get(prefix, material, count)), fraction,
+        public GTKubeRecipe chancedOutput(TagPrefix prefix, Material material, int count, String fraction,
+                                          int tierChanceBoost) {
+            return chancedOutput(SizedIngredient.of(ChemicalHelper.get(prefix, material).getItem(), count), fraction,
                     tierChanceBoost);
         }
 
-        public GTRecipeJS chancedOutput(TagPrefix prefix, Material material, String fraction, int tierChanceBoost) {
+        public GTKubeRecipe chancedOutput(TagPrefix prefix, Material material, String fraction, int tierChanceBoost) {
             return chancedOutput(prefix, material, 1, fraction, tierChanceBoost);
         }
 
-        public GTRecipeJS chancedFluidOutput(FluidStackJS stack, int chance, int tierChanceBoost) {
+        public GTKubeRecipe chancedFluidOutput(SizedFluidIngredient stack, int chance, int tierChanceBoost) {
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             int lastChance = this.chance;
             int lastTierChanceBoost = this.tierChanceBoost;
@@ -543,16 +402,16 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedFluidOutput(FluidStackJS stack, String fraction, int tierChanceBoost) {
-            if (stack.getAmount() == 0) {
+        public GTKubeRecipe chancedFluidOutput(SizedFluidIngredient stack, String fraction, int tierChanceBoost) {
+            if (stack.amount() == 0) {
                 return this;
             }
 
             String[] split = fraction.split("/");
             if (split.length > 2) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
-                        fraction, new Throwable()));
+                        fraction));
             }
 
             int chance;
@@ -562,9 +421,9 @@ public interface GTRecipeSchema {
                 try {
                     chance = (int) Double.parseDouble(split[0]);
                 } catch (NumberFormatException e) {
-                    throw new RecipeExceptionJS(String.format(
+                    throw new KubeRuntimeException(String.format(
                             "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
-                            fraction, new Throwable()));
+                            fraction));
                 }
                 return chancedFluidOutput(stack, chance, tierChanceBoost);
             }
@@ -573,20 +432,20 @@ public interface GTRecipeSchema {
                 chance = Integer.parseInt(split[0]);
                 maxChance = Integer.parseInt(split[1]);
             } catch (NumberFormatException e) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Fraction or number was not parsed correctly! Expected format is \"1/3\" or \"1000\". Actual: \"%s\".",
                         fraction, e));
             }
 
             if (0 >= chance || chance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Chance cannot be less or equal to 0 or more than %s, Actual: %s, id: %s",
-                                ChanceLogic.getMaxChancedValue(), chance, id, new Throwable()));
+                                ChanceLogic.getMaxChancedValue(), chance, id));
             }
             if (chance >= maxChance || maxChance > ChanceLogic.getMaxChancedValue()) {
-                throw new RecipeExceptionJS(String.format(
+                throw new KubeRuntimeException(String.format(
                         "Max Chance cannot be less or equal to Chance or more than %s, Actual: %s, id: %s",
-                        ChanceLogic.getMaxChancedValue(), maxChance, id, new Throwable()));
+                        ChanceLogic.getMaxChancedValue(), maxChance, id));
             }
 
             int scalar = Math.floorDiv(ChanceLogic.getMaxChancedValue(), maxChance);
@@ -607,71 +466,58 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS chancedOutputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
+        public GTKubeRecipe chancedOutputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
             if (getValue(OUTPUT_CHANCE_LOGICS) == null) setValue(OUTPUT_CHANCE_LOGICS, new HashMap<>());
             getValue(OUTPUT_CHANCE_LOGICS).put(cap, logic);
             save();
             return this;
         }
 
-        public GTRecipeJS chancedItemOutputLogic(ChanceLogic logic) {
+        public GTKubeRecipe chancedItemOutputLogic(ChanceLogic logic) {
             return chancedOutputLogic(ItemRecipeCapability.CAP, logic);
         }
 
-        public GTRecipeJS chancedFluidOutputLogic(ChanceLogic logic) {
+        public GTKubeRecipe chancedFluidOutputLogic(ChanceLogic logic) {
             return chancedOutputLogic(FluidRecipeCapability.CAP, logic);
         }
 
-        public GTRecipeJS chancedInputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
+        public GTKubeRecipe chancedInputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
             if (getValue(INPUT_CHANCE_LOGICS) == null) setValue(INPUT_CHANCE_LOGICS, new HashMap<>());
             getValue(INPUT_CHANCE_LOGICS).put(cap, logic);
             save();
             return this;
         }
 
-        public GTRecipeJS chancedItemInputLogic(ChanceLogic logic) {
+        public GTKubeRecipe chancedItemInputLogic(ChanceLogic logic) {
             return chancedInputLogic(ItemRecipeCapability.CAP, logic);
         }
 
-        public GTRecipeJS chancedFluidInputLogic(ChanceLogic logic) {
+        public GTKubeRecipe chancedFluidInputLogic(ChanceLogic logic) {
             return chancedInputLogic(FluidRecipeCapability.CAP, logic);
         }
 
-        public GTRecipeJS chancedTickOutputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
+        public GTKubeRecipe chancedTickOutputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
             if (getValue(TICK_OUTPUT_CHANCE_LOGICS) == null) setValue(TICK_OUTPUT_CHANCE_LOGICS, new HashMap<>());
             getValue(TICK_OUTPUT_CHANCE_LOGICS).put(cap, logic);
             save();
             return this;
         }
 
-        public GTRecipeJS chancedTickInputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
+        public GTKubeRecipe chancedTickInputLogic(RecipeCapability<?> cap, ChanceLogic logic) {
             if (getValue(TICK_INPUT_CHANCE_LOGICS) == null) setValue(TICK_INPUT_CHANCE_LOGICS, new HashMap<>());
             getValue(TICK_INPUT_CHANCE_LOGICS).put(cap, logic);
             save();
             return this;
         }
 
-        public GTRecipeJS inputFluids(GTRecipeComponents.FluidIngredientJS... inputs) {
-            for (var fluidIng : inputs) {
-                for (var stack : fluidIng.getIngredient().getStacks()) {
-                    var mat = ChemicalHelper.getMaterial(stack.getFluid());
-                    if (!mat.isNull()) {
-                        fluidMaterialStacks.add(new MaterialStack(mat,
-                                ((long) stack.getAmount() * GTValues.M) / GTValues.L));
-                    }
-                }
-            }
-            return input(FluidRecipeCapability.CAP, (Object[]) inputs);
-        }
-
-        public GTRecipeJS outputFluids(FluidStackJS... outputs) {
+        public GTKubeRecipe outputFluids(SizedFluidIngredient... outputs) {
             return output(FluidRecipeCapability.CAP, (Object[]) outputs);
         }
 
         //////////////////////////////////////
         // ********** DATA ***********//
         //////////////////////////////////////
-        public GTRecipeJS addData(String key, Tag data) {
+        public GTKubeRecipe addData(String key, Tag data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).put(key, data);
             save();
@@ -679,7 +525,7 @@ public interface GTRecipeSchema {
         }
 
         @HideFromJS
-        public GTRecipeJS addData(String key, int data) {
+        public GTKubeRecipe addData(String key, int data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putInt(key, data);
             save();
@@ -687,14 +533,14 @@ public interface GTRecipeSchema {
         }
 
         @HideFromJS
-        public GTRecipeJS addData(String key, long data) {
+        public GTKubeRecipe addData(String key, long data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putLong(key, data);
             save();
             return this;
         }
 
-        public GTRecipeJS addDataString(String key, String data) {
+        public GTKubeRecipe addDataString(String key, String data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putString(key, data);
             save();
@@ -702,60 +548,60 @@ public interface GTRecipeSchema {
         }
 
         @HideFromJS
-        public GTRecipeJS addData(String key, float data) {
+        public GTKubeRecipe addData(String key, float data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putFloat(key, data);
             save();
             return this;
         }
 
-        public GTRecipeJS addDataNumber(String key, double data) {
+        public GTKubeRecipe addDataNumber(String key, double data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putDouble(key, data);
             save();
             return this;
         }
 
-        public GTRecipeJS addDataBool(String key, boolean data) {
+        public GTKubeRecipe addDataBool(String key, boolean data) {
             if (getValue(DATA) == null) setValue(DATA, new CompoundTag());
             getValue(DATA).putBoolean(key, data);
             save();
             return this;
         }
 
-        public GTRecipeJS blastFurnaceTemp(int blastTemp) {
+        public GTKubeRecipe blastFurnaceTemp(int blastTemp) {
             return addData("ebf_temp", blastTemp);
         }
 
-        public GTRecipeJS explosivesAmount(int explosivesAmount) {
+        public GTKubeRecipe explosivesAmount(int explosivesAmount) {
             return addData("explosives_amount", explosivesAmount);
         }
 
-        public GTRecipeJS explosivesType(ItemStack explosivesType) {
-            return addData("explosives_type", explosivesType.save(new CompoundTag()));
+        public GTKubeRecipe explosivesType(ItemStack explosivesType) {
+            return addData("explosives_type", explosivesType.save(GTRegistries.builtinRegistry()));
         }
 
-        public GTRecipeJS solderMultiplier(int multiplier) {
+        public GTKubeRecipe solderMultiplier(int multiplier) {
             return addData("solder_multiplier", multiplier);
         }
 
-        public GTRecipeJS disableDistilleryRecipes(boolean flag) {
+        public GTKubeRecipe disableDistilleryRecipes(boolean flag) {
             return addDataBool("disable_distillery", flag);
         }
 
-        public GTRecipeJS fusionStartEU(long eu) {
+        public GTKubeRecipe fusionStartEU(long eu) {
             return addData("eu_to_start", eu);
         }
 
-        public GTRecipeJS researchScan(boolean isScan) {
+        public GTKubeRecipe researchScan(boolean isScan) {
             return addDataBool("scan_for_research", isScan);
         }
 
-        public GTRecipeJS durationIsTotalCWU(boolean durationIsTotalCWU) {
+        public GTKubeRecipe durationIsTotalCWU(boolean durationIsTotalCWU) {
             return addDataBool("duration_is_total_cwu", durationIsTotalCWU);
         }
 
-        public GTRecipeJS hideDuration(boolean hideDuration) {
+        public GTKubeRecipe hideDuration(boolean hideDuration) {
             return addDataBool("hide_duration", hideDuration);
         }
 
@@ -763,123 +609,123 @@ public interface GTRecipeSchema {
         // ******* CONDITIONS ********//
         //////////////////////////////////////
 
-        public GTRecipeJS cleanroom(CleanroomType cleanroomType) {
+        public GTKubeRecipe cleanroom(CleanroomType cleanroomType) {
             return addCondition(new CleanroomCondition(cleanroomType));
         }
 
-        public GTRecipeJS dimension(ResourceLocation dimension, boolean reverse) {
+        public GTKubeRecipe dimension(ResourceKey<Level> dimension, boolean reverse) {
             return addCondition(new DimensionCondition(dimension).setReverse(reverse));
         }
 
-        public GTRecipeJS dimension(ResourceLocation dimension) {
+        public GTKubeRecipe dimension(ResourceKey<Level> dimension) {
             return dimension(dimension, false);
         }
 
-        public GTRecipeJS biome(ResourceLocation biome, boolean reverse) {
+        public GTKubeRecipe biome(ResourceLocation biome, boolean reverse) {
             return addCondition(new BiomeCondition(biome).setReverse(reverse));
         }
 
-        public GTRecipeJS biome(ResourceLocation biome) {
+        public GTKubeRecipe biome(ResourceLocation biome) {
             return biome(biome, false);
         }
 
-        public GTRecipeJS rain(float level, boolean reverse) {
+        public GTKubeRecipe rain(float level, boolean reverse) {
             return addCondition(new RainingCondition(level).setReverse(reverse));
         }
 
-        public GTRecipeJS rain(float level) {
+        public GTKubeRecipe rain(float level) {
             return rain(level, false);
         }
 
-        public GTRecipeJS thunder(float level, boolean reverse) {
+        public GTKubeRecipe thunder(float level, boolean reverse) {
             return addCondition(new ThunderCondition(level).setReverse(reverse));
         }
 
-        public GTRecipeJS thunder(float level) {
+        public GTKubeRecipe thunder(float level) {
             return thunder(level, false);
         }
 
-        public GTRecipeJS posY(int min, int max, boolean reverse) {
+        public GTKubeRecipe posY(int min, int max, boolean reverse) {
             return addCondition(new PositionYCondition(min, max).setReverse(reverse));
         }
 
-        public GTRecipeJS posY(int min, int max) {
+        public GTKubeRecipe posY(int min, int max) {
             return posY(min, max, false);
         }
 
-        public GTRecipeJS environmentalHazard(MedicalCondition condition, boolean reverse) {
+        public GTKubeRecipe environmentalHazard(MedicalCondition condition, boolean reverse) {
             return addCondition(new EnvironmentalHazardCondition(condition).setReverse(reverse));
         }
 
-        public GTRecipeJS environmentalHazard(MedicalCondition condition) {
+        public GTKubeRecipe environmentalHazard(MedicalCondition condition) {
             return environmentalHazard(condition, false);
         }
 
-        public GTRecipeJS daytime(boolean isNight) {
+        public GTKubeRecipe daytime(boolean isNight) {
             return addCondition(new DaytimeCondition().setReverse(isNight));
         }
 
-        public GTRecipeJS daytime() {
+        public GTKubeRecipe daytime() {
             return daytime(false);
         }
 
-        public GTRecipeJS heraclesQuest(String questId, boolean isReverse) {
+        public GTKubeRecipe heraclesQuest(String questId, boolean isReverse) {
             if (!GTCEu.Mods.isHeraclesLoaded()) {
-                throw new RecipeExceptionJS("Heracles not loaded!");
+                throw new KubeRuntimeException("Heracles not loaded!");
             }
             if (questId.isEmpty()) {
-                throw new RecipeExceptionJS(String.format("Quest ID cannot be empty for recipe %s", this.id));
+                throw new KubeRuntimeException(String.format("Quest ID cannot be empty for recipe %s", this.id));
             }
             return addCondition(new HeraclesQuestCondition(isReverse, questId));
         }
 
-        public GTRecipeJS heraclesQuest(String questId) {
+        public GTKubeRecipe heraclesQuest(String questId) {
             return heraclesQuest(questId, false);
         }
 
-        public GTRecipeJS gameStage(String stageName) {
+        public GTKubeRecipe gameStage(String stageName) {
             return gameStage(stageName, false);
         }
 
-        public GTRecipeJS gameStage(String stageName, boolean isReverse) {
+        public GTKubeRecipe gameStage(String stageName, boolean isReverse) {
             if (!GTCEu.Mods.isGameStagesLoaded()) {
-                throw new RecipeExceptionJS("GameStages is not loaded, ignoring recipe condition");
+                throw new KubeRuntimeException("GameStages is not loaded, ignoring recipe condition");
             }
             return addCondition(new GameStageCondition(isReverse, stageName));
         }
 
-        public GTRecipeJS ftbQuest(String questId, boolean isReverse) {
+        public GTKubeRecipe ftbQuest(String questId, boolean isReverse) {
             if (!GTCEu.Mods.isFTBQuestsLoaded()) {
-                throw new RecipeExceptionJS("FTBQuests is not loaded!");
+                throw new KubeRuntimeException("FTBQuests is not loaded!");
             }
             if (questId.isEmpty()) {
-                throw new RecipeExceptionJS(String.format("Quest ID cannot be empty for recipe %s", this.id));
+                throw new KubeRuntimeException(String.format("Quest ID cannot be empty for recipe %s", this.id));
             }
             long qID = QuestObjectBase.parseCodeString(questId);
             if (qID == 0L) {
-                throw new RecipeExceptionJS(String.format("Quest %s not found for recipe %s", questId, this.id));
+                throw new KubeRuntimeException(String.format("Quest %s not found for recipe %s", questId, this.id));
             }
             return addCondition(new FTBQuestCondition(isReverse, qID));
         }
 
-        public GTRecipeJS ftbQuest(String questId) {
+        public GTKubeRecipe ftbQuest(String questId) {
             return ftbQuest(questId, false);
         }
 
         private boolean applyResearchProperty(ResearchData.ResearchEntry researchEntry) {
             if (!ConfigHolder.INSTANCE.machines.enableResearch) return false;
             if (researchEntry == null) {
-                throw new RecipeExceptionJS(
+                throw new KubeRuntimeException(
                         String.format("Assembly Line Research Entry cannot be empty.", new IllegalArgumentException()));
             }
 
             if (!generatingRecipes) {
-                throw new RecipeExceptionJS(String.format("Cannot generate recipes when using researchWithoutRecipe()",
+                throw new KubeRuntimeException(String.format("Cannot generate recipes when using researchWithoutRecipe()",
                         new IllegalArgumentException()));
             }
 
-            if (getValue(CONDITIONS) == null) setValue(CONDITIONS, new RecipeCondition[0]);
-            ResearchCondition condition = Arrays.stream(this.getValue(CONDITIONS))
+            if (getValue(CONDITIONS) == null) setValue(CONDITIONS, List.of());
+            ResearchCondition condition = this.getValue(CONDITIONS).stream()
                     .filter(ResearchCondition.class::isInstance).findAny().map(ResearchCondition.class::cast)
                     .orElse(null);
             if (condition != null) {
@@ -898,7 +744,7 @@ public interface GTRecipeSchema {
          * @param researchId the researchId for the recipe
          * @return this
          */
-        public GTRecipeJS researchWithoutRecipe(@NotNull String researchId) {
+        public GTKubeRecipe researchWithoutRecipe(@NotNull String researchId) {
             return researchWithoutRecipe(researchId, ResearchManager.getDefaultScannerItem());
         }
 
@@ -909,7 +755,7 @@ public interface GTRecipeSchema {
          * @param dataStack  the stack to hold the data. Must have the {@link IDataItem} behavior.
          * @return this
          */
-        public GTRecipeJS researchWithoutRecipe(@NotNull String researchId, @NotNull ItemStack dataStack) {
+        public GTKubeRecipe researchWithoutRecipe(@NotNull String researchId, @NotNull ItemStack dataStack) {
             applyResearchProperty(new ResearchData.ResearchEntry(researchId, dataStack));
             this.generatingRecipes = false;
             return this;
@@ -918,7 +764,7 @@ public interface GTRecipeSchema {
         /**
          * Generates a research recipe for the Scanner.
          */
-        public GTRecipeJS scannerResearch(UnaryOperator<ResearchRecipeBuilder.ScannerRecipeBuilder> research) {
+        public GTKubeRecipe scannerResearch(UnaryOperator<ResearchRecipeBuilder.ScannerRecipeBuilder> research) {
             GTRecipeBuilder.ResearchRecipeEntry entry = research.apply(new ResearchRecipeBuilder.ScannerRecipeBuilder())
                     .build();
             if (applyResearchProperty(new ResearchData.ResearchEntry(entry.researchId(), entry.dataStack()))) {
@@ -933,14 +779,14 @@ public interface GTRecipeSchema {
          * @param researchStack the stack to use for research
          * @return this
          */
-        public GTRecipeJS scannerResearch(@NotNull ItemStack researchStack) {
+        public GTKubeRecipe scannerResearch(@NotNull ItemStack researchStack) {
             return scannerResearch(b -> b.researchStack(researchStack));
         }
 
         /**
          * Generates a research recipe for the Research Station.
          */
-        public GTRecipeJS stationResearch(UnaryOperator<ResearchRecipeBuilder.StationRecipeBuilder> research) {
+        public GTKubeRecipe stationResearch(UnaryOperator<ResearchRecipeBuilder.StationRecipeBuilder> research) {
             GTRecipeBuilder.ResearchRecipeEntry entry = research.apply(new ResearchRecipeBuilder.StationRecipeBuilder())
                     .build();
             if (applyResearchProperty(new ResearchData.ResearchEntry(entry.researchId(), entry.dataStack()))) {
@@ -949,18 +795,18 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTRecipeJS addMaterialInfo(boolean item) {
+        public GTKubeRecipe addMaterialInfo(boolean item) {
             this.itemMaterialInfo = item;
             return this;
         }
 
-        public GTRecipeJS addMaterialInfo(boolean item, boolean fluid) {
+        public GTKubeRecipe addMaterialInfo(boolean item, boolean fluid) {
             this.itemMaterialInfo = item;
             this.fluidMaterialInfo = fluid;
             return this;
         }
 
-        public GTRecipeJS removePreviousMaterialInfo() {
+        public GTKubeRecipe removePreviousMaterialInfo() {
             this.removeMaterialInfo = true;
             return this;
         }
@@ -970,118 +816,45 @@ public interface GTRecipeSchema {
          */
 
         @Override
-        public ResourceLocation getOrCreateId() {
-            if (id == null) {
-                String prefix = type.id.getNamespace() + ":";
-                String path = "%s/%s".formatted(type.id.getPath(), "kjs_custom");
-                id = type.event.takeId(this, prefix, path);
-                String pathWithoutType = StringUtils.substringAfter(id.getPath(), '/');
-                idWithoutType = new ResourceLocation(id.getNamespace(), pathWithoutType);
-            }
-            return id;
-        }
-
-        @Override
-        public @Nullable Recipe<?> createRecipe() {
+        public KubeRecipe serializeChanges() {
             if (onSave != null) {
                 onSave.accept(this);
             }
-            return super.createRecipe();
-        }
-
-        public InputItem readInputItem(Object from) {
-            if (from instanceof SizedIngredient ingr) {
-                return InputItem.of(ingr.getInner(), ingr.getAmount());
-            } else if (from instanceof JsonObject jsonObject) {
-                if (!jsonObject.has("type") ||
-                        !jsonObject.get("type").getAsString().equals(SizedIngredient.TYPE.toString())) {
-                    return InputItem.of(from);
-                }
-                var sizedIngredient = SizedIngredient.fromJson(jsonObject);
-                return InputItem.of(sizedIngredient.getInner(), sizedIngredient.getAmount());
-            }
-            return InputItem.of(from);
-        }
-
-        public JsonElement writeInputItem(InputItem value) {
-            return SizedIngredient.create(value.ingredient, value.count).toJson();
-        }
-
-        @Override
-        public OutputItem readOutputItem(Object from) {
-            if (from instanceof ExtendedOutputItem outputItem) {
-                return outputItem;
-            } else if (from instanceof OutputItem outputItem) {
-                return outputItem;
-            } else if (from instanceof SizedIngredient ingredient) {
-                if (ingredient.getInner() instanceof IntProviderIngredient intProvider) {
-                    return new ExtendedOutputItem(intProvider, 1);
-                }
-                return OutputItem.of(ingredient.getInner().getItems()[0], Double.NaN);
-            } else if (from instanceof IntProviderIngredient ingredient) {
-                return new ExtendedOutputItem(ingredient, 1);
-            } else if (from instanceof JsonObject jsonObject) {
-                float chance = 1.0f;
-                if (jsonObject.has("chance")) {
-                    chance = jsonObject.get("chance").getAsFloat();
-                }
-                if (jsonObject.has("content")) {
-                    jsonObject = jsonObject.getAsJsonObject("content");
-                }
-                var ingredient = Ingredient.fromJson(jsonObject);
-                return OutputItem.of(ingredient.getItems()[0], chance);
-            }
-            return OutputItem.of(from);
-        }
-
-        @Override
-        public JsonElement writeOutputItem(OutputItem value) {
-            if (value instanceof ExtendedOutputItem extended) {
-                if (extended.ingredient.getInner() instanceof IntProviderIngredient intProvider) {
-                    return intProvider.toJson();
-                }
-                return extended.ingredient.toJson();
-            }
-            return SizedIngredient.create(value.item).toJson();
-        }
-
-        @Override
-        public JsonElement writeInputFluid(InputFluid value) {
-            var fluid = ((FluidStackJS) value).getFluidStack();
-            return FluidIngredient.of((int) fluid.getAmount(), fluid.getFluid()).toJson();
-        }
-
-        @Override
-        public InputFluid readInputFluid(Object from) {
-            return super.readInputFluid(from);
+            return super.serializeChanges();
         }
     }
 
-    RecipeKey<ResourceLocation> ID = GTRecipeComponents.RESOURCE_LOCATION.key("id");
-    RecipeKey<Long> DURATION = TimeComponent.TICKS.key("duration").optional(100L);
-    RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data").optional((CompoundTag) null);
-    RecipeKey<RecipeCondition[]> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asArray().key("recipeConditions")
+    RecipeKey<ResourceLocation> ID = GTRecipeComponents.RESOURCE_LOCATION.key("id", ComponentRole.OTHER);
+    RecipeKey<TickDuration> DURATION = TimeComponent.TICKS.key("duration", ComponentRole.OTHER)
+            .optional(new TickDuration(100));
+    RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data", ComponentRole.OTHER).optional((CompoundTag) null);
+    RecipeKey<List<RecipeCondition<?>>> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asList()
+            .key("recipeConditions", ComponentRole.OTHER)
+            .optional(new ArrayList<>());
+    RecipeKey<Boolean> IS_FUEL = BooleanComponent.BOOLEAN.key("isFuel", ComponentRole.OTHER).optional(false);
+
+    RecipeKey<CapabilityMap> ALL_INPUTS = CapabilityMapComponent.INSTANCE.key("inputs", ComponentRole.INPUT).defaultOptional();
+    RecipeKey<CapabilityMap> ALL_TICK_INPUTS = CapabilityMapComponent.INSTANCE.key("tickInputs", ComponentRole.INPUT)
             .defaultOptional();
-    RecipeKey<ResourceLocation> CATEGORY = GTRecipeComponents.RESOURCE_LOCATION.key("category").defaultOptional();
 
-    RecipeKey<CapabilityMap> ALL_INPUTS = GTRecipeComponents.IN.key("inputs").defaultOptional();
-    RecipeKey<CapabilityMap> ALL_TICK_INPUTS = GTRecipeComponents.TICK_IN.key("tickInputs").defaultOptional();
-
-    RecipeKey<CapabilityMap> ALL_OUTPUTS = GTRecipeComponents.OUT.key("outputs").defaultOptional();
-    RecipeKey<CapabilityMap> ALL_TICK_OUTPUTS = GTRecipeComponents.TICK_OUT.key("tickOutputs").defaultOptional();
+    RecipeKey<CapabilityMap> ALL_OUTPUTS = CapabilityMapComponent.INSTANCE.key("outputs", ComponentRole.OUTPUT)
+            .defaultOptional();
+    RecipeKey<CapabilityMap> ALL_TICK_OUTPUTS = CapabilityMapComponent.INSTANCE.key("tickOutputs", ComponentRole.OUTPUT)
+            .defaultOptional();
 
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> INPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
-            .key("inputChanceLogics").defaultOptional();
+            .key("inputChanceLogics", ComponentRole.OTHER).defaultOptional();
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> OUTPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
-            .key("outputChanceLogics").defaultOptional();
+            .key("outputChanceLogics", ComponentRole.OTHER).defaultOptional();
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> TICK_INPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
-            .key("tickInputChanceLogics").defaultOptional();
+            .key("tickInputChanceLogics", ComponentRole.OTHER).defaultOptional();
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> TICK_OUTPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
-            .key("tickOutputChanceLogics").defaultOptional();
+            .key("tickOutputChanceLogics", ComponentRole.OTHER).defaultOptional();
 
-    RecipeSchema SCHEMA = new RecipeSchema(GTRecipeJS.class, GTRecipeJS::new, DURATION, DATA, CONDITIONS,
-            ALL_INPUTS, ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
-            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS, CATEGORY)
-            .constructor((recipe, schemaType, keys, from) -> recipe.id(from.getValue(recipe, ID)), ID)
-            .constructor(DURATION, CONDITIONS, ALL_INPUTS, ALL_OUTPUTS, ALL_TICK_INPUTS, ALL_TICK_OUTPUTS);
+    RecipeSchema SCHEMA = new RecipeSchema(DURATION, DATA, CONDITIONS, ALL_INPUTS,
+            ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
+            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS,
+            IS_FUEL)
+            .factory(new KubeRecipeFactory(GTCEu.id("recipe"), GTKubeRecipe.class, GTKubeRecipe::new))
+            .constructor(new IDRecipeConstructor());
 }

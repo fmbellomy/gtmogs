@@ -1,28 +1,29 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.machine;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
-import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.api.registry.registrate.MultiblockMachineBuilder;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
 import net.minecraft.resources.ResourceLocation;
 
 import com.google.common.base.Preconditions;
-import dev.latvian.mods.kubejs.client.LangEventJS;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 
 @Accessors(fluent = true, chain = true)
-public class KJSTieredMultiblockBuilder extends BuilderBase<MultiblockMachineDefinition[]> {
+public class KJSTieredMultiblockBuilder extends BuilderBase<@Nullable MultiblockMachineDefinition @NotNull []> {
 
     @Setter
     public volatile int[] tiers = GTMachineUtils.ELECTRIC_TIERS;
@@ -41,18 +42,18 @@ public class KJSTieredMultiblockBuilder extends BuilderBase<MultiblockMachineDef
     }
 
     @Override
-    public void generateLang(LangEventJS lang) {
+    public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
         for (int tier : tiers) {
-            MachineDefinition def = value[tier];
-            if (def.getLangValue() != null) {
-                lang.add(GTCEu.MOD_ID, def.getDescriptionId(), def.getLangValue());
+            MachineDefinition def = object[tier];
+            if (def != null && def.getLangValue() != null) {
+                lang.add(def.getId().getNamespace(), def.getDescriptionId(), def.getLangValue());
             }
         }
     }
 
     @Override
-    public MultiblockMachineDefinition[] register() {
+    public @Nullable MultiblockMachineDefinition @NotNull [] createObject() {
         Preconditions.checkNotNull(tiers, "Tiers can't be null!");
         Preconditions.checkArgument(tiers.length > 0, "tiers must have at least one tier!");
         Preconditions.checkNotNull(machine, "You must set a machine creation function! " +
@@ -71,7 +72,7 @@ public class KJSTieredMultiblockBuilder extends BuilderBase<MultiblockMachineDef
             this.definition.apply(tier, builder);
             definitions[tier] = builder.register();
         }
-        return value = definitions;
+        return definitions;
     }
 
     @FunctionalInterface

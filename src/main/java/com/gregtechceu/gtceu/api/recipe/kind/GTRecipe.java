@@ -9,7 +9,6 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -24,10 +23,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class GTRecipe implements net.minecraft.world.item.crafting.Recipe<RecipeInput> {
 
     public final GTRecipeType recipeType;
@@ -44,7 +39,7 @@ public class GTRecipe implements net.minecraft.world.item.crafting.Recipe<Recipe
     public final Map<RecipeCapability<?>, ChanceLogic> tickInputChanceLogics;
     public final Map<RecipeCapability<?>, ChanceLogic> tickOutputChanceLogics;
 
-    public final List<RecipeCondition> conditions;
+    public final List<RecipeCondition<?>> conditions;
     // for KubeJS. actual type is List<IngredientAction>.
     // Must be List<?> to not cause crashes without KubeJS.
     public final List<?> ingredientActions;
@@ -64,7 +59,7 @@ public class GTRecipe implements net.minecraft.world.item.crafting.Recipe<Recipe
                     Map<RecipeCapability<?>, ChanceLogic> outputChanceLogics,
                     Map<RecipeCapability<?>, ChanceLogic> tickInputChanceLogics,
                     Map<RecipeCapability<?>, ChanceLogic> tickOutputChanceLogics,
-                    List<RecipeCondition> conditions,
+                    List<RecipeCondition<?>> conditions,
                     List<?> ingredientActions,
                     @NotNull CompoundTag data,
                     int duration,
@@ -84,7 +79,7 @@ public class GTRecipe implements net.minecraft.world.item.crafting.Recipe<Recipe
                     Map<RecipeCapability<?>, ChanceLogic> outputChanceLogics,
                     Map<RecipeCapability<?>, ChanceLogic> tickInputChanceLogics,
                     Map<RecipeCapability<?>, ChanceLogic> tickOutputChanceLogics,
-                    List<RecipeCondition> conditions,
+                    List<RecipeCondition<?>> conditions,
                     List<?> ingredientActions,
                     @NotNull CompoundTag data,
                     int duration,
@@ -135,7 +130,7 @@ public class GTRecipe implements net.minecraft.world.item.crafting.Recipe<Recipe
 
     @Override
     public @NotNull RecipeSerializer<?> getSerializer() {
-        return recipeType.getRe;
+        return recipeType.getSerializer();
     }
 
     @Override

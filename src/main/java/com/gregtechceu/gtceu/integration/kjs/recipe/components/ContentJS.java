@@ -1,78 +1,52 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe.components;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 
-import net.minecraft.util.GsonHelper;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import dev.latvian.mods.kubejs.recipe.InputReplacement;
-import dev.latvian.mods.kubejs.recipe.OutputReplacement;
-import dev.latvian.mods.kubejs.recipe.RecipeJS;
-import dev.latvian.mods.kubejs.recipe.ReplacementMatch;
-import dev.latvian.mods.kubejs.recipe.component.ComponentRole;
+import com.mojang.serialization.Codec;
+import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
+import dev.latvian.mods.kubejs.recipe.match.ReplacementMatchInfo;
+import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.rhino.type.TypeInfo;
+import org.apache.commons.lang3.mutable.MutableObject;
 
-public record ContentJS<T>(RecipeComponent<T> baseComponent, RecipeCapability<?> capability, boolean isOutput)
+public record ContentJS<T>(RecipeComponentType<?> type, RecipeComponentType<T> baseComponent, RecipeCapability<?> capability)
         implements RecipeComponent<Content> {
 
-    @Override
-    public ComponentRole role() {
-        return isOutput ? ComponentRole.OUTPUT : ComponentRole.INPUT;
+    public static <T> ContentJS<T> create(RecipeComponentType<T> baseComponent, RecipeCapability<?> capability) {
+        MutableObject<ContentJS<T>> value = new MutableObject<>();
+        RecipeComponentType.<Content>unit(GTCEu.id(capability.name + "_content"),
+                t -> {
+                    var content = new ContentJS<>(t, baseComponent, capability);
+                    value.setValue(content);
+                    return content;
+                });
+        return value.getValue();
     }
 
     @Override
-    public Class<?> componentClass() {
-        return Content.class;
+    public Codec<Content> codec() {
+        return Content.codec(capability);
     }
 
     @Override
-    public JsonElement write(RecipeJS recipe, Content value) {
-        JsonObject object = new JsonObject();
-        object.add("content", baseComponent.write(recipe, baseComponent.read(recipe, value.content)));
-        object.addProperty("chance", value.chance);
-        object.addProperty("maxChance", value.maxChance);
-        object.addProperty("tierChanceBoost", value.tierChanceBoost);
-        return object;
+    public TypeInfo typeInfo() {
+        return TypeInfo.of(Content.class);
     }
 
     @Override
-    public Content read(RecipeJS recipe, Object from) {
-        if (from instanceof Content) return (Content) from;
-        else if (from instanceof JsonObject json) {
-            Object content = baseComponent.read(recipe, json.get("content"));
-            int chance = GsonHelper.getAsInt(json, "chance", ChanceLogic.getMaxChancedValue());
-            int maxChance = GsonHelper.getAsInt(json, "maxChance", ChanceLogic.getMaxChancedValue());
-            int tierChanceBoost = GsonHelper.getAsInt(json, "tierChanceBoost", 0);
-            return new Content(content, chance, maxChance, tierChanceBoost);
-        }
-        return null;
+    public Content replace(Context cx, KubeRecipe recipe, Content original, ReplacementMatchInfo match, Object with) {
+        return new Content(
+                baseComponent.instance().replace(cx, recipe,
+                        baseComponent.instance().wrap(cx, recipe, original.content),match, with),
+                original.chance, original.maxChance, original.tierChanceBoost);
     }
 
     @Override
-    public boolean isInput(RecipeJS recipe, Content value, ReplacementMatch match) {
-        return !isOutput && baseComponent.isInput(recipe, baseComponent.read(recipe, value.content), match);
-    }
-
-    @Override
-    public boolean isOutput(RecipeJS recipe, Content value, ReplacementMatch match) {
-        return isOutput && baseComponent.isOutput(recipe, baseComponent.read(recipe, value.content), match);
-    }
-
-    @Override
-    public Content replaceInput(RecipeJS recipe, Content original, ReplacementMatch match, InputReplacement with) {
-        return isInput(recipe, original, match) ? new Content(
-                baseComponent.replaceInput(recipe, baseComponent.read(recipe, original.content), match, with),
-                original.chance, original.maxChance, original.tierChanceBoost) :
-                original;
-    }
-
-    @Override
-    public Content replaceOutput(RecipeJS recipe, Content original, ReplacementMatch match, OutputReplacement with) {
-        return isOutput(recipe, original, match) ? new Content(with.replaceOutput(recipe, match, with),
-                original.chance, original.maxChance, original.tierChanceBoost) :
-                original;
+    public String toString() {
+        return "content[" + baseComponent + "]";
     }
 }

@@ -57,7 +57,7 @@ public class GTToolBehaviors {
                     new ToolBehaviorType<>(ToolModeSwitchBehavior.CODEC, ToolModeSwitchBehavior.STREAM_CODEC));
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.TOOL_BEHAVIORS));
+        GTCEuAPI.postRegisterEvent(GTRegistries.TOOL_BEHAVIORS);
         GTRegistries.TOOL_BEHAVIORS.freeze();
     }
 }

@@ -27,8 +27,8 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class WorldGeneratorUtils {
@@ -41,35 +41,36 @@ public class WorldGeneratorUtils {
 
     public static final HashBiMap<ResourceLocation, MapCodec<? extends VeinGenerator>> VEIN_GENERATORS = HashBiMap
             .create();
-    public static final HashBiMap<ResourceLocation, Function<GTOreDefinition, ? extends VeinGenerator>> VEIN_GENERATOR_FUNCTIONS = HashBiMap
+    public static final HashBiMap<ResourceLocation, Supplier<? extends VeinGenerator>> VEIN_GENERATOR_FUNCTIONS = HashBiMap
             .create();
 
     public static final HashBiMap<ResourceLocation, MapCodec<? extends IndicatorGenerator>> INDICATOR_GENERATORS = HashBiMap
             .create();
-    public static final HashBiMap<ResourceLocation, Function<GTOreDefinition, ? extends IndicatorGenerator>> INDICATOR_GENERATOR_FUNCTIONS = HashBiMap
+    public static final HashBiMap<ResourceLocation, Supplier<? extends IndicatorGenerator>> INDICATOR_GENERATOR_FUNCTIONS = HashBiMap
             .create();
 
     private static class WorldOreVeinCache {
 
-        private final List<GTOreDefinition> worldVeins;
-        private final List<Entry<Integer, GTOreDefinition>> veins = new LinkedList<>();
+        private final List<Holder<OreVeinDefinition>> worldVeins;
+        private final List<Entry<Integer, Holder<OreVeinDefinition>>> veins = new LinkedList<>();
 
         public WorldOreVeinCache(ServerLevel level) {
-            this.worldVeins = GTRegistries.ORE_VEINS.values().stream()
-                    .filter(entry -> entry.dimensionFilter().stream()
+            this.worldVeins = level.registryAccess().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY).holders()
+                    .filter(entry -> entry.value().dimensionFilter().stream()
                             .anyMatch(dim -> WorldGeneratorUtils.isSameDimension(dim, level.dimension())))
                     .collect(Collectors.toList());
         }
 
-        private List<Entry<Integer, GTOreDefinition>> getEntry(Holder<Biome> biome) {
+        @SuppressWarnings("DataFlowIssue")
+        private List<Entry<Integer, Holder<OreVeinDefinition>>> getEntry(Holder<Biome> biome) {
             if (!veins.isEmpty())
                 return veins;
-            List<Entry<Integer, GTOreDefinition>> result = worldVeins.stream()
-                    .filter(entry -> entry.biomes() == null ||
-                            (entry.biomes().get().size() == 0 || entry.biomes().get().contains(biome)))
+            List<Entry<Integer, Holder<OreVeinDefinition>>> result = worldVeins.stream()
+                    .filter(entry -> entry.value().biomes() == null ||
+                            (entry.value().biomes().size() == 0 || entry.value().biomes().contains(biome)))
                     .map(vein -> new AbstractMap.SimpleEntry<>(
-                            vein.weight() +
-                                    (vein.biomeWeightModifier() == null ? 0 : vein.biomeWeightModifier().apply(biome)),
+                            vein.value().weight() +
+                                    (vein.value().biomeWeightModifier() == null ? 0 : vein.value().biomeWeightModifier().apply(biome)),
                             vein))
                     .filter(entry -> entry.getKey() > 0)
                     .collect(Collectors.toList());
@@ -78,8 +79,9 @@ public class WorldGeneratorUtils {
         }
     }
 
-    public static List<Entry<Integer, GTOreDefinition>> getCachedBiomeVeins(ServerLevel level, Holder<Biome> biome,
-                                                                            RandomSource random) {
+    public static List<Entry<Integer, Holder<OreVeinDefinition>>> getCachedBiomeVeins(ServerLevel level,
+                                                                                      Holder<Biome> biome,
+                                                                                      RandomSource random) {
         if (oreVeinCache.containsKey(level))
             return oreVeinCache.get(level).getEntry(biome);
         WorldOreVeinCache worldOreVeinCache = new WorldOreVeinCache(level);

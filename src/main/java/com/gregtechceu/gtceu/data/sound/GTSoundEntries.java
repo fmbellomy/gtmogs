@@ -57,8 +57,8 @@ public class GTSoundEntries {
     public static final SoundEntry METAL_PIPE = REGISTRATE.sound("metal_pipe").build();
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.SOUNDS));
-        GTRegistries.SOUNDS.values().forEach(SoundEntry::prepare);
+        GTCEuAPI.postRegisterEvent(GTRegistries.SOUNDS);
+        GTRegistries.SOUNDS.forEach(SoundEntry::prepare);
         registerSounds();
 
         GTRegistries.SOUNDS.freeze();

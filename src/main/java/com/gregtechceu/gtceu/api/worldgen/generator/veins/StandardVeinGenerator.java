@@ -3,12 +3,13 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,6 +40,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor
 public class StandardVeinGenerator extends VeinGenerator {
 
     // spotless:off
@@ -60,10 +62,6 @@ public class StandardVeinGenerator extends VeinGenerator {
 
     @Getter
     public Either<List<OreConfiguration.TargetBlockState>, Material> blocks;
-
-    public StandardVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public StandardVeinGenerator(Block block, Block deepBlock, Block netherBlock) {
         this.block = NonNullSupplier.of(() -> block);
@@ -140,7 +138,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
@@ -175,7 +173,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     protected void doPlaceNormal(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
-                                 GTOreDefinition entry, BlockPos origin,
+                                 OreVeinDefinition entry, BlockPos origin,
                                  Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                  double pMinX, double pMaxX, double pMinZ, double pMaxZ, double pMinY, double pMaxY,
                                  int pX, int pY, int pZ, int pWidth, int pHeight) {
@@ -239,7 +237,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     private static void generateShape(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
-                                      GTOreDefinition entry, BlockPos origin,
+                                      OreVeinDefinition entry, BlockPos origin,
                                       Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                       int pX, int pY, int pZ, int pWidth, int pHeight, double[] shape,
                                       int shapeIdxOffset,
@@ -293,7 +291,7 @@ public class StandardVeinGenerator extends VeinGenerator {
         }
     }
 
-    private static void placeBlock(BulkSectionAccess access, long randomSeed, GTOreDefinition entry,
+    private static void placeBlock(BulkSectionAccess access, long randomSeed, OreVeinDefinition entry,
                                    Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                    BlockPos pos,
                                    float density, MutableInt placedAmount) {

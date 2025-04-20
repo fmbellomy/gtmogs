@@ -3,13 +3,14 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.mojang.serialization.MapCodec;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -43,6 +44,7 @@ import java.util.stream.Stream;
 
 @Accessors(fluent = true, chain = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class DikeVeinGenerator extends VeinGenerator {
 
     public static final MapCodec<DikeVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -57,10 +59,6 @@ public class DikeVeinGenerator extends VeinGenerator {
     @Setter
     public int maxYLevel;
 
-    public DikeVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
-
     @Override
     public List<Map.Entry<Either<BlockState, Material>, Integer>> getAllEntries() {
         return this.blocks.stream()
@@ -74,7 +72,7 @@ public class DikeVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
@@ -118,7 +116,7 @@ public class DikeVeinGenerator extends VeinGenerator {
 
     private void placeBlock(
             BulkSectionAccess level, LevelChunkSection section, long randomSeed, BlockPos pos,
-            GTOreDefinition entry) {
+            OreVeinDefinition entry) {
         var rand = new XoroshiroRandomSource(randomSeed);
         List<? extends Map.Entry<Integer, DikeBlockDefinition>> entries = blocks.stream()
                 .map(b -> Map.entry(b.weight, b)).toList();

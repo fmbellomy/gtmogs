@@ -7,7 +7,7 @@ import net.neoforged.fml.event.IModBusEvent;
 
 /**
  * Event to add a material registry in.
- * <br>
+ * <br/>
  * Material events are fired on the MOD bus as the forge bus isn't active until all mods have loaded.
  *
  * @see IMaterialRegistryManager#createRegistry(String)

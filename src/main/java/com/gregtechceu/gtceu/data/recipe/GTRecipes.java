@@ -112,7 +112,7 @@ public class GTRecipes {
             RecyclingRecipes.init(consumer);
             ItemMaterialData.resolveItemMaterialInfos(consumer);
         }
-        AddonFinder.getAddons().forEach(addon -> addon.addRecipes(consumer));
+        AddonFinder.getAddonList().forEach(addon -> addon.addRecipes(consumer));
     }
 
     /*
@@ -125,6 +125,6 @@ public class GTRecipes {
         RECIPE_FILTERS.clear();
 
         RecipeRemoval.init(actualConsumer);
-        AddonFinder.getAddons().forEach(addon -> addon.removeRecipes(actualConsumer));
+        AddonFinder.getAddonList().forEach(addon -> addon.removeRecipes(actualConsumer));
     }
 }

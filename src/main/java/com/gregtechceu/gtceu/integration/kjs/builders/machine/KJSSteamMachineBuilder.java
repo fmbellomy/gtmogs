@@ -5,16 +5,17 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.steam.SimpleSteamMachine;
-import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.WorkableSteamMachineRenderer;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
 import net.minecraft.resources.ResourceLocation;
-import dev.latvian.mods.kubejs.client.LangEventJS;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.Nullable;
 
 @Accessors(fluent = true, chain = true)
 public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
@@ -25,6 +26,7 @@ public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
     public volatile SteamCreationFunction machine = SimpleSteamMachine::new;
     @Setter
     public volatile SteamDefinitionFunction definition = (isHP, def) -> def.tier(isHP ? 1 : 0);
+    @Nullable
     private volatile MachineDefinition hp = null;
 
     public KJSSteamMachineBuilder(ResourceLocation id) {
@@ -32,7 +34,7 @@ public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
     }
 
     @Override
-    public MachineDefinition register() {
+    public MachineDefinition createObject() {
         MachineBuilder<?> lowPressureBuilder = GTRegistration.REGISTRATE.machine(
                 String.format("lp_%s", this.id.getPath()),
                 holder -> machine.create(holder, false));
@@ -55,13 +57,14 @@ public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
             hp = highPressureBuilder.register();
         }
 
-        return value = lowPressure;
+        return lowPressure;
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
-    public void generateLang(LangEventJS lang) {
+    public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
-        lang.add(GTCEu.MOD_ID, value.getDescriptionId(), value.getLangValue());
+        lang.add(GTCEu.MOD_ID, get().getDescriptionId(), get().getLangValue());
         if (hp != null) {
             lang.add(GTCEu.MOD_ID, hp.getDescriptionId(), hp.getLangValue());
         }

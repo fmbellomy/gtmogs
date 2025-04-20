@@ -137,7 +137,7 @@ public class CommonInit {
         GTDimensionMarkers.init();
         ChanceLogic.init();
         WaypointManager.init();
-        AddonFinder.getAddons().forEach(IGTAddon::gtFinishedLoading);
+        AddonFinder.getAddonList().forEach(IGTAddon::gtInitComplete);
         GTIngredientTypes.INGREDIENT_TYPES.register(modBus);
 
         GTRegistrateDatagen.init();
@@ -178,7 +178,7 @@ public class CommonInit {
         MaterialRegistryManager managerInternal = (MaterialRegistryManager) GTCEuAPI.materialManager;
 
         GTCEu.LOGGER.info("Registering material registries");
-        ModLoader.postEvent(new MaterialRegistryEvent());
+        ModLoader.postEventWrapContainerInModOrder(new MaterialRegistryEvent());
 
         // First, register CEu Materials
         managerInternal.unfreezeRegistries();
@@ -190,16 +190,15 @@ public class CommonInit {
 
         // Then, register addon Materials
         GTCEu.LOGGER.info("Registering addon Materials");
+        //noinspection removal
         MaterialEvent materialEvent = new MaterialEvent();
-        ModLoader.postEvent(materialEvent);
-        if (GTCEu.Mods.isKubeJSLoaded()) {
-            KJSEventWrapper.materialRegistry();
-        }
+        ModLoader.postEventWrapContainerInModOrder(materialEvent);
+        GTCEuAPI.postRegisterEvent(GTRegistries.MATERIALS);
 
         // Fire Post-Material event, intended for when Materials need to be iterated over in-full before freezing
         // Block entirely new Materials from being added in the Post event
         managerInternal.closeRegistries();
-        ModLoader.postEvent(new PostMaterialEvent());
+        ModLoader.postEventWrapContainerInModOrder(new PostMaterialEvent());
         if (GTCEu.Mods.isKubeJSLoaded()) {
             KJSEventWrapper.materialModification();
         }
@@ -223,13 +222,8 @@ public class CommonInit {
     }
 
     @SubscribeEvent
-    public static void loadComplete(FMLLoadCompleteEvent e) {
-        e.enqueueWork(() -> {
-            if (GTCEu.isModLoaded(GTValues.MODID_TOP)) {
-                GTCEu.LOGGER.info("TheOneProbe found. Enabling integration...");
-                TheOneProbePluginImpl.init();
-            }
-        });
+    public static void interModProcess(InterModProcessEvent event) {
+        InterModComms.sendTo("theoneprobe", "getTheOneProbe", () -> (Function<ITheOneProbe, Void>) TheOneProbePlugin::init);
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
@@ -278,6 +272,16 @@ public class CommonInit {
     }
 
     @SubscribeEvent
+    public static void registerDataPackRegistries(DataPackRegistryEvent.NewRegistry event) {
+        event.dataPackRegistry(GTRegistries.ORE_VEIN_REGISTRY,
+                OreVeinDefinition.DIRECT_CODEC, OreVeinDefinition.DIRECT_CODEC);
+        event.dataPackRegistry(GTRegistries.BEDROCK_FLUID_REGISTRY,
+                BedrockFluidDefinition.DIRECT_CODEC, BedrockFluidDefinition.DIRECT_CODEC);
+        event.dataPackRegistry(GTRegistries.BEDROCK_ORE_REGISTRY,
+                BedrockOreDefinition.DIRECT_CODEC, BedrockOreDefinition.DIRECT_CODEC);
+    }
+
+    @SubscribeEvent
     public static void registerPackFinders(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.CLIENT_RESOURCES) {
             // Clear old data
@@ -316,12 +320,8 @@ public class CommonInit {
 
     public static final class KJSEventWrapper {
 
-        public static void materialRegistry() {
-            GTRegistryInfo.registerFor(GTCEuAPI.materialManager.getRegistry(GTCEu.MOD_ID).getRegistryName());
-        }
-
         public static void materialModification() {
-            GTCEuStartupEvents.MATERIAL_MODIFICATION.post(new MaterialModificationEventJS());
+            GTCEuStartupEvents.MATERIAL_MODIFICATION.post(new MaterialModificationKubeEvent());
         }
     }
 }

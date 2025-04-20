@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.api.worldgen.generator;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -36,14 +36,7 @@ public abstract class VeinGenerator {
     public static final Codec<VeinGenerator> DIRECT_CODEC = REGISTRY_CODEC.dispatchStable(VeinGenerator::codec,
             Function.identity());
 
-    protected GTOreDefinition entry;
-
     public VeinGenerator() {}
-
-    public VeinGenerator(GTOreDefinition entry) {
-        this.entry = entry;
-    }
-
     /**
      * @return List of [block|material, chance]
      */
@@ -91,17 +84,12 @@ public abstract class VeinGenerator {
      */
     @HideFromJS
     public abstract Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random,
-                                                           GTOreDefinition entry, BlockPos origin);
+                                                           OreVeinDefinition entry, BlockPos origin);
 
     @HideFromJS
     public abstract VeinGenerator build();
 
     public abstract VeinGenerator copy();
-
-    @HideFromJS
-    public GTOreDefinition parent() {
-        return entry;
-    }
 
     public abstract MapCodec<? extends VeinGenerator> codec();
 }

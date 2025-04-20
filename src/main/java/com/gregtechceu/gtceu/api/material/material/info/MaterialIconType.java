@@ -1,8 +1,9 @@
 package com.gregtechceu.gtceu.api.material.material.info;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
+import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 
+import com.gregtechceu.gtceu.integration.kjs.events.MaterialIconInfoKubeEvent;
 import com.lowdragmc.lowdraglib.utils.ResourceHelper;
 
 import net.minecraft.client.Minecraft;
@@ -127,7 +128,7 @@ public record MaterialIconType(String name) {
 
     public static void init() {
         if (GTCEu.Mods.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistryInfo.MATERIAL_ICON_TYPE.registryKey);
+            KJSCallWrapper.postEvent();
         }
     }
 
@@ -292,5 +293,13 @@ public record MaterialIconType(String name) {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    private static class KJSCallWrapper {
+
+        private static void postEvent() {
+            GTCEuStartupEvents.MATERIAL_ICON_INFO.post(new MaterialIconInfoKubeEvent());
+        }
+
     }
 }

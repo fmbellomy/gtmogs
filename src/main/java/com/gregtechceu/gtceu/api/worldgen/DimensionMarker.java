@@ -1,12 +1,9 @@
 package com.gregtechceu.gtceu.api.worldgen;
 
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
-import com.gregtechceu.gtceu.integration.kjs.Validator;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 import com.gregtechceu.gtceu.utils.memoization.MemoizedSupplier;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -15,10 +12,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
-import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
@@ -69,37 +63,4 @@ public class DimensionMarker {
         return stack;
     }
 
-    @Setter
-    @Accessors(fluent = true, chain = true)
-    public static class Builder extends BuilderBase<DimensionMarker> {
-
-        private Supplier<Item> iconSupplier;
-        private int tier = 0;
-        @Nullable
-        private String overrideName;
-
-        public Builder(ResourceLocation dimKey) {
-            super(dimKey);
-        }
-
-        public Builder(ResourceLocation dimKey, Object... args) {
-            this(dimKey);
-        }
-
-        @HideFromJS
-        public DimensionMarker buildAndRegister() {
-            Validator.validate(
-                    id,
-                    Validator.errorIfNull(iconSupplier, "icon"),
-                    Validator.errorIfOutOfRange(tier, "tier", 0, MAX_TIER - 1));
-            DimensionMarker marker = new DimensionMarker(tier, iconSupplier, overrideName);
-            marker.register(id);
-            return marker;
-        }
-
-        @Override
-        public DimensionMarker register() {
-            return value = buildAndRegister();
-        }
-    }
 }

@@ -164,7 +164,7 @@ public class GTCovers {
     }
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.COVERS));
+        GTCEuAPI.postRegisterEvent(GTRegistries.COVERS);
         GTRegistries.COVERS.freeze();
     }
 }

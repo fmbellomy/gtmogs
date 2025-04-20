@@ -18,7 +18,6 @@ public class DungeonLootLoader {
     public static void init() {
         if (ConfigHolder.INSTANCE.worldgen.addLoot || ConfigHolder.INSTANCE.worldgen.increaseDungeonLoot) {
             GTCEu.LOGGER.info("Registering dungeon loot...");
-            ChestGenHooks.init();
         }
         if (ConfigHolder.INSTANCE.worldgen.addLoot) {
             ChestGenHooks.addItem(BuiltInLootTables.SPAWN_BONUS_CHEST, GTItems.BOTTLE_PURPLE_DRINK.asStack(), 8, 16, 2);

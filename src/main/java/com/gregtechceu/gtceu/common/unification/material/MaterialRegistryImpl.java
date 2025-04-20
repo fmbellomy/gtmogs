@@ -5,25 +5,28 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.Collection;
-import java.util.Collections;
 
 public class MaterialRegistryImpl extends MaterialRegistry {
 
     private static int networkIdCounter;
 
     private final int networkId = networkIdCounter++;
-    private final java.lang.String modid;
+    private final String modid;
+    private final ResourceLocation templateId;
 
     private boolean isRegistryClosed = false;
     @NotNull
     private Material fallbackMaterial = GTMaterials.NULL;
 
-    protected MaterialRegistryImpl(@NotNull java.lang.String modid) {
-        super(modid);
-        this.modid = modid;
+    protected MaterialRegistryImpl(@NotNull String modId) {
+        super(modId);
+        this.modid = modId;
+        this.templateId = ResourceLocation.fromNamespaceAndPath(modId, "");
     }
 
     @Override
@@ -32,21 +35,26 @@ public class MaterialRegistryImpl extends MaterialRegistry {
     }
 
     @Override
-    public <T extends Material> T register(@NotNull java.lang.String key, @NotNull T value) {
+    public @NotNull Material get(String key) {
+        return getOrDefault(templateId.withPath(key), getFallbackMaterial());
+    }
+
+    public <T extends Material> T register(@NotNull String key, @NotNull T value) {
         if (isRegistryClosed) {
             GTCEu.LOGGER.error(
                     "Materials cannot be registered in the PostMaterialEvent (or after)! Must be added in the MaterialEvent. Skipping material {}...",
                     key);
             return null;
         }
-        super.register(key, value);
+        super.register(templateId.withPath(key), value);
         return value;
     }
 
     @NotNull
+    @UnmodifiableView
     @Override
     public Collection<Material> getAllMaterials() {
-        return Collections.unmodifiableCollection(this.registry.values());
+        return this.registry().values();
     }
 
     @Override
@@ -70,7 +78,7 @@ public class MaterialRegistryImpl extends MaterialRegistry {
 
     @NotNull
     @Override
-    public java.lang.String getModid() {
+    public String getModid() {
         return this.modid;
     }
 

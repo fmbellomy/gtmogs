@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.common.recipe.builder;
 
-import com.google.gson.JsonElement;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
@@ -23,22 +22,15 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntCircuitIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.common.recipe.condition.*;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
-import com.gregtechceu.gtceu.utils.codec.CodecUtils;
-import com.lowdragmc.lowdraglib.utils.NBTToJsonConverter;
-
-import com.mojang.serialization.JsonOps;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -53,8 +45,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import dev.ftb.mods.ftbquests.quest.QuestObjectBase;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
 import lombok.Getter;
@@ -69,11 +59,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @SuppressWarnings({ "unchecked", "UnusedReturnValue" })
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Accessors(chain = true, fluent = true)
 public class GTRecipeBuilder {
 
@@ -87,7 +73,7 @@ public class GTRecipeBuilder {
     public final Map<RecipeCapability<?>, ChanceLogic> tickInputChanceLogic = new IdentityHashMap<>();
     public final Map<RecipeCapability<?>, ChanceLogic> tickOutputChanceLogic = new IdentityHashMap<>();
 
-    public final List<RecipeCondition> conditions = new ArrayList<>();
+    public final List<RecipeCondition<?>> conditions = new ArrayList<>();
 
     @NotNull
     public CompoundTag data = new CompoundTag();
@@ -1329,61 +1315,6 @@ public class GTRecipeBuilder {
         return this;
     }
 
-    public void toJson(JsonObject json) {
-        json.addProperty("type", recipeType.registryName.toString());
-        json.addProperty("duration", Math.abs(duration));
-        if (data != null && !data.isEmpty()) {
-            json.add("data", NBTToJsonConverter.getObject(data));
-        }
-        json.add("inputs", capabilitiesToJson(input));
-        json.add("outputs", capabilitiesToJson(output));
-        json.add("tickInputs", capabilitiesToJson(tickInput));
-        json.add("tickOutputs", capabilitiesToJson(tickOutput));
-
-        json.add("inputChanceLogics", chanceLogicsToJson(inputChanceLogic));
-        json.add("outputChanceLogics", chanceLogicsToJson(outputChanceLogic));
-        json.add("tickInputChanceLogics", chanceLogicsToJson(tickInputChanceLogic));
-        json.add("tickOutputChanceLogics", chanceLogicsToJson(tickOutputChanceLogic));
-
-        json.addProperty("category", recipeCategory.registryKey.toString());
-
-        if (!conditions.isEmpty()) {
-            JsonArray array = new JsonArray();
-            RegistryOps<JsonElement> ops = GTRegistries.builtinRegistry()
-                    .createSerializationContext(JsonOps.INSTANCE);
-            for (RecipeCondition condition : conditions) {
-                var condJson = CodecUtils.encodeMap(condition, condition.getType().getCodec(), )
-                var condJson = condition.getType().getCodec().encode(condition, ops, ops.mapBuilder())
-                        .build(JsonOps.INSTANCE.empty());
-                condJson.addProperty("type", GTRegistries.RECIPE_CONDITIONS.getKey(condition.getType()));
-                array.add(condJson);
-            }
-            json.add("recipeConditions", array);
-        }
-    }
-
-    public JsonObject capabilitiesToJson(Map<RecipeCapability<?>, List<Content>> contents) {
-        JsonObject jsonObject = new JsonObject();
-        contents.forEach((cap, list) -> {
-            JsonArray contentsJson = new JsonArray();
-            for (Content content : list) {
-                contentsJson.add(cap.serializer.toJsonContent(content));
-            }
-            jsonObject.add(GTRegistries.RECIPE_CAPABILITIES.getKey(cap), contentsJson);
-        });
-        return jsonObject;
-    }
-
-    public JsonObject chanceLogicsToJson(Map<RecipeCapability<?>, ChanceLogic> chanceLogics) {
-        JsonObject jsonObject = new JsonObject();
-        chanceLogics.forEach((cap, logic) -> {
-            String capId = GTRegistries.RECIPE_CAPABILITIES.getKey(cap);
-            String logicId = GTRegistries.CHANCE_LOGICS.getKey(logic);
-            jsonObject.addProperty(capId, logicId);
-        });
-        return jsonObject;
-    }
-
     public void save(RecipeOutput output) {
         if (onSave != null) {
             onSave.accept(this, output);
@@ -1424,7 +1355,7 @@ public class GTRecipeBuilder {
         var itemOutputs = output.getOrDefault(ItemRecipeCapability.CAP, new ArrayList<>());
         var itemInputs = input.getOrDefault(ItemRecipeCapability.CAP, new ArrayList<>());
         if (itemOutputs.size() == 1 && (!itemInputs.isEmpty() || !tempFluidStacks.isEmpty())) {
-            var currOutput = itemOutputs.get(0).content;
+            var currOutput = itemOutputs.getFirst().content;
             ItemLike out = null;
             int outputCount = 0;
 

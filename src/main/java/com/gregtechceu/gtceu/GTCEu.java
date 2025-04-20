@@ -30,8 +30,9 @@ import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import dev.emi.emi.config.EmiConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.ApiStatus;
 import java.nio.file.Path;
 
 @Mod(GTCEu.MOD_ID)
@@ -39,11 +40,15 @@ public class GTCEu {
 
     public static final String MOD_ID = "gtceu";
     private static final ResourceLocation TEMPLATE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "");
-    public static final String NAME = "GregTechCEu";
-    public static final Logger LOGGER = LoggerFactory.getLogger(NAME);
+    public static final String NAME = "GTCEu";
+    public static final Logger LOGGER = LogManager.getLogger(NAME);
+
+    @ApiStatus.Internal
+    public static IEventBus gtModBus;
 
     public GTCEu(IEventBus modBus, FMLModContainer container) {
         GTCEuAPI.instance = this;
+        GTCEu.gtModBus = modBus;
         ConfigHolder.init();
         CommonInit.init(modBus);
 

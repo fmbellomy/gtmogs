@@ -4,11 +4,12 @@ import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import lombok.NoArgsConstructor;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -59,6 +60,7 @@ import java.util.function.Predicate;
 
 @Accessors(chain = true, fluent = true)
 @AllArgsConstructor
+@NoArgsConstructor
 public class GeodeVeinGenerator extends VeinGenerator {
 
     public static final Codec<Double> CHANCE_RANGE = Codec.doubleRange(0.0, 1.0);
@@ -107,10 +109,6 @@ public class GeodeVeinGenerator extends VeinGenerator {
     @Setter
     public int invalidBlocksThreshold = 0;
 
-    public GeodeVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
-
     @Override
     public List<Map.Entry<Either<BlockState, Material>, Integer>> getAllEntries() {
         RandomSource source = new LegacyRandomSource(0);
@@ -128,7 +126,7 @@ public class GeodeVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         // TODO refactor geode sizes for the new ore generation system.
         // For now, geode veins are still generated in place.

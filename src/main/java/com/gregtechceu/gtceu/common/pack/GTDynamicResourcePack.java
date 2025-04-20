@@ -2,10 +2,8 @@ package com.gregtechceu.gtceu.common.pack;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
-import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -37,14 +35,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.common.pack.GTDynamicDataPack.writeJson;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class GTDynamicResourcePack implements PackResources {
 
     protected static final ObjectSet<String> CLIENT_DOMAINS = new ObjectOpenHashSet<>();
@@ -58,7 +52,7 @@ public class GTDynamicResourcePack implements PackResources {
     }
 
     public GTDynamicResourcePack(PackLocationInfo info) {
-        this(info, AddonFinder.getAddons().stream().map(IGTAddon::addonModId).collect(Collectors.toSet()));
+        this(info, AddonFinder.getAddons().keySet());
     }
 
     public GTDynamicResourcePack(PackLocationInfo info, Collection<String> domains) {

@@ -57,6 +57,7 @@ public final class ChestGenHooks {
 
     public static void init() {
         NeoForge.EVENT_BUS.register(ChestGenHooks.class);
+        RandomWeightLootFunction.init();
     }
 
     @SubscribeEvent
@@ -160,9 +161,7 @@ public final class ChestGenHooks {
             this.maxAmount = maxAmount;
         }
 
-        public static void init() {
-            // Do nothing here. This just ensures that TYPE is being set immediately when called.
-        }
+        public static void init() {}
 
         @Override
         public @NotNull LootItemFunctionType<RandomWeightLootFunction> getType() {
