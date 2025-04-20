@@ -23,6 +23,9 @@ public interface FluidStorage {
         @Getter
         @Setter
         private FluidBuilder builder;
+        @Getter
+        @Setter
+        private FluidStorageKey key;
     }
 
     /**

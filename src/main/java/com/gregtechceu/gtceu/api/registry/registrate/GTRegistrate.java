@@ -101,11 +101,6 @@ public class GTRegistrate extends Registrate {
         });
     }
 
-    public IGTFluidBuilder createFluid(String name, String langKey, Material material, ResourceLocation stillTexture,
-                                       ResourceLocation flowingTexture) {
-        return fluid(this, material, name, langKey, stillTexture, flowingTexture);
-    }
-
     public <DEFINITION extends MachineDefinition> MachineBuilder<DEFINITION> machine(String name,
                                                                                      Function<ResourceLocation, DEFINITION> definitionFactory,
                                                                                      Function<IMachineBlockEntity, MetaMachine> metaMachine,

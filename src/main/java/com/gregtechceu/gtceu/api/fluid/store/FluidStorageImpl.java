@@ -82,8 +82,7 @@ public class FluidStorageImpl implements FluidStorage {
                                 material);
                         return;
                     }
-                    Supplier<? extends Fluid> fluid = entry.getValue().build(material.getModid(), material,
-                            entry.getKey(), registrate);
+                    Supplier<? extends Fluid> fluid = entry.getValue().build(material, entry.getKey(), registrate);
                     if (!storeNoOverwrites(entry.getKey(), fluid, entry.getValue())) {
                         GTCEu.LOGGER.error("{} already has an associated fluid for material {}", material, material);
                     }
@@ -128,9 +127,9 @@ public class FluidStorageImpl implements FluidStorage {
             throw new IllegalArgumentException(key + " already has an associated fluid");
         }
         if (builder != null) {
-            map.put(key, new FluidEntry(fluid, builder));
+            map.put(key, new FluidEntry(fluid, builder, key));
         } else {
-            map.put(key, new FluidEntry(fluid, null));
+            map.put(key, new FluidEntry(fluid, null, key));
         }
     }
 }
