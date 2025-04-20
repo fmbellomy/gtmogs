@@ -16,7 +16,6 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -58,10 +57,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
 
     @Getter
@@ -325,7 +320,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
         return super.useWithoutItem(state, level, pos, player, hit);
     }
 
-    public boolean canConnectRedstone(BlockGetter level, BlockPos pos, Direction side) {
+    public boolean canConnectRedstone(BlockGetter level, BlockPos pos, @Nullable Direction side) {
         return getMachine(level, pos).canConnectRedstone(side);
     }
 
@@ -357,7 +352,7 @@ public class MetaMachineBlock extends AppearanceBlock implements IMachineBlock {
     @Nullable
     @Override
     public BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                         BlockState sourceState, BlockPos sourcePos) {
+                                         @Nullable BlockState sourceState, BlockPos sourcePos) {
         var machine = getMachine(level, pos);
         if (machine != null) {
             return machine.getBlockAppearance(state, level, pos, side, sourceState, sourcePos);

@@ -65,10 +65,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class QuantumChestMachine extends TieredMachine implements IAutoOutputItem, IInteractedMachine, IControllable,
                                  IDropSaveMachine, IFancyUIMachine {
 

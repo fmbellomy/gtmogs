@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.integration.emi.orevein;
 
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
@@ -17,9 +17,9 @@ import java.util.List;
 
 public class GTEmiOreVein extends ModularEmiRecipe<WidgetGroup> {
 
-    private final GTOreDefinition oreDefinition;
+    private final OreVeinDefinition oreDefinition;
 
-    public GTEmiOreVein(GTOreDefinition oreDefinition) {
+    public GTEmiOreVein(OreVeinDefinition oreDefinition) {
         super(() -> new GTOreVeinWidget(oreDefinition));
         this.oreDefinition = oreDefinition;
     }

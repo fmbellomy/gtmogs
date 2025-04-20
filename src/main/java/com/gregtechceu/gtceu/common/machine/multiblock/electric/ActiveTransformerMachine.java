@@ -37,7 +37,6 @@ import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.abilities;
 
-
 public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
                                       implements IControllable, IExplosionMachine, IFancyUIMachine, IDisplayUIMachine {
 

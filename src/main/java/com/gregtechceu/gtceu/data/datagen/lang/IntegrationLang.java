@@ -1,10 +1,10 @@
 package com.gregtechceu.gtceu.data.datagen.lang;
 
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.worldgen.GTBedrockFluids;
-import com.gregtechceu.gtceu.data.worldgen.GTOres;
+import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 
@@ -30,8 +30,8 @@ public class IntegrationLang {
         provider.add("gtceu.jei.ore_vein_diagram.weight", "Weight: %s");
         provider.add("gtceu.jei.ore_vein_diagram.dimensions", "Dimensions:");
         GTRegistries.ORE_VEINS.unfreeze();
-        GTOres.init();
-        for (GTOreDefinition oreDefinition : GTRegistries.ORE_VEINS) {
+        GTOreVeins.init();
+        for (OreVeinDefinition oreDefinition : GTRegistries.ORE_VEINS) {
             String name = GTRegistries.ORE_VEINS.getKey(oreDefinition).getPath();
             provider.add("gtceu.jei.ore_vein." + name, RegistrateLangProvider.toEnglishName(name));
         }

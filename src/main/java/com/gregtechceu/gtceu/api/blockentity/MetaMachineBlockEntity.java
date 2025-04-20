@@ -21,10 +21,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Set;
 
-@ParametersAreNonnullByDefault
 public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
 
     public final MultiManagedStorage managedStorage = new MultiManagedStorage();

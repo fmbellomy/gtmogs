@@ -21,7 +21,7 @@ import com.gregtechceu.gtceu.integration.jei.subtype.CircuitSubtypeInterpreter;
 import com.gregtechceu.gtceu.integration.jei.subtype.MaterialSubtypeInterpreter;
 import com.gregtechceu.gtceu.integration.jei.subtype.PotionFluidSubtypeInterpreter;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.gregtechceu.gtceu.integration.xei.widgets.GTProgrammedCircuitWidget;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -38,10 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 @JeiPlugin
 public class GTJEIPlugin implements IModPlugin {
 
@@ -97,8 +94,7 @@ public class GTJEIPlugin implements IModPlugin {
         GTBedrockFluidInfoCategory.registerRecipes(registration);
         if (ConfigHolder.INSTANCE.machines.doBedrockOres)
             GTBedrockOreInfoCategory.registerRecipes(registration);
-        registration.addRecipes(GTProgrammedCircuitCategory.RECIPE_TYPE,
-                List.of(new GTProgrammedCircuitCategory.GTProgrammedCircuitWrapper()));
+        registration.addRecipes(GTProgrammedCircuitCategory.RECIPE_TYPE, List.of(new GTProgrammedCircuitWidget()));
     }
 
     @Override
@@ -115,7 +111,7 @@ public class GTJEIPlugin implements IModPlugin {
 
     @Override
     public <T> void registerFluidSubtypes(ISubtypeRegistration registration,
-                                          IPlatformFluidHelper<T> platformFluidHelper) {
+                                          @NotNull IPlatformFluidHelper<T> platformFluidHelper) {
         PotionFluidSubtypeInterpreter interpreter = PotionFluidSubtypeInterpreter.INSTANCE;
         PotionFluid potionFluid = GTFluids.POTION.get();
         registration.registerSubtypeInterpreter(NeoForgeTypes.FLUID_STACK, potionFluid.getSource(), interpreter);

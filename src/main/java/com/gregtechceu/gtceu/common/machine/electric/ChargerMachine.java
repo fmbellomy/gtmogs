@@ -23,7 +23,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
@@ -33,15 +32,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * @author lucifer_ll
  * @date 2023/7/12
  * @implNote ChargerMachine
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ChargerMachine extends TieredEnergyMachine implements IControllable, IFancyUIMachine, IMachineLife {
 
     public static final long AMPS_PER_ITEM = 4L;

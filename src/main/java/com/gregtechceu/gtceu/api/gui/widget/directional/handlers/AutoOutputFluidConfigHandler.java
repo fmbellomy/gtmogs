@@ -14,7 +14,6 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 import com.lowdragmc.lowdraglib.utils.BlockPosFace;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.neoforged.api.distmarker.Dist;
@@ -22,10 +21,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class AutoOutputFluidConfigHandler implements IDirectionalConfigHandler {
 
     private static final IGuiTexture TEXTURE_OFF = new GuiTextureGroup(

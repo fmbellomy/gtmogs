@@ -13,14 +13,9 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.ImageWidget;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.fluids.FluidType;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SteamHatchPartMachine extends FluidHatchPartMachine {
 
     public static final int INITIAL_TANK_CAPACITY = 64 * FluidType.BUCKET_VOLUME;

@@ -48,6 +48,7 @@ public class MachineDefinition implements Supplier<IMachineBlock> {
     // This is only stored here for KJS use.
     @Getter
     @Setter
+    @Nullable
     private String langValue;
     @Setter
     private Supplier<? extends Block> blockSupplier;
@@ -59,8 +60,7 @@ public class MachineDefinition implements Supplier<IMachineBlock> {
     private Function<IMachineBlockEntity, MetaMachine> machineSupplier;
     @Getter
     @Setter
-    @Nullable
-    private GTRecipeType[] recipeTypes;
+    private GTRecipeType @Nullable [] recipeTypes;
     @Getter
     @Setter
     private int tier;

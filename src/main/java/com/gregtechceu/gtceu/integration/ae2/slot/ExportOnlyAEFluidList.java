@@ -13,10 +13,8 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
-@ParametersAreNonnullByDefault
 public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfigurableSlotList {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(

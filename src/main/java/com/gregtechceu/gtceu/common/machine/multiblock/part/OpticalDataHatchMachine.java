@@ -11,7 +11,6 @@ import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.common.blockentity.OpticalPipeBlockEntity;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -23,8 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class OpticalDataHatchMachine extends MultiblockPartMachine implements IOpticalDataAccessHatch {
 

@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -22,16 +21,13 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class PipeBlockItem extends BlockItem {
 
     public PipeBlockItem(PipeBlock block, Properties properties) {
         super(block, properties);
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public PipeBlock getBlock() {
         return (PipeBlock) super.getBlock();

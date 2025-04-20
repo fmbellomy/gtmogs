@@ -46,7 +46,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -68,13 +67,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.*;
 import static com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection.*;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class CleanroomMachine extends WorkableElectricMultiblockMachine
                               implements ICleanroomProvider, IDisplayUIMachine, IDataInfoProvider {
 

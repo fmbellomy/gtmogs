@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.integration.xei.widgets;
 import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
@@ -54,7 +54,7 @@ public class GTOreVeinWidget extends WidgetGroup {
     private final Set<ResourceKey<Level>> dimensionFilter;
     public final static int width = 120;
 
-    public GTOreVeinWidget(GTOreDefinition oreDefinition) {
+    public GTOreVeinWidget(OreVeinDefinition oreDefinition) {
         super(0, 0, width, 160);
         this.name = getOreName(oreDefinition);
         this.weight = oreDefinition.weight();
@@ -88,8 +88,8 @@ public class GTOreVeinWidget extends WidgetGroup {
     }
 
     @SuppressWarnings("all")
-    private String range(GTOreDefinition oreDefinition) {
-        HeightProvider height = oreDefinition.range().height;
+    private String range(OreVeinDefinition oreDefinition) {
+        HeightProvider height = oreDefinition.heightRange().height;
         int minHeight = 0, maxHeight = 0;
         if (height instanceof UniformHeight uniform) {
             minHeight = uniform.minInclusive.resolveY(null);
@@ -98,7 +98,7 @@ public class GTOreVeinWidget extends WidgetGroup {
         return String.format("%d - %d", minHeight, maxHeight);
     }
 
-    private void setupBaseGui(GTOreDefinition oreDefinition) {
+    private void setupBaseGui(OreVeinDefinition oreDefinition) {
         NonNullList<ItemStack> containedOresAsItemStacks = NonNullList.create();
         List<Integer> chances = oreDefinition.veinGenerator().getAllChances();
         containedOresAsItemStacks.addAll(getRawMaterialList(oreDefinition));
@@ -144,7 +144,7 @@ public class GTOreVeinWidget extends WidgetGroup {
         }
     }
 
-    private void setupText(GTOreDefinition ignored) {
+    private void setupText(OreVeinDefinition ignored) {
         addWidget(new ImageWidget(5, 0, width - 10, 16,
                 new TextTexture("gtceu.jei.ore_vein." + name).setType(TextTexture.TextType.LEFT_ROLL)
                         .setWidth(width - 10)));
@@ -215,7 +215,7 @@ public class GTOreVeinWidget extends WidgetGroup {
         }
     }
 
-    public static List<ItemStack> getContainedOresAndBlocks(GTOreDefinition oreDefinition) {
+    public static List<ItemStack> getContainedOresAndBlocks(OreVeinDefinition oreDefinition) {
         return oreDefinition.veinGenerator().getAllEntries().stream()
                 .flatMap(entry -> entry.getKey().map(state -> Stream.of(state.getBlock().asItem().getDefaultInstance()),
                         material -> {
@@ -229,7 +229,7 @@ public class GTOreVeinWidget extends WidgetGroup {
                 .toList();
     }
 
-    public static List<ItemStack> getRawMaterialList(GTOreDefinition oreDefinition) {
+    public static List<ItemStack> getRawMaterialList(OreVeinDefinition oreDefinition) {
         return oreDefinition.veinGenerator().getAllEntries().stream()
                 .map(entry -> entry.getKey().map(state -> state.getBlock().asItem().getDefaultInstance(),
                         material -> ChemicalHelper.get(TagPrefix.rawOre, material)))
@@ -242,7 +242,7 @@ public class GTOreVeinWidget extends WidgetGroup {
                 .toList();
     }
 
-    public static String getOreName(GTOreDefinition oreDefinition) {
+    public static String getOreName(OreVeinDefinition oreDefinition) {
         ResourceLocation id = ClientInit.CLIENT_ORE_VEINS.inverse().get(oreDefinition);
         return id.getPath();
     }

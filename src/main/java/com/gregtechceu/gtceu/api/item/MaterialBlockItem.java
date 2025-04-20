@@ -12,7 +12,6 @@ import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.neoforged.api.distmarker.Dist;
@@ -23,20 +22,14 @@ import org.jetbrains.annotations.Nullable;
 
 public class MaterialBlockItem extends BlockItem implements IItemRendererProvider {
 
-    protected MaterialBlockItem(MaterialBlock block, Properties properties) {
+    public MaterialBlockItem(MaterialBlock block, Properties properties) {
         super(block, properties);
-    }
-
-    public static MaterialBlockItem create(MaterialBlock block, Item.Properties properties) {
-        return new MaterialBlockItem(block, properties);
     }
 
     @Override
     public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
         return getItemBurnTime();
     }
-
-    public void onRegister() {}
 
     @Override
     @NotNull

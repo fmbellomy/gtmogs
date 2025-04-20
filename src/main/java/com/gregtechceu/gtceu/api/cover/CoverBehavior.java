@@ -18,7 +18,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -39,14 +38,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents cover instance attached on the specific side of meta tile entity
  * Cover filters out interaction and logic of meta tile entity
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLight {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CoverBehavior.class);

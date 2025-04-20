@@ -1,17 +1,13 @@
 package com.gregtechceu.gtceu.api.transfer.fluid;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @AllArgsConstructor
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ModifiableFluidHandlerWrapper implements IFluidHandlerModifiable {
 
     private IFluidHandler handler;

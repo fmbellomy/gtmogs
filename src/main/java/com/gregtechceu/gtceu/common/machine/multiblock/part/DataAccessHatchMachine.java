@@ -26,7 +26,6 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -40,8 +39,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class DataAccessHatchMachine extends TieredPartMachine
                                     implements IMachineLife, IDataAccessHatch, IDataInfoProvider {

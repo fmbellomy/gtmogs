@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.utils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.neoforged.neoforge.client.model.SimpleModelState;
@@ -14,10 +13,6 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import java.security.InvalidParameterException;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class GTMatrixUtils {
 
     protected static final Table<Direction, Direction, SimpleModelState> rotations = Tables

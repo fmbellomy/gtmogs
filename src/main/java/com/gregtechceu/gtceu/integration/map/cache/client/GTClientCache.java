@@ -72,7 +72,7 @@ public class GTClientCache extends WorldCache implements IClientCache {
     @Override
     public CompoundTag saveDimFile(String prefix, ResourceKey<Level> dim) {
         if (!cache.containsKey(dim)) return null;
-        return cache.get(dim).toNBT(true);
+        return cache.get(dim).toNBT();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class GTClientCache extends WorldCache implements IClientCache {
         if (!cache.containsKey(dim)) {
             cache.put(dim, new DimensionCache());
         }
-        cache.get(dim).fromNBT(data, true);
+        cache.get(dim).fromNBT(data);
 
         // FIXME janky hack mate
         GenericMapRenderer renderer = GroupingMapRenderer.getInstance();

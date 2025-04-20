@@ -20,9 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
 public class LampBlockItem extends BlockItem implements IItemRendererProvider {
 
     public LampBlockItem(LampBlock block, Properties properties) {

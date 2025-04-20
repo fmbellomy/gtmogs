@@ -17,7 +17,6 @@ public class MapFluidTagIngredient extends AbstractMapIngredient {
         return tag.location().hashCode();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj)) {
@@ -28,6 +27,6 @@ public class MapFluidTagIngredient extends AbstractMapIngredient {
 
     @Override
     public String toString() {
-        return "MapFluidTagIngredient{" + "create=" + tag.location() + "}";
+        return "MapFluidTagIngredient{" + "tag=" + tag.location() + "}";
     }
 }

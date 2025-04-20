@@ -1,22 +1,16 @@
 package com.gregtechceu.gtceu.utils.codec;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 import com.mojang.datafixers.util.Function12;
 import com.mojang.datafixers.util.Function8;
 import io.netty.buffer.ByteBuf;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class StreamCodecUtils {
 
     public static <B extends ByteBuf, K, V, M extends Map<K, V>> StreamCodec<B, M> dispatchMap(

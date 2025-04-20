@@ -1400,8 +1400,8 @@ public class LangHandler {
     }
 
     /**
-     * Returns the sub-key consisting of the given key plus the given index.<br>
-     * E.g.,<br>
+     * Returns the sub-key consisting of the given key plus the given index.<br/>
+     * E.g.,<br/>
      *
      * <pre>
      * <code>getSubKey("terminal.fluid_prospector.tier", 0)</code>
@@ -1423,9 +1423,9 @@ public class LangHandler {
     }
 
     /**
-     * Registers multiple values under the same key with a given provider.<br>
-     * <br>
-     * For example, a cumbersome way to add translations would be the following:<br>
+     * Registers multiple values under the same key with a given provider.<br/>
+     * <br/>
+     * For example, a cumbersome way to add translations would be the following:<br/>
      *
      * <pre>
      * <code>provider.add("terminal.fluid_prospector.tier.0", "radius size 1");
@@ -1465,7 +1465,7 @@ public class LangHandler {
     }
 
     /**
-     * Gets all translation components from a multi lang's sub-keys.<br>
+     * Gets all translation components from a multi lang's sub-keys.<br/>
      * E.g., given a multi lang:
      *
      * <pre>
@@ -1505,7 +1505,7 @@ public class LangHandler {
     /**
      * Gets all translation components from a multi lang's sub-keys. Supports
      * additional arguments for the translation
-     * components.<br>
+     * components.<br/>
      * E.g., given a multi lang:
      *
      * <pre>
@@ -1587,14 +1587,14 @@ public class LangHandler {
     /**
      * Adds one key-value-pair to the given lang provider per line in the given
      * multiline (a multiline is a String
-     * containing newline characters).<br>
+     * containing newline characters).<br/>
      * Example:
      *
      * <pre>
      * <code>multilineLang(provider, "gtceu.gui.overclock.enabled", "Overclocking Enabled.\nClick to Disable");</code>
      * </pre>
      *
-     * This results in the following translations:<br>
+     * This results in the following translations:<br/>
      *
      * <pre>
      * <code>"gtceu.gui.overclock.enabled.0": "Overclocking Enabled.",

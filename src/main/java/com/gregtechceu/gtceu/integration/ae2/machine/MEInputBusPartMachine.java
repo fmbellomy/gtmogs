@@ -19,7 +19,6 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
@@ -32,10 +31,6 @@ import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
 import net.minecraft.world.item.component.CustomData;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MEInputBusPartMachine extends MEBusPartMachine
                                    implements IDataStickInteractable, IMachineLife, IHasCircuitSlot {
 

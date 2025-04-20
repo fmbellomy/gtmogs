@@ -490,7 +490,7 @@ public class GTToolType {
 
     public final String name;
     public final String idFormat;
-    // at least one has to be set. first one MUST be the main create.
+    // at least one has to be set. first one MUST be the main tag.
     public final List<TagKey<Item>> itemTags;
     public final List<TagKey<Block>> harvestTags;
     public final Set<ItemAbility> defaultAbilities;

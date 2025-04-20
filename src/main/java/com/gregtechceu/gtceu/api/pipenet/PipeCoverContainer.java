@@ -31,7 +31,6 @@ import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-
 public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(PipeCoverContainer.class);

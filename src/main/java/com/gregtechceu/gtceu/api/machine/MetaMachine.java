@@ -697,7 +697,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
     @Override
     @NotNull
     public BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                         BlockState sourceState, BlockPos sourcePos) {
+                                         @Nullable BlockState sourceState, BlockPos sourcePos) {
         var appearance = getCoverContainer().getBlockAppearance(state, level, pos, side, sourceState, sourcePos);
         if (appearance != null) return appearance;
         if (this instanceof IMultiPart part && part.isFormed()) {
@@ -719,7 +719,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
     }
 
     @Override
-    public boolean canConnectRedstone(Direction side) {
+    public boolean canConnectRedstone(@Nullable Direction side) {
         if (side == null) return false;
 
         // For some reason, Minecraft requests the output signal from the opposite side...

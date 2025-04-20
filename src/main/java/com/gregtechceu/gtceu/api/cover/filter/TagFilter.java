@@ -42,6 +42,7 @@ public abstract class TagFilter<T, S extends Filter<T, S>> implements Filter<T, 
     public void setFilterExpr(String filterExpr) {
         this.tagFilterExpression = filterExpr;
         matchExpr = TagExprFilter.parseExpression(tagFilterExpression);
+        //noinspection unchecked
         onUpdated.accept((S) this);
     }
 

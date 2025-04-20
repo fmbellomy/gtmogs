@@ -79,7 +79,6 @@ import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -267,7 +266,7 @@ public class GTBlocks {
         builder.put(GTMaterials.HastelloyC276, CASING_SHOCK_PROOF);
 
         MaterialCasingCollectionEvent event = new MaterialCasingCollectionEvent(builder);
-        AddonFinder.getAddons().forEach(addon -> addon.collectMaterialCasings(event));
+        AddonFinder.getAddonList().forEach(addon -> addon.collectMaterialCasings(event));
 
         MATERIALS_TO_CASINGS = builder.build();
     }
@@ -989,7 +988,7 @@ public class GTBlocks {
             .initialProperties(() -> Blocks.OAK_PLANKS)
             .lang("Treated Wood Planks")
             .properties(p -> p.mapColor(MapColor.TERRACOTTA_GRAY))
-            .tag(TagUtil.createBlockTag("treated_wood")) // matches IE treated wood create
+            .tag(TagUtil.createBlockTag("treated_wood")) // matches IE treated wood tag
             .tag(BlockTags.MINEABLE_WITH_AXE)
             .item()
             .tag(TagUtil.createItemTag("treated_wood"))
@@ -1213,7 +1212,6 @@ public class GTBlocks {
             .blockstate(GTModels.cubeAllModel("brittle_charcoal", GTCEu.id("block/misc/brittle_charcoal")))
             .item((b, p) -> new BlockItem(b, p) {
 
-                @ParametersAreNonnullByDefault
                 @Override
                 public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                             TooltipFlag isAdvanced) {

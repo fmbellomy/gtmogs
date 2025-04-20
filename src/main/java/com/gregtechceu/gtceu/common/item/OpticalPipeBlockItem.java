@@ -12,9 +12,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
 public class OpticalPipeBlockItem extends PipeBlockItem implements IItemRendererProvider {
 
     public OpticalPipeBlockItem(OpticalPipeBlock block, Properties properties) {

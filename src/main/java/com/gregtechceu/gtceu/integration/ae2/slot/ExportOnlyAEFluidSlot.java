@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
 
@@ -13,10 +12,6 @@ import appeng.api.stacks.GenericStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHandlerModifiable, IFluidTank {
 
     public ExportOnlyAEFluidSlot() {

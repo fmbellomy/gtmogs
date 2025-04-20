@@ -39,7 +39,7 @@ public class VoidFluidHandlerItemStack extends FluidHandlerItemStack {
 
     @Override
     protected void setFluid(FluidStack fluid) {
-        // No NBT create
+        // No NBT tag
     }
 
     @Override

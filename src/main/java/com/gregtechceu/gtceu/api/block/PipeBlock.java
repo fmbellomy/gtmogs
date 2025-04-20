@@ -24,7 +24,6 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.client.renderer.IBlockRendererProvider;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -66,7 +65,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @SuppressWarnings("deprecation")
 public abstract class PipeBlock<PipeType extends Enum<PipeType> & IPipeType<NodeDataType>, NodeDataType,
@@ -446,7 +444,7 @@ public abstract class PipeBlock<PipeType extends Enum<PipeType> & IPipeType<Node
 
     @Override
     public BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                         BlockState sourceState, BlockPos sourcePos) {
+                                         @Nullable BlockState sourceState, BlockPos sourcePos) {
         var pipe = getPipeTile(level, pos);
         if (pipe != null) {
             var appearance = pipe.getCoverContainer().getBlockAppearance(state, level, pos, side, sourceState,

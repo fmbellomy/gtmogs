@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.item.SurfaceRockBlockItem;
 import com.gregtechceu.gtceu.client.renderer.block.SurfaceRockRenderer;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.core.BlockPos;
@@ -35,10 +34,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class SurfaceRockBlock extends Block {
 
     public static final DirectionProperty FACING = BlockStateProperties.FACING;

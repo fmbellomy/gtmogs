@@ -7,15 +7,10 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.function.Predicate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ParallelLogic {
 
     /**

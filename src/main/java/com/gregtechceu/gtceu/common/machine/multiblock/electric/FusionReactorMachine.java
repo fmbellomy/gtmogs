@@ -31,7 +31,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -46,15 +45,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.recipe.OverclockingLogic.PERFECT_HALF_DURATION_FACTOR;
 import static com.gregtechceu.gtceu.api.recipe.OverclockingLogic.PERFECT_HALF_VOLTAGE_FACTOR;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class FusionReactorMachine extends WorkableElectricMultiblockMachine implements ITieredMachine {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(FusionReactorMachine.class,

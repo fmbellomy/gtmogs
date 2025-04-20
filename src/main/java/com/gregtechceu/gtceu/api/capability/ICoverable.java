@@ -66,7 +66,7 @@ public interface ICoverable extends ITickSubscription, IAppearance {
 
     /**
      * Internal method, do not call yourself.
-     * <br>
+     * <br/>
      * Use {@link ICoverable#removeCover(boolean, Direction, Player)} and
      * {@link ICoverable#placeCoverOnSide(Direction, ItemStack, CoverDefinition, ServerPlayer)} instead
      * 
@@ -255,7 +255,7 @@ public interface ICoverable extends ITickSubscription, IAppearance {
     @Override
     default BlockState getBlockAppearance(@NotNull BlockState state, @NotNull BlockAndTintGetter level,
                                           @NotNull BlockPos pos, @NotNull Direction side,
-                                          @NotNull BlockState sourceState, @NotNull BlockPos sourcePos) {
+                                          @Nullable BlockState sourceState, @NotNull BlockPos sourcePos) {
         CoverBehavior cover = getCoverAtSide(side);
         if (cover != null) {
             return cover.getAppearance(sourceState, sourcePos);

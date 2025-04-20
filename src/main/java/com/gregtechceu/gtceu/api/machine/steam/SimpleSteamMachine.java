@@ -26,7 +26,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -36,8 +35,6 @@ import com.google.common.collect.Tables;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class SimpleSteamMachine extends SteamWorkableMachine implements IExhaustVentMachine, IUIMachine {
 
@@ -128,7 +125,7 @@ public class SimpleSteamMachine extends SteamWorkableMachine implements IExhaust
     /**
      * Recipe Modifier for <b>Simple Steam Machines</b> - can be used as a valid {@link RecipeModifier}
      * <p>
-     * Recipe is rejected if tier is greater than LV or if machine cannot vent.<br>
+     * Recipe is rejected if tier is greater than LV or if machine cannot vent.<br/>
      * Duration is multiplied by {@code 2} if the machine is low pressure
      * </p>
      *

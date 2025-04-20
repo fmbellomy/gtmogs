@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.core.mixins.ShapedRecipeAccessor;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,10 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class StrictShapedRecipe extends ShapedRecipe {
 
     public static final RecipeSerializer<StrictShapedRecipe> SERIALIZER = new Serializer();

@@ -63,10 +63,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MinerMachine extends WorkableTieredMachine
                           implements IMiner, IControllable, IFancyUIMachine, IDataInfoProvider, IAutoOutputItem {
 

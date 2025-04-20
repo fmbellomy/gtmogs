@@ -15,10 +15,7 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 @Accessors(chain = true)
-@ParametersAreNonnullByDefault
 public class FluidTankProxyTrait extends MachineTrait implements IFluidHandlerModifiable, ICapabilityTrait {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(FluidTankProxyTrait.class);

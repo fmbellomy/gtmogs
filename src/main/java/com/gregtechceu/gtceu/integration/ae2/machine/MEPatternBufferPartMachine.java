@@ -41,7 +41,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.experimental.ExtensionMethod;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -83,10 +82,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class MEPatternBufferPartMachine extends MEBusPartMachine
                                         implements ICraftingProvider, PatternContainer, IDataStickInteractable {

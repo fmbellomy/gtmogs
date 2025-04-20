@@ -50,7 +50,7 @@ public class SimpleCoilType implements ICoilType, StringRepresentable {
     @Override
     @NotNull
     public String getSerializedName() {
-        return name;
+        return getName();
     }
 
     @Override

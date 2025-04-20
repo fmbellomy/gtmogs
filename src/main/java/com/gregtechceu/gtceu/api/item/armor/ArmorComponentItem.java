@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.*;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
@@ -35,10 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ArmorComponentItem extends ArmorItem implements IComponentItem {
 
     @Getter

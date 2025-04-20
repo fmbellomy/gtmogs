@@ -11,7 +11,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -26,7 +25,6 @@ import lombok.Getter;
  * @date 2023/11/4
  * @implNote ShapedEnergyTransferRecipe
  */
-@MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
 public class ShapedEnergyTransferRecipe extends ShapedRecipe {
 

@@ -24,7 +24,7 @@ public record ToolBehaviors(@Unmodifiable Map<ToolBehaviorType<?>, IToolBehavior
     public static final ToolBehaviors EMPTY = new ToolBehaviors(Map.of());
 
     public static final Codec<ToolBehaviors> CODEC = Codec
-            .dispatchedMap(GTRegistries.TOOL_BEHAVIORS.codec(), type -> (Codec<IToolBehavior<?>>) type.getCodec())
+            .dispatchedMap(GTRegistries.TOOL_BEHAVIORS.byNameCodec(), type -> (Codec<IToolBehavior<?>>) type.getCodec())
             .xmap(ToolBehaviors::new, ToolBehaviors::behaviors);
     public static final StreamCodec<RegistryFriendlyByteBuf, ToolBehaviors> STREAM_CODEC = StreamCodecUtils
             .dispatchMap(

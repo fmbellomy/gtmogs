@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.pipenet.*;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,7 +17,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class MaterialPipeBlock<
         PipeType extends Enum<PipeType> & IPipeType<NodeDataType> & IMaterialPipeType<NodeDataType>, NodeDataType,

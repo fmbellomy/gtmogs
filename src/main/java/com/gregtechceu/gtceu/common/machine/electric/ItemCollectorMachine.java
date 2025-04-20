@@ -35,7 +35,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -62,15 +61,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * @author h3tr
  * @date 2023/7/13
  * @implNote FisherMachine
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ItemCollectorMachine extends TieredEnergyMachine
                                   implements IAutoOutputItem, IFancyUIMachine, IMachineLife, IWorkable {
 

@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -34,10 +33,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class GTShovelItem extends ShovelItem implements IGTTool {
 
     @Getter

@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.data.item.GTDataComponents;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -20,10 +19,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleFluidFilter implements FluidFilter {
 
     public static final Codec<SimpleFluidFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(

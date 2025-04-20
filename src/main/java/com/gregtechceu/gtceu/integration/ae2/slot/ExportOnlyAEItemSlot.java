@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.integration.ae2.slot;
 import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
@@ -11,10 +10,6 @@ import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ExportOnlyAEItemSlot extends ExportOnlyAESlot implements IItemHandlerModifiable {
 
     public ExportOnlyAEItemSlot() {

@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.item.behavior.FacadeItemBehaviour;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -21,10 +20,6 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class FacadeCoverRecipe implements CraftingRecipe {
 
     public static final FacadeCoverRecipe INSTANCE = new FacadeCoverRecipe();

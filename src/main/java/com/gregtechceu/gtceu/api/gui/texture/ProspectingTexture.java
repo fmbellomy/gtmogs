@@ -8,7 +8,6 @@ import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.utils.ColorUtils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.AbstractTexture;
@@ -28,12 +27,9 @@ import lombok.Getter;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX_COLOR;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @OnlyIn(Dist.CLIENT)
 public class ProspectingTexture extends AbstractTexture {
 

@@ -33,8 +33,6 @@ import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 public class SimpleGeneratorMachine extends WorkableTieredMachine
                                     implements IFancyUIMachine, IEnvironmentalHazardEmitter {
 

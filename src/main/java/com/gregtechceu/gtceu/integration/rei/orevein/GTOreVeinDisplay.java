@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.integration.rei.orevein;
 
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -16,9 +16,9 @@ import java.util.List;
 
 public class GTOreVeinDisplay extends ModularDisplay<WidgetGroup> {
 
-    private final GTOreDefinition oreDefinition;
+    private final OreVeinDefinition oreDefinition;
 
-    public GTOreVeinDisplay(GTOreDefinition oreDefinition) {
+    public GTOreVeinDisplay(OreVeinDefinition oreDefinition) {
         super(() -> new GTOreVeinWidget(oreDefinition), GTOreVeinDisplayCategory.CATEGORY);
         this.oreDefinition = oreDefinition;
     }

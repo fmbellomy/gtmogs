@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.utils;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -9,10 +8,6 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class GTMath {
 
     public static long clamp(long value, long min, long max) {

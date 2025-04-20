@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.data.item.GTDataComponents;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 
 import com.mojang.serialization.Codec;
@@ -19,10 +18,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleItemFilter implements ItemFilter {
 
     public static final Codec<SimpleItemFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(

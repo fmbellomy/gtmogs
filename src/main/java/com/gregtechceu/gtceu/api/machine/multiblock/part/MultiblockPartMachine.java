@@ -14,7 +14,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.annotation.UpdateListener;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 
@@ -28,8 +27,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class MultiblockPartMachine extends MetaMachine implements IMultiPart {
 

@@ -66,10 +66,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class QuantumTankMachine extends TieredMachine implements IAutoOutputFluid, IInteractedMachine, IControllable,
                                 IDropSaveMachine, IFancyUIMachine {
 

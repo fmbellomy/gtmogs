@@ -40,7 +40,6 @@ import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * A map renderer for Journeymap, uses Journeymap's own tooltip rendering to fit existing theming better

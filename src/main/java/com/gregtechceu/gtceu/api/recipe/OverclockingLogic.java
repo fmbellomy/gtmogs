@@ -9,13 +9,11 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import org.jetbrains.annotations.NotNull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents a function that, given an initial set of {@link OCParams} and a {@code maxVoltage},
  * will produce an {@link OCResult}
  */
-@ParametersAreNonnullByDefault
 @FunctionalInterface
 public interface OverclockingLogic {
 

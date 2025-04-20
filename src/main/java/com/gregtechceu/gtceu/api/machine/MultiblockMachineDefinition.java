@@ -12,9 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.function.TriFunction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;

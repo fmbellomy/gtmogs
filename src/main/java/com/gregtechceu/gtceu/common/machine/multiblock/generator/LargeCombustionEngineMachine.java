@@ -27,7 +27,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -39,10 +38,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class LargeCombustionEngineMachine extends WorkableElectricMultiblockMachine implements ITieredMachine {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
@@ -119,7 +114,7 @@ public class LargeCombustionEngineMachine extends WorkableElectricMultiblockMach
     /**
      * Recipe Modifier for <b>Combustion Engine Multiblocks</b> - can be used as a valid {@link RecipeModifier}
      * <p>
-     * Recipe is rejected if the machine's intakes are obstructed or if it doesn't have lubricant<br>
+     * Recipe is rejected if the machine's intakes are obstructed or if it doesn't have lubricant<br/>
      * Recipe is parallelized up to {@code desiredEUt / recipeEUt} times.
      * EUt is further multiplied by the production boost of the engine.
      *

@@ -323,7 +323,7 @@ public abstract class SteamBoilerMachine extends SteamWorkableMachine
     //////////////////////////////////////
 
     @Override
-    public void animateTick(RandomSource random) {
+    public void animateTick(@NotNull RandomSource random) {
         if (isActive()) {
             final BlockPos pos = getPos();
             float x = pos.getX() + 0.5F;

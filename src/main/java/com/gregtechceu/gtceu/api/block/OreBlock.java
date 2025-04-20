@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.client.renderer.block.OreBlockRenderer;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -19,8 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.NotNull;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class OreBlock extends MaterialBlock {
 

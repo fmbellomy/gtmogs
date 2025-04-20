@@ -21,7 +21,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
@@ -33,7 +32,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class WorkableMultiblockMachine extends MultiblockControllerMachine
                                                 implements IWorkableMultiController, IMufflableMachine {

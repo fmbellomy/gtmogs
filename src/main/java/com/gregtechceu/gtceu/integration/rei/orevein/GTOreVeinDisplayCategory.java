@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.rei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
@@ -59,7 +59,7 @@ public class GTOreVeinDisplayCategory extends ModularUIDisplayCategory<GTOreVein
     }
 
     public static void registerDisplays(DisplayRegistry registry) {
-        for (GTOreDefinition oreDefinition : ClientInit.CLIENT_ORE_VEINS.values()) {
+        for (OreVeinDefinition oreDefinition : ClientInit.CLIENT_ORE_VEINS.values()) {
             registry.add(new GTOreVeinDisplay(oreDefinition));
         }
     }

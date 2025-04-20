@@ -29,7 +29,6 @@ import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -50,12 +49,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.data.material.GTMaterials.DrillingFluid;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class LargeMinerMachine extends WorkableElectricMultiblockMachine
                                implements IMiner, IControllable, IDataInfoProvider {
 

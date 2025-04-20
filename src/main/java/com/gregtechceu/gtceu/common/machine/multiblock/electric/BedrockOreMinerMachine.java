@@ -20,7 +20,6 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
@@ -30,15 +29,12 @@ import lombok.Getter;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * @author Screret
  * @date 2023/7/12
  * @implNote BedrockOreMinerMachine
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class BedrockOreMinerMachine extends WorkableElectricMultiblockMachine implements ITieredMachine {
 
     @Getter

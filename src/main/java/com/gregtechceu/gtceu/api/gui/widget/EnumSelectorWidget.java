@@ -9,7 +9,6 @@ import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.widget.CycleButtonWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 
@@ -21,13 +20,10 @@ import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * A widget for selecting a value from an enum or a subset of its values.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class EnumSelectorWidget<T extends Enum<T> & EnumSelectorWidget.SelectableEnum> extends WidgetGroup {
 
     public interface SelectableEnum {

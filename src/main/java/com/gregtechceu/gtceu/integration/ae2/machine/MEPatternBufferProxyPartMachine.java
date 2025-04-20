@@ -16,7 +16,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.TickTask;
@@ -31,10 +30,6 @@ import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class MEPatternBufferProxyPartMachine extends TieredIOPartMachine
                                              implements IMachineLife, IDataStickInteractable {
 

@@ -38,7 +38,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -59,8 +58,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Supplier;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class HPCAMachine extends WorkableElectricMultiblockMachine
                          implements IOpticalComputationProvider, IControllable {

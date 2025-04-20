@@ -185,7 +185,7 @@ public abstract class ProspectorMode<T> {
             if (savedData.getDefinition() == null) {
                 return null;
             }
-            return new FluidInfo(savedData.getDefinition().getStoredFluid().get(),
+            return new FluidInfo(savedData.getDefinition().value().getStoredFluid().get(),
                     savedData.getFluidYield(),
                     100 * savedData.getOperationsRemaining() / BedrockFluidVeinSavedData.MAXIMUM_VEIN_OPERATIONS);
         }
@@ -288,7 +288,7 @@ public abstract class ProspectorMode<T> {
                         chunk.getPos().z);
                 if (oreVein.getDefinition() != null) {
                     var left = 100 * oreVein.getOperationsRemaining() / BedrockOreVeinSavedData.MAXIMUM_VEIN_OPERATIONS;
-                    for (var entry : oreVein.getDefinition().materials()) {
+                    for (var entry : oreVein.getDefinition().value().materials()) {
                         storage[0][0] = ArrayUtils.add(storage[0][0],
                                 new OreInfo(entry.getFirst(), entry.getSecond(), left, oreVein.getOreYield()));
                     }

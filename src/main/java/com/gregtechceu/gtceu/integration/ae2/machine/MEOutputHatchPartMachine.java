@@ -19,7 +19,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import lombok.experimental.ExtensionMethod;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 
 import appeng.api.config.Actionable;
@@ -30,10 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMachineLife {
 

@@ -12,7 +12,6 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -52,10 +51,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class MaterialBlock extends AppearanceBlock {
 
     public final TagPrefix tagPrefix;
@@ -95,7 +91,6 @@ public class MaterialBlock extends AppearanceBlock {
     }
 
     /** Start falling ore stuff */
-    @SuppressWarnings("deprecation")
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (TagPrefix.ORES.containsKey(this.tagPrefix) && TagPrefix.ORES.get(tagPrefix).isSand() &&
@@ -104,7 +99,6 @@ public class MaterialBlock extends AppearanceBlock {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
                                   BlockPos currentPos, BlockPos neighborPos) {
@@ -115,7 +109,6 @@ public class MaterialBlock extends AppearanceBlock {
         return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!FallingBlock.isFree(level.getBlockState(pos.below())) || pos.getY() < level.getMinBuildHeight()) {

@@ -16,10 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 @NoArgsConstructor
-@ParametersAreNonnullByDefault
 public class HudGuiOverlay implements LayeredDraw.Layer {
 
     @Override

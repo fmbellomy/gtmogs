@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectOre;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.map.cache.DimensionCache;
@@ -13,10 +12,12 @@ import com.gregtechceu.gtceu.integration.map.cache.WorldCache;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.*;
 
@@ -81,7 +82,7 @@ public class ServerCache extends WorldCache {
             }
         }
 
-        GTNetwork.NETWORK.sendToPlayer(new SPacketProspectOre(dim, foundVeins), player);
+        PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
     }
 
     public void prospectByOreMaterial(ResourceKey<Level> dim, Material material, BlockPos origin, ServerPlayer player,
@@ -94,20 +95,21 @@ public class ServerCache extends WorldCache {
                 foundVeins.add(nearbyVein);
             }
         }
-        GTNetwork.NETWORK.sendToPlayer(new SPacketProspectOre(dim, foundVeins), player);
+        PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
     }
 
-    public void prospectByDepositName(ResourceKey<Level> dim, String depositName, BlockPos origin, ServerPlayer player,
+    public void prospectByDepositName(ResourceKey<Level> dim, ResourceLocation veinId, BlockPos origin, ServerPlayer player,
                                       int radius) {
         if (radius < 0) return;
         List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, origin, radius);
         List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
         for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
-            if (GTRegistries.ORE_VEINS.getKey(nearbyVein.definition()).toString().equals(depositName)) {
+            if (veinId.equals(GTRegistries.builtinRegistry().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY)
+                    .getKey(nearbyVein.definition()))) {
                 foundVeins.add(nearbyVein);
             }
         }
-        GTNetwork.NETWORK.sendToPlayer(new SPacketProspectOre(dim, foundVeins), player);
+        PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
     }
 
     public void prospectAllInChunk(ResourceKey<Level> dim, ChunkPos pos, ServerPlayer player) {
@@ -118,7 +120,7 @@ public class ServerCache extends WorldCache {
                 foundVeins.add(nearbyVein);
             }
         }
-        GTNetwork.NETWORK.sendToPlayer(new SPacketProspectOre(dim, foundVeins), player);
+        PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
     }
 
     public void removeAllInChunk(ResourceKey<Level> dim, ChunkPos pos) {

@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.api.transfer.fluid;
 
 import com.lowdragmc.lowdraglib.syncdata.IContentChangeAware;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.neoforged.neoforge.common.util.INBTSerializable;
@@ -12,11 +11,8 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Predicate;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class CustomFluidTank extends FluidTank
                              implements IFluidHandlerModifiable, INBTSerializable<CompoundTag>, IContentChangeAware {
 

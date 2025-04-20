@@ -9,7 +9,6 @@ import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -32,12 +31,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.utils.GTMatrixUtils.*;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class WorkableOverlayModel {
 
     public enum OverlayFace {

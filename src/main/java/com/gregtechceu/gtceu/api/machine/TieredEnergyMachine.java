@@ -16,10 +16,7 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.util.Mth;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class TieredEnergyMachine extends TieredMachine implements ITieredMachine, IExplosionMachine {
 

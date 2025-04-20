@@ -20,7 +20,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public abstract class WorkableTieredMachine extends TieredEnergyMachine implements IRecipeLogicMachine,
                                             IMachineLife, IMufflableMachine, IOverclockMachine {

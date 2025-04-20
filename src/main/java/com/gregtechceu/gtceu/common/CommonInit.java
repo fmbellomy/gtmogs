@@ -16,8 +16,12 @@ import com.gregtechceu.gtceu.api.material.material.event.MaterialRegistryEvent;
 import com.gregtechceu.gtceu.api.material.material.event.PostMaterialEvent;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGenLayers;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerators;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerators;
 import com.gregtechceu.gtceu.api.gui.factory.CoverUIFactory;
@@ -29,6 +33,7 @@ import com.gregtechceu.gtceu.common.item.DrumMachineItem;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.datafixer.GTDataFixers;
 import com.gregtechceu.gtceu.data.item.GTArmorMaterials;
+import com.gregtechceu.gtceu.data.loot.ChestGenHooks;
 import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.misc.GTDimensionMarkers;
 import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
@@ -47,7 +52,6 @@ import com.gregtechceu.gtceu.data.datagen.GTRegistrateDatagen;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.datagen.lang.MaterialLangGenerator;
-import com.gregtechceu.gtceu.data.loot.ChestGenHooks;
 import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.data.material.GTElements;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -62,14 +66,14 @@ import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.gregtechceu.gtceu.data.tools.GTToolTiers;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
-import com.gregtechceu.gtceu.integration.kjs.events.MaterialModificationEventJS;
+import com.gregtechceu.gtceu.integration.kjs.events.MaterialModificationKubeEvent;
 import com.gregtechceu.gtceu.integration.map.WaypointManager;
-import com.gregtechceu.gtceu.integration.top.forge.TheOneProbePluginImpl;
+import com.gregtechceu.gtceu.integration.top.TheOneProbePlugin;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import com.lowdragmc.lowdraglib.gui.factory.UIFactory;
 
+import mcjty.theoneprobe.api.ITheOneProbe;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
@@ -78,7 +82,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.InterModComms;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -90,15 +96,16 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
-import net.neoforged.neoforge.registries.RegisterEvent;
 
 import com.google.common.collect.Multimaps;
 import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import com.tterrag.registrate.providers.RegistrateProvider;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.List;
+import java.util.function.Function;
 
 public class CommonInit {
 
@@ -166,6 +173,7 @@ public class CommonInit {
         CustomBlockRotations.init();
         KeyBind.init();
         MachineOwner.init();
+        ChestGenHooks.init();
         GTDataFixers.init();
 
         FusionReactorMachine.registerFusionTier(GTValues.LuV, " (MKI)");
@@ -209,17 +217,10 @@ public class CommonInit {
     }
 
     @SubscribeEvent
-    public static void register(RegisterEvent event) {
-        if (event.getRegistryKey().equals(BuiltInRegistries.LOOT_FUNCTION_TYPE.key()))
-            ChestGenHooks.RandomWeightLootFunction.init();
-    }
+    public static void commonSetup(FMLCommonSetupEvent event) {}
 
     @SubscribeEvent
-    public static void commonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> {
-
-        });
-    }
+    public static void loadComplete(FMLLoadCompleteEvent event) {}
 
     @SubscribeEvent
     public static void interModProcess(InterModProcessEvent event) {

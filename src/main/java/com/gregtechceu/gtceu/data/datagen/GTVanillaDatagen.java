@@ -1,14 +1,12 @@
 package com.gregtechceu.gtceu.data.datagen;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.registry.registrate.SoundEntryBuilder;
 import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
 import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
-import com.gregtechceu.gtceu.data.worldgen.GTBiomeModifiers;
-import com.gregtechceu.gtceu.data.worldgen.GTConfiguredFeatures;
+import com.gregtechceu.gtceu.data.worldgen.*;
 import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
-import com.gregtechceu.gtceu.data.worldgen.GTPlacedFeatures;
-import com.gregtechceu.gtceu.data.worldgen.GTDensityFunctions;
 import com.gregtechceu.gtceu.data.datagen.tag.BiomeTagsLoader;
 import com.gregtechceu.gtceu.data.datagen.tag.DamageTagsLoader;
 
@@ -48,7 +46,8 @@ public class GTVanillaDatagen {
                             .add(Registries.DENSITY_FUNCTION, GTDensityFunctions::bootstrap)
                             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, GTBiomeModifiers::bootstrap)
                             .add(Registries.JUKEBOX_SONG, GTJukeboxSongs::bootstrap)
-                            .add(Registries.ENCHANTMENT_PROVIDER, GTEnchantmentProviders::bootstrap),
+                            .add(Registries.ENCHANTMENT_PROVIDER, GTEnchantmentProviders::bootstrap)
+                            .add(GTRegistries.BEDROCK_FLUID_REGISTRY, GTBedrockFluids::bootstrap),
                     set));
             generator.addProvider(true,
                     new DamageTagsLoader(packOutput, provider.getRegistryProvider(), existingFileHelper));

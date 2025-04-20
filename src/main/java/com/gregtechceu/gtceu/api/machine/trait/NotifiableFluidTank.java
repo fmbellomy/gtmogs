@@ -23,11 +23,9 @@ import lombok.Getter;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Predicate;
 
-@ParametersAreNonnullByDefault
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluidIngredient>
                                  implements ICapabilityTrait, IFluidHandlerModifiable {

@@ -29,13 +29,11 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntFunction;
 import java.util.function.Predicate;
 
-@ParametersAreNonnullByDefault
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<SizedIngredient>
                                         implements ICapabilityTrait, IItemHandlerModifiable {

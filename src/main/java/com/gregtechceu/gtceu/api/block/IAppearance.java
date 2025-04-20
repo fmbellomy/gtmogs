@@ -10,11 +10,12 @@ import org.jetbrains.annotations.Nullable;
 public interface IAppearance {
 
     /**
-     * get Appearance. same as IBlockExtension.getAppearance() / IFabricBlock.getAppearance()
+     * @see net.neoforged.neoforge.common.extensions.IBlockExtension#getAppearance(BlockState, BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
+     *      IBlockExtension#getAppearance
      */
     @Nullable
     default BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                          BlockState sourceState, BlockPos sourcePos) {
+                                          @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
         return state;
     }
 }
