@@ -1,10 +1,8 @@
 package com.gregtechceu.gtceu.data.inject;
 
 import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.data.datafixer.GTReferences;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
-import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -31,9 +29,4 @@ public class GTEnumProxies {
             (Supplier<Item>) () -> GTItems.TREATED_WOOD_CHEST_BOAT.get(),
             (Supplier<Item>) () -> Items.STICK,
             false);
-
-    public static final EnumProxy<DataFixTypes> SAVED_DATA_BEDROCK_FLUID_PROXY = new EnumProxy<>(DataFixTypes.class,
-            GTReferences.SAVED_DATA_BEDROCK_FLUID);
-    public static final EnumProxy<DataFixTypes> SAVED_DATA_BEDROCK_ORE_PROXY = new EnumProxy<>(DataFixTypes.class,
-            GTReferences.SAVED_DATA_BEDROCK_ORE);
 }

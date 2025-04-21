@@ -7,22 +7,13 @@ import net.minecraft.util.datafix.DataFixTypes;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.mojang.datafixers.DSL;
 import com.mojang.serialization.Dynamic;
-import net.neoforged.fml.common.asm.enumextension.IExtensibleEnum;
-import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 import org.spongepowered.asm.mixin.injection.At;
 
-/**
- * The required {@code getExtensionInfo()} method is
- * injected with ASM in {@link GTMixinPlugin} because Mixin doesn't allow injecting non-private static methods.
- * @see IExtensibleEnum
- * @see GTMixinPlugin#postApply(String, ClassNode, String, IMixinInfo)
- */
 @Mixin(DataFixTypes.class)
-public class DataFixTypesMixin implements net.neoforged.fml.common.asm.enumextension.IExtensibleEnum {
+public class DataFixTypesMixin {
 
     @Shadow
     @Final

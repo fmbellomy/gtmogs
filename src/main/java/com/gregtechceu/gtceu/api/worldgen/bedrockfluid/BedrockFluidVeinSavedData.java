@@ -37,8 +37,7 @@ public class BedrockFluidVeinSavedData extends SavedData {
         return serverLevel.getDataStorage()
                 .computeIfAbsent(
                         new SavedData.Factory<>(() -> new BedrockFluidVeinSavedData(serverLevel),
-                                (tag, provider) -> new BedrockFluidVeinSavedData(serverLevel, tag),
-                                GTEnumProxies.SAVED_DATA_BEDROCK_FLUID_PROXY.getValue()),
+                                (tag, provider) -> new BedrockFluidVeinSavedData(serverLevel, tag)),
                         "gtceu_bedrock_fluid");
     }
 

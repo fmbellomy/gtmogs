@@ -5,7 +5,7 @@
       "name": "GTCEU_RUBBER",
       "constructor": "(Ljava/util/function/Supplier;Ljava/lang/String;Ljava/util/function/Supplier;Ljava/util/function/Supplier;Ljava/util/function/Supplier;Z)V",
       "parameters": {
-        "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
+        "class": "com/gregtechceu/gtceu/data/inject/GTEnumProxies",
         "field": "RUBBER_BOAT_PROXY"
       }
     },
@@ -14,27 +14,8 @@
       "name": "GTCEU_TREATED_WOOD",
       "constructor": "(Ljava/util/function/Supplier;Ljava/lang/String;Ljava/util/function/Supplier;Ljava/util/function/Supplier;Ljava/util/function/Supplier;Z)V",
       "parameters": {
-        "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
+        "class": "com/gregtechceu/gtceu/data/inject/GTEnumProxies",
         "field": "TREATED_WOOD_BOAT_PROXY"
-      }
-    },
-
-    {
-      "enum": "net/minecraft/util/datafix/DataFixTypes",
-      "name": "GTCEU_SAVED_DATA_BEDROCK_FLUID",
-      "constructor": "(Lcom/mojang/datafixers/DSL$TypeReference;)V",
-      "parameters": {
-        "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
-        "field": "SAVED_DATA_BEDROCK_FLUID_PROXY"
-      }
-    },
-    {
-      "enum": "net/minecraft/util/datafix/DataFixTypes",
-      "name": "GTCEU_SAVED_DATA_BEDROCK_ORE",
-      "constructor": "(Lcom/mojang/datafixers/DSL$TypeReference;)V",
-      "parameters": {
-        "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
-        "field": "SAVED_DATA_BEDROCK_ORE_PROXY"
       }
     }
   ]

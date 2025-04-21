@@ -41,8 +41,7 @@ public class BedrockOreVeinSavedData extends SavedData {
     public static BedrockOreVeinSavedData getOrCreate(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
                 .computeIfAbsent(new SavedData.Factory<>(() -> new BedrockOreVeinSavedData(serverLevel),
-                        (tag, provider) -> new BedrockOreVeinSavedData(serverLevel, tag),
-                                GTEnumProxies.SAVED_DATA_BEDROCK_ORE_PROXY.getValue()),
+                        (tag, provider) -> new BedrockOreVeinSavedData(serverLevel, tag)),
                         "gtceu_bedrock_ore");
     }
 
