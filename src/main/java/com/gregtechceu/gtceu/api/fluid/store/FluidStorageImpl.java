@@ -87,6 +87,7 @@ public class FluidStorageImpl implements FluidStorage {
                         GTCEu.LOGGER.error("{} already has an associated fluid for material {}", material, material);
                     }
                 });
+        //noinspection DataFlowIssue
         toRegister = null;
         registered = true;
     }
@@ -101,7 +102,7 @@ public class FluidStorageImpl implements FluidStorage {
     }
 
     public @Nullable FluidEntry getEntry(@NotNull FluidStorageKey key) {
-        return map.getOrDefault(key, null);
+        return map.get(key);
     }
 
     /**

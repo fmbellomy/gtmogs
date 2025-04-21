@@ -305,7 +305,7 @@ public class FluidBuilder {
             if (fluid.getSource() instanceof GTFluid gtSource) attributes.forEach(gtSource::addAttribute);
             if (fluid.getFlowing() instanceof GTFluid gtFlowing) attributes.forEach(gtFlowing::addAttribute);
         });
-        return builder.register();
+        return builder.register()::getSource;
     }
 
     private void determineName(@NotNull Material material, @Nullable FluidStorageKey key) {

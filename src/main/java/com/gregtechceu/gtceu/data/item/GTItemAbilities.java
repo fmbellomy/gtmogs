@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.data.item;
 
 import com.google.common.collect.Sets;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import kroppeb.stareval.Util;
+import net.minecraft.Util;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.extensions.IBlockExtension;

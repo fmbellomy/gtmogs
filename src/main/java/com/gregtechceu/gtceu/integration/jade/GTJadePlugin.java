@@ -18,6 +18,7 @@ import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
+import java.util.List;
 import java.util.Objects;
 
 @WailaPlugin
@@ -83,11 +84,17 @@ public class GTJadePlugin implements IWailaPlugin {
 
     static {
         GTMaterialItems.TOOL_ITEMS.columnMap().forEach((type, map) -> {
-            if (type.harvestTags.isEmpty() || type.harvestTags.getFirst().location().getNamespace().equals("minecraft"))
-                return;
-            HarvestToolProvider.registerHandler(SimpleToolHandler.create(GTCEu.id(type.name), map.values().stream()
-                    .filter(Objects::nonNull).filter(ItemProviderEntry::isBound)
-                    .map(ItemProviderEntry::asItem).toList()));
+            if (type.toolDefinition.getTool().rules().isEmpty() || map.isEmpty()) return;
+
+            List<Item> tools = map
+                    .values()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .filter(ItemProviderEntry::isBound)
+                    .map(ItemProviderEntry::asItem)
+                    .toList();
+            if (tools.isEmpty()) return;
+            HarvestToolProvider.registerHandler(SimpleToolHandler.create(GTCEu.id(type.name), tools, true));
         });
     }
 }

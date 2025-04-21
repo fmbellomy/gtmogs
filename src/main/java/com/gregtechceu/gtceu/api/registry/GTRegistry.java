@@ -22,8 +22,6 @@ import java.util.*;
 @SuppressWarnings("UnusedReturnValue")
 public class GTRegistry<T> extends MappedRegistry<T> {
 
-    public static final Map<ResourceKey<?>, GTRegistry<?>> REGISTERED = new HashMap<>();
-
     public GTRegistry(ResourceLocation registryName) {
         this(ResourceKeyAccessor.callCreate(GTRegistries.ROOT_GT_REGISTRY_NAME, registryName));
     }
@@ -31,7 +29,9 @@ public class GTRegistry<T> extends MappedRegistry<T> {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public GTRegistry(ResourceKey<? extends Registry<T>> registryKey) {
         super(registryKey, Lifecycle.stable());
-        GTRegistries.ROOT.register((ResourceKey) registryKey, this, RegistrationInfo.BUILT_IN);
+        if (!registryKey.location().equals(GTRegistries.ROOT_GT_REGISTRY_NAME)) {
+            GTRegistries.ROOT.register((ResourceKey) registryKey, this, RegistrationInfo.BUILT_IN);
+        }
     }
 
     @Override

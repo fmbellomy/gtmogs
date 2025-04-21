@@ -1,12 +1,7 @@
 package com.gregtechceu.gtceu.core.mixins;
 
-import net.neoforged.fml.common.asm.enumextension.ExtensionInfo;
 import net.neoforged.fml.loading.LoadingModList;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
@@ -31,8 +26,16 @@ public class GTMixinPlugin implements IMixinConfigPlugin {
             return LoadingModList.get().getModFileById("theoneprobe") != null;
         } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.jei")) {
             return LoadingModList.get().getModFileById("jei") != null;
-        } else if (mixinClassName.contains("com.gregtechceu.gtceu.core.mixins.emi")) {
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.emi")) {
             return LoadingModList.get().getModFileById("emi") != null;
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.ftbchunks")) {
+            return LoadingModList.get().getModFileById("ftbchunks") != null;
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.theoneprobe")) {
+            return LoadingModList.get().getModFileById("ftbchunks") != null;
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.xaerominimap")) {
+            return LoadingModList.get().getModFileById("xaerominimap") != null;
+        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.xaeroworldmap")) {
+            return LoadingModList.get().getModFileById("xaeroworldmap") != null;
         }
         return true;
     }

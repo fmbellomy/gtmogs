@@ -219,7 +219,7 @@ public class CommonInit {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void registerCapabilities(RegisterCapabilitiesEvent event) {
+    public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         for (Block block : BuiltInRegistries.BLOCK) {
             if (ConfigHolder.INSTANCE.compat.energy.nativeEUToFE &&
                     event.isBlockRegistered(Capabilities.EnergyStorage.BLOCK, block)) {

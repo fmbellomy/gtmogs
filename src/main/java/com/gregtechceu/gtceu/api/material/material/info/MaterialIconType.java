@@ -13,6 +13,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -154,7 +155,7 @@ public record MaterialIconType(String name) {
             }
         }
 
-        suffix = suffix == null || suffix.isBlank() ? "" : "_" + suffix;
+        suffix = Strings.isBlank(suffix) ? "" : "_" + suffix;
 
         MaterialIconSet iconSet = materialIconSet;
         // noinspection ConstantConditions

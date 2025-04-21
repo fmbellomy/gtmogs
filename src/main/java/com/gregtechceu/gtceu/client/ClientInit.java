@@ -73,7 +73,7 @@ public class ClientInit {
     }
 
     @SubscribeEvent
-    public void onClientSetup(FMLClientSetupEvent event) {
+    public static void onClientSetup(FMLClientSetupEvent event) {
         MachineOwner.init();
         if (ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration &&
                 GTCEu.isModLoaded(GTValues.MODID_FTB_CHUNKS)) {

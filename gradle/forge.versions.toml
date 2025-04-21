@@ -69,7 +69,7 @@ architectury        = { module = "dev.architectury:architectury-neoforge", versi
 clothconfig         = { module = "me.shedaniel.cloth:cloth-config-neoforge", version.ref = "clothconfig" }
 theoneprobe         = { module = "mcjty.theoneprobe:theoneprobe", version.ref = "theoneprobe" }
 curios              = { module = "top.theillusivec4.curios:curios-neoforge", version.ref = "curios" }
-kotlinforforge      = { module = "thedarkcolour:kotlinforforge", version.ref = "kotlinforforge" }
+kotlinforforge      = { module = "thedarkcolour:kotlinforforge-neoforge", version.ref = "kotlinforforge" }
 journeymap-api      = { module = "info.journeymap:journeymap-api-neoforge", version.ref = "journeyMapApi" }
 shimmer             = { module = "com.lowdragmc.shimmer:Shimmer-forge", version.ref = "shimmer" }
 ftblibrary          = { module = "dev.ftb.mods:ftb-library-neoforge", version.ref = "ftblibrary" }
