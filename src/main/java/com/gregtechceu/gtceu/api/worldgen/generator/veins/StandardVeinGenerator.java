@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -49,7 +50,7 @@ public class StandardVeinGenerator extends VeinGenerator {
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("deep_block").forGetter(ext -> ext.deepBlock.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block").forGetter(ext -> ext.netherBlock.get())
     ).apply(instance, StandardVeinGenerator::new));
-    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
+    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec())
             .fieldOf("targets")
             .xmap(StandardVeinGenerator::new, StandardVeinGenerator::getBlocks);
     // spotless:on

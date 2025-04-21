@@ -64,10 +64,10 @@ public class ToggleEnergyConsumerBehavior implements IInteractionItem, IItemLife
     }
 
     public static boolean isItemActive(ItemStack itemStack) {
-        return itemStack.getOrDefault(GTDataComponents.TOOL_MODE, false);
+        return itemStack.getOrDefault(GTDataComponents.ACTIVE, false);
     }
 
     public static void setItemActive(ItemStack itemStack, boolean isActive) {
-        itemStack.set(GTDataComponents.TOOL_MODE, isActive);
+        itemStack.set(GTDataComponents.ACTIVE, isActive);
     }
 }

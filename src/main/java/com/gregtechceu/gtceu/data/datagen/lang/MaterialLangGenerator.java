@@ -1,16 +1,17 @@
 package com.gregtechceu.gtceu.data.datagen.lang;
 
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
-
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 
 import static com.gregtechceu.gtceu.utils.FormattingUtil.toEnglishName;
 
 public class MaterialLangGenerator {
 
-    public static void generate(RegistrateLangProvider provider, MaterialRegistry registry) {
-        for (Material material : registry.getAllMaterials())
-            provider.add(material.getUnlocalizedName(), toEnglishName(material.getName()));
+    public static void generate(RegistrateLangProvider provider, final String modId) {
+        GTCEuAPI.materialManager.stream()
+                .filter(mat -> mat.getModid().equals(modId))
+                .forEach(material -> {
+                    provider.add(material.getUnlocalizedName(), toEnglishName(material.getName()));
+                });
     }
 }

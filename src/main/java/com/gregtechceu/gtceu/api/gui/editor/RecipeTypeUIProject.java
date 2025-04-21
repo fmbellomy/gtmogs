@@ -100,7 +100,7 @@ public class RecipeTypeUIProject extends UIProject {
                 new UIMainPanel(editor, root, recipeType == null ? null : recipeType.getTranslationKey()));
         for (WidgetToolBox.Default tab : WidgetToolBox.Default.TABS) {
             editor.getToolPanel().addNewToolBox("ldlib.gui.editor.group." + tab.groupName, tab.icon,
-                    tab.createToolBox());
+                    tab::createToolBox);
         }
     }
 

@@ -219,8 +219,8 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
     }
 
     @Override
-    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot,
-                                            ArmorMaterial.Layer layer) {
+    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                            EquipmentSlot slot, ArmorMaterial.Layer layer) {
         return GTCEu.id("textures/armor/advanced_nano_muscle_suite_1.png");
     }
 

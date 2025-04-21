@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.indicators;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
@@ -46,7 +46,7 @@ import java.util.stream.Stream;
 public class SurfaceIndicatorGenerator extends IndicatorGenerator {
 
     public static final MapCodec<SurfaceIndicatorGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.either(BlockState.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("block")
+            Codec.either(BlockState.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("block")
                     .forGetter(ext -> ext.block),
             IntProvider.codec(1, 32).fieldOf("radius").forGetter(ext -> ext.radius),
             FloatProvider.codec(0.0f, 2.0f).fieldOf("density").forGetter(ext -> ext.density),
@@ -219,7 +219,7 @@ public class SurfaceIndicatorGenerator extends IndicatorGenerator {
         }
 
         @Override
-        public String getSerializedName() {
+        public @NotNull String getSerializedName() {
             return name().toLowerCase(Locale.ROOT);
         }
 

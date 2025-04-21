@@ -21,7 +21,6 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockAndTintGetter;
@@ -38,16 +37,9 @@ import org.joml.Quaternionf;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/2/24
- * @implNote FacadeRenderer
- *           It can only be used for item.
- *           call it in other renderer to render a facade cover.
- */
 public class FacadeCoverRenderer implements ICoverRenderer {
 
-    public final static FacadeCoverRenderer INSTANCE = new FacadeCoverRenderer();
+    public static final FacadeCoverRenderer INSTANCE = new FacadeCoverRenderer();
 
     protected FacadeCoverRenderer() {}
 
@@ -62,12 +54,8 @@ public class FacadeCoverRenderer implements ICoverRenderer {
     public void renderItem(ItemStack stack, ItemDisplayContext transformType, boolean leftHand, PoseStack matrixStack,
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         var mc = Minecraft.getInstance();
-        var renderItem = FacadeItemBehaviour.getFacadeStack(stack);
-        BlockState blockState = null;
-        if (renderItem.getItem() instanceof BlockItem blockItem) {
-            blockState = blockItem.getBlock().defaultBlockState();
-        }
-        if (blockState != null && mc.level != null) {
+        BlockState blockState = FacadeItemBehaviour.getFacadeState(stack);
+        if (mc.level != null) {
             model = mc.getBlockRenderer().getBlockModel(blockState);
             if (!model.isCustomRenderer()) {
                 matrixStack.pushPose();

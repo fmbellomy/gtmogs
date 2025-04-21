@@ -83,14 +83,18 @@ public class MachineRenderer extends TextureOverrideRenderer
                     new ItemBakedModel() {
 
                         @Override
-                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction, RandomSource random) {
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state,
+                                                                 @Nullable Direction direction,
+                                                                 @NotNull RandomSource random) {
                             return getQuads(state, direction, random, ModelData.EMPTY, null);
                         }
 
                         @Override
                         @OnlyIn(Dist.CLIENT)
-                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction,
-                                                                 @NotNull RandomSource random, @NotNull ModelData data, RenderType renderType) {
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state,
+                                                                 @Nullable Direction direction,
+                                                                 @NotNull RandomSource random,
+                                                                 @NotNull ModelData data, RenderType renderType) {
                             List<BakedQuad> quads = new LinkedList<>();
                             renderMachine(quads, machineItem.getDefinition(), null, Direction.NORTH, direction, random,
                                     direction, BlockModelRotation.X0_Y0, data, renderType);
@@ -190,7 +194,9 @@ public class MachineRenderer extends TextureOverrideRenderer
                               @NotNull RandomSource rand, @Nullable Direction modelFacing,
                               ModelState modelState, @NotNull ModelData data, RenderType renderType) {
         if (!(machine instanceof IMultiPart part) || !part.replacePartModelWhenFormed() ||
-                !renderReplacedPartMachine(quads, part, frontFacing, side, rand, modelFacing, modelState)) {
+                !renderReplacedPartMachine(quads,
+                        part, frontFacing, side, rand, modelFacing,
+                        modelState, data, renderType)) {
             renderBaseModel(quads, definition, machine, modelState, side, rand, data, renderType);
         }
     }

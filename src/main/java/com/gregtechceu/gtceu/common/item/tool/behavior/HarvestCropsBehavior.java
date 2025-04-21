@@ -14,7 +14,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,8 +25,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 import com.google.common.collect.ImmutableSet;
 import net.neoforged.neoforge.common.ItemAbility;
@@ -56,40 +53,31 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
             return InteractionResult.PASS;
         }
 
+        Level level = context.getLevel();
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
-        InteractionHand hand = context.getHand();
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
 
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
         Set<BlockPos> blocks;
-
-        if (aoeDefinition.isNone()) {
+        if (aoeDefinition.isNone() || player == null) {
             blocks = ImmutableSet.of(pos);
         } else {
-            HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
-
-            if (rayTraceResult.getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
-            if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                return InteractionResult.PASS;
-
-            blocks = ToolHelper.iterateAoE(stack, aoeDefinition, player.level(), player, rayTraceResult,
+            blocks = ToolHelper.iterateAoE(stack, aoeDefinition, level, player, context.getHitResult(),
                     HarvestCropsBehavior::isBlockCrops);
-            if (isBlockCrops(stack, context.getLevel(), player, blockHitResult.getBlockPos(), context)) {
-                blocks.add(blockHitResult.getBlockPos());
-            }
+            blocks.add(pos);
         }
 
         boolean harvested = false;
         for (BlockPos blockPos : blocks) {
-            if (harvestBlockRoutine(stack, blockPos, player)) {
+            if (harvestBlockRoutine(stack, blockPos, level, player)) {
                 harvested = true;
             }
         }
 
-        return harvested ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        return harvested ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
     }
 
     private static boolean isBlockCrops(ItemStack stack, Level world, Player player, BlockPos pos,
@@ -101,8 +89,7 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
         return false;
     }
 
-    private static boolean harvestBlockRoutine(ItemStack stack, BlockPos pos, Player player) {
-        var level = player.level();
+    private static boolean harvestBlockRoutine(ItemStack stack, BlockPos pos, Level level, @Nullable Player player) {
         var blockState = level.getBlockState(pos);
         var block = blockState.getBlock();
         var cropBlock = (CropBlock) block;
@@ -122,10 +109,8 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
             }
             dropListOfItems(level, pos, drops);
             level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(blockState));
-            level.setBlock(pos, cropBlock.getStateForAge(0), Block.UPDATE_ALL);
-            if (!player.isCreative()) {
-                ToolHelper.damageItem(stack, player);
-            }
+            level.setBlock(pos, cropBlock.getStateForAge(0), Block.UPDATE_ALL_IMMEDIATE);
+            ToolHelper.damageItem(stack, player);
             return true;
         }
 

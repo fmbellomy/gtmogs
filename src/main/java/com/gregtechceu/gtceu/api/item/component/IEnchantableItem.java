@@ -10,5 +10,5 @@ public interface IEnchantableItem {
 
     int getEnchantmentValue(ItemStack stack);
 
-    boolean canApplyAtEnchantingTable(ItemStack stack, Holder<Enchantment> enchantment);
+    boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment);
 }

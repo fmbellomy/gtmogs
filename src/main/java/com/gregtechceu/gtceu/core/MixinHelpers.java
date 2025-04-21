@@ -145,7 +145,7 @@ public class MixinHelpers {
                         GTValues.CUSTOM_TAG_SOURCE));
             }
         } else if (registry == BuiltInRegistries.FLUID) {
-            for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+            for (Material material : GTCEuAPI.materialManager) {
                 if (material.hasProperty(PropertyKey.FLUID)) {
                     FluidProperty property = material.getProperty(PropertyKey.FLUID);
                     for (FluidStorageKey key : FluidStorageKey.allKeys()) {

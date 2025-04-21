@@ -66,8 +66,8 @@ public interface IArmorLogic {
         return 0xFFFFFF;
     }
 
-    @Nullable
-    ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer);
+    @Nullable ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                               EquipmentSlot slot, ArmorMaterial.Layer layer);
 
     @NotNull
     default HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot,

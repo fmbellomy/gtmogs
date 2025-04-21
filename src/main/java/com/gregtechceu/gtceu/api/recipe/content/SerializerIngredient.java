@@ -1,15 +1,12 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
 
-import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Dynamic;
-import com.mojang.serialization.JsonOps;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 public class SerializerIngredient implements IContentSerializer<SizedIngredient> {
@@ -20,23 +17,13 @@ public class SerializerIngredient implements IContentSerializer<SizedIngredient>
     private SerializerIngredient() {}
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf, SizedIngredient content) {
-        content.toNetwork(buf);
+    public void toNetwork(RegistryFriendlyByteBuf buf, SizedIngredient content) {
+        SizedIngredient.STREAM_CODEC.encode(buf, content);
     }
 
     @Override
-    public SizedIngredient fromNetwork(FriendlyByteBuf buf) {
-        return Ingredient.fromNetwork(buf);
-    }
-
-    @Override
-    public SizedIngredient fromJson(JsonElement json) {
-        return Ingredient.fromJson(json);
-    }
-
-    @Override
-    public JsonElement toJson(SizedIngredient content) {
-        return content.toJson();
+    public SizedIngredient fromNetwork(RegistryFriendlyByteBuf buf) {
+        return SizedIngredient.STREAM_CODEC.decode(buf);
     }
 
     @Override

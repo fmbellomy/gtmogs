@@ -358,8 +358,7 @@ public class GTRecipeType implements RecipeType<GTRecipe> {
          * @return A custom recipe to run given the current holder's inputs. Will be called only if a registered
          *         recipe is not found to run. Return null if no recipe should be run by your logic.
          */
-        @Nullable
-        GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder);
+        @Nullable GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder);
 
         /**
          * Build all representative recipes in this method, then add them to the appropriate recipe category.

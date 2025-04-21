@@ -57,10 +57,9 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
     @Override
     public MachineDefinition createObject() {
         tieredBuilder.createObject();
-        //noinspection DataFlowIssue
         for (var def : tieredBuilder.get()) {
             if (def != null) {
-                return value = def;
+                return def;
             }
         }
         // should never happen.

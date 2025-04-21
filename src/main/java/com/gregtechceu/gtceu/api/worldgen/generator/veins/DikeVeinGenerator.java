@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -187,7 +188,7 @@ public class DikeVeinGenerator extends VeinGenerator {
 
         // spotless:off
         public static final Codec<DikeBlockDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        Codec.either(TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec()).fieldOf("block").forGetter(x -> x.block),
+                        Codec.either(TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("block").forGetter(x -> x.block),
                         Codec.INT.fieldOf("weight").forGetter(x -> x.weight),
                         Codec.INT.fieldOf("min_y").orElse(320).forGetter(x -> x.minY),
                         Codec.INT.fieldOf("max_y").orElse(-64).forGetter(x -> x.maxY))

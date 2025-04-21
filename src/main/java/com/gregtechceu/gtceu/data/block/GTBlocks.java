@@ -698,7 +698,7 @@ public class GTBlocks {
             .properties(p -> p.mapColor(MapColor.FIRE).instabreak().sound(SoundType.GRASS).ignitedByLava())
             .tag(BlockTags.MINEABLE_WITH_AXE)
             .blockstate((ctx, prov) -> prov.simpleBlock(ctx.get(), prov.models().cubeBottomTop(ctx.getName(),
-                    GTCEu.id("block/misc/industrial_tnt_side"),
+                    prov.blockTexture(ctx.get()).withSuffix("_side"),
                     ResourceLocation.withDefaultNamespace("block/tnt_bottom"),
                     ResourceLocation.withDefaultNamespace("block/tnt_top"))))
             .simpleItem()
@@ -721,7 +721,7 @@ public class GTBlocks {
         TreeGrower treeGrower = new TreeGrower(
                 GTCEu.id("rubber").toString(),
                 Optional.empty(),
-                Optional.of(GTConfiguredFeatures.RUBBER),
+                Optional.of(GTConfiguredFeatures.RUBBER_TREE),
                 Optional.empty()
         );
         return new SaplingBlock(treeGrower, properties);

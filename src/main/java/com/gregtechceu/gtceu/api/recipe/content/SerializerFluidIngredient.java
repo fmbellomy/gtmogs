@@ -34,18 +34,6 @@ public class SerializerFluidIngredient implements IContentSerializer<SizedFluidI
     }
 
     @Override
-    public SizedFluidIngredient fromJson(JsonElement json) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        return SizedFluidIngredient.NESTED_CODEC.parse(ops, json).getOrThrow();
-    }
-
-    @Override
-    public JsonElement toJson(SizedFluidIngredient content) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        return SizedFluidIngredient.NESTED_CODEC.encodeStart(ops, content).getOrThrow();
-    }
-
-    @Override
     public SizedFluidIngredient of(Object o) {
         if (o instanceof SizedFluidIngredient ingredient) {
             return ingredient.copy();

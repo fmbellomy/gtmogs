@@ -37,6 +37,7 @@ import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
 import lombok.experimental.ExtensionMethod;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.chat.Component;
@@ -174,8 +175,8 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
             if (!prefix.isEmpty() && TagPrefix.ORES.containsKey(prefix)) {
                 Material material = ChemicalHelper.getMaterialStack(stack.getItem()).material();
                 ingredients.add(new MapItemIntersectionIngredient((IntersectionIngredient) IntersectionIngredient
-                        .of(Ingredient.of(prefix.getItemTags(material)[0]),
-                                Ingredient.of(prefix.getItemParentTags()[0]))
+                        .of(Ingredient.of(prefix.getItemTags(material).getFirst()),
+                                Ingredient.of(prefix.getItemParentTags().getFirst()))
                         .getCustomIngredient()));
             }
         }
@@ -426,7 +427,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                 Set<ItemStack> cache = new ObjectOpenCustomHashSet<>(ItemStackHashStrategy.comparingItem());
                 if (possibleRecipes != null) {
                     for (GTRecipe r : possibleRecipes) {
-                        Content outputContent = r.getOutputContents(ItemRecipeCapability.CAP).get(0);
+                        Content outputContent = r.getOutputContents(ItemRecipeCapability.CAP).getFirst();
                         ItemStack researchStack = ItemRecipeCapability.CAP.of(outputContent.content).getItems()[0];
                         if (!cache.contains(researchStack)) {
                             cache.add(researchStack);
@@ -434,7 +435,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                         }
                     }
                 }
-                scannerPossibilities.add(entryLists.get(0));
+                scannerPossibilities.add(entryLists.getFirst());
             }
         }
 
@@ -593,7 +594,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
     private static @Nullable ItemTagList tryMapTag(final Ingredient ingredient, int amount) {
         var values = ingredient.getValues();
         if (values.length > 0 && values[0] instanceof Ingredient.TagValue(TagKey<Item> tag)) {
-            return ItemTagList.of(tag, amount, null);
+            return ItemTagList.of(tag, amount, DataComponentPatch.EMPTY);
         }
         return null;
     }

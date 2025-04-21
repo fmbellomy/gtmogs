@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid;
 
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredientEquality;
 import com.gregtechceu.gtceu.api.recipe.lookup.AbstractMapIngredient;
 
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
@@ -20,7 +19,6 @@ public class MapFluidIntersectionIngredient extends AbstractMapIngredient {
     public MapFluidIntersectionIngredient(IntersectionFluidIngredient ingredient) {
         this.intersectionIngredient = ingredient;
         this.ingredients = new ArrayList<>(ingredient.children());
-        this.ingredients.sort(FluidIngredientEquality.INGREDIENT_COMPARATOR);
     }
 
     @Override

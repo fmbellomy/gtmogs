@@ -71,7 +71,7 @@ public class ThermalFluidStats implements IItemComponent, IComponentCapability, 
             tooltipComponents
                     .add(Component.translatable("gtceu.universal.tooltip.fluid_stored", tank.getHoverName(),
                             tank.getAmount()));
-            TooltipsHandler.appendFluidTooltips(tank, tooltipComponents::add, null);
+            TooltipsHandler.appendFluidTooltips(tank, tooltipComponents::add, isAdvanced, context);
         }, () -> {
             tooltipComponents.add(Component.translatable("gtceu.universal.tooltip.fluid_storage_capacity",
                     FormattingUtil.formatNumbers(capacity)));

@@ -41,6 +41,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Consumer;
 
+@SuppressWarnings({ "unchecked", "rawtypes" })
 public class ProspectingMapWidget extends WidgetGroup implements SearchComponentWidget.IWidgetSearch<Object> {
 
     private final int chunkRadius;
@@ -246,7 +247,6 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
             List<Object[]> items = new ArrayList<>();
             for (int i = 0; i < mode.cellSize; i++) {
                 for (int j = 0; j < mode.cellSize; j++) {
-                    assert texture != null;
                     if (texture.data[cX * mode.cellSize + i][cZ * mode.cellSize + j] != null) {
                         items.add(texture.data[cX * mode.cellSize + i][cZ * mode.cellSize + j]);
                     }
@@ -324,9 +324,9 @@ public class ProspectingMapWidget extends WidgetGroup implements SearchComponent
         if (!vein.isEmpty()) {
             vein.sort((o1, o2) -> (int) (o1.center().distToCenterSqr(xPos, o1.center().getY(), zPos) -
                     o2.center().distToCenterSqr(xPos, o2.center().getY(), zPos)));
-            var name = OreRenderLayer.getName(vein.get(0)).getString();
-            var materials = vein.get(0).definition().veinGenerator().getAllMaterials();
-            var mostCommonItem = materials.get(materials.size() - 1);
+            var name = OreRenderLayer.getName(vein.getFirst()).getString();
+            var materials = vein.getFirst().definition().value().veinGenerator().getAllMaterials();
+            var mostCommonItem = materials.getLast();
             var color = mostCommonItem.getMaterialRGB();
             return new WaypointItem(blockPos, name, color);
         }

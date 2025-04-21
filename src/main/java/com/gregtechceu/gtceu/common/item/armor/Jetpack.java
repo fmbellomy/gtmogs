@@ -104,8 +104,8 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
     }
 
     @Override
-    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot,
-                                            ArmorMaterial.Layer layer) {
+    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                            EquipmentSlot slot, ArmorMaterial.Layer layer) {
         return GTCEu.id("textures/armor/jetpack.png");
     }
 

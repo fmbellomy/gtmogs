@@ -9,18 +9,21 @@ import com.gregtechceu.gtceu.api.item.component.IItemComponent;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
@@ -29,13 +32,8 @@ import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.function.Consumer;
 
 public final class ResearchManager {
-
-    public static final String RESEARCH_NBT_TAG = "assembly_line_research";
-    public static final String RESEARCH_ID_NBT_TAG = "research_id";
-    public static final String RESEARCH_TYPE_NBT_TAG = "research_type";
 
     @NotNull
     public static ItemStack getDefaultScannerItem() {
@@ -53,15 +51,12 @@ public final class ResearchManager {
     private ResearchManager() {}
 
     /**
-     * @param stackCompound the compound contained on the ItemStack to write to
-     * @param researchId    the research id
+     * @param stack      the ItemStack to write to
+     * @param researchId the research id
      */
-    public static void writeResearchToNBT(@NotNull CompoundTag stackCompound, @NotNull String researchId,
-                                          GTRecipeType recipeType) {
-        CompoundTag compound = new CompoundTag();
-        compound.putString(RESEARCH_ID_NBT_TAG, researchId);
-        compound.putString(RESEARCH_TYPE_NBT_TAG, recipeType.registryName.toString());
-        stackCompound.put(RESEARCH_NBT_TAG, compound);
+    public static void writeResearchToComponent(@NotNull ItemStack stack, @NotNull String researchId,
+                                                GTRecipeType recipeType) {
+        stack.set(GTDataComponents.RESEARCH_ITEM, new ResearchItem(researchId, recipeType.registryName));
     }
 
     /**
@@ -70,15 +65,12 @@ public final class ResearchManager {
      */
     @Nullable
     public static Pair<GTRecipeType, String> readResearchId(@NotNull ItemStack stack) {
-        CompoundTag compound = stack.getTag();
-        if (!hasResearchTag(compound)) return null;
+        ResearchItem researchItem = stack.get(GTDataComponents.RESEARCH_ITEM);
+        if (researchItem == null) return null;
 
-        CompoundTag researchCompound = compound.getCompound(RESEARCH_NBT_TAG);
-        String researchId = researchCompound.getString(RESEARCH_ID_NBT_TAG);
-        ResourceLocation researchRecipeType = ResourceLocation
-                .tryParse(researchCompound.getString(RESEARCH_TYPE_NBT_TAG));
-        return researchId.isEmpty() || researchRecipeType == null ? null :
-                Pair.of(GTRegistries.RECIPE_TYPES.get(researchRecipeType), researchId);
+        ResourceLocation researchRecipeType = researchItem.researchRecipeType;
+        return researchItem.researchId.isEmpty() ? null :
+                Pair.of(GTRegistries.RECIPE_TYPES.get(researchRecipeType), researchItem.researchId);
     }
 
     /**
@@ -102,16 +94,7 @@ public final class ResearchManager {
      * @return if the stack has the research CompoundTag
      */
     public static boolean hasResearchTag(@NotNull ItemStack stack) {
-        return hasResearchTag(stack.getTag());
-    }
-
-    /**
-     * @param compound the compound to check
-     * @return if the tag has the research CompoundTag
-     */
-    private static boolean hasResearchTag(@Nullable CompoundTag compound) {
-        if (compound == null || compound.isEmpty()) return false;
-        return compound.contains(RESEARCH_NBT_TAG, Tag.TAG_COMPOUND);
+        return stack.has(GTDataComponents.RESEARCH_ITEM);
     }
 
     /**
@@ -134,11 +117,10 @@ public final class ResearchManager {
                                                    int duration, int EUt, int CWUt, RecipeOutput provider) {
         if (!ConfigHolder.INSTANCE.machines.enableResearch) return;
 
-        CompoundTag compound = dataItem.getComponentsPatch();
-        writeResearchToNBT(compound, researchId, recipeType);
+        writeResearchToComponent(dataItem, researchId, recipeType);
 
         if (CWUt > 0) {
-            GTRecipeTypes.RESEARCH_STATION_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
+            GTRecipeTypes.RESEARCH_STATION_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnder(researchId))
                     .inputItems(dataItem.getItem())
                     .inputItems(researchItem)
                     .outputItems(dataItem)
@@ -147,7 +129,7 @@ public final class ResearchManager {
                     .totalCWU(duration)
                     .save(provider);
         } else {
-            GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
+            GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnder(researchId))
                     .inputItems(dataItem.getItem())
                     .inputItems(researchItem)
                     .outputItems(dataItem)
@@ -158,13 +140,25 @@ public final class ResearchManager {
         }
     }
 
+    public record ResearchItem(String researchId, ResourceLocation researchRecipeType) {
+
+        public static final Codec<ResearchItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.STRING.fieldOf("research_id").forGetter(ResearchItem::researchId),
+                ResourceLocation.CODEC.fieldOf("research_type").forGetter(ResearchItem::researchRecipeType)
+        ).apply(instance, ResearchItem::new));
+        public static final StreamCodec<ByteBuf, ResearchItem> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.STRING_UTF8, ResearchItem::researchId,
+                ResourceLocation.STREAM_CODEC, ResearchItem::researchRecipeType,
+                ResearchItem::new);
+    }
+
     public static class DataStickCopyScannerLogic implements GTRecipeType.ICustomRecipeLogic {
 
         private static final int EUT = 2;
         private static final int DURATION = 100;
 
         @Override
-        public GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder) {
+        public @Nullable GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder) {
             var itemInputs = holder.getCapabilitiesFlat(IO.IN, ItemRecipeCapability.CAP).stream()
                     .filter(IItemHandlerModifiable.class::isInstance)
                     .map(IItemHandlerModifiable.class::cast)
@@ -180,9 +174,8 @@ public final class ResearchManager {
             return null;
         }
 
-        private GTRecipe createDataRecipe(@NotNull ItemStack first, @NotNull ItemStack second) {
+        private @Nullable GTRecipe createDataRecipe(@NotNull ItemStack first, @NotNull ItemStack second) {
             DataComponentPatch patch = second.getComponentsPatch();
-            if (patch.isEmpty()) return null;
 
             // Both must be data items
             if (!isStackDataItem(first, true)) return null;

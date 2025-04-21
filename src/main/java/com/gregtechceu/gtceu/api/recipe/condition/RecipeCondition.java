@@ -84,7 +84,7 @@ public abstract class RecipeCondition<T extends RecipeCondition<T>> {
         buf.writeBoolean(isReverse);
     }
 
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public RecipeCondition<T> fromNetwork(RegistryFriendlyByteBuf buf) {
         isReverse = buf.readBoolean();
         return this;
     }

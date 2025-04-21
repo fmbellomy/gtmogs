@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
@@ -40,6 +39,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ import java.util.stream.Stream;
 public class VeinedVeinGenerator extends VeinGenerator {
 
     public static final Codec<Either<List<OreConfiguration.TargetBlockState>, Material>> BLOCK_ENTRY_CODEC = Codec
-            .either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec());
+            .either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec());
     // spotless:off
     public static final MapCodec<VeinedVeinGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             VeinBlockDefinition.CODEC.listOf().fieldOf("ore_blocks").forGetter(it -> it.oreBlocks),
@@ -113,7 +113,7 @@ public class VeinedVeinGenerator extends VeinGenerator {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
         Registry<? extends DensityFunction> densityFunctions = GTRegistries.builtinRegistry()
-                .registry(Registries.DENSITY_FUNCTION).get();
+                .registryOrThrow(Registries.DENSITY_FUNCTION);
 
         List<? extends Map.Entry<Integer, VeinBlockDefinition>> commonEntries = oreBlocks.stream()
                 .map(b -> Map.entry(b.weight, b)).toList();
@@ -329,12 +329,12 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return function.mapAll(new DensityFunction.Visitor() {
 
             @Override
-            public DensityFunction apply(DensityFunction densityFunction) {
+            public @NotNull DensityFunction apply(@NotNull DensityFunction densityFunction) {
                 return densityFunction;
             }
 
             @Override
-            public DensityFunction.NoiseHolder visitNoise(DensityFunction.NoiseHolder noiseHolder) {
+            public DensityFunction.@NotNull NoiseHolder visitNoise(DensityFunction.@NotNull NoiseHolder noiseHolder) {
                 var holder = noiseHolder.noiseData();
                 var noise = randomState.getOrCreateNoise(holder.unwrapKey().orElseThrow());
                 return new DensityFunction.NoiseHolder(holder, noise);

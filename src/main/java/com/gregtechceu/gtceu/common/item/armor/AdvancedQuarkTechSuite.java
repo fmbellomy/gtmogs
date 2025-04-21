@@ -21,6 +21,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
@@ -28,6 +29,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +38,7 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
 
     // A replacement for checking the current world time, to get around the gamerule that stops it
     private long timer = 0L;
-    private List<Pair<NonNullList<ItemStack>, List<Integer>>> inventoryIndexMap;
+    private @Nullable List<Pair<NonNullList<ItemStack>, List<Integer>>> inventoryIndexMap;
 
     public AdvancedQuarkTechSuite(int energyPerUse, long capacity, int tier) {
         super(ArmorItem.Type.CHESTPLATE, energyPerUse, capacity, tier);
@@ -245,7 +247,8 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
      */
 
     @Override
-    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                            EquipmentSlot slot, ArmorMaterial.Layer layer) {
         return GTCEu.id("textures/armor/advanced_quark_tech_suite_1.png");
     }
 
@@ -278,6 +281,7 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
         return container.getCharge() > 0;
     }
 
+    @Nullable
     private static IElectricItem getIElectricItem(@NotNull ItemStack stack) {
         return GTCapabilityHelper.getElectricItem(stack);
     }
@@ -318,7 +322,7 @@ public class AdvancedQuarkTechSuite extends QuarkTechSuite implements IJetpack {
     }
 
     @Override
-    public ParticleOptions getParticle() {
+    public @Nullable ParticleOptions getParticle() {
         return null;
     }
 

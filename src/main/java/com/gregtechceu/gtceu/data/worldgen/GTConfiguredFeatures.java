@@ -25,8 +25,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
 public class GTConfiguredFeatures {
 
-    public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER = ResourceKey.create(Registries.CONFIGURED_FEATURE,
-            GTCEu.id("rubber_tree"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER_TREE = ResourceKey.create(
+            Registries.CONFIGURED_FEATURE, GTCEu.id("rubber_tree"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> RED_GRANITE_BLOB = ResourceKey
             .create(Registries.CONFIGURED_FEATURE, GTCEu.id("red_granite_blob"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> MARBLE_BLOB = ResourceKey
@@ -35,7 +35,7 @@ public class GTConfiguredFeatures {
             .create(Registries.CONFIGURED_FEATURE, GTCEu.id("raw_oil_sprout"));
 
     public static void bootstrap(BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
-        FeatureUtils.register(ctx, RUBBER, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
+        FeatureUtils.register(ctx, RUBBER_TREE, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider
                         .simple(GTBlocks.RUBBER_LOG.get().changeNatural(GTBlocks.RUBBER_LOG.getDefaultState(), true)),
                 new ForkingTrunkPlacer(5, 1, 3),

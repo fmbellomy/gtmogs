@@ -561,7 +561,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
             ListTag cacheTag = new ListTag();
             for (var entry : cache.object2IntEntrySet()) {
                 CompoundTag compoundTag = new CompoundTag();
-                var obj = cap.serializer.toNbtGeneric(cap.of(entry.getKey()));
+                var obj = cap.serializer.toNbtGeneric(cap.of(entry.getKey()), GTRegistries.builtinRegistry());
                 compoundTag.put("entry", obj);
                 compoundTag.putInt("cached_chance", entry.getIntValue());
                 cacheTag.add(compoundTag);
@@ -576,7 +576,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
         super.loadCustomPersistedData(tag);
         CompoundTag chanceCache = tag.getCompound("chance_cache");
         for (String key : chanceCache.getAllKeys()) {
-            RecipeCapability<?> cap = GTRegistries.RECIPE_CAPABILITIES.get(key);
+            RecipeCapability<?> cap = GTRegistries.RECIPE_CAPABILITIES.get(GTCEu.id(key));
             if (cap == null) continue; // Necessary since we removed a RecipeCapability when nuking Create
             // noinspection rawtypes
             Object2IntMap map = this.chanceCaches.computeIfAbsent(cap, RecipeCapability::makeChanceCache);
@@ -584,7 +584,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
             ListTag chanceTag = chanceCache.getList(key, Tag.TAG_COMPOUND);
             for (int i = 0; i < chanceTag.size(); ++i) {
                 CompoundTag chanceKey = chanceTag.getCompound(i);
-                var entry = cap.serializer.fromNbt(chanceKey.get("entry"));
+                var entry = cap.serializer.fromNbt(chanceKey.get("entry"), GTRegistries.builtinRegistry());
                 int value = chanceKey.getInt("cached_chance");
                 // noinspection unchecked
                 map.put(entry, value);
@@ -594,7 +594,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
             ListTag cacheTag = new ListTag();
             for (var entry : cache.object2IntEntrySet()) {
                 CompoundTag compoundTag = new CompoundTag();
-                var obj = cap.serializer.toNbtGeneric(cap.of(entry.getKey()));
+                var obj = cap.serializer.toNbtGeneric(cap.of(entry.getKey()), GTRegistries.builtinRegistry());
                 compoundTag.put("entry", obj);
                 compoundTag.putInt("cached_chance", entry.getIntValue());
                 cacheTag.add(compoundTag);

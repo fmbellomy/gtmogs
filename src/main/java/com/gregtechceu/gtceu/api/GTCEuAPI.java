@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.block.ICoilType;
 import com.gregtechceu.gtceu.api.block.IFilterType;
-import com.gregtechceu.gtceu.api.material.material.IMaterialRegistryManager;
+import com.gregtechceu.gtceu.api.material.material.IMaterialRegistry;
 import com.gregtechceu.gtceu.api.machine.multiblock.IBatteryData;
 import com.gregtechceu.gtceu.api.registry.GTRegistry;
 import com.gregtechceu.gtceu.common.block.BatteryBlock;
@@ -32,7 +32,7 @@ public class GTCEuAPI {
     /** Will always be available */
     public static GTCEu instance;
     /** Will be available at the Construction stage */
-    public static IMaterialRegistryManager materialManager;
+    public static IMaterialRegistry materialManager;
 
     /** Will be available at the Pre-Initialization stage */
     @Getter

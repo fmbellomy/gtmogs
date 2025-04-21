@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,13 +32,13 @@ public class SteamEnergyRecipeHandler implements IRecipeHandler<Long> {
         long eut = left.stream().reduce(0L, Long::sum);
         int totalSteam = GTMath.saturatedCast((long) Math.ceil(eut * conversionRate));
         if (totalSteam > 0) {
-            var steam = io == IO.IN ? FluidIngredient.of(GTMaterials.Steam.getFluidTag(), totalSteam) :
-                    FluidIngredient.of(GTMaterials.Steam.getFluid(totalSteam));
-            var list = new ArrayList<FluidIngredient>();
+            SizedFluidIngredient steam = io == IO.IN ? SizedFluidIngredient.of(GTMaterials.Steam.getFluidTag(), totalSteam) :
+                    SizedFluidIngredient.of(GTMaterials.Steam.getFluid(totalSteam));
+            List<SizedFluidIngredient> list = new ArrayList<>();
             list.add(steam);
             var leftSteam = steamTank.handleRecipeInner(io, recipe, list, simulate);
             if (leftSteam == null || leftSteam.isEmpty()) return null;
-            eut = (long) (leftSteam.get(0).getAmount() / conversionRate);
+            eut = (long) (leftSteam.getFirst().amount() / conversionRate);
         }
         return eut <= 0 ? null : Collections.singletonList(eut);
     }

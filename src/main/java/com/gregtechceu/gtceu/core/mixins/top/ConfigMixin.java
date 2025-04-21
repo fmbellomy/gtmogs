@@ -47,7 +47,7 @@ public class ConfigMixin {
             at = @At(value = "INVOKE", target = "Ljava/util/List;iterator()Ljava/util/Iterator;"))
     private static void gtceu$injectHarvestTags(CallbackInfoReturnable<Map<ResourceLocation, String>> cir) {
         Set<Integer> passedTiers = new HashSet<>();
-        for (Material mat : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material mat : GTCEuAPI.materialManager) {
             if (mat.hasProperty(PropertyKey.TOOL)) {
                 MaterialToolTier tier = mat.getToolTier();
                 int harvestLevel = tier.property.getHarvestLevel();

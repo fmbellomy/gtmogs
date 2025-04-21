@@ -1,10 +1,9 @@
 package com.gregtechceu.gtceu.utils;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentContents;
 import net.minecraft.network.chat.MutableComponent;
 
-import com.google.common.base.CaseFormat;
+import net.minecraft.network.chat.contents.PlainTextContents;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -67,14 +66,14 @@ public class FormattingUtil {
     }
 
     /**
-     * Does almost the same thing as .to(LOWER_UNDERSCORE, string), but it also inserts underscores between words and
-     * numbers.
+     * Does almost the same thing as UPPER_CAMEL.to(LOWER_UNDERSCORE, string), but it also inserts underscores between
+     * words and numbers.
      *
      * @param string Any string with ASCII characters.
      * @return A string that is all lowercase, with underscores inserted before word/number boundaries:
      *         "maragingSteel300" -> "maraging_steel_300"
      */
-    public static String toLowerCaseUnderscore(String string) {
+    public static String toLowerCaseUnder(String string) {
         StringBuilder result = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             if (i != 0 && (Character.isUpperCase(string.charAt(i)) ||
@@ -86,22 +85,10 @@ public class FormattingUtil {
     }
 
     /**
-     * Does almost the same thing as .to(LOWER_UNDERSCORE, string), but it also inserts underscores between words and
-     * numbers.
-     *
-     * @param string Any string with ASCII characters.
-     * @return A string that is all lowercase, with underscores inserted before word/number boundaries:
-     *         "maragingSteel300" -> "maraging_steel_300"
-     */
-    public static String toLowerCaseUnder(String string) {
-        return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, string);
-    }
-
-    /**
      * apple_orange.juice => Apple Orange (Juice)
      */
-    public static String toEnglishName(Object internalName) {
-        return Arrays.stream(internalName.toString().toLowerCase(Locale.ROOT).split("_"))
+    public static String toEnglishName(String internalName) {
+        return Arrays.stream(internalName.toLowerCase(Locale.ROOT).split("_"))
                 .map(StringUtils::capitalize)
                 .collect(Collectors.joining(" "));
     }
@@ -245,6 +232,6 @@ public class FormattingUtil {
     }
 
     private static boolean isEmptyComponent(Component component) {
-        return component.getContents() == ComponentContents.EMPTY && component.getSiblings().isEmpty();
+        return component.getContents() == PlainTextContents.EMPTY && component.getSiblings().isEmpty();
     }
 }

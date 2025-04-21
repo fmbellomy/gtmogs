@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -407,9 +406,9 @@ public class GTUtil {
             return false;
         }
 
-        Biome biome = world.getBiome(blockPos.above()).value();
+        Holder<Biome> biome = world.getBiome(blockPos.above());
         if (world.isRaining()) {
-            if (biome.warmEnoughToRain(blockPos.above()) || biome.coldEnoughToSnow(blockPos.above())) {
+            if (biome.value().warmEnoughToRain(blockPos.above()) || biome.value().coldEnoughToSnow(blockPos.above())) {
                 return false;
             }
         }
@@ -418,9 +417,8 @@ public class GTUtil {
             return false;
         }
 
-        ResourceLocation javdVoidBiome = ResourceLocation.fromNamespaceAndPath("javd", "void");
-        if (GTCEu.Mods.isJAVDLoaded() &&
-                world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome).equals(javdVoidBiome)) {
+        ResourceLocation javdVoidBiome = ResourceLocation.fromNamespaceAndPath(GTValues.MODID_JAVD, "void");
+        if (GTCEu.isModLoaded(GTValues.MODID_JAVD) && biome.is(javdVoidBiome)) {
             return !world.isDay();
         } else return world.isDay();
     }

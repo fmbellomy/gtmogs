@@ -51,8 +51,7 @@ public interface IJetpack {
         return 0.0D;
     }
 
-    @Nullable
-    default ParticleOptions getParticle() {
+    default @Nullable ParticleOptions getParticle() {
         return ParticleTypes.LARGE_SMOKE;
     }
 

@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -239,14 +239,12 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
     @AllArgsConstructor
     public static class Layer {
-
+        // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
-                        .fieldOf("targets").forGetter(layer -> layer.target),
-                ExtraCodecs.intRange(-1, Integer.MAX_VALUE).optionalFieldOf("layers", -1)
-                        .forGetter(layer -> layer.layers))
-                .apply(instance, Layer::new));
-
+                Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("targets").forGetter(layer -> layer.target),
+                ExtraCodecs.intRange(-1, Integer.MAX_VALUE).optionalFieldOf("layers", -1).forGetter(layer -> layer.layers)
+        ).apply(instance, Layer::new));
+        // spotless:on
         public final Either<List<OreConfiguration.TargetBlockState>, Material> target;
         public int layers;
 

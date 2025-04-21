@@ -307,7 +307,7 @@ public class GTModels {
      * register fluid models for materials
      */
     public static void registerMaterialFluidModels() {
-        for (var material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (var material : GTCEuAPI.materialManager) {
             var fluidProperty = material.getProperty(PropertyKey.FLUID);
             if (fluidProperty == null) continue;
 

@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
@@ -321,11 +322,11 @@ public class GeodeVeinGenerator extends VeinGenerator {
 
         // spotless:off
         public static final Codec<GeodeBlockSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        Codec.either(BlockStateProvider.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("filling_provider").forGetter(config -> config.fillingProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("inner_layer_provider").forGetter(config -> config.innerLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("alternate_inner_layer_provider").forGetter(config -> config.alternateInnerLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("middle_layer_provider").forGetter(config -> config.middleLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTCEuAPI.materialManager.codec()).fieldOf("outer_layer_provider").forGetter(config -> config.outerLayerProvider),
+                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("filling_provider").forGetter(config -> config.fillingProvider),
+                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("inner_layer_provider").forGetter(config -> config.innerLayerProvider),
+                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("alternate_inner_layer_provider").forGetter(config -> config.alternateInnerLayerProvider),
+                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("middle_layer_provider").forGetter(config -> config.middleLayerProvider),
+                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("outer_layer_provider").forGetter(config -> config.outerLayerProvider),
                         ExtraCodecs.nonEmptyList(BlockState.CODEC.listOf()).fieldOf("inner_placements").forGetter(config -> config.innerPlacements),
                         TagKey.hashedCodec(Registries.BLOCK).fieldOf("cannot_replace").forGetter(config -> config.cannotReplace),
                         TagKey.hashedCodec(Registries.BLOCK).fieldOf("invalid_blocks").forGetter(config -> config.invalidBlocks),

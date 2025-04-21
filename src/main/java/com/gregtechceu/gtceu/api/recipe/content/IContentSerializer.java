@@ -2,17 +2,12 @@ package com.gregtechceu.gtceu.api.recipe.content;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.RegistryOps;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 
@@ -30,9 +25,15 @@ public interface IContentSerializer<T> {
                 GSON.fromJson(buf.readUtf(), JsonElement.class)).getOrThrow();
     }
 
-    T fromJson(JsonElement json);
+    Codec<T> codec();
 
-    JsonElement toJson(T content);
+    default T fromJson(JsonElement json, HolderLookup.Provider provider) {
+        return codec().parse(provider.createSerializationContext(JsonOps.INSTANCE), json).getOrThrow();
+    }
+
+    default JsonElement toJson(T content, HolderLookup.Provider provider) {
+        return codec().encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), content).getOrThrow();
+    }
 
     T of(Object o);
 
@@ -52,38 +53,6 @@ public interface IContentSerializer<T> {
         int chance = buf.readVarInt();
         int maxChance = buf.readVarInt();
         int tierChanceBoost = buf.readVarInt();
-        return new Content(inner, chance, maxChance, tierChanceBoost);
-    }
-
-    Codec<T> codec();
-
-    default T fromJson(JsonElement json, HolderLookup.Provider provider) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, provider);
-        return codec().parse(ops, json).getOrThrow(false, GTCEu.LOGGER::error);
-    }
-
-    default JsonElement toJson(T content, HolderLookup.Provider provider) {
-        RegistryOps<JsonElement> ops = RegistryOps.create(JsonOps.INSTANCE, provider);
-        return codec().encodeStart(ops, content).getOrThrow(false, GTCEu.LOGGER::error);
-    }
-
-    @SuppressWarnings("unchecked")
-    default JsonElement toJsonContent(Content content) {
-        JsonObject json = new JsonObject();
-        json.add("content", toJson((T) content.getContent()));
-        json.addProperty("chance", content.chance);
-        json.addProperty("maxChance", content.maxChance);
-        json.addProperty("tierChanceBoost", content.tierChanceBoost);
-        return json;
-    }
-
-    default Content fromJsonContent(JsonElement json) {
-        JsonObject jsonObject = json.getAsJsonObject();
-        T inner = fromJson(jsonObject.get("content"));
-        int chance = jsonObject.has("chance") ? jsonObject.get("chance").getAsInt() : ChanceLogic.getMaxChancedValue();
-        int maxChance = jsonObject.has("maxChance") ? jsonObject.get("maxChance").getAsInt() :
-                ChanceLogic.getMaxChancedValue();
-        int tierChanceBoost = jsonObject.has("tierChanceBoost") ? jsonObject.get("tierChanceBoost").getAsInt() : 0;
         return new Content(inner, chance, maxChance, tierChanceBoost);
     }
 

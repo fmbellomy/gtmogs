@@ -10,6 +10,7 @@ import com.lowdragmc.lowdraglib.syncdata.managed.MultiManagedStorage;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
@@ -17,6 +18,8 @@ import java.util.Collection;
  * Dummy machine BE used for wrapping {@link DummyRecipeLogicMachine}s
  */
 public class DummyMachineBlockEntity implements IMachineBlockEntity {
+
+    public final MultiManagedStorage managedStorage = new MultiManagedStorage();
 
     @Getter
     public final DummyRecipeLogicMachine metaMachine;
@@ -40,7 +43,7 @@ public class DummyMachineBlockEntity implements IMachineBlockEntity {
     }
 
     @Override
-    public MultiManagedStorage getRootStorage() {
-        return null;
+    public @NotNull MultiManagedStorage getRootStorage() {
+        return managedStorage;
     }
 }

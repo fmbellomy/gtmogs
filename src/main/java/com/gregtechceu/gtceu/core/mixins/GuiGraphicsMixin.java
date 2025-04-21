@@ -75,7 +75,7 @@ public class GuiGraphicsMixin {
             if (recipes != null && !recipes.isEmpty()) {
                 for (var recipe : recipes) {
                     ItemStack output = ItemRecipeCapability.CAP
-                            .of(recipe.getOutputContents(ItemRecipeCapability.CAP).get(0).content).getItems()[0];
+                            .of(recipe.getOutputContents(ItemRecipeCapability.CAP).getFirst().content).getItems()[0];
 
                     if (!output.isEmpty() && !ItemStack.isSameItemSameComponents(output, stack)) {
                         gtceu$renderInstead(livingEntity, level, output, x, y, seed, z);

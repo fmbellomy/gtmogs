@@ -139,7 +139,7 @@ public class ToolHelper {
             if (stack.has(DataComponents.UNBREAKABLE)) {
                 return;
             }
-            if (!(user instanceof Player player) || !player.isCreative()) {
+            if (!(user instanceof Player player) || !player.hasInfiniteMaterials()) {
                 RandomSource random = user == null ? GTValues.RNG : user.getRandom();
                 if (tool.isElectric()) {
                     int electricDamage = damage * ConfigHolder.INSTANCE.machines.energyUsageMultiplier;
@@ -240,7 +240,7 @@ public class ToolHelper {
         return stack.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none());
     }
 
-    public static Set<BlockPos> iterateAoE(ItemStack stack, AoESymmetrical aoeDefinition, Level world,
+    public static Set<BlockPos> iterateAoE(ItemStack stack, @Nullable AoESymmetrical aoeDefinition, Level world,
                                            Player player, HitResult hit, AOEFunction function) {
         if (aoeDefinition != null && !aoeDefinition.isNone() && hit instanceof BlockHitResult blockHit) {
             int column = aoeDefinition.column();

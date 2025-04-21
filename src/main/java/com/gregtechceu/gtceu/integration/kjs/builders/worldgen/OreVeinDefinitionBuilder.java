@@ -11,7 +11,6 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.Tolerate;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.valueproviders.ConstantInt;
@@ -24,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 @Accessors(chain = true, fluent = true)
 public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
@@ -71,16 +68,14 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
 
     public OreVeinDefinitionBuilder layer(IWorldGenLayer layer) {
         this.layer = layer;
-        if (this.dimensionFilter == null || this.dimensionFilter.isEmpty()) {
-            dimensions(layer.getLevels().toArray(ResourceLocation[]::new));
+        if (this.dimensionFilter.isEmpty()) {
+            dimensions(layer.getLevels());
         }
         return this;
     }
 
-    public OreVeinDefinitionBuilder dimensions(ResourceLocation... dimensions) {
-        this.dimensionFilter = Arrays.stream(dimensions)
-                .map(location -> ResourceKey.create(Registries.DIMENSION, location))
-                .collect(Collectors.toSet());
+    public OreVeinDefinitionBuilder dimensions(Collection<ResourceKey<Level>> dimensions) {
+        this.dimensionFilter = new HashSet<>(dimensions);
         return this;
     }
 
@@ -190,10 +185,12 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     @SuppressWarnings("SameParameterValue")
     private <T extends IndicatorGenerator> T getOrCreateIndicatorGenerator(Class<T> indicatorClass,
                                                                            Supplier<T> constructor) {
+        @Nullable
         var existingGenerator = indicatorGenerators.stream()
                 .filter(indicatorClass::isInstance)
                 .map(indicatorClass::cast)
-                .findFirst().orElse(null);
+                .findFirst()
+                .orElse(null);
 
         if (existingGenerator != null)
             return existingGenerator;
@@ -213,7 +210,7 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     public OreVeinDefinition createObject() {
         return new OreVeinDefinition(clusterSize, density, weight, layer,
                 Set.copyOf(dimensionFilter), heightRange, discardChanceOnAirExposure,
-                () -> biomes, biomeWeightModifier, veinGenerator, indicatorGenerators);
+                biomes, biomeWeightModifier, veinGenerator, indicatorGenerators);
     }
 
 }

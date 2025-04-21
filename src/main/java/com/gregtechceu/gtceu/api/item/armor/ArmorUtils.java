@@ -25,6 +25,7 @@ import net.neoforged.neoforge.event.EventHooks;
 
 import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -105,7 +106,7 @@ public class ArmorUtils {
     /**
      * Spawn particle behind player with speedY speed
      */
-    public static void spawnParticle(Level world, Player player, ParticleOptions type, double speedY) {
+    public static void spawnParticle(Level world, Player player, @Nullable ParticleOptions type, double speedY) {
         if (type != null) {
             Vec3 forward = player.getForward();
             world.addParticle(type, player.getX() - forward.x, player.getY() + 0.5D, player.getZ() - forward.z, 0.0D,

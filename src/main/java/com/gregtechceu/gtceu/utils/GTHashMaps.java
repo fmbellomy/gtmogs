@@ -4,6 +4,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
+
 import it.unimi.dsi.fastutil.objects.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -107,7 +108,7 @@ public final class GTHashMaps {
             FluidStack fluidStack = fluidInputs.getFluidInTank(i);
             if (fluidStack != FluidStack.EMPTY && fluidStack.getAmount() > 0) {
                 FluidKey key = new FluidKey(fluidStack);
-                map.put(key, map.getInt(key) + fluidStack.getAmount());
+                map.merge(key, fluidStack.getAmount(), Integer::sum);
             }
         }
 
@@ -130,7 +131,7 @@ public final class GTHashMaps {
         for (FluidStack fluidStack : fluidInputs) {
             if (fluidStack != null && fluidStack.getAmount() > 0) {
                 FluidKey key = new FluidKey(fluidStack);
-                map.put(key, map.getInt(key) + fluidStack.getAmount());
+                map.merge(key, fluidStack.getAmount(), Integer::sum);
             }
         }
 

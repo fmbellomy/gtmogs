@@ -141,7 +141,7 @@ public class GTRecipeLookup {
             if (index > 0) {
                 for (ItemStack unique : uniqueItems) {
                     if (unique == null) break;
-                    else if (ItemStack.isSameItemSameTags(input, unique)) {
+                    else if (ItemStack.isSameItemSameComponents(input, unique)) {
                         continue main;
                     }
                 }
@@ -390,7 +390,7 @@ public class GTRecipeLookup {
      */
     @NotNull
     protected List<List<AbstractMapIngredient>> fromRecipe(@NotNull GTRecipe r) {
-        List<List<AbstractMapIngredient>> list = new ObjectArrayList<>(r.inputs.values().size());
+        List<List<AbstractMapIngredient>> list = new ObjectArrayList<>(r.inputs.size());
         r.inputs.forEach((cap, contents) -> {
             if (cap.isRecipeSearchFilter() && !contents.isEmpty()) {
                 List<Object> ingredients = new ArrayList<>();
@@ -430,7 +430,7 @@ public class GTRecipeLookup {
     @NotNull
     protected List<List<AbstractMapIngredient>> fromHolder(@NotNull IRecipeCapabilityHolder r) {
         var handlerMap = r.getCapabilitiesFlat().getOrDefault(IO.IN, Collections.emptyMap());
-        int size = handlerMap.values().size();
+        int size = handlerMap.size();
         List<List<AbstractMapIngredient>> list = new ObjectArrayList<>(size);
         for (var entry : handlerMap.entrySet()) {
             var cap = entry.getKey();
@@ -467,7 +467,7 @@ public class GTRecipeLookup {
 
         // Add combustion fuels to the Powerless Jetpack
         if (recipe.getType() == GTRecipeTypes.COMBUSTION_GENERATOR_FUELS) {
-            Content content = recipe.getInputContents(FluidRecipeCapability.CAP).get(0);
+            Content content = recipe.getInputContents(FluidRecipeCapability.CAP).getFirst();
             SizedFluidIngredient fluid = FluidRecipeCapability.CAP.of(content.content);
             PowerlessJetpack.FUELS.putIfAbsent(fluid, recipe.duration);
         }

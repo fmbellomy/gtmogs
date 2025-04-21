@@ -99,7 +99,7 @@ public class MachineUIProject extends UIProject {
 
         for (WidgetToolBox.Default tab : WidgetToolBox.Default.TABS) {
             editor.getToolPanel().addNewToolBox("ldlib.gui.editor.group." + tab.groupName, tab.icon,
-                    tab.createToolBox());
+                    tab::createToolBox);
         }
     }
 

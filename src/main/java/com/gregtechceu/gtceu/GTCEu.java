@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.CommonInit;
 import com.gregtechceu.gtceu.common.network.GTNetwork;
-import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.command.GTCommandArguments;
 import com.gregtechceu.gtceu.data.effect.GTMobEffects;
@@ -32,6 +31,7 @@ import dev.emi.emi.config.EmiConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.ApiStatus;
 import java.nio.file.Path;
 
@@ -50,18 +50,19 @@ public class GTCEu {
         GTCEuAPI.instance = this;
         GTCEu.gtModBus = modBus;
         ConfigHolder.init();
-        CommonInit.init(modBus);
 
-        modBus.addListener(AlloyBlastPropertyAddition::addAlloyBlastProperties);
-        modBus.addListener(GTNetwork::registerPayloads);
         // must be set here because of KubeJS compat
         // trying to read this before the pre-init stage
-        GTCEuAPI.materialManager = MaterialRegistryManager.getInstance();
+        GTCEuAPI.materialManager = GTRegistries.MATERIALS;
         GTCEuAPI.initializeHighTier();
         if (GTCEu.isDev()) {
             ConfigHolder.INSTANCE.recipes.generateLowQualityGems = true;
             ConfigHolder.INSTANCE.compat.energy.enableFEConverters = true;
         }
+        CommonInit.init(modBus);
+
+        modBus.addListener(AlloyBlastPropertyAddition::addAlloyBlastProperties);
+        modBus.addListener(GTNetwork::registerPayloads);
 
         GTValueProviderTypes.init(modBus);
         GTRegistries.init(modBus);
@@ -72,6 +73,9 @@ public class GTCEu {
     }
 
     public static ResourceLocation id(String path) {
+        if (Strings.isBlank(path)) {
+            return TEMPLATE_LOCATION;
+        }
         return TEMPLATE_LOCATION.withPath(FormattingUtil.toLowerCaseUnder(path));
     }
 
@@ -205,10 +209,6 @@ public class GTCEu {
 
         public static boolean isShimmerLoaded() {
             return isModLoaded(GTValues.MODID_SHIMMER);
-        }
-
-        public static boolean isJAVDLoaded() {
-            return isModLoaded(GTValues.MODID_JAVD);
         }
 
         public static boolean isFTBTeamsLoaded() {

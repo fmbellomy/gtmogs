@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.client.TooltipsHandler;
 import com.gregtechceu.gtceu.client.renderer.BlockHighlightRenderer;
 import com.gregtechceu.gtceu.client.renderer.MultiblockInWorldPreviewRenderer;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
-import com.gregtechceu.gtceu.common.commands.GTClientCommands;
+import com.gregtechceu.gtceu.data.command.GTClientCommands;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 
 import net.neoforged.api.distmarker.Dist;

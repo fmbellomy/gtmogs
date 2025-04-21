@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.api.material.Element;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
@@ -55,7 +56,7 @@ public final class GTRegistries {
     public static final ResourceKey<Registry<DimensionMarker>> DIMENSION_MARKER_REGISTRY = makeRegistryKey(GTCEu.id("dimension_marker"));
 
     // GT Registry
-    public static final GTRegistry<Material> MATERIALS = new GTRegistry<>(MATERIAL_REGISTRY);
+    public static final MaterialRegistry MATERIALS = new MaterialRegistry(MATERIAL_REGISTRY);
     public static final GTRegistry<Element> ELEMENTS = new GTRegistry<>(ELEMENT_REGISTRY);
     public static final GTRegistry<MachineDefinition> MACHINES = new GTRegistry<>(MACHINE_REGISTRY);
     public static final GTRegistry<CoverDefinition> COVERS = new GTRegistry<>(COVER_REGISTRY);

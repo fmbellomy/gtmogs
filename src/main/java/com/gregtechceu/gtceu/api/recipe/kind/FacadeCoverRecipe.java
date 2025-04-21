@@ -7,11 +7,8 @@ import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.item.behavior.FacadeItemBehaviour;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -20,26 +17,16 @@ import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class FacadeCoverRecipe implements CraftingRecipe {
+public class FacadeCoverRecipe extends CustomRecipe {
 
-    public static final FacadeCoverRecipe INSTANCE = new FacadeCoverRecipe();
-    public static final MapCodec<FacadeCoverRecipe> CODEC = MapCodec.unit(INSTANCE);
-    public static final StreamCodec<RegistryFriendlyByteBuf, FacadeCoverRecipe> STREAM_CODEC = StreamCodec
-            .unit(INSTANCE);
-    public static final RecipeSerializer<FacadeCoverRecipe> SERIALIZER = new RecipeSerializer<>() {
-
-        @Override
-        public MapCodec<FacadeCoverRecipe> codec() {
-            return FacadeCoverRecipe.CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, FacadeCoverRecipe> streamCodec() {
-            return FacadeCoverRecipe.STREAM_CODEC;
-        }
-    };
+    public static SimpleCraftingRecipeSerializer<FacadeCoverRecipe> SERIALIZER = new SimpleCraftingRecipeSerializer<>(
+            FacadeCoverRecipe::new);
 
     public static ResourceLocation ID = GTCEu.id("crafting/facade_cover");
+
+    public FacadeCoverRecipe(CraftingBookCategory category) {
+        super(category);
+    }
 
     @Override
     public boolean matches(CraftingInput container, Level level) {
@@ -101,10 +88,5 @@ public class FacadeCoverRecipe implements CraftingRecipe {
     @Override
     public RecipeSerializer<?> getSerializer() {
         return SERIALIZER;
-    }
-
-    @Override
-    public CraftingBookCategory category() {
-        return CraftingBookCategory.MISC;
     }
 }

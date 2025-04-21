@@ -81,7 +81,7 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
         return condition.fromNetwork(buf);
     }
 
-    public static void conditionWriter(RegistryFriendlyByteBuf buf, RecipeCondition condition) {
+    public static void conditionWriter(RegistryFriendlyByteBuf buf, RecipeCondition<?> condition) {
         buf.writeResourceLocation(GTRegistries.RECIPE_CONDITIONS.getKey(condition.getType()));
         condition.toNetwork(buf);
     }

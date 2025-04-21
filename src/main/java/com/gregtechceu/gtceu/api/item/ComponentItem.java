@@ -156,7 +156,7 @@ public class ComponentItem extends Item implements IUIHolder.Item, IItemRenderer
     public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
         for (IItemComponent component : components) {
             if (component instanceof IEnchantableItem enchantableItem &&
-                    enchantableItem.canApplyAtEnchantingTable(stack, enchantment)) {
+                    enchantableItem.supportsEnchantment(stack, enchantment)) {
                 return true;
             }
         }

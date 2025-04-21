@@ -9,7 +9,6 @@ import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
@@ -37,9 +36,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Used to allow a tool to hoe the ground, only if it cannot extend the
- * {@link com.gregtechceu.gtceu.api.item.tool.GTHoeItem}
- * class.
+ * Used to allow a tool to hoe the ground
  */
 public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
 
@@ -57,39 +54,34 @@ public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
     @NotNull
     @Override
     public InteractionResult onItemUse(UseOnContext context) {
-        if (context.getClickedFace() == Direction.DOWN) return InteractionResult.PASS;
-
-        Level world = context.getLevel();
+        Level level = context.getLevel();
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         InteractionHand hand = context.getHand();
-
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
-        Set<BlockPos> blocks;
         // only attempt to till if the center block is tillable
-        if (isBlockTillable(stack, world, player, pos, context)) {
-            if (aoeDefinition.isNone()) {
-                blocks = ImmutableSet.of(pos);
-            } else {
-                HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
+        if (!isBlockTillable(stack, level, player, pos, context)) {
+            return InteractionResult.PASS;
+        }
 
-                if (rayTraceResult.getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
-                if (!(rayTraceResult instanceof BlockHitResult blockHitResult)) return InteractionResult.PASS;
-
-                blocks = getTillableBlocks(stack, aoeDefinition, world, player, blockHitResult);
-                if (isBlockTillable(stack, world, player, blockHitResult.getBlockPos(), context)) {
-                    blocks.add(blockHitResult.getBlockPos());
-                }
-            }
-        } else return InteractionResult.PASS;
+        Set<BlockPos> blocks;
+        if (aoeDefinition.isNone() || player == null) {
+            blocks = ImmutableSet.of(pos);
+        } else {
+            blocks = getTillableBlocks(stack, aoeDefinition, level, player, context.getHitResult());
+            blocks.add(pos);
+        }
 
         boolean tilled = false;
         for (BlockPos blockPos : blocks) {
-            BlockState state = world.getBlockState(blockPos);
-            tilled |= tillGround(new UseOnContext(player, hand, context.getHitResult().withPosition(blockPos)), state);
-            if (!player.isCreative()) {
+            BlockState state = level.getBlockState(blockPos);
+            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+                    context.getHitResult().withPosition(blockPos));
+            boolean didTill = tillGround(newCtx, state);
+            tilled |= didTill;
+            if (didTill && player != null) {
                 ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
             }
             if (stack.isEmpty())
@@ -97,10 +89,8 @@ public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
         }
 
         if (tilled) {
-            world.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.HOE_TILL,
-                    SoundSource.PLAYERS, 1.0F, 1.0F);
-            player.swing(hand);
-            return InteractionResult.SUCCESS;
+            level.playSound(null, pos, SoundEvents.HOE_TILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return InteractionResult.PASS;
@@ -113,20 +103,18 @@ public class HoeGroundBehavior implements IToolBehavior<HoeGroundBehavior> {
     }
 
     protected boolean isBlockTillable(ItemStack stack, Level world, Player player, BlockPos pos, UseOnContext context) {
-        if (world.getBlockState(pos.above()).isAir()) {
-            BlockState state = world.getBlockState(pos);
-            BlockState newState = state.getToolModifiedState(context, ItemAbilities.HOE_TILL, false);
-            return newState != null && newState != state;
-        }
-        return false;
+        BlockState state = world.getBlockState(pos);
+        BlockState newState = state.getToolModifiedState(context, ItemAbilities.HOE_TILL, true);
+        return newState != null && newState != state;
     }
 
     protected boolean tillGround(UseOnContext context, BlockState state) {
         BlockState newState = state.getToolModifiedState(context, ItemAbilities.HOE_TILL, false);
         if (newState != null && newState != state) {
+            boolean result = context.getLevel().setBlock(context.getClickedPos(), newState, Block.UPDATE_ALL_IMMEDIATE);
             context.getLevel().gameEvent(GameEvent.BLOCK_CHANGE, context.getClickedPos(),
                     GameEvent.Context.of(context.getPlayer(), state));
-            return context.getLevel().setBlock(context.getClickedPos(), newState, Block.UPDATE_ALL_IMMEDIATE);
+            return result;
         }
         return false;
     }

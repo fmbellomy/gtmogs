@@ -102,12 +102,12 @@ public class GTRegistry<T> extends MappedRegistry<T> {
 
     @UnmodifiableView
     public Set<Map.Entry<ResourceLocation, T>> entries() {
-        return Collections.unmodifiableSet(Maps.transformValues(this.getByLocation(), Holder::value).entrySet());
+        return Collections.unmodifiableSet(Maps.transformValues(this.gtceu$getByLocation(), Holder::value).entrySet());
     }
 
     @UnmodifiableView
     public Map<ResourceLocation, T> registry() {
-        return Collections.unmodifiableMap(Maps.transformValues(this.getByLocation(), Holder::value));
+        return Collections.unmodifiableMap(Maps.transformValues(this.gtceu$getByLocation(), Holder::value));
     }
 
     public T getOrDefault(ResourceLocation name, T defaultValue) {
@@ -135,13 +135,13 @@ public class GTRegistry<T> extends MappedRegistry<T> {
     public boolean remove(Holder<T> holder) {
         ResourceKey<T> key = holder.getKey();
         boolean removed = true;
-        removed &= this.getByKey().remove(key) != null;
-        removed &= this.getByLocation().remove(key.location()) != null;
-        removed &= this.getByValue().remove(holder.value()) != null;
-        removed &= this.getById().remove(holder);
-        removed &= this.getToId().removeInt(holder.value()) != -1;
-        removed &= this.getRegistrationInfos().remove(key) != null;
-        removed &= this.getRegistrationInfos().remove(key) != null;
+        removed &= this.gtceu$getByKey().remove(key) != null;
+        removed &= this.gtceu$getByLocation().remove(key.location()) != null;
+        removed &= this.gtceu$getByValue().remove(holder.value()) != null;
+        removed &= this.gtceu$getById().remove(holder);
+        removed &= this.gtceu$getToId().removeInt(holder.value()) != -1;
+        removed &= this.gtceu$getRegistrationInfos().remove(key) != null;
+        removed &= this.gtceu$getRegistrationInfos().remove(key) != null;
 
         return removed;
     }

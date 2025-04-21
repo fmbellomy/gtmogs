@@ -39,7 +39,7 @@ public class BedrockOreBuilder extends BuilderBase<BedrockOreDefinition> {
     private int depletedYield; // yield after the vein is depleted
     @Setter
     private List<Pair<Material, Integer>> materials = new ArrayList<>(); // the ores which the vein contains
-    private Set<ResourceKey<Level>> dimensions;
+    private final transient Set<ResourceKey<Level>> dimensions = new HashSet<>();
     private final List<BiomeWeightModifier> biomes = new LinkedList<>();
 
     public BedrockOreBuilder(ResourceLocation id) {
@@ -66,20 +66,20 @@ public class BedrockOreBuilder extends BuilderBase<BedrockOreDefinition> {
         return this.yield(UniformInt.of(min, max));
     }
 
-    public BedrockOreBuilder biomes(int weight, HolderSet<Biome> biomes) {
-        this.biomes.add(new BiomeWeightModifier(() -> biomes, weight));
+    @SafeVarargs
+    public final BedrockOreBuilder addSpawnDimension(ResourceKey<Level>... dimensions) {
+        this.dimensions.addAll(Arrays.asList(dimensions));
         return this;
     }
 
-    @HideFromJS
-    public BedrockOreBuilder dimensions(Set<ResourceKey<Level>> dimensions) {
-        this.dimensions = dimensions;
+    public BedrockOreBuilder biomes(int weight, HolderSet<Biome> biomes) {
+        this.biomes.add(new BiomeWeightModifier(biomes, weight));
         return this;
     }
 
     @Override
     public BedrockOreDefinition createObject() {
         return new BedrockOreDefinition(weight, size, yield, depletionAmount, depletionChance,
-                depletedYield, materials, biomes, dimensions);;
+                depletedYield, materials, biomes, dimensions);
     }
 }

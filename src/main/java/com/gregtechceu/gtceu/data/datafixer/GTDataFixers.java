@@ -75,6 +75,8 @@ public class GTDataFixers {
 
         builder.addFixer(new GTItemStackComponentizationFix(schemaV1));
         Schema schemaV2 = builder.addSchema(2, SAME_NAMESPACED);
+        builder.addFixer(ItemRenameFix.create(schemaV2, "Tungstensteel rename fix",
+                createRenamer(Pattern.compile("gtceu:tungstensteel"), "gtceu:tungsten_steel")));
     }
 
     private static UnaryOperator<String> createRenamer(String oldName, String newName) {

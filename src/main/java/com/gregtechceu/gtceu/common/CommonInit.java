@@ -11,12 +11,12 @@ import com.gregtechceu.gtceu.api.capability.compat.GTEnergyWrapper;
 import com.gregtechceu.gtceu.api.item.GTBucketItem;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.material.material.event.MaterialEvent;
-import com.gregtechceu.gtceu.api.material.material.event.MaterialRegistryEvent;
 import com.gregtechceu.gtceu.api.material.material.event.PostMaterialEvent;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
+import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGenLayers;
@@ -46,7 +46,6 @@ import com.gregtechceu.gtceu.data.item.GTFoods;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
-import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.core.mixins.AbstractRegistrateAccessor;
 import com.gregtechceu.gtceu.data.datagen.GTRegistrateDatagen;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
@@ -149,20 +148,20 @@ public class CommonInit {
 
         GTRegistrateDatagen.init();
         // Register all material manager registries, for materials with mod ids.
-        GTCEuAPI.materialManager.getRegistries().forEach(registry -> {
+        GTCEuAPI.materialManager.getUsedNamespaces().forEach(namespace -> {
             // Force the material lang generator to be at index 0, so that addons' lang generators can override it.
-            AbstractRegistrateAccessor accessor = (AbstractRegistrateAccessor) registry.getRegistrate();
+            GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(namespace);
+            AbstractRegistrateAccessor accessor = (AbstractRegistrateAccessor) registrate;
             if (accessor.getDoDatagen().get()) {
                 List<NonNullConsumer<? extends RegistrateProvider>> providers = Multimaps.asMap(accessor.getDatagens())
                         .get(ProviderType.LANG);
                 providers.addFirst(
-                        (provider) -> MaterialLangGenerator.generate((RegistrateLangProvider) provider, registry));
+                        (provider) -> MaterialLangGenerator.generate((RegistrateLangProvider) provider, namespace));
             }
 
-            registry.getRegistrate()
-                    .registerEventListeners(ModList.get().getModContainerById(registry.getModid())
-                            .map(ModContainer::getEventBus)
-                            .orElse(modBus));
+            ModList.get().getModContainerById(namespace)
+                    .map(ModContainer::getEventBus)
+                    .ifPresent(registrate::registerEventListeners);
         });
 
         WorldGenLayers.registerAll();
@@ -183,24 +182,16 @@ public class CommonInit {
 
     private static void initMaterials() {
         // First, register other mods' Registries
-        MaterialRegistryManager managerInternal = (MaterialRegistryManager) GTCEuAPI.materialManager;
-
-        GTCEu.LOGGER.info("Registering material registries");
-        ModLoader.postEventWrapContainerInModOrder(new MaterialRegistryEvent());
+        MaterialRegistry managerInternal = (MaterialRegistry) GTCEuAPI.materialManager;
 
         // First, register CEu Materials
         managerInternal.unfreezeRegistries();
         GTCEu.LOGGER.info("Registering GTCEu Materials");
         GTMaterials.init();
-        MaterialRegistryManager.getInstance()
-                .getRegistry(GTCEu.MOD_ID)
-                .setFallbackMaterial(GTMaterials.Aluminium);
+        managerInternal.setFallbackMaterial(GTCEu.MOD_ID, GTMaterials.Aluminium);
 
         // Then, register addon Materials
         GTCEu.LOGGER.info("Registering addon Materials");
-        //noinspection removal
-        MaterialEvent materialEvent = new MaterialEvent();
-        ModLoader.postEventWrapContainerInModOrder(materialEvent);
         GTCEuAPI.postRegisterEvent(GTRegistries.MATERIALS);
 
         // Fire Post-Material event, intended for when Materials need to be iterated over in-full before freezing

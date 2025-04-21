@@ -20,6 +20,7 @@ import net.neoforged.neoforge.fluids.capability.templates.VoidFluidHandler;
 
 import lombok.Getter;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import javax.annotation.Nonnull;
 
 public class FluidContainerIngredient implements ICustomIngredient {
     // spotless:off
-    public static final MapCodec<FluidContainerIngredient> CODEC  = SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid")
+    public static final MapCodec<FluidContainerIngredient> CODEC = SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid")
             .xmap(FluidContainerIngredient::new, FluidContainerIngredient::getFluid);
     // spotless:on
     @Getter

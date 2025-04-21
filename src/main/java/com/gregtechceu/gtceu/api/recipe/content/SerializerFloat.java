@@ -1,10 +1,7 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.FriendlyByteBuf;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class SerializerFloat implements IContentSerializer<Float> {
@@ -14,23 +11,13 @@ public class SerializerFloat implements IContentSerializer<Float> {
     private SerializerFloat() {}
 
     @Override
-    public void toNetwork(FriendlyByteBuf buf, Float content) {
+    public void toNetwork(RegistryFriendlyByteBuf buf, Float content) {
         buf.writeFloat(content);
     }
 
     @Override
-    public Float fromNetwork(FriendlyByteBuf buf) {
+    public Float fromNetwork(RegistryFriendlyByteBuf buf) {
         return buf.readFloat();
-    }
-
-    @Override
-    public Float fromJson(JsonElement json) {
-        return json.getAsFloat();
-    }
-
-    @Override
-    public JsonElement toJson(Float content) {
-        return new JsonPrimitive(content);
     }
 
     @Override

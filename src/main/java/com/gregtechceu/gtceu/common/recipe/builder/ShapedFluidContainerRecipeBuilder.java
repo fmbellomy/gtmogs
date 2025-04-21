@@ -2,13 +2,15 @@ package com.gregtechceu.gtceu.common.recipe.builder;
 
 import com.gregtechceu.gtceu.api.recipe.kind.ShapedFluidContainerRecipe;
 
+import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 
-import com.google.gson.JsonObject;
+import net.minecraft.world.item.crafting.ShapedRecipe;
+import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import org.jetbrains.annotations.Nullable;
-import java.util.function.Consumer;
+
+import java.util.Objects;
 
 public class ShapedFluidContainerRecipeBuilder extends ShapedRecipeBuilder {
 
@@ -17,35 +19,12 @@ public class ShapedFluidContainerRecipeBuilder extends ShapedRecipeBuilder {
     }
 
     public void save(RecipeOutput consumer) {
-        consumer.accept(new FinishedRecipe() {
-
-            @Override
-            public void serializeRecipeData(JsonObject pJson) {
-                toJson(pJson);
-            }
-
-            @Override
-            public ResourceLocation getId() {
-                var ID = id == null ? defaultId() : id;
-                return ResourceLocation.fromNamespaceAndPath(ID.getNamespace(), "shaped_fluid_container/" + ID.getPath());
-            }
-
-            @Override
-            public RecipeSerializer<?> getType() {
-                return ShapedFluidContainerRecipe.SERIALIZER;
-            }
-
-            @Nullable
-            @Override
-            public JsonObject serializeAdvancement() {
-                return null;
-            }
-
-            @Nullable
-            @Override
-            public ResourceLocation getAdvancementId() {
-                return null;
-            }
-        });
+        var recipeId = id == null ? defaultId() : id;
+        ShapedRecipe recipe = new ShapedFluidContainerRecipe(
+                Objects.requireNonNullElse(this.group, ""),
+                RecipeBuilder.determineBookCategory(this.category),
+                ShapedRecipePattern.of(key, rows),
+                this.output, false);
+        consumer.accept(recipeId.withPrefix("shaped_fluid_container/"), recipe, null);
     }
 }

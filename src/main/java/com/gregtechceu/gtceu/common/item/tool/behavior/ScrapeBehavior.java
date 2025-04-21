@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
@@ -60,66 +59,53 @@ public class ScrapeBehavior implements IToolBehavior<ScrapeBehavior> {
         BlockPos pos = context.getClickedPos();
         InteractionHand hand = context.getHand();
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
-        Set<BlockPos> blocks;
         // only attempt to strip if the center block is strippable
-        if (isBlockScrapable(stack, level, player, pos, context)) {
-            if (aoeDefinition.isNone()) {
-                blocks = ImmutableSet.of(pos);
-            } else {
-                HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
-
-                if (rayTraceResult == null)
-                    return InteractionResult.PASS;
-                if (rayTraceResult.getType() != HitResult.Type.BLOCK)
-                    return InteractionResult.PASS;
-                if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                    return InteractionResult.PASS;
-                if (blockHitResult.getDirection() == null)
-                    return InteractionResult.PASS;
-
-                blocks = getScrapableBlocks(stack, aoeDefinition, level, player, rayTraceResult);
-                blocks.add(blockHitResult.getBlockPos());
-            }
-        } else
+        if (!isBlockScrapable(stack, level, player, pos, context)) {
             return InteractionResult.PASS;
+        }
 
-        boolean pathed = false;
+        Set<BlockPos> blocks;
+        if (aoeDefinition.isNone() || player == null) {
+            blocks = ImmutableSet.of(pos);
+        } else {
+            blocks = getScrapableBlocks(stack, aoeDefinition, level, player, context.getHitResult());
+            blocks.add(pos);
+        }
+
+        boolean scraped = false;
         for (BlockPos blockPos : blocks) {
-            pathed |= level.setBlock(blockPos,
-                    getScraped(level.getBlockState(blockPos),
-                            new UseOnContext(player, hand, context.getHitResult().withPosition(blockPos))),
-                    Block.UPDATE_ALL);
+            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+                    context.getHitResult().withPosition(blockPos));
+            scraped |= level.setBlock(blockPos, getScraped(level.getBlockState(blockPos), newCtx),
+                    Block.UPDATE_ALL_IMMEDIATE);
             level.levelEvent(player, LevelEvent.PARTICLES_SCRAPE, blockPos, 0);
-            if (!player.isCreative()) {
-                ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
-            }
+
+            ToolHelper.damageItem(stack, player);
             if (stack.isEmpty())
                 break;
         }
 
-        if (pathed) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AXE_WAX_OFF,
-                    SoundSource.PLAYERS, 1.0F, 1.0F);
-            player.swing(hand);
-            return InteractionResult.SUCCESS;
+        if (scraped) {
+            level.playSound(null, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return InteractionResult.PASS;
     }
 
     public static Set<BlockPos> getScrapableBlocks(ItemStack stack, AoESymmetrical aoeDefinition, Level Level,
-                                                   Player player, HitResult rayTraceResult) {
-        return ToolHelper.iterateAoE(stack, aoeDefinition, Level, player, rayTraceResult,
+                                                   Player player, HitResult hitResult) {
+        return ToolHelper.iterateAoE(stack, aoeDefinition, Level, player, hitResult,
                 ScrapeBehavior.INSTANCE::isBlockScrapable);
     }
 
     protected boolean isBlockScrapable(ItemStack stack, Level level, Player player, BlockPos pos,
                                        UseOnContext context) {
         BlockState state = level.getBlockState(pos);
-        BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_SCRAPE, false);
+        BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_SCRAPE, true);
         return newState != null && newState != state;
     }
 

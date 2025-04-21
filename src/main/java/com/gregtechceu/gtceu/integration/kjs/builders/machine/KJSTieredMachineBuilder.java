@@ -61,8 +61,7 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
     public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
         for (int tier : tiers) {
-            //noinspection DataFlowIssue
-            MachineDefinition def = value[tier];
+            MachineDefinition def = object[tier];
             if (def != null && def.getLangValue() != null) {
                 lang.add(GTCEu.MOD_ID, def.getDescriptionId(), def.getLangValue());
             }
@@ -102,9 +101,9 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
                                     tankScalingFunction.apply(tier), true));
                 }
             }
-            definitions[tier] = builder.createObject();
+            definitions[tier] = builder.register();
         }
-        return value = definitions;
+        return definitions;
     }
 
     @FunctionalInterface

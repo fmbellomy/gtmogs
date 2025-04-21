@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.utils.input;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.CPacketKeysPressed;
 
 import net.minecraft.client.KeyMapping;
@@ -10,21 +9,22 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-@Mod.EventBusSubscriber(modid = GTCEu.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = GTCEu.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
 public enum KeyBind {
 
     VANILLA_JUMP(() -> () -> Minecraft.getInstance().options.keyJump),
@@ -44,7 +44,8 @@ public enum KeyBind {
 
     public static final KeyBind[] VALUES = values();
 
-    private static double mouseDelta = 0.0;
+    private static double mouseDeltaX = 0.0;
+    private static double mouseDeltaY = 0.0;
 
     public static void init() {
         GTCEu.LOGGER.info("Registering KeyBinds");
@@ -68,7 +69,7 @@ public enum KeyBind {
         }
         if (!updating.isEmpty()) {
             try {
-                GTNetwork.NETWORK.sendToServer(new CPacketKeysPressed(updating));
+                PacketDistributor.sendToServer(new CPacketKeysPressed(updating));
             } catch (NullPointerException exception) {
                 GTCEu.LOGGER.error("Keys pressed packet failed to send with an exception", exception);
             }
@@ -87,22 +88,23 @@ public enum KeyBind {
 
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-        mouseDelta = event.getScrollDelta();
+        mouseDeltaX = event.getScrollDeltaX();
+        mouseDeltaY = event.getScrollDeltaY();
     }
 
     @OnlyIn(Dist.CLIENT)
     public static boolean scrollingUp() {
-        return mouseDelta > 0;
+        return mouseDeltaY > 0;
     }
 
     @OnlyIn(Dist.CLIENT)
     public static boolean notScrolling() {
-        return mouseDelta == 0;
+        return mouseDeltaY == 0;
     }
 
     @OnlyIn(Dist.CLIENT)
     public static boolean scrollingDown() {
-        return mouseDelta < 0;
+        return mouseDeltaY < 0;
     }
 
     @OnlyIn(Dist.CLIENT)

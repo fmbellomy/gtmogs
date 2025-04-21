@@ -11,6 +11,7 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import net.minecraft.network.chat.MutableComponent;
 
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -30,6 +31,7 @@ public abstract class TagFilter<T, S extends Filter<T, S>> implements Filter<T, 
     protected Consumer<S> itemWriter = filter -> {};
     protected Consumer<S> onUpdated = filter -> itemWriter.accept(filter);
 
+    @Nullable
     protected TagExprFilter.TagExprParser.MatchExpr matchExpr = null;
 
     protected TagFilter() {}

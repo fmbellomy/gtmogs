@@ -59,48 +59,38 @@ public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
         BlockPos pos = context.getClickedPos();
         InteractionHand hand = context.getHand();
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
         Set<BlockPos> blocks;
         // only attempt to flatten if the center block is flattenable
-        if (level.getBlockState(pos.above()).isAir() && isBlockPathConvertible(stack, level, player, pos, context)) {
-            if (aoeDefinition.isNone()) {
-                blocks = ImmutableSet.of(pos);
-            } else {
-                HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
-
-                if (rayTraceResult.getType() != HitResult.Type.BLOCK)
-                    return InteractionResult.PASS;
-                if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                    return InteractionResult.PASS;
-
-                blocks = getPathConvertibleBlocks(stack, aoeDefinition, level, player, rayTraceResult);
-                blocks.add(blockHitResult.getBlockPos());
-            }
-        } else
+        if (!isBlockPathConvertible(stack, level, player, pos, context)) {
             return InteractionResult.PASS;
+        }
+        if (aoeDefinition.isNone()) {
+            blocks = ImmutableSet.of(pos);
+        } else {
+            blocks = getPathConvertibleBlocks(stack, aoeDefinition, level, player, context.getHitResult());
+            blocks.add(pos);
+        }
 
         boolean pathed = false;
         for (BlockPos blockPos : blocks) {
-            BlockState newState = getFlattened(level.getBlockState(blockPos),
-                    new UseOnContext(player, hand, context.getHitResult().withPosition(blockPos)));
+            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+                    context.getHitResult().withPosition(blockPos));
+            BlockState newState = getFlattened(level.getBlockState(blockPos), newCtx);
             if (newState == null) {
                 continue;
             }
-            pathed |= level.setBlock(blockPos, newState, Block.UPDATE_ALL);
-            if (!player.isCreative()) {
-                ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
-            }
+            pathed |= level.setBlock(blockPos, newState, Block.UPDATE_ALL_IMMEDIATE);
+            ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
             if (stack.isEmpty())
                 break;
         }
 
         if (pathed) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.SHOVEL_FLATTEN,
-                    SoundSource.PLAYERS, 1.0F, 1.0F);
-            player.swing(hand);
-            return InteractionResult.SUCCESS;
+            level.playSound(null, pos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
+            return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return InteractionResult.PASS;
@@ -114,12 +104,9 @@ public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
 
     protected boolean isBlockPathConvertible(ItemStack stack, Level level, Player player, BlockPos pos,
                                              UseOnContext context) {
-        if (level.getBlockState(pos.above()).isAir()) {
-            BlockState state = level.getBlockState(pos);
-            BlockState newState = state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
-            return newState != null && newState != state;
-        }
-        return false;
+        BlockState state = level.getBlockState(pos);
+        BlockState newState = state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, true);
+        return newState != null && newState != state;
     }
 
     protected BlockState getFlattened(BlockState unFlattenedState, UseOnContext context) {

@@ -38,7 +38,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -306,7 +308,8 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
                         Component.translatable("gtceu.fluid.amount", FormattingUtil.formatNumbers(stack.getAmount()),
                                 FormattingUtil.formatNumbers(lastTankCapacity)));
             }
-            TooltipsHandler.appendFluidTooltips(stack, tooltips::add, null);
+            TooltipsHandler.appendFluidTooltips(stack, tooltips::add,
+                    TooltipFlag.NORMAL, Item.TooltipContext.of(gui.entityPlayer.level()));
         } else {
             tooltips.add(Component.translatable("gtceu.fluid.empty"));
             if (!isPhantom && showAmount) {

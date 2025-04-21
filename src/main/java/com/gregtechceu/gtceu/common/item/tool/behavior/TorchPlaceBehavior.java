@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -53,9 +52,11 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
     @Override
     public @NotNull InteractionResult onItemUse(UseOnContext context) {
         Player player = context.getPlayer();
-        InteractionHand hand = context.getHand();
+        if (player == null) {
+            return InteractionResult.PASS;
+        }
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
 
         ItemStack slotStack;
         if (this.cacheSlotKey) {
@@ -72,7 +73,7 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
             slotStack = player.getInventory().offhand.get(i);
             if (checkAndPlaceTorch(context, slotStack)) {
                 final int finalI = i;
-                slotStack.update(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY,
+                stack.update(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY,
                         val -> val.withBehavior(new TorchPlaceBehavior(this.cacheSlotKey, -(finalI + 1))));
                 return InteractionResult.SUCCESS;
             }
@@ -81,7 +82,7 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
             slotStack = player.getInventory().items.get(i);
             if (checkAndPlaceTorch(context, slotStack)) {
                 final int finalI = i;
-                slotStack.update(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY,
+                stack.update(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY,
                         val -> val.withBehavior(new TorchPlaceBehavior(this.cacheSlotKey, finalI)));
                 return InteractionResult.SUCCESS;
             }
@@ -101,7 +102,7 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
         if (context.getPlayer() == null)
             return false;
 
-        if (!(slotItem instanceof BlockItem slotItemBlock)) {
+        if (!(slotItem instanceof BlockItem blockItem)) {
             return false;
         }
 
@@ -116,10 +117,10 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
             var torchContext = new UseOnContext(context.getLevel(), context.getPlayer(), context.getHand(), slotStack,
                     context.getHitResult());
             var blockPlaceContext = new BlockPlaceContext(torchContext);
-            InteractionResult placed = slotItemBlock.place(blockPlaceContext);
+            InteractionResult placed = blockItem.place(blockPlaceContext);
             boolean wasPlaced = placed.consumesAction();
             if (wasPlaced) {
-                SoundType sound = slotItemBlock.getBlock().getSoundType(slotItemBlock.getBlock().defaultBlockState(),
+                SoundType sound = blockItem.getBlock().getSoundType(blockItem.getBlock().defaultBlockState(),
                         context.getLevel(), pos, context.getPlayer());
                 context.getLevel().playSound(context.getPlayer(), pos, sound.getPlaceSound(), SoundSource.BLOCKS,
                         (sound.getVolume() + 1.0F) / 2.0F, sound.getPitch() * 0.8F);

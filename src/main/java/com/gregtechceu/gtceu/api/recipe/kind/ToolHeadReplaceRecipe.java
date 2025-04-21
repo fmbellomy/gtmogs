@@ -10,15 +10,10 @@ import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.CustomRecipe;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,10 +39,10 @@ public class ToolHeadReplaceRecipe extends CustomRecipe {
     }
 
     @Override
-    public boolean matches(CraftingContainer inv, @NotNull Level level) {
+    public boolean matches(CraftingInput inv, @NotNull Level level) {
         List<ItemStack> list = new ArrayList<>();
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack stack = inv.getItem(i);
             if (!stack.isEmpty()) {
                 list.add(stack);
@@ -80,10 +75,10 @@ public class ToolHeadReplaceRecipe extends CustomRecipe {
     }
 
     @Override
-    public @NotNull ItemStack assemble(CraftingContainer inv, @NotNull RegistryAccess registryAccess) {
+    public @NotNull ItemStack assemble(CraftingInput inv, @NotNull HolderLookup.Provider registries) {
         List<ItemStack> list = new ArrayList<>();
 
-        for (int i = 0; i < inv.getContainerSize(); i++) {
+        for (int i = 0; i < inv.size(); i++) {
             ItemStack itemstack = inv.getItem(i);
 
             if (!itemstack.isEmpty()) {
@@ -112,7 +107,7 @@ public class ToolHeadReplaceRecipe extends CustomRecipe {
             GTToolType[] toolArray = TOOL_HEAD_TO_TOOL_MAP.get(toolHead.tagPrefix());
             ItemStack newTool = GTMaterialItems.TOOL_ITEMS.get(toolHead.material(), toolArray[tool.getElectricTier()])
                     .get().get(powerUnit.getCharge(), powerUnit.getMaxCharge());
-            if (newTool == null) return ItemStack.EMPTY;
+            if (newTool.isEmpty()) return ItemStack.EMPTY;
 
             return newTool;
         }
@@ -120,8 +115,8 @@ public class ToolHeadReplaceRecipe extends CustomRecipe {
     }
 
     @Override
-    public @NotNull NonNullList<ItemStack> getRemainingItems(@NotNull CraftingContainer container) {
-        var result = super.getRemainingItems(container);
+    public @NotNull NonNullList<ItemStack> getRemainingItems(@NotNull CraftingInput input) {
+        var result = super.getRemainingItems(input);
         for (ItemStack stack : result) {
             if (stack.getItem() instanceof IGTTool) {
                 stack.setCount(0);

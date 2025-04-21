@@ -495,7 +495,7 @@ public class MiscRecipeLoader {
                 .duration(100).EUt(VA[LV]).save(provider);
 
         if (!ConfigHolder.INSTANCE.recipes.hardMiscRecipes) {
-            VanillaRecipeHelper.addShapedRecipe(provider, "flour_to_dough", new ItemStack(DOUGH, 8),
+            VanillaRecipeHelper.addShapedRecipe(provider, "flour_to_dough", new ItemStack(DOUGH.asItem(), 8),
                     "FFF", "FWF", "FFF",
                     'F', ChemicalHelper.get(dust, Wheat),
                     'W', Water.getBucket());
@@ -509,10 +509,10 @@ public class MiscRecipeLoader {
                     .save(provider);
 
             VanillaRecipeHelper.addShapelessRecipe(provider, "pumpkin_pie_from_dough", new ItemStack(Items.PUMPKIN_PIE),
-                    new ItemStack(Blocks.PUMPKIN), new ItemStack(Items.SUGAR), new ItemStack(DOUGH));
+                    new ItemStack(Blocks.PUMPKIN), new ItemStack(Items.SUGAR), new ItemStack(DOUGH.asItem()));
 
             VanillaRecipeHelper.addShapelessRecipe(provider, "cookie_from_dough", new ItemStack(Items.COOKIE, 8),
-                    new ItemStack(DOUGH), new ItemStack(Items.COCOA_BEANS));
+                    new ItemStack(DOUGH.asItem()), new ItemStack(Items.COCOA_BEANS));
 
             FORMING_PRESS_RECIPES.recipeBuilder("cookie")
                     .notConsumable(SHAPE_MOLD_CYLINDER)
@@ -530,7 +530,7 @@ public class MiscRecipeLoader {
                     'M', new FluidContainerIngredient(Milk.getFluidTag(), 1000),
                     'D', DOUGH);
         } else {
-            VanillaRecipeHelper.addShapedRecipe(provider, "flour_to_dough", new ItemStack(DOUGH, 4),
+            VanillaRecipeHelper.addShapedRecipe(provider, "flour_to_dough", new ItemStack(DOUGH.asItem(), 4),
                     "FFF", "FWF", "FFF",
                     'F', ChemicalHelper.get(dust, Wheat),
                     'W', Water.getBucket());
@@ -545,10 +545,10 @@ public class MiscRecipeLoader {
                     .save(provider);
 
             VanillaRecipeHelper.addShapelessRecipe(provider, "pumpkin_pie_from_dough", new ItemStack(Items.PUMPKIN_PIE),
-                    new ItemStack(Blocks.PUMPKIN), new ItemStack(DOUGH), new ItemStack(Items.SUGAR), 'r', 'k');
+                    new ItemStack(Blocks.PUMPKIN), new ItemStack(DOUGH.asItem()), new ItemStack(Items.SUGAR), 'r', 'k');
 
             VanillaRecipeHelper.addShapelessRecipe(provider, "cookie", new ItemStack(Items.COOKIE, 4),
-                    new ItemStack(Items.COCOA_BEANS), new ItemStack(DOUGH), new ItemStack(Items.SUGAR), 'r');
+                    new ItemStack(Items.COCOA_BEANS), new ItemStack(DOUGH.asItem()), new ItemStack(Items.SUGAR), 'r');
 
             FORMING_PRESS_RECIPES.recipeBuilder("cookie")
                     .notConsumable(SHAPE_MOLD_CYLINDER)

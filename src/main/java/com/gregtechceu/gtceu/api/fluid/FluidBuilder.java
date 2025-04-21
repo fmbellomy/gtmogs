@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.fluid;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttribute;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
+import com.gregtechceu.gtceu.api.item.GTBucketItem;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialFlags;
 import com.gregtechceu.gtceu.api.material.material.properties.BlastProperty;
@@ -12,10 +13,13 @@ import com.gregtechceu.gtceu.api.registry.registrate.forge.GTClientFluidTypeExte
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.tterrag.registrate.AbstractRegistrate;
+import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluid;
 
 import com.google.common.base.Preconditions;
@@ -277,9 +281,10 @@ public class FluidBuilder {
         determineLuminosity(material);
         determineViscosity(material);
 
+        final String langKey = this.translation != null ? this.translation : key.getTranslationKeyFor(material);
         //noinspection DataFlowIssue
         var builder = registrate.fluid(this.name, this.still, this.flowing,
-                        (p, $1, $2) -> makeFluidType(registrate, p, material, key),
+                        (p, $1, $2) -> makeFluidType(registrate, p, material, key, langKey),
                         (p) -> new GTFluid.Flowing(this.state, this.burnTime, p))
                 .source((p) -> new GTFluid.Source(this.state, this.burnTime, p));
         if (this.hasFluidBlock) {
@@ -289,8 +294,12 @@ public class FluidBuilder {
                                     .texture("particle", this.still)))
                     .register();
         } else builder.noBlock();
-        if (this.hasBucket) builder.defaultBucket();
-        else builder.noBucket();
+        if (this.hasBucket) {
+            builder.bucket((fluid, properties) -> new GTBucketItem(fluid, properties, material, langKey))
+                    .properties(p -> p.craftRemainder(Items.BUCKET).stacksTo(1))
+                    .setData(ProviderType.LANG, NonNullBiConsumer.noop())
+                    .register();
+        } else builder.noBucket();
 
         builder.onRegister(fluid -> {
             if (fluid.getSource() instanceof GTFluid gtSource) attributes.forEach(gtSource::addAttribute);
@@ -403,14 +412,13 @@ public class FluidBuilder {
     }
 
     private FluidType makeFluidType(AbstractRegistrate<?> owner, FluidType.Properties properties,
-                                    Material material, FluidStorageKey key) {
+                                    Material material, FluidStorageKey key, String langKey) {
         properties.sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
                 .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY)
                 .temperature(this.temperature)
                 .density(this.density)
                 .lightLevel(this.luminosity)
                 .viscosity(this.viscosity);
-        final String langKey = this.translation != null ? this.translation : key.getTranslationKeyFor(material);
         FluidType type = new FluidType(properties) {
 
             @Override

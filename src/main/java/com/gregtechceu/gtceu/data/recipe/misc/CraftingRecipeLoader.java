@@ -286,7 +286,7 @@ public class CraftingRecipeLoader {
         ///////////////////////////////////////////////////
         // Special //
         ///////////////////////////////////////////////////
-        SpecialRecipeBuilder.special(FacadeCoverRecipe.SERIALIZER).save(provider, "gtceu:crafting/facade_cover");
+        SpecialRecipeBuilder.special(FacadeCoverRecipe::new).save(provider, FacadeCoverRecipe.ID.toString());
     }
 
     private static void addDuctRecipes(@NotNull RecipeOutput provider, @NotNull Material material,
