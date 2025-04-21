@@ -82,7 +82,6 @@ public class GTRecipeWidget extends WidgetGroup {
         return 0;
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     private void setRecipeWidget() {
         setClientSideWidget();
 
@@ -130,7 +129,7 @@ public class GTRecipeWidget extends WidgetGroup {
             capability.getKey().addXEIInfo(this, xOffset, recipe, capability.getValue(), true, false, yOff);
         }
 
-        for (RecipeCondition condition : recipe.conditions) {
+        for (RecipeCondition<?> condition : recipe.conditions) {
             if (condition.getTooltips() == null) continue;
             if (condition instanceof DimensionCondition dimCondition) {
                 addWidget(dimCondition
@@ -145,6 +144,7 @@ public class GTRecipeWidget extends WidgetGroup {
         recipe.recipeType.getRecipeUI().appendJEIUI(recipe, this);
     }
 
+    @SuppressWarnings("deprecation")
     private void initializeRecipeTextWidget() {
         String tierText = GTValues.VNF[tier];
         int textsY = yOffset - 10;

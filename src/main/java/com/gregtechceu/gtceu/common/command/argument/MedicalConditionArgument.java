@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.common.commands.arguments;
+package com.gregtechceu.gtceu.common.command.argument;
 
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 

@@ -10,8 +10,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 public class CycleItemStackHandler implements IItemHandlerModifiable {
 
     private final List<ItemStackList> stacks;

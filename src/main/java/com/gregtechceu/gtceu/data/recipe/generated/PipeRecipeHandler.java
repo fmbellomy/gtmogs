@@ -16,8 +16,6 @@ import net.minecraft.world.item.ItemStack;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.function.Consumer;
-
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialFlags.NO_SMASHING;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;

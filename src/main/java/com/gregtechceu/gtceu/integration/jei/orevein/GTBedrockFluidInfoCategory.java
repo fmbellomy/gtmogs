@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.integration.jei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
-import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
@@ -10,6 +10,8 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -20,10 +22,12 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
 
-public class GTBedrockFluidInfoCategory extends ModularUIRecipeCategory<BedrockFluidDefinition> {
+import java.util.function.Function;
 
-    public final static RecipeType<BedrockFluidDefinition> RECIPE_TYPE = new RecipeType<>(
-            GTCEu.id("bedrock_fluid_diagram"), BedrockFluidDefinition.class);
+public class GTBedrockFluidInfoCategory extends ModularUIRecipeCategory<Holder<BedrockFluidDefinition>> {
+
+    public final static RecipeType<Holder<BedrockFluidDefinition>> RECIPE_TYPE = new RecipeType(
+            GTCEu.id("bedrock_fluid_diagram"), Holder.class);
     @Getter
     private final IDrawable background;
     @Getter
@@ -38,7 +42,11 @@ public class GTBedrockFluidInfoCategory extends ModularUIRecipeCategory<BedrockF
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
-        registry.addRecipes(RECIPE_TYPE, ClientInit.CLIENT_FLUID_VEINS.values().stream().toList());
+        var fluids = Minecraft.getInstance().level.registryAccess()
+                .registryOrThrow(GTRegistries.BEDROCK_FLUID_REGISTRY);
+        registry.addRecipes(RECIPE_TYPE, fluids.holders()
+                .<Holder<BedrockFluidDefinition>>map(Function.identity())
+                .toList());
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
@@ -47,7 +55,7 @@ public class GTBedrockFluidInfoCategory extends ModularUIRecipeCategory<BedrockF
     }
 
     @NotNull
-    public RecipeType<BedrockFluidDefinition> getRecipeType() {
+    public RecipeType<Holder<BedrockFluidDefinition>> getRecipeType() {
         return RECIPE_TYPE;
     }
 

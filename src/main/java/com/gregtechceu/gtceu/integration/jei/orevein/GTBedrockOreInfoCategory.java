@@ -1,6 +1,8 @@
 package com.gregtechceu.gtceu.integration.jei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
@@ -8,6 +10,8 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 
@@ -20,10 +24,12 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
 
-public class GTBedrockOreInfoCategory extends ModularUIRecipeCategory<BedrockOreDefinition> {
+import java.util.function.Function;
 
-    public final static RecipeType<BedrockOreDefinition> RECIPE_TYPE = new RecipeType<>(
-            GTCEu.id("bedrock_ore_diagram"), BedrockOreDefinition.class);
+public class GTBedrockOreInfoCategory extends ModularUIRecipeCategory<Holder<BedrockOreDefinition>> {
+
+    public final static RecipeType<Holder<BedrockOreDefinition>> RECIPE_TYPE = new RecipeType(
+            GTCEu.id("bedrock_ore_diagram"), Holder.class);
     @Getter
     private final IDrawable background;
     @Getter
@@ -37,7 +43,11 @@ public class GTBedrockOreInfoCategory extends ModularUIRecipeCategory<BedrockOre
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
-        registry.addRecipes(RECIPE_TYPE, ClientInit.CLIENT_BEDROCK_ORE_VEINS.values().stream().toList());
+        var bedrockOres = Minecraft.getInstance().level.registryAccess()
+                .registryOrThrow(GTRegistries.BEDROCK_ORE_REGISTRY);
+        registry.addRecipes(RECIPE_TYPE, bedrockOres.holders()
+                .<Holder<BedrockOreDefinition>>map(Function.identity())
+                .toList());
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
@@ -47,7 +57,7 @@ public class GTBedrockOreInfoCategory extends ModularUIRecipeCategory<BedrockOre
 
     @NotNull
     @Override
-    public RecipeType<BedrockOreDefinition> getRecipeType() {
+    public RecipeType<Holder<BedrockOreDefinition>> getRecipeType() {
         return RECIPE_TYPE;
     }
 

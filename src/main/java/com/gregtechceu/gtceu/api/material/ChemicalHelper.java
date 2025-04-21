@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.stack.ItemMaterialInfo;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
@@ -87,7 +88,7 @@ public class ChemicalHelper {
     public static Material getMaterial(Fluid fluid) {
         if (FLUID_MATERIAL.isEmpty()) {
             Set<TagKey<Fluid>> allFluidTags = BuiltInRegistries.FLUID.getTagNames().collect(Collectors.toSet());
-            for (final Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+            for (final Material material : GTCEuAPI.materialManager) {
                 if (material.hasProperty(PropertyKey.FLUID)) {
                     FluidProperty property = material.getProperty(PropertyKey.FLUID);
                     FluidStorageKey.allKeys().stream()
@@ -199,7 +200,7 @@ public class ChemicalHelper {
             // lookups.
             Set<TagKey<Item>> allItemTags = BuiltInRegistries.ITEM.getTagNames().collect(Collectors.toSet());
             for (TagPrefix prefix : TagPrefix.values()) {
-                for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+                for (Material material : GTCEuAPI.materialManager) {
                     prefix.getItemTags(material).stream()
                             .filter(allItemTags::contains)
                             .forEach(tagKey -> {

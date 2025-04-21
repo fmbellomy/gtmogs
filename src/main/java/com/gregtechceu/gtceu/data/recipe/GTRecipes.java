@@ -57,13 +57,11 @@ public class GTRecipes {
             }
         };
 
-        ComposterRecipes.addComposterRecipes(ComposterBlock.COMPOSTABLES::put);
-
         // Decomposition info loading
         MaterialInfoLoader.init();
 
         // com.gregtechceu.gtceu.data.recipe.generated.*
-        for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material material : GTCEuAPI.materialManager) {
             if (material.hasFlag(MaterialFlags.DISABLE_MATERIAL_RECIPES)) {
                 continue;
             }

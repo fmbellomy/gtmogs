@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.common.commands.arguments;
+package com.gregtechceu.gtceu.common.command.argument;
 
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 
@@ -18,8 +18,8 @@ import java.util.function.Function;
 
 public class MedicalConditionParser {
 
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_ITEM = new DynamicCommandExceptionType(
-            id -> Component.translatable("argument.item.id.invalid", id));
+    private static final DynamicCommandExceptionType ERROR_UNKNOWN_CONDITION = new DynamicCommandExceptionType(
+            id -> Component.translatable("argument.medical_condition.id.invalid", id));
     private static final Function<SuggestionsBuilder, CompletableFuture<Suggestions>> SUGGEST_NOTHING = SuggestionsBuilder::buildFuture;
     private final StringReader reader;
     private MedicalCondition result;
@@ -64,11 +64,12 @@ public class MedicalConditionParser {
             reader.skip();
         }
         String name = reader.getString().substring(i, reader.getCursor());
-        MedicalCondition material = MedicalCondition.CONDITIONS.get(name);
-        this.result = Optional.ofNullable(material).orElseThrow(() -> {
+        MedicalCondition condition = MedicalCondition.CONDITIONS.get(name);
+        if (condition == null) {
             this.reader.setCursor(i);
-            return ERROR_UNKNOWN_ITEM.createWithContext(this.reader, name);
-        });
+            throw  ERROR_UNKNOWN_CONDITION.createWithContext(this.reader, name);
+        }
+        this.result = condition;
     }
 
     private void parse() throws CommandSyntaxException {

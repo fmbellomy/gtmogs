@@ -101,7 +101,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     }
 
     /**
-     * Will be called on server side after the cover attachment to the meta tile entity
+     * Will be called on server side after the cover attachment to the machine
      * Cover can change it's internal state here and return initial data as nbt.
      *
      * @param itemStack the item cover was attached from

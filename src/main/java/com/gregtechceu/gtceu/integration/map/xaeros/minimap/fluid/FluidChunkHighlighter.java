@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import org.jetbrains.annotations.Nullable;
 import xaero.common.minimap.highlight.ChunkHighlighter;
 import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 

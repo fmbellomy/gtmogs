@@ -10,7 +10,7 @@ import lombok.Getter;
 public class OreVeinElement {
 
     @Getter
-    private GeneratedVeinMetadata vein;
+    private final GeneratedVeinMetadata vein;
     @Getter
     private final String name;
     @Getter
@@ -24,6 +24,6 @@ public class OreVeinElement {
     }
 
     public Material getFirstMaterial() {
-        return vein.definition().veinGenerator().getAllMaterials().get(0);
+        return vein.definition().value().veinGenerator().getAllMaterials().getFirst();
     }
 }

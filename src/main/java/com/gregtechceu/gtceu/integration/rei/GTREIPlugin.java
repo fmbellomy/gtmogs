@@ -93,7 +93,7 @@ public class GTREIPlugin implements REIClientPlugin {
         for (GTToolType toolType : GTToolType.getTypes().values()) {
             registry.group(GTCEu.id("tool/" + toolType.name),
                     Component.translatable("gtceu.tool.class." + toolType.name),
-                    EntryIngredients.ofItemTag(toolType.itemTags.get(0)));
+                    EntryIngredients.ofItemTag(toolType.itemTags.getFirst()));
             // EntryIngredients.ofItemStacks(GTItems.TOOL_ITEMS.column(toolType).values().stream().filter(Objects::nonNull).map(ItemProviderEntry::get).map(IGTTool::get).collect(Collectors.toSet()))
         }
 
@@ -120,18 +120,18 @@ public class GTREIPlugin implements REIClientPlugin {
         }
 
         List<EntryStack<dev.architectury.fluid.FluidStack>> stacks = new ArrayList<>(BuiltInRegistries.POTION.size());
-        for (Potion potion : BuiltInRegistries.POTION) {
+        BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack stack = PotionFluidHelper.getFluidFromPotion(potion, PotionFluidHelper.BOTTLE_AMOUNT);
             stacks.add(EntryStacks
-                    .of(dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getTag())));
-        }
+                    .of(dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentsPatch())));
+        });
         registry.group(GTCEu.id("potion_fluids"), Component.translatable("gtceu.rei.group.potion_fluids"), stacks);
     }
 
     @Override
     public void registerItemComparators(ItemComparatorRegistry registry) {
-        registry.registerNbt(GTItems.PROGRAMMED_CIRCUIT.asItem());
-        registry.registerNbt(GTItems.TURBINE_ROTOR.asItem());
+        registry.registerComponents(GTItems.PROGRAMMED_CIRCUIT.asItem());
+        registry.registerComponents(GTItems.TURBINE_ROTOR.asItem());
     }
 
     @Override
@@ -143,11 +143,11 @@ public class GTREIPlugin implements REIClientPlugin {
 
     @Override
     public void registerEntries(EntryRegistry registry) {
-        for (Potion potion : BuiltInRegistries.POTION) {
+        BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack stack = PotionFluidHelper.getFluidFromPotion(potion, PotionFluidHelper.BOTTLE_AMOUNT);
             registry.addEntry(EntryStacks.of(
-                    dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getTag())));
-        }
+                    dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentsPatch())));
+        });
     }
 
     private static String toUpperAllWords(String text) {

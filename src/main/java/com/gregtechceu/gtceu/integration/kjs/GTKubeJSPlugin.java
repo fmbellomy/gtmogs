@@ -50,7 +50,6 @@ import com.gregtechceu.gtceu.data.machine.GCYMMachines;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.common.machine.multiblock.primitive.PrimitiveFancyUIWorkableMachine;
-import com.gregtechceu.gtceu.common.unification.material.MaterialRegistryManager;
 import com.gregtechceu.gtceu.data.block.GCYMBlocks;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
@@ -76,7 +75,7 @@ import com.gregtechceu.gtceu.integration.kjs.builders.recipetype.GTRecipeCategor
 import com.gregtechceu.gtceu.integration.kjs.builders.recipetype.GTRecipeTypeBuilder;
 import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.BedrockOreBuilder;
 import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.DimensionMarkerBuilder;
-import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.FluidVeinBuilder;
+import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.BedrockFluidBuilder;
 import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.OreVeinDefinitionBuilder;
 import com.gregtechceu.gtceu.integration.kjs.helpers.GTResourceLocation;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MachineConstructors;
@@ -151,7 +150,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         });
 
         registry.addDefault(GTRegistries.ORE_VEIN_REGISTRY, OreVeinDefinitionBuilder.class, OreVeinDefinitionBuilder::new);
-        registry.addDefault(GTRegistries.BEDROCK_FLUID_REGISTRY, FluidVeinBuilder.class, FluidVeinBuilder::new);
+        registry.addDefault(GTRegistries.BEDROCK_FLUID_REGISTRY, BedrockFluidBuilder.class, BedrockFluidBuilder::new);
         registry.addDefault(GTRegistries.BEDROCK_ORE_REGISTRY, BedrockOreBuilder.class, BedrockOreBuilder::new);
     }
 
@@ -207,7 +206,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         // Material related
         event.add("GTElements", GTElements.class);
         event.add("GTMaterials", GTMaterials.class);
-        event.add("GTMaterialRegistry", MaterialRegistryManager.getInstance());
+        event.add("GTMaterialRegistry", GTCEuAPI.materialManager);
         event.add("TagPrefix", TagPrefix.class);
         event.add("ItemGenerationCondition", TagPrefix.Conditions.class);
         event.add("MaterialEntry", MaterialEntry.class);

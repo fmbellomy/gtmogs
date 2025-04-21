@@ -72,7 +72,7 @@ public class RecipeOutputProvider extends CapabilityInfoProvider<RecipeLogic> {
 
                 List<FluidStack> fluidOutputs = new ArrayList<>();
                 for (var fluid : fluidContents) {
-                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getStacks();
+                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getFluids();
                     if (stacks.length == 0) continue;
                     if (stacks[0].isEmpty()) continue;
                     var stack = stacks[0].copy();
@@ -116,7 +116,7 @@ public class RecipeOutputProvider extends CapabilityInfoProvider<RecipeLogic> {
                 horizontalPane = verticalPane
                         .horizontal(verticalPane.defaultLayoutStyle().alignment(ElementAlignment.ALIGN_CENTER));
                 horizontalPane.element(new FluidStackElement(fluidOutput, new FluidStyle())).text(" ")
-                        .text(fluidOutput.getDisplayName());
+                        .text(fluidOutput.getHoverName());
             }
         }
     }

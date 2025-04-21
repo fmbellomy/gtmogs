@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +19,8 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class GTBedrockFluids {
+
+    public static final Set<ResourceKey<BedrockFluidDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
 
     //////////////////////////////////////
     // ******** OVERWORLD ********//
@@ -39,7 +42,9 @@ public class GTBedrockFluids {
 
 
     public static ResourceKey<BedrockFluidDefinition> create(ResourceLocation id) {
-        return ResourceKey.create(GTRegistries.BEDROCK_FLUID_REGISTRY, id);
+        var key = ResourceKey.create(GTRegistries.BEDROCK_FLUID_REGISTRY, id);
+        ALL_KEYS.add(key);
+        return key;
     }
 
     public static Set<ResourceKey<Level>> nether() {
@@ -123,13 +128,13 @@ public class GTBedrockFluids {
                 .depletionChance(100)
                 .depletedYield(30)
                 .dimensions(nether()));
-        register(context, NETHER_NATURAL_GAS,
-                builder -> builder.fluid(GTMaterials.NaturalGas::getFluid)
-                        .weight(35)
-                        .yield(150, 300)
-                        .depletionAmount(1)
-                        .depletionChance(100)
-                        .depletedYield(40)
-                        .dimensions(nether()));
+        register(context, NETHER_NATURAL_GAS, builder -> builder
+                .fluid(GTMaterials.NaturalGas::getFluid)
+                .weight(35)
+                .yield(150, 300)
+                .depletionAmount(1)
+                .depletionChance(100)
+                .depletedYield(40)
+                .dimensions(nether()));
     }
 }

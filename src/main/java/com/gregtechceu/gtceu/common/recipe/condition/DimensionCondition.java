@@ -15,6 +15,7 @@ import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
 import com.mojang.serialization.MapCodec;
+import lombok.Getter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -36,7 +37,8 @@ public class DimensionCondition extends RecipeCondition<DimensionCondition> {
             .and(ResourceKey.codec(Registries.DIMENSION).fieldOf("dimension").forGetter(DimensionCondition::getDimension)
             ).apply(instance, DimensionCondition::new));
     // spotless:on
-    public final static DimensionCondition INSTANCE = new DimensionCondition();
+
+    @Getter
     private ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION,
             ResourceLocation.withDefaultNamespace("dummy"));
 
@@ -66,7 +68,8 @@ public class DimensionCondition extends RecipeCondition<DimensionCondition> {
 
     public SlotWidget setupDimensionMarkers(int xOffset, int yOffset) {
         DimensionMarker dimMarker = GTRegistries.DIMENSION_MARKERS.getOrDefault(this.dimension.location(),
-                new DimensionMarker(DimensionMarker.MAX_TIER, () -> Blocks.BARRIER, this.dimension.toString()));
+                new DimensionMarker(DimensionMarker.MAX_TIER,
+                        () -> Blocks.BARRIER, this.dimension.location().toString()));
         ItemStack icon = dimMarker.getIcon();
         CustomItemStackHandler handler = new CustomItemStackHandler(1);
         SlotWidget dimSlot = new SlotWidget(handler, 0, xOffset, yOffset, false, false)
@@ -80,18 +83,14 @@ public class DimensionCondition extends RecipeCondition<DimensionCondition> {
         return dimSlot;
     }
 
-    public ResourceKey<Level> getDimension() {
-        return dimension;
-    }
-
     @Override
     public boolean testCondition(@NotNull GTRecipe recipe, @NotNull RecipeLogic recipeLogic) {
         Level level = recipeLogic.machine.self().getLevel();
-        return level != null && dimension.equals(level.dimension().location());
+        return level != null && dimension == level.dimension();
     }
 
     @Override
-    public RecipeCondition createTemplate() {
+    public DimensionCondition createTemplate() {
         return new DimensionCondition();
     }
 
@@ -104,15 +103,15 @@ public class DimensionCondition extends RecipeCondition<DimensionCondition> {
     }
 
     @Override
-    public RecipeCondition fromNetwork(RegistryFriendlyByteBuf buf) {
+    public DimensionCondition fromNetwork(RegistryFriendlyByteBuf buf) {
         super.fromNetwork(buf);
-        dimension = buf.readResourceLocation();
+        dimension = buf.readResourceKey(Registries.DIMENSION);
         return this;
     }
 
     @Override
     public void toNetwork(RegistryFriendlyByteBuf buf) {
         super.toNetwork(buf);
-        buf.writeResourceLocation(dimension);
+        buf.writeResourceKey(dimension);
     }
 }

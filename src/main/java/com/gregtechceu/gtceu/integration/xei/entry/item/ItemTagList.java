@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.integration.xei.entry.item;
 
-import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -10,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -20,7 +19,7 @@ public final class ItemTagList implements ItemEntryList {
     @Getter
     private final List<ItemTagEntry> entries = new ArrayList<>();
 
-    public static ItemTagList of(@NotNull TagKey<Item> tag, int amount, @Nullable DataComponentPatch componentPatch) {
+    public static ItemTagList of(@NotNull TagKey<Item> tag, int amount, @NotNull DataComponentPatch componentPatch) {
         var list = new ItemTagList();
         list.add(tag, amount, componentPatch);
         return list;
@@ -30,7 +29,7 @@ public final class ItemTagList implements ItemEntryList {
         entries.add(entry);
     }
 
-    public void add(@NotNull TagKey<Item> tag, int amount, @Nullable DataComponentPatch componentPatch) {
+    public void add(@NotNull TagKey<Item> tag, int amount, @NotNull DataComponentPatch componentPatch) {
         add(new ItemTagEntry(tag, amount, componentPatch));
     }
 
@@ -46,17 +45,11 @@ public final class ItemTagList implements ItemEntryList {
                 .toList();
     }
 
-    public record ItemTagEntry(@NotNull TagKey<Item> tag, int amount, @Nullable DataComponentPatch componentPatch) {
+    public record ItemTagEntry(@NotNull TagKey<Item> tag, int amount, @NotNull DataComponentPatch componentPatch) {
 
         public Stream<ItemStack> stacks() {
             return BuiltInRegistries.ITEM.getTag(tag).map(HolderSet.ListBacked::stream).orElseGet(Stream::empty)
-                    .map(holder -> stackWithTag(holder, amount, componentPatch));
+                    .map(holder -> new ItemStack(holder, amount, componentPatch));
         }
-    }
-
-    private static ItemStack stackWithTag(Holder<Item> holder, int amount, @Nullable DataComponentPatch componentPatch) {
-        ItemStack stack = new ItemStack(holder.value(), amount);
-        stack.applyComponents(componentPatch);
-        return stack;
     }
 }

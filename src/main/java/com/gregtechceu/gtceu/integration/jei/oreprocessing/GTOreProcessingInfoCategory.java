@@ -42,8 +42,8 @@ public class GTOreProcessingInfoCategory extends ModularUIRecipeCategory<Materia
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
-        registry.addRecipes(RECIPE_TYPE, GTCEuAPI.materialManager.getRegisteredMaterials().stream()
-                .filter((material) -> material.hasProperty(PropertyKey.ORE) &&
+        registry.addRecipes(RECIPE_TYPE, GTCEuAPI.materialManager.stream()
+                .filter(material -> material.hasProperty(PropertyKey.ORE) &&
                         !material.hasFlag(MaterialFlags.NO_ORE_PROCESSING_TAB))
                 .toList());
     }

@@ -24,7 +24,7 @@ import java.util.List;
 public class AlloyBlastPropertyAddition {
 
     public static void addAlloyBlastProperties(PostMaterialEvent event) {
-        for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material material : GTCEuAPI.materialManager) {
             if (!material.hasFlag(MaterialFlags.DISABLE_ALLOY_PROPERTY)) {
                 addAlloyBlastProperty(material);
             }

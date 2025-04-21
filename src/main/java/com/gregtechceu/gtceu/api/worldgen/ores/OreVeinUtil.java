@@ -1,32 +1,18 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryCodecs;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.mojang.serialization.JsonOps;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class OreVeinUtil {
 
@@ -104,30 +90,5 @@ public class OreVeinUtil {
      */
     static int getMaxIndicatorSearchDistance() {
         return getMaxVeinSearchDistance() + (int) Math.ceil((double) GTOreVeins.getLargestIndicatorOffset() / 16.0);
-    }
-
-    @Nullable
-    public static Supplier<HolderSet<Biome>> resolveBiomes(List<String> biomes) {
-        if (biomes.isEmpty())
-            return null;
-
-        RegistryOps<JsonElement> registryOps = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        JsonElement codecInput = resolveBiomeCodecInput(biomes);
-        return () -> RegistryCodecs.homogeneousList(Registries.BIOME)
-                .parse(registryOps, codecInput)
-                .getOrThrow();
-    }
-
-    private static JsonElement resolveBiomeCodecInput(List<String> biomes) {
-        if (biomes.size() == 1)
-            return new JsonPrimitive(biomes.get(0));
-
-        if (biomes.stream().anyMatch(filter -> filter.startsWith("#")))
-            throw new IllegalStateException(
-                    "Cannot resolve biomes: You may use either a single tag or multiple individual biomes.");
-
-        var jsonArray = new JsonArray();
-        biomes.forEach(jsonArray::add);
-        return jsonArray;
     }
 }

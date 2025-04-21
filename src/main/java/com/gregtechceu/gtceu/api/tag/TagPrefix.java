@@ -201,7 +201,7 @@ public class TagPrefix {
                             .requiresCorrectToolForDrops().strength(4.5F, 9.0F),
                     ResourceLocation.withDefaultNamespace("block/end_stone"), true, false, true);
 
-    public static final TagPrefix rawOre = new TagPrefix("raw", true)
+    public static final TagPrefix rawOre = new TagPrefix("raw")
             .idPattern("raw_%s")
             .defaultTagPath("raw_materials/%s")
             .unformattedTagPath("raw_materials")
@@ -975,8 +975,6 @@ public class TagPrefix {
     @Getter
     @Setter
     private String idPattern;
-    @Getter
-    public final boolean invertedName;
 
     protected final List<TagType> tags = new ArrayList<>();
     @Setter
@@ -1033,14 +1031,10 @@ public class TagPrefix {
     protected final Set<TagKey<Block>> miningToolTag = new HashSet<>();
 
     public TagPrefix(String name) {
-        this(name, false);
-    }
-
-    public TagPrefix(String name, boolean invertedName) {
         this.name = name;
-        this.idPattern = "%s_" + FormattingUtil.toLowerCaseUnder(name);
-        this.invertedName = invertedName;
-        this.langValue = "%s " + FormattingUtil.toEnglishName(FormattingUtil.toLowerCaseUnder(name));
+        String lowerCaseUnder = FormattingUtil.toLowerCaseUnder(name);
+        this.idPattern = "%s_" + lowerCaseUnder;
+        this.langValue = "%s " + FormattingUtil.toEnglishName(lowerCaseUnder);
         PREFIXES.put(name, this);
     }
 
@@ -1229,7 +1223,7 @@ public class TagPrefix {
     }
 
     public String getUnlocalizedName() {
-        return "tagprefix." + FormattingUtil.toLowerCaseUnderscore(name);
+        return "tagprefix." + FormattingUtil.toLowerCaseUnder(name);
     }
 
     public MutableComponent getLocalizedName(Material material) {
@@ -1237,7 +1231,7 @@ public class TagPrefix {
     }
 
     public String getUnlocalizedName(Material material) {
-        String formattedPrefix = FormattingUtil.toLowerCaseUnderscore(this.name);
+        String formattedPrefix = FormattingUtil.toLowerCaseUnder(this.name);
         String matSpecificKey = String.format("item.%s.%s", material.getModid(),
                 this.idPattern.formatted(material.getName()));
         if (LocalizationUtils.exist(matSpecificKey)) {

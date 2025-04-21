@@ -1,10 +1,12 @@
 package com.gregtechceu.gtceu.integration.emi.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 
@@ -21,9 +23,11 @@ public class GTOreVeinEmiCategory extends EmiRecipeCategory {
     }
 
     public static void registerDisplays(EmiRegistry registry) {
-        for (OreVeinDefinition oreDefinition : ClientInit.CLIENT_ORE_VEINS.values()) {
-            registry.addRecipe(new GTEmiOreVein(oreDefinition));
-        }
+        var fluids = Minecraft.getInstance().level.registryAccess()
+                .registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
+        fluids.holders().forEach(ore -> {
+            registry.addRecipe(new GTEmiOreVein(ore));
+        });
     }
 
     public static void registerWorkStations(EmiRegistry registry) {

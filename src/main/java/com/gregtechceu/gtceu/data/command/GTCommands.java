@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.common.commands;
+package com.gregtechceu.gtceu.data.command;
 
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;

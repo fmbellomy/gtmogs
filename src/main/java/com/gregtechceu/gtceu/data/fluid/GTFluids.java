@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluid;
@@ -18,12 +17,14 @@ import net.neoforged.neoforge.common.NeoForgeMod;
 
 import com.tterrag.registrate.util.entry.FluidEntry;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Supplier;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
 public class GTFluids {
 
+    @SuppressWarnings("UnstableApiUsage")
     public static final FluidEntry<PotionFluid> POTION = REGISTRATE
             .fluid("potion", GTCEu.id("block/fluids/fluid.potion"), GTCEu.id("block/fluids/fluid.potion"),
                     PotionFluid.PotionFluidType::new, PotionFluid::new)
@@ -41,14 +42,12 @@ public class GTFluids {
 
         // register fluids for materials
         REGISTRATE.creativeModeTab(() -> GTCreativeModeTabs.MATERIAL_FLUID);
-        for (MaterialRegistry registry : GTCEuAPI.materialManager.getRegistries()) {
-            GTRegistrate registrate = registry.getRegistrate();
-            for (var material : registry.getAllMaterials()) {
-                var fluidProperty = material.getProperty(PropertyKey.FLUID);
+        for (var material : GTCEuAPI.materialManager) {
+            var fluidProperty = material.getProperty(PropertyKey.FLUID);
 
-                if (fluidProperty != null) {
-                    fluidProperty.registerFluids(material, registrate);
-                }
+            if (fluidProperty != null) {
+                GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(material.getModid());
+                fluidProperty.registerFluids(material, registrate);
             }
         }
     }

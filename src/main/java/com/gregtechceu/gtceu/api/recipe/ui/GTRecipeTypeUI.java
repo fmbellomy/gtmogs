@@ -16,6 +16,7 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.integration.emi.recipe.GTRecipeEMICategory;
 import com.gregtechceu.gtceu.integration.jei.recipe.GTRecipeJEICategory;
 import com.gregtechceu.gtceu.integration.rei.recipe.GTRecipeREICategory;
@@ -113,7 +114,7 @@ public class GTRecipeTypeUI {
                                     "ui/recipe_type/%s.rtui".formatted(recipeType.registryName.getPath())));
                     try (InputStream inputStream = resource.open()) {
                         try (DataInputStream dataInputStream = new DataInputStream(inputStream)) {
-                            this.customUICache = NbtIo.read(dataInputStream, NbtAccounter.UNLIMITED);
+                            this.customUICache = NbtIo.read(dataInputStream, NbtAccounter.unlimitedHeap());
                         }
                     }
                 } catch (Exception e) {
@@ -150,7 +151,7 @@ public class GTRecipeTypeUI {
     public record RecipeHolder(DoubleSupplier progressSupplier,
                                Table<IO, RecipeCapability<?>, Object> storages,
                                CompoundTag data,
-                               List<RecipeCondition> conditions,
+                               List<RecipeCondition<?>> conditions,
                                boolean isSteam,
                                boolean isHighPressure) {}
 
@@ -162,7 +163,7 @@ public class GTRecipeTypeUI {
     public WidgetGroup createUITemplate(DoubleSupplier progressSupplier,
                                         Table<IO, RecipeCapability<?>, Object> storages,
                                         CompoundTag data,
-                                        List<RecipeCondition> conditions,
+                                        List<RecipeCondition<?>> conditions,
                                         boolean isSteam,
                                         boolean isHighPressure) {
         var template = createEditableUITemplate(isSteam, isHighPressure);
@@ -175,7 +176,7 @@ public class GTRecipeTypeUI {
     public WidgetGroup createUITemplate(DoubleSupplier progressSupplier,
                                         Table<IO, RecipeCapability<?>, Object> storages,
                                         CompoundTag data,
-                                        List<RecipeCondition> conditions) {
+                                        List<RecipeCondition<?>> conditions) {
         return createUITemplate(progressSupplier, storages, data, conditions, false, false);
     }
 
@@ -190,7 +191,8 @@ public class GTRecipeTypeUI {
                 CompoundTag nbt = getCustomUI();
                 WidgetGroup group = new WidgetGroup();
                 IConfigurableWidget.deserializeNBT(group, nbt.getCompound("root"),
-                        Resources.fromNBT(nbt.getCompound("resources")), false);
+                        Resources.fromNBT(nbt.getCompound("resources")), false,
+                        GTRegistries.builtinRegistry());
                 group.setSelfPosition(new Position(0, 0));
                 return group;
             }
@@ -322,6 +324,7 @@ public class GTRecipeTypeUI {
             int capCount = entry.getValue();
             for (int slotIndex = 0; slotIndex < capCount; slotIndex++) {
                 var slot = cap.createWidget();
+                //noinspection DataFlowIssue
                 slot.setSelfPosition(new Position((index % 3) * 18 + 4, (index / 3) * 18 + 4));
                 slot.setBackground(
                         getOverlaysForSlot(isOutputs, cap, slotIndex == capCount - 1, isSteam, isHighPressure));

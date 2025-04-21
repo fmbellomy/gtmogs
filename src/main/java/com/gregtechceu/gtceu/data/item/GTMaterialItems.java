@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.item.tool.MaterialToolTier;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
-import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.IGTTool;
@@ -64,7 +63,7 @@ public class GTMaterialItems {
     // Reference Tables
     public static Table<TagPrefix, Material, ItemEntry<TagPrefixItem>> MATERIAL_ITEMS;
     public final static Table<Material, GTToolType, ItemProviderEntry<Item, ? extends IGTTool>> TOOL_ITEMS = ArrayTable.create(
-            GTCEuAPI.materialManager.getRegisteredMaterials().stream()
+            GTCEuAPI.materialManager.stream()
                     .filter(mat -> mat.hasProperty(PropertyKey.TOOL))
                     .toList(),
             GTToolType.getTypes().values().stream().toList());
@@ -74,12 +73,10 @@ public class GTMaterialItems {
         REGISTRATE.creativeModeTab(() -> MATERIAL_ITEM);
         for (var tagPrefix : TagPrefix.values()) {
             if (tagPrefix.doGenerateItem()) {
-                for (MaterialRegistry registry : GTCEuAPI.materialManager.getRegistries()) {
-                    GTRegistrate registrate = registry.getRegistrate();
-                    for (Material material : registry.getAllMaterials()) {
-                        if (tagPrefix.doGenerateItem(material)) {
-                            generateMaterialItem(tagPrefix, material, registrate);
-                        }
+                for (Material material : GTCEuAPI.materialManager) {
+                    GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(material.getModid());
+                    if (tagPrefix.doGenerateItem(material)) {
+                        generateMaterialItem(tagPrefix, material, registrate);
                     }
                 }
             }
@@ -105,14 +102,12 @@ public class GTMaterialItems {
     public static void generateTools() {
         REGISTRATE.creativeModeTab(() -> TOOL);
         for (GTToolType toolType : GTToolType.getTypes().values()) {
-            for (MaterialRegistry registry : GTCEuAPI.materialManager.getRegistries()) {
-                GTRegistrate registrate = registry.getRegistrate();
-                for (Material material : registry.getAllMaterials()) {
-                    if (material.hasProperty(PropertyKey.TOOL)) {
-                        var property = material.getProperty(PropertyKey.TOOL);
-                        if (property.hasType(toolType)) {
-                            generateTool(material, toolType, registrate);
-                        }
+            for (Material material : GTCEuAPI.materialManager) {
+                GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(material.getModid());
+                if (material.hasProperty(PropertyKey.TOOL)) {
+                    var property = material.getProperty(PropertyKey.TOOL);
+                    if (property.hasType(toolType)) {
+                        generateTool(material, toolType, registrate);
                     }
                 }
             }
@@ -123,7 +118,7 @@ public class GTMaterialItems {
     private static void generateTool(final Material material, final GTToolType toolType, GTRegistrate registrate) {
         final MaterialToolTier tier = material.getToolTier();
         // spotless:off
-        TOOL_ITEMS.put(material, toolType, (ItemProviderEntry<Item, ? extends IGTTool>) registrate
+        TOOL_ITEMS.put(material, toolType, (ItemProviderEntry<Item, ? extends IGTTool>) (ItemProviderEntry<Item, ?>) registrate
                 .item(toolType.idFormat.formatted(tier.material.getName()), p -> toolType.constructor.create(toolType, tier, material, toolType.toolDefinition, p).asItem())
                 .properties(p -> {
                     if (!toolType.toolDefinition.getAoEDefinition().isNone()) {
@@ -132,9 +127,6 @@ public class GTMaterialItems {
                     return p.craftRemainder(Items.AIR);
                 })
                 .properties(p -> {
-                    // don't show the normal vanilla damage and attack speed tooltips,
-                    // we handle those ourselves
-
                     IGTToolDefinition toolStats = toolType.toolDefinition;
                     // Set other tool stats (durability)
                     ToolProperty toolProperty = material.getProperty(PropertyKey.TOOL);
@@ -168,6 +160,7 @@ public class GTMaterialItems {
                                             AttributeModifier.Operation.ADD_VALUE),
                                     EquipmentSlotGroup.MAINHAND)
                             .build()
+                            // don't show the normal vanilla damage and attack speed tooltips, we handle those ourselves
                             .withTooltip(false);
                     p.component(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
 

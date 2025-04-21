@@ -42,7 +42,7 @@
         "LevelMixin",
         "LivingEntityMixin",
         "LootPoolAccessor",
-        "MappedRegistryAccessor",
+        "MappedRegistryMixin",
         "OreConfigurationMixin",
         "OreVeinifierMixin",
         "PotionBrewingAccessor",

@@ -36,6 +36,7 @@ public class MultiblockDisplayText {
         return new Builder(textList, isStructureFormed, showIncompleteStructureWarning);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
 
         private final List<Component> textList;
@@ -364,7 +365,7 @@ public class MultiblockDisplayText {
                     }
                 }
                 for (var fluid : fluidOutputs) {
-                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getStacks();
+                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getFluids();
                     if (stacks.length == 0) continue;
                     var stack = stacks[0];
                     int amount = stack.getAmount();
@@ -395,8 +396,7 @@ public class MultiblockDisplayText {
             if (!isStructureFormed || !hasMultipleModes)
                 return this;
             textList.add(Component
-                    .translatable("gtceu.gui.machinemode",
-                            Component.translatable(recipeType.registryName.toLanguageKey()))
+                    .translatable("gtceu.gui.machinemode", recipeType.getName())
                     .withStyle(ChatFormatting.AQUA));
             return this;
         }

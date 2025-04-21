@@ -2,8 +2,10 @@ package com.gregtechceu.gtceu.integration.jei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -12,6 +14,8 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -25,10 +29,12 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import org.jetbrains.annotations.NotNull;
 
-public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<OreVeinDefinition> {
+import java.util.function.Function;
 
-    public final static RecipeType<OreVeinDefinition> RECIPE_TYPE = new RecipeType<>(GTCEu.id("ore_vein_diagram"),
-            OreVeinDefinition.class);
+public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVeinDefinition>> {
+
+    public final static RecipeType<Holder<OreVeinDefinition>> RECIPE_TYPE = new RecipeType(GTCEu.id("ore_vein_diagram"),
+            Holder.class);
     @Getter
     private final IDrawable background;
     @Getter
@@ -43,14 +49,18 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<OreVeinDefini
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
-        registry.addRecipes(RECIPE_TYPE, ClientInit.CLIENT_ORE_VEINS.values().stream().toList());
+        var ores = Minecraft.getInstance().level.registryAccess()
+                .registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
+        registry.addRecipes(RECIPE_TYPE, ores.holders()
+                .<Holder<OreVeinDefinition>>map(Function.identity())
+                .toList());
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder builder, OreVeinDefinition definition, IFocusGroup focuses) {
+    public void setRecipe(IRecipeLayoutBuilder builder, Holder<OreVeinDefinition> definition, IFocusGroup focuses) {
         super.setRecipe(builder, definition, focuses);
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
-                .addItemStacks(GTOreVeinWidget.getContainedOresAndBlocks(definition));
+                .addItemStacks(GTOreVeinWidget.getContainedOresAndBlocks(definition.value()));
     }
 
     public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
@@ -61,7 +71,7 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<OreVeinDefini
 
     @NotNull
     @Override
-    public RecipeType<OreVeinDefinition> getRecipeType() {
+    public RecipeType<Holder<OreVeinDefinition>> getRecipeType() {
         return RECIPE_TYPE;
     }
 

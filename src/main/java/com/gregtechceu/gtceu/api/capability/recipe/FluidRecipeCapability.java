@@ -34,6 +34,7 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
 import lombok.experimental.ExtensionMethod;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
@@ -376,7 +377,7 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
         if (ingredient.ingredient() instanceof IntersectionFluidIngredient intersection) {
             return mapIntersection(intersection, ingredient.amount());
         } else if (ingredient.ingredient() instanceof TagFluidIngredient tag) {
-            return FluidTagList.of(tag.tag(), ingredient.amount(), null);
+            return FluidTagList.of(tag.tag(), ingredient.amount(), DataComponentPatch.EMPTY);
         }
         return FluidStackList.of(Arrays.asList(ingredient.getFluids()));
     }

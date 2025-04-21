@@ -119,6 +119,9 @@ public class LangHandler {
         provider.add("gtceu.tool.class.shears", "Shears");
         provider.add("gtceu.tool.class.drill", "Drill");
 
+        provider.add("argument.material.id.invalid", "Unknown material '%s'");
+        provider.add("argument.medical_condition.id.invalid", "Unknown medical condition '%s'");
+
         provider.add("command.gtceu.medical_condition.get", "Player %s has these medical conditions:");
         provider.add("command.gtceu.medical_condition.get.empty", "Player %s has no medical conditions.");
         provider.add("command.gtceu.medical_condition.get.element", "Condition %s§r: %s minutes %s seconds");
@@ -496,7 +499,6 @@ public class LangHandler {
         provider.add("cover.shutter.message.enabled", "Closed shutter");
         provider.add("cover.shutter.message.disabled", "Opened shutter");
 
-        replace(provider, "item.gtceu.bucket", "%s Bucket");
         replace(provider, GTMaterials.FullersEarth.getUnlocalizedName(), "Fuller's Earth");
         // greg's humor is now on 1.21...
         replace(provider, GTMaterials.Cooperite.getUnlocalizedName(), "Sheldonite");

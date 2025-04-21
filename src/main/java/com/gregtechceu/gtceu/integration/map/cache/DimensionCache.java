@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.integration.map.cache;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.level.ChunkPos;
@@ -31,25 +32,25 @@ public class DimensionCache {
         return added;
     }
 
-    public CompoundTag toNBT() {
-        return toNBT(new CompoundTag());
+    public CompoundTag toNBT(HolderLookup.Provider registries) {
+        return toNBT(new CompoundTag(), registries);
     }
 
-    public CompoundTag toNBT(CompoundTag nbt) {
+    public CompoundTag toNBT(CompoundTag nbt, HolderLookup.Provider registries) {
         for (GridPos key : cache.keySet()) {
-            nbt.put(key.x + "," + key.z, cache.get(key).toNBT());
+            nbt.put(key.x + "," + key.z, cache.get(key).toNBT(registries));
         }
         return nbt;
     }
 
-    public void fromNBT(CompoundTag tag) {
+    public void fromNBT(CompoundTag tag, HolderLookup.Provider provider) {
         for (String gridPos : tag.getAllKeys()) {
             String[] split = gridPos.split(",");
             GridPos key = new GridPos(Integer.parseInt(split[0]), Integer.parseInt(split[1]));
             if (!cache.containsKey(key)) {
                 cache.put(key, new GridCache());
             }
-            cache.get(key).fromNBT(tag.getList(gridPos, Tag.TAG_COMPOUND));
+            cache.get(key).fromNBT(tag.getList(gridPos, Tag.TAG_COMPOUND), provider);
         }
     }
 

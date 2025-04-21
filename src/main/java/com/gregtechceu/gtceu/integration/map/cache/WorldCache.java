@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.integration.map.cache;
 
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 

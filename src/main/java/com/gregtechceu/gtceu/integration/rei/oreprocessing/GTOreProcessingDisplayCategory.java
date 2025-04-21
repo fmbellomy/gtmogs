@@ -62,7 +62,7 @@ public class GTOreProcessingDisplayCategory extends ModularUIDisplayCategory<GTO
     }
 
     public static void registerDisplays(DisplayRegistry registry) {
-        for (Material mat : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material mat : GTCEuAPI.materialManager) {
             if (mat.hasProperty(ORE) && !mat.hasFlag(MaterialFlags.NO_ORE_PROCESSING_TAB)) {
                 registry.add(new GTOreProcessingDisplay(mat));
             }

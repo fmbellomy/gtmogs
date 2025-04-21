@@ -1,35 +1,29 @@
-package com.gregtechceu.gtceu.common.commands.arguments;
+package com.gregtechceu.gtceu.common.command.argument;
 
-import com.gregtechceu.gtceu.api.material.material.IMaterialRegistryManager;
 import com.gregtechceu.gtceu.api.material.material.Material;
 
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
-import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public class MaterialParser {
 
-    private static final SimpleCommandExceptionType ERROR_NO_TAGS_ALLOWED = new SimpleCommandExceptionType(
-            Component.translatable("argument.item.create.disallowed"));
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_ITEM = new DynamicCommandExceptionType(
-            id -> Component.translatable("argument.item.id.invalid", id));
-    private static final DynamicCommandExceptionType ERROR_UNKNOWN_TAG = new DynamicCommandExceptionType(
-            tag -> Component.translatable("arguments.item.create.unknown", tag));
-    private static final char SYNTAX_START_NBT = '{';
-    private static final char SYNTAX_TAG = '#';
+    private static final DynamicCommandExceptionType ERROR_UNKNOWN_MATERIAL = new DynamicCommandExceptionType(
+            id -> Component.translatable("argument.material.id.invalid", id));
     private static final Function<SuggestionsBuilder, CompletableFuture<Suggestions>> SUGGEST_NOTHING = SuggestionsBuilder::buildFuture;
-    private final IMaterialRegistryManager materials;
+    private final HolderLookup<Material> materials;
     private final StringReader reader;
     private Material result;
     /**
@@ -37,13 +31,13 @@ public class MaterialParser {
      */
     private Function<SuggestionsBuilder, CompletableFuture<Suggestions>> suggestions = SUGGEST_NOTHING;
 
-    private MaterialParser(IMaterialRegistryManager materials, StringReader reader) {
+    private MaterialParser(HolderLookup<Material> materials, StringReader reader) {
         this.materials = materials;
         this.reader = reader;
     }
 
-    public static Material parseForMaterial(IMaterialRegistryManager registry,
-                                            StringReader reader) throws CommandSyntaxException {
+    public static Material parseForMaterial(HolderLookup<Material> registry, StringReader reader)
+            throws CommandSyntaxException {
         int i = reader.getCursor();
 
         try {
@@ -56,7 +50,7 @@ public class MaterialParser {
         }
     }
 
-    public static CompletableFuture<Suggestions> fillSuggestions(IMaterialRegistryManager lookup,
+    public static CompletableFuture<Suggestions> fillSuggestions(HolderLookup<Material> lookup,
                                                                  SuggestionsBuilder builder) {
         StringReader stringReader = new StringReader(builder.getInput());
         stringReader.setCursor(builder.getStart());
@@ -71,12 +65,11 @@ public class MaterialParser {
 
     private void readMaterial() throws CommandSyntaxException {
         int i = this.reader.getCursor();
-        ResourceLocation resourceLocation = ResourceLocation.read(this.reader);
-        Material material = this.materials.getRegistry(resourceLocation.getNamespace()).get(resourceLocation.getPath());
-        this.result = Optional.ofNullable(material).orElseThrow(() -> {
-            this.reader.setCursor(i);
-            return ERROR_UNKNOWN_ITEM.createWithContext(this.reader, resourceLocation);
-        });
+        ResourceLocation id = ResourceLocation.read(this.reader);
+        this.result = this.materials.get(ResourceKey.create(GTRegistries.MATERIAL_REGISTRY, id)).orElseThrow(() -> {
+                    this.reader.setCursor(i);
+                    return ERROR_UNKNOWN_MATERIAL.createWithContext(this.reader, id);
+                }).value();
     }
 
     private void parse() throws CommandSyntaxException {
@@ -86,6 +79,6 @@ public class MaterialParser {
 
     private CompletableFuture<Suggestions> suggestMaterial(SuggestionsBuilder builder) {
         return SharedSuggestionProvider.suggestResource(
-                this.materials.getRegisteredMaterials().stream().map(Material::getResourceLocation), builder);
+                this.materials.listElementIds().map(ResourceKey::location), builder);
     }
 }

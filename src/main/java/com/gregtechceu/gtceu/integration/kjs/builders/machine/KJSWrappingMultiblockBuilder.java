@@ -19,105 +19,49 @@ import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+
 public class KJSWrappingMultiblockBuilder extends BuilderBase<MultiblockMachineDefinition> {
 
     @HideFromJS
-    @Nullable
     @Getter
     private final KJSTieredMultiblockBuilder tieredBuilder;
-    @HideFromJS
-    @Nullable
-    @Getter
-    private final MultiblockMachineBuilder machineBuilder;
 
-    public KJSWrappingMultiblockBuilder(ResourceLocation id, KJSTieredMultiblockBuilder tieredBuilder) {
+    public KJSWrappingMultiblockBuilder(ResourceLocation id) {
         super(id);
-        this.tieredBuilder = tieredBuilder;
-        this.machineBuilder = null;
-    }
-
-    public KJSWrappingMultiblockBuilder(ResourceLocation id, MultiblockMachineBuilder machineBuilder) {
-        super(id);
-        this.tieredBuilder = null;
-        this.machineBuilder = machineBuilder;
+        this.tieredBuilder = new KJSTieredMultiblockBuilder(id);
     }
 
     public KJSWrappingMultiblockBuilder tiers(int... tiers) {
-        if (tieredBuilder != null) {
-            tieredBuilder.tiers(tiers);
-        }
-        if (machineBuilder != null && tiers.length > 0) {
-            machineBuilder.tier(tiers[0]);
-        }
+        tieredBuilder.tiers(tiers);
         return this;
     }
 
     public KJSWrappingMultiblockBuilder machine(KJSTieredMultiblockBuilder.TieredCreationFunction machine) {
-        if (tieredBuilder != null) {
-            tieredBuilder.machine(machine);
-        }
-        if (machineBuilder != null) {
-            machineBuilder.machine((holder) -> machine.create(holder, machineBuilder.tier()));
-        }
+        tieredBuilder.machine(machine);
         return this;
     }
 
     public KJSWrappingMultiblockBuilder definition(KJSTieredMultiblockBuilder.DefinitionFunction definition) {
-        if (tieredBuilder != null) {
-            tieredBuilder.definition(definition);
-        }
-        if (machineBuilder != null) {
-            definition.apply(machineBuilder.tier(), machineBuilder);
-        }
+        tieredBuilder.definition(definition);
         return this;
     }
 
     @Override
     public void generateLang(LangKubeEvent lang) {
-        if (tieredBuilder != null) {
-            tieredBuilder.generateLang(lang);
-        }
-        if (machineBuilder != null) {
-            MultiblockMachineDefinition def = get();
-            if (def.getLangValue() != null) {
-                lang.add(def.getId().getNamespace(), def.getDescriptionId(), def.getLangValue());
-            }
-        }
+        tieredBuilder.generateLang(lang);
     }
 
     @Override
     public MultiblockMachineDefinition createObject() {
-        if (tieredBuilder != null) {
-            tieredBuilder.createObject();
-            for (var def : tieredBuilder.get()) {
-                if (def != null) {
-                    return def;
-                }
+        tieredBuilder.createObject();
+        for (var def : tieredBuilder.get()) {
+            if (def != null) {
+                return def;
             }
         }
-        if (machineBuilder != null) {
-            return machineBuilder.register();
-        }
         // should never happen.
-        throw new IllegalStateException("Empty multiblock builder [" + id + "]");
-    }
-
-    public static KJSWrappingMultiblockBuilder createKJSMulti(ResourceLocation id) {
-        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.create(id.getNamespace()), id.getPath(),
-                WorkableElectricMultiblockMachine::new,
-                MetaMachineBlock::new,
-                MetaMachineItem::new,
-                MetaMachineBlockEntity::createBlockEntity);
-        return new KJSWrappingMultiblockBuilder(id, baseBuilder);
-    }
-
-    public static KJSWrappingMultiblockBuilder createKJSMulti(ResourceLocation id,
-                                                              KJSTieredMachineBuilder.CreationFunction<? extends MultiblockControllerMachine> machine) {
-        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.create(id.getNamespace()), id.getPath(),
-                machine::create,
-                MetaMachineBlock::new,
-                MetaMachineItem::new,
-                MetaMachineBlockEntity::createBlockEntity);
-        return new KJSWrappingMultiblockBuilder(id, baseBuilder);
+        throw new IllegalStateException("Empty tiered multiblock builder " + Arrays.toString(tieredBuilder.get()) +
+                " With id " + tieredBuilder.id);
     }
 }

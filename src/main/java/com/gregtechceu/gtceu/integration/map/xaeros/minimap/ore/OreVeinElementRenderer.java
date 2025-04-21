@@ -20,7 +20,7 @@ import xaero.hud.minimap.element.render.MinimapElementRenderer;
 
 public class OreVeinElementRenderer extends MinimapElementRenderer<OreVeinElement, OreVeinElementContext> {
 
-    protected static final ResourceLocation STONE = new ResourceLocation("block/stone");
+    protected static final ResourceLocation STONE = ResourceLocation.withDefaultNamespace("block/stone");
 
     private OreVeinElementRenderer(OreVeinElementReader elementReader,
                                    OreVeinElementRenderProvider provider,
@@ -42,7 +42,7 @@ public class OreVeinElementRenderer extends MinimapElementRenderer<OreVeinElemen
         GeneratedVeinMetadata vein = element.getVein();
         int iconSize = ConfigHolder.INSTANCE.compat.minimap.oreIconSize;
 
-        Material firstMaterial = vein.definition().veinGenerator().getAllMaterials().get(0);
+        Material firstMaterial = vein.definition().value().veinGenerator().getAllMaterials().getFirst();
         int materialARGB = firstMaterial.getMaterialARGB();
         float[] colors = DrawUtil.floats(materialARGB);
         RenderSystem.setShaderColor(1, 1, 1, 1);

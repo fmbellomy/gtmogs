@@ -1,10 +1,10 @@
-package com.gregtechceu.gtceu.common.commands;
+package com.gregtechceu.gtceu.data.command;
 
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
-import com.gregtechceu.gtceu.common.commands.arguments.MedicalConditionArgument;
+import com.gregtechceu.gtceu.common.command.argument.MedicalConditionArgument;
 
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;

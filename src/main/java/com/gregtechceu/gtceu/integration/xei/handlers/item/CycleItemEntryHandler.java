@@ -8,6 +8,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,8 @@ public class CycleItemEntryHandler implements IItemHandlerModifiable {
 
     @Getter
     private final List<ItemEntryList> entries;
+
+    @Nullable
     private List<List<ItemStack>> unwrapped = null;
 
     public CycleItemEntryHandler(List<ItemEntryList> entries) {
@@ -32,6 +35,7 @@ public class CycleItemEntryHandler implements IItemHandlerModifiable {
         return unwrapped;
     }
 
+    @Nullable
     private static List<ItemStack> getStacksNullable(ItemEntryList list) {
         if (list == null) return null;
         return list.getStacks();
@@ -55,7 +59,7 @@ public class CycleItemEntryHandler implements IItemHandlerModifiable {
     }
 
     @Override
-    public void setStackInSlot(int index, ItemStack stack) {
+    public void setStackInSlot(int index, @NotNull ItemStack stack) {
         if (index >= 0 && index < entries.size()) {
             entries.set(index, ItemStackList.of(stack));
             unwrapped = null;

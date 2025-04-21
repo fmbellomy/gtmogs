@@ -10,8 +10,12 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
+import com.gregtechceu.gtceu.api.multiblock.BlockPattern;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockShapeInfo;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
@@ -25,6 +29,7 @@ import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -36,258 +41,353 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.*;
 
+@SuppressWarnings("unused")
 public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachineDefinition> {
 
-    private final MultiblockMachineBuilder builder;
+    private final MultiblockMachineBuilder internal;
 
-    public MultiblockMachineBuilderWrapper(ResourceLocation id) {
+    public MultiblockMachineBuilderWrapper(ResourceLocation id, MultiblockMachineBuilder internal) {
         super(id);
-        builder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()), id.getPath(),
-                WorkableElectricMultiblockMachine::new,
-                MetaMachineBlock::new,
-                MetaMachineItem::new,
-                MetaMachineBlockEntity::createBlockEntity);
+        this.internal = internal;
     }
 
-    public MultiblockMachineBuilder shapeInfo(Function<MultiblockMachineDefinition, MultiblockShapeInfo> shape) {
-        this.shapeInfos.add(d -> List.of(shape.apply(d)));
+    public MultiblockMachineBuilderWrapper generator(boolean generator) {
+        internal.generator(generator);
         return this;
     }
 
-    public MultiblockMachineBuilder shapeInfos(Function<MultiblockMachineDefinition, List<MultiblockShapeInfo>> shapes) {
-        this.shapeInfos.add(shapes);
+    public MultiblockMachineBuilderWrapper pattern(Function<MultiblockMachineDefinition, BlockPattern> pattern) {
+        internal.pattern(pattern);
         return this;
     }
 
-    public MultiblockMachineBuilder recoveryItems(Supplier<ItemLike[]> items) {
-        this.recoveryItems.add(() -> Arrays.stream(items.get()).map(ItemLike::asItem).map(Item::getDefaultInstance)
-                .toArray(ItemStack[]::new));
+    public MultiblockMachineBuilderWrapper allowFlip(boolean allowFlip) {
+        internal.allowFlip(allowFlip);
         return this;
     }
 
-    public MultiblockMachineBuilder recoveryStacks(Supplier<ItemStack[]> stacks) {
-        this.recoveryItems.add(stacks);
+    public MultiblockMachineBuilderWrapper partSorter(Comparator<IMultiPart> partSorter) {
+        internal.partSorter(partSorter);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper partAppearance(@Nullable TriFunction<IMultiController, IMultiPart, Direction, BlockState> partAppearance) {
+        internal.partAppearance(partAppearance);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper additionalDisplay(BiConsumer<IMultiController, List<Component>> additionalDisplay) {
+        internal.additionalDisplay(additionalDisplay);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper shapeInfo(Function<MultiblockMachineDefinition, MultiblockShapeInfo> shape) {
+        internal.shapeInfo(shape);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper shapeInfos(Function<MultiblockMachineDefinition, List<MultiblockShapeInfo>> shapes) {
+        internal.shapeInfos(shapes);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper recoveryItems(Supplier<ItemLike[]> items) {
+        internal.recoveryItems(items);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper recoveryStacks(Supplier<ItemStack[]> stacks) {
+        internal.recoveryStacks(stacks);
         return this;
     }
 
     public MultiblockMachineBuilderWrapper definition(Function<ResourceLocation, MultiblockMachineDefinition> definition) {
-        return (MultiblockMachineBuilder) super.definition(definition);
+        internal.definition(definition);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper machine(Function<IMachineBlockEntity, MetaMachine> machine) {
-        return (MultiblockMachineBuilder) super.machine(machine);
+        internal.machine(machine);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper renderer(@Nullable Supplier<IRenderer> renderer) {
-        return (MultiblockMachineBuilder) super.renderer(renderer);
+        internal.renderer(renderer);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper shape(VoxelShape shape) {
-        return (MultiblockMachineBuilder) super.shape(shape);
+        internal.shape(shape);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper multiblockPreviewRenderer(boolean multiBlockWorldPreview,
                                                                      boolean multiBlockXEIPreview) {
-        return (MultiblockMachineBuilder) super.multiblockPreviewRenderer(multiBlockWorldPreview, multiBlockXEIPreview);
+        internal.multiblockPreviewRenderer(multiBlockWorldPreview, multiBlockXEIPreview);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper rotationState(RotationState rotationState) {
-        return (MultiblockMachineBuilder) super.rotationState(rotationState);
+        internal.rotationState(rotationState);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper hasTESR(boolean hasTESR) {
-        return (MultiblockMachineBuilder) super.hasTESR(hasTESR);
+        internal.hasTESR(hasTESR);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper blockProp(NonNullUnaryOperator<BlockBehaviour.Properties> blockProp) {
-        return (MultiblockMachineBuilder) super.blockProp(blockProp);
+        internal.blockProp(blockProp);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper itemProp(NonNullUnaryOperator<Item.Properties> itemProp) {
-        return (MultiblockMachineBuilder) super.itemProp(itemProp);
+        internal.itemProp(itemProp);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper blockBuilder(@Nullable Consumer<BlockBuilder<? extends Block, ?>> blockBuilder) {
-        return (MultiblockMachineBuilder) super.blockBuilder(blockBuilder);
+        internal.blockBuilder(blockBuilder);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper itemBuilder(@Nullable Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder) {
-        return (MultiblockMachineBuilder) super.itemBuilder(itemBuilder);
+        internal.itemBuilder(itemBuilder);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeTypes(GTRecipeType... recipeTypes) {
-        return (MultiblockMachineBuilder) super.recipeTypes(recipeTypes);
+        internal.recipeTypes(recipeTypes);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeType(GTRecipeType recipeTypes) {
-        return (MultiblockMachineBuilder) super.recipeType(recipeTypes);
+        internal.recipeType(recipeTypes);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper tier(int tier) {
-        return (MultiblockMachineBuilder) super.tier(tier);
+        internal.tier(tier);
+        return this;
     }
 
-    public MultiblockMachineBuilder recipeOutputLimits(Object2IntMap<RecipeCapability<?>> map) {
-        return (MultiblockMachineBuilder) super.recipeOutputLimits(map);
+    public MultiblockMachineBuilderWrapper recipeOutputLimits(Object2IntMap<RecipeCapability<?>> map) {
+        internal.recipeOutputLimits(map);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper addOutputLimit(RecipeCapability<?> capability, int limit) {
-        return (MultiblockMachineBuilder) super.addOutputLimit(capability, limit);
+        internal.addOutputLimit(capability, limit);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper itemColor(BiFunction<ItemStack, Integer, Integer> itemColor) {
-        return (MultiblockMachineBuilder) super.itemColor(itemColor);
+        internal.itemColor(itemColor);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper modelRenderer(Supplier<ResourceLocation> model) {
-        return (MultiblockMachineBuilder) super.modelRenderer(model);
+        internal.modelRenderer(model);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper defaultModelRenderer() {
-        return (MultiblockMachineBuilder) super.defaultModelRenderer();
+        internal.defaultModelRenderer();
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper tieredHullRenderer(ResourceLocation model) {
-        return (MultiblockMachineBuilder) super.tieredHullRenderer(model);
+        internal.tieredHullRenderer(model);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper overlayTieredHullRenderer(String name) {
-        return (MultiblockMachineBuilder) super.overlayTieredHullRenderer(name);
+        internal.overlayTieredHullRenderer(name);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper workableTieredHullRenderer(ResourceLocation workableModel) {
-        return (MultiblockMachineBuilder) super.workableTieredHullRenderer(workableModel);
+        internal.workableTieredHullRenderer(workableModel);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing, ResourceLocation overlayModel) {
-        return (MultiblockMachineBuilder) super.workableCasingRenderer(baseCasing, overlayModel);
+        internal.workableCasingRenderer(baseCasing, overlayModel);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing, ResourceLocation overlayModel,
                                                                   boolean tint) {
-        return (MultiblockMachineBuilder) super.workableCasingRenderer(baseCasing, overlayModel, tint);
+        internal.workableCasingRenderer(baseCasing, overlayModel, tint);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper sidedWorkableCasingRenderer(String basePath, ResourceLocation overlayModel,
                                                                        boolean tint) {
-        return (MultiblockMachineBuilder) super.sidedWorkableCasingRenderer(basePath, overlayModel, tint);
+        internal.sidedWorkableCasingRenderer(basePath, overlayModel, tint);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper sidedWorkableCasingRenderer(String basePath, ResourceLocation overlayModel) {
-        return (MultiblockMachineBuilder) super.sidedWorkableCasingRenderer(basePath, overlayModel);
+        internal.sidedWorkableCasingRenderer(basePath, overlayModel);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper tooltipBuilder(@Nullable BiConsumer<ItemStack, List<Component>> tooltipBuilder) {
-        return (MultiblockMachineBuilder) super.tooltipBuilder(tooltipBuilder);
+        internal.tooltipBuilder(tooltipBuilder);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper appearance(@Nullable Supplier<BlockState> state) {
-        return (MultiblockMachineBuilder) super.appearance(state);
+        internal.appearance(state);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper appearanceBlock(Supplier<? extends Block> block) {
-        return (MultiblockMachineBuilder) super.appearanceBlock(block);
+        internal.appearanceBlock(block);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper langValue(@Nullable String langValue) {
-        return (MultiblockMachineBuilder) super.langValue(langValue);
+        internal.langValue(langValue);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper overlaySteamHullRenderer(String name) {
-        return (MultiblockMachineBuilder) super.overlaySteamHullRenderer(name);
+        internal.overlaySteamHullRenderer(name);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper workableSteamHullRenderer(boolean isHighPressure, ResourceLocation workableModel) {
-        return (MultiblockMachineBuilder) super.workableSteamHullRenderer(isHighPressure, workableModel);
+        internal.workableSteamHullRenderer(isHighPressure, workableModel);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper tooltips(Component... components) {
-        return (MultiblockMachineBuilder) super.tooltips(components);
+        internal.tooltips(components);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper conditionalTooltip(Component component, Supplier<Boolean> condition) {
-        return conditionalTooltip(component, condition.get());
+        internal.conditionalTooltip(component, condition.get());
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper conditionalTooltip(Component component, boolean condition) {
-        if (condition)
-            tooltips(component);
+        internal.conditionalTooltip(component, condition);
         return this;
     }
 
     public MultiblockMachineBuilderWrapper abilities(PartAbility... abilities) {
-        return (MultiblockMachineBuilder) super.abilities(abilities);
+        internal.abilities(abilities);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper paintingColor(int paintingColor) {
-        return (MultiblockMachineBuilder) super.paintingColor(paintingColor);
+        internal.paintingColor(paintingColor);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeModifier(RecipeModifier recipeModifier) {
-        return (MultiblockMachineBuilder) super.recipeModifier(recipeModifier);
+        internal.recipeModifier(recipeModifier);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeModifier(RecipeModifier recipeModifier, boolean alwaysTryModifyRecipe) {
-        return (MultiblockMachineBuilder) super.recipeModifier(recipeModifier, alwaysTryModifyRecipe);
+        internal.recipeModifier(recipeModifier, alwaysTryModifyRecipe);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeModifiers(RecipeModifier... recipeModifiers) {
-        return (MultiblockMachineBuilder) super.recipeModifiers(recipeModifiers);
+        internal.recipeModifiers(recipeModifiers);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper recipeModifiers(boolean alwaysTryModifyRecipe, RecipeModifier... recipeModifiers) {
-        return (MultiblockMachineBuilder) super.recipeModifiers(alwaysTryModifyRecipe, recipeModifiers);
+        internal.recipeModifiers(alwaysTryModifyRecipe, recipeModifiers);
+        return this;
     }
 
-    public MultiblockMachineBuilder noRecipeModifier() {
-        return (MultiblockMachineBuilder) super.noRecipeModifier();
+    public MultiblockMachineBuilderWrapper noRecipeModifier() {
+        internal.noRecipeModifier();
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper alwaysTryModifyRecipe(boolean alwaysTryModifyRecipe) {
-        return (MultiblockMachineBuilder) super.alwaysTryModifyRecipe(alwaysTryModifyRecipe);
+        internal.alwaysTryModifyRecipe(alwaysTryModifyRecipe);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper beforeWorking(BiPredicate<IRecipeLogicMachine, GTRecipe> beforeWorking) {
-        return (MultiblockMachineBuilder) super.beforeWorking(beforeWorking);
+        internal.beforeWorking(beforeWorking);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper onWorking(Predicate<IRecipeLogicMachine> onWorking) {
-        return (MultiblockMachineBuilder) super.onWorking(onWorking);
+        internal.onWorking(onWorking);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper onWaiting(Consumer<IRecipeLogicMachine> onWaiting) {
-        return (MultiblockMachineBuilder) super.onWaiting(onWaiting);
+        internal.onWaiting(onWaiting);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper afterWorking(Consumer<IRecipeLogicMachine> afterWorking) {
-        return (MultiblockMachineBuilder) super.afterWorking(afterWorking);
+        internal.afterWorking(afterWorking);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper regressWhenWaiting(boolean regressWhenWaiting) {
-        return (MultiblockMachineBuilder) super.regressWhenWaiting(regressWhenWaiting);
+        internal.regressWhenWaiting(regressWhenWaiting);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper editableUI(@Nullable EditableMachineUI editableUI) {
-        return (MultiblockMachineBuilder) super.editableUI(editableUI);
+        internal.editableUI(editableUI);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper onBlockEntityRegister(NonNullConsumer<BlockEntityType<BlockEntity>> onBlockEntityRegister) {
-        return (MultiblockMachineBuilder) super.onBlockEntityRegister(onBlockEntityRegister);
+        internal.onBlockEntityRegister(onBlockEntityRegister);
+        return this;
     }
 
     public MultiblockMachineBuilderWrapper allowExtendedFacing(boolean allowExtendedFacing) {
-        return (MultiblockMachineBuilder) super.allowExtendedFacing(allowExtendedFacing);
+        internal.allowExtendedFacing(allowExtendedFacing);
+        return this;
     }
 
     @Override
     public MultiblockMachineDefinition createObject() {
-        return null;
+        return internal.register();
+    }
+
+    public static MultiblockMachineBuilderWrapper createKJSMulti(ResourceLocation id) {
+        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()), id.getPath(),
+                WorkableElectricMultiblockMachine::new,
+                MetaMachineBlock::new,
+                MetaMachineItem::new,
+                MetaMachineBlockEntity::createBlockEntity);
+        return new MultiblockMachineBuilderWrapper(id, baseBuilder);
+    }
+
+    public static MultiblockMachineBuilderWrapper createKJSMulti(ResourceLocation id,
+                                                              KJSTieredMachineBuilder.CreationFunction<? extends MultiblockControllerMachine> machine) {
+        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()), id.getPath(),
+                machine::create,
+                MetaMachineBlock::new,
+                MetaMachineItem::new,
+                MetaMachineBlockEntity::createBlockEntity);
+        return new MultiblockMachineBuilderWrapper(id, baseBuilder);
     }
 
 }

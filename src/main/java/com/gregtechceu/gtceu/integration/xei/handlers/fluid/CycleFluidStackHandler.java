@@ -53,7 +53,7 @@ public class CycleFluidStackHandler implements IFluidHandlerModifiable {
     }
 
     @Override
-    public int fill(FluidStack resource, FluidAction action) {
+    public int fill(@NotNull FluidStack resource, @NotNull FluidAction action) {
         return 0;
     }
 
@@ -64,12 +64,12 @@ public class CycleFluidStackHandler implements IFluidHandlerModifiable {
 
     @NotNull
     @Override
-    public FluidStack drain(FluidStack resource, FluidAction action) {
+    public FluidStack drain(@NotNull FluidStack resource, @NotNull FluidAction action) {
         return FluidStack.EMPTY;
     }
 
     @Override
-    public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+    public @NotNull FluidStack drain(int maxDrain, @NotNull FluidAction action) {
         return FluidStack.EMPTY;
     }
 

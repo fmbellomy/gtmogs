@@ -19,9 +19,9 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
-import com.gregtechceu.gtceu.common.commands.GTCommands;
-import com.gregtechceu.gtceu.common.commands.HazardCommands;
-import com.gregtechceu.gtceu.common.commands.MedicalConditionCommands;
+import com.gregtechceu.gtceu.data.command.GTCommands;
+import com.gregtechceu.gtceu.data.command.HazardCommands;
+import com.gregtechceu.gtceu.data.command.MedicalConditionCommands;
 import com.gregtechceu.gtceu.common.data.PostRegistryListener;
 import com.gregtechceu.gtceu.common.item.armor.QuarkTechSuite;
 import com.gregtechceu.gtceu.common.item.behavior.ToggleEnergyConsumerBehavior;
@@ -75,7 +75,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
-public class ForgeCommonEventListener {
+public class CommonEventListener {
 
     @SubscribeEvent
     public static void tickPlayerInventoryHazards(PlayerTickEvent.Post event) {
@@ -213,7 +213,7 @@ public class ForgeCommonEventListener {
             MultiblockWorldSavedData.getOrCreate(serverLevel).releaseExecutorService();
             ServerCache.instance.invalidateWorld(serverLevel);
         } else if (event.getLevel().isClientSide()) {
-            ClientCacheManager.saveCaches();
+            ClientCacheManager.saveCaches(event.getLevel().registryAccess());
         }
     }
 

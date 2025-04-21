@@ -175,7 +175,7 @@ public class VanillaRecipeHelper {
     }
 
     /**
-     * Adds a shaped recipe which clears the nbt of the outputs
+     * Adds a shaped recipe which clears the components of the outputs
      *
      * @see VanillaRecipeHelper#addShapedRecipe(RecipeOutput, String, ItemStack, Object...)
      */
@@ -487,7 +487,7 @@ public class VanillaRecipeHelper {
     }
 
     /**
-     * Adds a shapeless recipe which clears the nbt of the outputs
+     * Adds a shapeless recipe which clears the components of the outputs
      *
      * @see VanillaRecipeHelper#addShapelessRecipe(RecipeOutput, String, ItemStack, Object...)
      */

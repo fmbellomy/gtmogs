@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -43,7 +44,7 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
     public static void onBlockEntityRegister(BlockEntityType<BlockEntity> type) {}
 
     @Override
-    public MultiManagedStorage getRootStorage() {
+    public @NotNull MultiManagedStorage getRootStorage() {
         return managedStorage;
     }
 

@@ -113,9 +113,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         this.serverTicks = new ArrayList<>();
         this.waitingToAdd = new ArrayList<>();
         // bind sync storage
-        if (holder.getRootStorage() != null) {
-            this.holder.getRootStorage().attach(getSyncStorage());
-        }
+        this.holder.getRootStorage().attach(getSyncStorage());
     }
 
     //////////////////////////////////////

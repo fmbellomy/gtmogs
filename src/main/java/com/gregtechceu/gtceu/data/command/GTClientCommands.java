@@ -1,6 +1,5 @@
-package com.gregtechceu.gtceu.common.commands;
+package com.gregtechceu.gtceu.data.command;
 
-import com.gregtechceu.gtceu.common.network.GTNetwork;
 import com.gregtechceu.gtceu.common.network.packets.SCPacketShareProspection;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 

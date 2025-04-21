@@ -1,9 +1,9 @@
-package com.gregtechceu.gtceu.common.commands;
+package com.gregtechceu.gtceu.data.command;
 
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.common.commands.arguments.MedicalConditionArgument;
+import com.gregtechceu.gtceu.common.command.argument.MedicalConditionArgument;
 
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;

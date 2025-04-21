@@ -1,12 +1,13 @@
 package com.gregtechceu.gtceu.data.item;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.cover.filter.SimpleFluidFilter;
 import com.gregtechceu.gtceu.api.cover.filter.SimpleItemFilter;
+import com.gregtechceu.gtceu.api.cover.filter.SmartItemFilter;
 import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.*;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.item.behavior.ItemMagnetBehavior;
 import com.gregtechceu.gtceu.common.item.tool.behavior.ToolModeSwitchBehavior;
 import com.gregtechceu.gtceu.utils.ResearchManager;
@@ -61,8 +62,8 @@ public class GTDataComponents {
     // Material-related
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Material>> ITEM_MATERIAL = DATA_COMPONENTS
             .registerComponentType("item_material", builder -> builder
-                    .persistent(GTCEuAPI.materialManager.codec())
-                    .networkSynchronized(GTCEuAPI.materialManager.streamCodec()));
+                    .persistent(GTRegistries.MATERIALS.byNameCodec())
+                    .networkSynchronized(GTRegistries.MATERIALS.streamCodec()));
 
     // Armor-related
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<GTArmor>> ARMOR_DATA = DATA_COMPONENTS
@@ -90,6 +91,9 @@ public class GTDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TAG_FILTER_EXPRESSION = DATA_COMPONENTS
             .registerComponentType("tag_filter_expression",
                     builder -> builder.persistent(Codec.STRING).networkSynchronized(ByteBufCodecs.STRING_UTF8));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SmartItemFilter.SmartFilteringMode>> SMART_ITEM_FILTER = DATA_COMPONENTS
+            .registerComponentType("smart_item_filter",
+                    builder -> builder.persistent(SmartItemFilter.SmartFilteringMode.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CIRCUIT_CONFIG = DATA_COMPONENTS
             .registerComponentType("circuit_config", builder -> builder.persistent(Codec.INT));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<SimpleFluidContent>> FLUID_CONTENT = DATA_COMPONENTS

@@ -154,7 +154,7 @@ public class GTElements {
     }
 
     public static void init() {
-        GTCEuAPI.postRegisterEvent(GTRegistries.MATERIALS);
+        GTCEuAPI.postRegisterEvent(GTRegistries.ELEMENTS);
         GTRegistries.ELEMENTS.freeze();
     }
 
