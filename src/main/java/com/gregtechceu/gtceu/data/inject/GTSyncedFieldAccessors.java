@@ -1,4 +1,4 @@
-package com.gregtechceu.gtceu.data.misc;
+package com.gregtechceu.gtceu.data.inject;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;

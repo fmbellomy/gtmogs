@@ -24,7 +24,11 @@ public class V0 extends NamespacedSchema {
     public void registerTypes(Schema schema, Map<String, Supplier<TypeTemplate>> entityTypes,
                               Map<String, Supplier<TypeTemplate>> blockEntityTypes) {
         super.registerTypes(schema, entityTypes, blockEntityTypes);
+        // spotless:off
         schema.registerType(false, GTReferences.MATERIAL_NAME, () -> DSL.constType(namespacedString()));
+        schema.registerType(false, GTReferences.SAVED_DATA_BEDROCK_FLUID, DSL::remainder);
+        schema.registerType(false, GTReferences.SAVED_DATA_BEDROCK_ORE, DSL::remainder);
+        // spotless:on
     }
 
     @Override

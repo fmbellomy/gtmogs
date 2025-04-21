@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
@@ -16,7 +15,7 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-public class CapabilityMapComponent implements RecipeComponent<CapabilityMap> {
+public record CapabilityMapComponent() implements RecipeComponent<CapabilityMap> {
 
     public static final Codec<CapabilityMap> CODEC = RecipeCapability.CODEC
             .xmap(CapabilityMap::new, Function.identity());
@@ -54,10 +53,5 @@ public class CapabilityMapComponent implements RecipeComponent<CapabilityMap> {
             }
         });
         return changed.get() ? new CapabilityMap(original) : original;
-    }
-
-    @Override
-    public String toString() {
-        return "capability_map[type=" + type + "]";
     }
 }

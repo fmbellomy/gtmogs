@@ -23,6 +23,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -76,6 +77,7 @@ public class BedrockOreDefinition {
     private List<BiomeWeightModifier> originalModifiers; // weighting of biomes
     @Getter
     @Setter
+    @Nullable
     public Set<ResourceKey<Level>> dimensionFilter; // filtering of dimensions
 
     public BedrockOreDefinition(ResourceLocation name, int size, int weight, IntProvider yield, int depletionAmount,

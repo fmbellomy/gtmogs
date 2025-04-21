@@ -38,7 +38,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
-import dev.latvian.mods.kubejs.recipe.component.BooleanComponent;
 import dev.latvian.mods.kubejs.recipe.component.ComponentRole;
 import dev.latvian.mods.kubejs.recipe.component.TimeComponent;
 import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
@@ -99,14 +98,7 @@ public interface GTRecipeSchema {
         }
 
         public <T> GTKubeRecipe input(RecipeCapability<T> capability, Object... obj) {
-            CapabilityMap map;
-            if (perTick) {
-                if (getValue(ALL_TICK_INPUTS) == null) setValue(ALL_TICK_INPUTS, new CapabilityMap());
-                map = getValue(ALL_TICK_INPUTS);
-            } else {
-                if (getValue(ALL_INPUTS) == null) setValue(ALL_INPUTS, new CapabilityMap());
-                map = getValue(ALL_INPUTS);
-            }
+            CapabilityMap map = getValue(perTick ? ALL_TICK_INPUTS : ALL_INPUTS);
             if (map != null) {
                 for (Object object : obj) {
                     map.add(capability, new Content(object, chance, maxChance, tierChanceBoost));
@@ -117,14 +109,7 @@ public interface GTRecipeSchema {
         }
 
         public <T> GTKubeRecipe output(RecipeCapability<T> capability, Object... obj) {
-            CapabilityMap map;
-            if (perTick) {
-                if (getValue(ALL_TICK_OUTPUTS) == null) setValue(ALL_TICK_OUTPUTS, new CapabilityMap());
-                map = getValue(ALL_TICK_OUTPUTS);
-            } else {
-                if (getValue(ALL_OUTPUTS) == null) setValue(ALL_OUTPUTS, new CapabilityMap());
-                map = getValue(ALL_OUTPUTS);
-            }
+            CapabilityMap map = getValue(perTick ? ALL_TICK_OUTPUTS : ALL_OUTPUTS);
             if (map != null) {
                 var recipeType = GTRegistries.RECIPE_TYPES.get(this.type.id);
                 if (map.get(capability) != null &&
@@ -823,24 +808,17 @@ public interface GTRecipeSchema {
             return super.serializeChanges();
         }
     }
-
+    // spotless:off
     RecipeKey<ResourceLocation> ID = GTRecipeComponents.RESOURCE_LOCATION.key("id", ComponentRole.OTHER);
-    RecipeKey<TickDuration> DURATION = TimeComponent.TICKS.key("duration", ComponentRole.OTHER)
-            .optional(new TickDuration(100));
-    RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data", ComponentRole.OTHER).optional((CompoundTag) null);
-    RecipeKey<List<RecipeCondition<?>>> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asList()
-            .key("recipeConditions", ComponentRole.OTHER)
-            .optional(new ArrayList<>());
-    RecipeKey<Boolean> IS_FUEL = BooleanComponent.BOOLEAN.key("isFuel", ComponentRole.OTHER).optional(false);
+    RecipeKey<TickDuration> DURATION = TimeComponent.TICKS.key("duration", ComponentRole.OTHER).optional(new TickDuration(100));
+    RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data", ComponentRole.OTHER).optional(new CompoundTag());
+    RecipeKey<List<RecipeCondition<?>>> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asList().key("recipeConditions", ComponentRole.OTHER).optional(new ArrayList<>());
 
-    RecipeKey<CapabilityMap> ALL_INPUTS = CapabilityMapComponent.INSTANCE.key("inputs", ComponentRole.INPUT).defaultOptional();
-    RecipeKey<CapabilityMap> ALL_TICK_INPUTS = CapabilityMapComponent.INSTANCE.key("tickInputs", ComponentRole.INPUT)
-            .defaultOptional();
+    RecipeKey<CapabilityMap> ALL_INPUTS = CapabilityMapComponent.INSTANCE.key("inputs", ComponentRole.INPUT).optional(new CapabilityMap());
+    RecipeKey<CapabilityMap> ALL_TICK_INPUTS = CapabilityMapComponent.INSTANCE.key("tickInputs", ComponentRole.INPUT).optional(new CapabilityMap());
 
-    RecipeKey<CapabilityMap> ALL_OUTPUTS = CapabilityMapComponent.INSTANCE.key("outputs", ComponentRole.OUTPUT)
-            .defaultOptional();
-    RecipeKey<CapabilityMap> ALL_TICK_OUTPUTS = CapabilityMapComponent.INSTANCE.key("tickOutputs", ComponentRole.OUTPUT)
-            .defaultOptional();
+    RecipeKey<CapabilityMap> ALL_OUTPUTS = CapabilityMapComponent.INSTANCE.key("outputs", ComponentRole.OUTPUT).optional(new CapabilityMap());
+    RecipeKey<CapabilityMap> ALL_TICK_OUTPUTS = CapabilityMapComponent.INSTANCE.key("tickOutputs", ComponentRole.OUTPUT).optional(new CapabilityMap());
 
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> INPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
             .key("inputChanceLogics", ComponentRole.OTHER).defaultOptional();
@@ -853,8 +831,8 @@ public interface GTRecipeSchema {
 
     RecipeSchema SCHEMA = new RecipeSchema(DURATION, DATA, CONDITIONS, ALL_INPUTS,
             ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
-            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS,
-            IS_FUEL)
+            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS)
             .factory(new KubeRecipeFactory(GTCEu.id("recipe"), GTKubeRecipe.class, GTKubeRecipe::new))
             .constructor(new IDRecipeConstructor());
+    // spotless:on
 }

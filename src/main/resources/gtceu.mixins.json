@@ -3,7 +3,7 @@
     "minVersion": "0.8",
     "package": "com.gregtechceu.gtceu.core.mixins",
     "compatibilityLevel": "JAVA_21",
-    "plugin": "com.gregtechceu.gtceu.core.mixins.GregTechMixinPlugin",
+    "plugin": "com.gregtechceu.gtceu.core.mixins.GTMixinPlugin",
     "client": [
         "BiomeColorsMixin",
         "BlockModelMixin",

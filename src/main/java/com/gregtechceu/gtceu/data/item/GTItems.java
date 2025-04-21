@@ -22,7 +22,7 @@ import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.api.item.component.*;
 import com.gregtechceu.gtceu.data.cover.GTCovers;
-import com.gregtechceu.gtceu.data.enumproxy.GTEnumProxies;
+import com.gregtechceu.gtceu.data.inject.GTEnumProxies;
 import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;

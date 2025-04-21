@@ -629,7 +629,7 @@ public class ElementMaterials {
                 .itemPipeProperties(512, 4.0f)
                 .buildAndRegister();
 
-        Plutonium239 = new Material.Builder(GTCEu.id("plutonium"))
+        Plutonium239 = new Material.Builder(GTCEu.id("plutonium_239"))
                 .ingot(3)
                 .liquid(new FluidBuilder().temperature(913))
                 .ore(true)
@@ -890,7 +890,7 @@ public class ElementMaterials {
                         .vacuumStats(VA[HV], 300))
                 .buildAndRegister();
 
-        Uranium238 = new Material.Builder(GTCEu.id("uranium"))
+        Uranium238 = new Material.Builder(GTCEu.id("uranium_238"))
                 .ingot(3)
                 .liquid(new FluidBuilder().temperature(1405))
                 .color(0x1d891d).secondaryColor(0x33342c).iconSet(RADIOACTIVE)

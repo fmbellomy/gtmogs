@@ -49,7 +49,7 @@ public class NoOpDataFixesInternals extends DataFixesInternals {
     }
 
     @Override
-    public @NotNull Dynamic<?> updateWithAllFixers(DSL.TypeReference dataFixTypes, @NotNull Dynamic<?> dynamic) {
+    public @NotNull <T> Dynamic<T> updateWithAllFixers(DSL.TypeReference dataFixTypes, @NotNull Dynamic<T> dynamic) {
         return dynamic;
     }
 

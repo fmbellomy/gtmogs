@@ -34,7 +34,7 @@ public abstract class HotbarManagerMixin {
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/nbt/NbtIo;write(Lnet/minecraft/nbt/CompoundTag;Ljava/nio/file/Path;)V",
                      shift = At.Shift.AFTER))
-    private void addModDataVersions(CallbackInfo ci, @Local CompoundTag tag) {
+    private void gtceu$addModDataVersions(CallbackInfo ci, @Local CompoundTag tag) {
         DataFixesInternals.get().addModDataVersions(tag);
     }
 }

@@ -138,12 +138,11 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
                             new KJSTieredMachineBuilder(id, SimpleGeneratorMachine::new,
                                     SimpleGeneratorMachine.EDITABLE_UI_CREATOR)));
 
-            reg.add(ID.kjs("multiblock"), KJSWrappingMultiblockBuilder.class,
-                    KJSWrappingMultiblockBuilder::createKJSMulti);
-            reg.add(ID.kjs("tiered_multiblock"), KJSWrappingMultiblockBuilder.class,
-                    (id) -> new KJSWrappingMultiblockBuilder(id, new KJSTieredMultiblockBuilder(id)));
-            reg.add(ID.kjs("primitive"), KJSWrappingMultiblockBuilder.class,
-                    (id) -> KJSWrappingMultiblockBuilder.createKJSMulti(id, PrimitiveFancyUIWorkableMachine::new));
+            reg.add(ID.kjs("multiblock"), MultiblockMachineBuilderWrapper.class,
+                    MultiblockMachineBuilderWrapper::createKJSMulti);
+            reg.add(ID.kjs("tiered_multiblock"), KJSWrappingMultiblockBuilder.class, KJSWrappingMultiblockBuilder::new);
+            reg.add(ID.kjs("primitive"), MultiblockMachineBuilderWrapper.class,
+                    (id) -> MultiblockMachineBuilderWrapper.createKJSMulti(id, PrimitiveFancyUIWorkableMachine::new));
         });
 
         registry.of(Registries.BLOCK, reg -> {
@@ -316,7 +315,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         registry.register(MaterialEntry.class, o -> {
             if (o instanceof MaterialEntry entry) return entry;
             if (o instanceof CharSequence chars) {
-                var values = chars.toString().split(":");
+                var values = chars.toString().split(":", 2);
                 if (values.length >= 2) {
                     return new MaterialEntry(TagPrefix.get(values[0]), GTMaterials.get(values[1]));
                 }
@@ -326,12 +325,16 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         registry.register(RecipeCapability.class, o -> {
             if (o instanceof RecipeCapability<?> capability) return capability;
             if (o instanceof ResourceLocation id) return GTRegistries.RECIPE_CAPABILITIES.get(id);
-            return GTRegistries.RECIPE_CAPABILITIES.get(GTResourceLocation.wrap(o).wrapped());
+            GTResourceLocation wrapper = GTResourceLocation.wrap(o);
+            if (wrapper == null) return null;
+            return GTRegistries.RECIPE_CAPABILITIES.get(wrapper.wrapped());
         });
         registry.register(ChanceLogic.class, o -> {
             if (o instanceof ChanceLogic capability) return capability;
             if (o instanceof ResourceLocation id) return GTRegistries.CHANCE_LOGICS.get(id);
-            return GTRegistries.CHANCE_LOGICS.get(GTResourceLocation.wrap(o).wrapped());
+            GTResourceLocation wrapper = GTResourceLocation.wrap(o);
+            if (wrapper == null) return null;
+            return GTRegistries.CHANCE_LOGICS.get(wrapper.wrapped());
         });
 
         registry.register(MaterialIconSet.class, o -> {

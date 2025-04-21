@@ -1,5 +1,8 @@
 {
     "net/minecraft/core/MappedRegistry": [
         "com/gregtechceu/gtceu/core/mixins/MappedRegistryAccessor<T>"
+    ],
+    "net/minecraft/util/datafix/DataFixTypes": [
+        "net/neoforged/fml/common/asm/enumextension/IExtensibleEnum"
     ]
 }

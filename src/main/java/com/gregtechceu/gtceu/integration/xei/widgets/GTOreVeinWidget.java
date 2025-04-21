@@ -11,7 +11,6 @@ import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
@@ -22,10 +21,10 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -35,56 +34,49 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import lombok.Getter;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
-/**
- * @author Arbor
- * @implNote GTOreVeinWidget
- */
 @Getter
 public class GTOreVeinWidget extends WidgetGroup {
 
-    private final String name;
+    private final String translationKey;
     private final int weight;
     private final String range;
     private final Set<ResourceKey<Level>> dimensionFilter;
     public final static int width = 120;
 
-    public GTOreVeinWidget(OreVeinDefinition oreDefinition) {
+    public GTOreVeinWidget(Holder<OreVeinDefinition> ore) {
         super(0, 0, width, 160);
-        this.name = getOreName(oreDefinition);
-        this.weight = oreDefinition.weight();
-        this.dimensionFilter = oreDefinition.dimensionFilter();
-        this.range = range(oreDefinition);
+        this.translationKey = getOreName(ore);
+        this.weight = ore.value().weight();
+        this.dimensionFilter = ore.value().dimensionFilter();
+        this.range = range(ore.value());
         setClientSideWidget();
-        setupBaseGui(oreDefinition);
-        setupText(oreDefinition);
+        setupBaseGui(ore.value());
+        setupText(ore.value());
     }
 
-    public GTOreVeinWidget(BedrockFluidDefinition fluid) {
+    public GTOreVeinWidget(Holder<BedrockFluidDefinition> fluid, Object marker) {
         super(0, 0, width, 140);
-        this.name = getFluidName(fluid);
-        this.weight = fluid.getWeight();
-        this.dimensionFilter = fluid.getDimensionFilter();
+        this.translationKey = getFluidName(fluid);
+        this.weight = fluid.value().getWeight();
+        this.dimensionFilter = fluid.value().getDimensionFilter();
         this.range = "NULL";
         setClientSideWidget();
-        setupBaseGui(fluid);
-        setupText(fluid);
+        setupBaseGui(fluid.value());
+        setupText(fluid.value());
     }
 
-    public GTOreVeinWidget(BedrockOreDefinition bedrockOre) {
+    public GTOreVeinWidget(Holder<BedrockOreDefinition> bedrockOre, Void marker) {
         super(0, 0, width, 140);
-        this.name = getBedrockOreName(bedrockOre);
-        this.weight = bedrockOre.weight();
-        this.dimensionFilter = bedrockOre.dimensionFilter();
+        this.translationKey = getBedrockOreName(bedrockOre);
+        this.weight = bedrockOre.value().weight();
+        this.dimensionFilter = bedrockOre.value().dimensionFilter();
         this.range = "NULL";
         setClientSideWidget();
-        setupBaseGui(bedrockOre);
-        setupText(bedrockOre);
+        setupBaseGui(bedrockOre.value());
+        setupText(bedrockOre.value());
     }
 
     @SuppressWarnings("all")
@@ -146,7 +138,7 @@ public class GTOreVeinWidget extends WidgetGroup {
 
     private void setupText(OreVeinDefinition ignored) {
         addWidget(new ImageWidget(5, 0, width - 10, 16,
-                new TextTexture("gtceu.jei.ore_vein." + name).setType(TextTexture.TextType.LEFT_ROLL)
+                new TextTexture(translationKey).setType(TextTexture.TextType.LEFT_ROLL)
                         .setWidth(width - 10)));
         addWidget(new LabelWidget(5, 40,
                 LocalizationUtils.format("gtceu.jei.ore_vein_diagram.spawn_range")));
@@ -161,7 +153,7 @@ public class GTOreVeinWidget extends WidgetGroup {
 
     private void setupText(BedrockFluidDefinition ignored) {
         addWidget(new ImageWidget(5, 0, width - 10, 16,
-                new TextTexture("gtceu.jei.bedrock_fluid." + name).setType(TextTexture.TextType.LEFT_ROLL)
+                new TextTexture(translationKey).setType(TextTexture.TextType.LEFT_ROLL)
                         .setWidth(width - 10)));
         addWidget(new LabelWidget(5, 40,
                 LocalizationUtils.format("gtceu.jei.ore_vein_diagram.weight", weight)));
@@ -172,7 +164,7 @@ public class GTOreVeinWidget extends WidgetGroup {
 
     private void setupText(BedrockOreDefinition ignored) {
         addWidget(new ImageWidget(5, 0, width - 10, 16,
-                new TextTexture("gtceu.jei.bedrock_ore." + name).setType(TextTexture.TextType.LEFT_ROLL)
+                new TextTexture(translationKey).setType(TextTexture.TextType.LEFT_ROLL)
                         .setWidth(width - 10)));
         addWidget(new LabelWidget(5, 40,
                 LocalizationUtils.format("gtceu.jei.ore_vein_diagram.weight", weight)));
@@ -242,18 +234,15 @@ public class GTOreVeinWidget extends WidgetGroup {
                 .toList();
     }
 
-    public static String getOreName(OreVeinDefinition oreDefinition) {
-        ResourceLocation id = ClientInit.CLIENT_ORE_VEINS.inverse().get(oreDefinition);
-        return id.getPath();
+    public static String getOreName(Holder<OreVeinDefinition> ore) {
+        return ore.getKey().location().toLanguageKey("ore_vein");
     }
 
-    public static String getFluidName(BedrockFluidDefinition fluid) {
-        ResourceLocation id = ClientInit.CLIENT_FLUID_VEINS.inverse().get(fluid);
-        return id.getPath();
+    public static String getFluidName(Holder<BedrockFluidDefinition> fluid) {
+        return fluid.getKey().location().toLanguageKey("bedrock_fluid");
     }
 
-    public static String getBedrockOreName(BedrockOreDefinition oreDefinition) {
-        ResourceLocation id = ClientInit.CLIENT_BEDROCK_ORE_VEINS.inverse().get(oreDefinition);
-        return id.getPath();
+    public static String getBedrockOreName(Holder<BedrockOreDefinition> bedrockOre) {
+        return bedrockOre.getKey().location().toLanguageKey("bedrock_ore");
     }
 }

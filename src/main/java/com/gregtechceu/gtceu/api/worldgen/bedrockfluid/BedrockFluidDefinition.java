@@ -26,6 +26,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -77,6 +79,7 @@ public class BedrockFluidDefinition {
     private List<BiomeWeightModifier> originalModifiers; // weighting of biomes
     @Getter
     @Setter
+    @Nullable
     public Set<ResourceKey<Level>> dimensionFilter; // filtering of dimensions
 
     public BedrockFluidDefinition(ResourceLocation name, int weight, int minimumYield, int maximumYield,

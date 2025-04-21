@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
+import com.gregtechceu.gtceu.data.inject.GTEnumProxies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -37,7 +37,8 @@ public class BedrockFluidVeinSavedData extends SavedData {
         return serverLevel.getDataStorage()
                 .computeIfAbsent(
                         new SavedData.Factory<>(() -> new BedrockFluidVeinSavedData(serverLevel),
-                                (tag, provider) -> new BedrockFluidVeinSavedData(serverLevel, tag)),
+                                (tag, provider) -> new BedrockFluidVeinSavedData(serverLevel, tag),
+                                GTEnumProxies.SAVED_DATA_BEDROCK_FLUID_PROXY.getValue()),
                         "gtceu_bedrock_fluid");
     }
 

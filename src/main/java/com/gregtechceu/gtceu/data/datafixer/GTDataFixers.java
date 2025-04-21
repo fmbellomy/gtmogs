@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import static com.gregtechceu.gtceu.api.datafixer.DataFixesInternals.BASE_SCHEMA;
 
+@SuppressWarnings("SameParameterValue")
 public class GTDataFixers {
 
     private static final BiFunction<Integer, Schema, Schema> SAME_NAMESPACED = NamespacedSchema::new;
@@ -44,8 +45,9 @@ public class GTDataFixers {
         DataFixerBuilder builder = new DataFixerBuilder(GTCEuAPI.GT_DATA_VERSION);
         addFixers(builder);
 
-        ExecutorService executor = Executors.newSingleThreadExecutor(new ThreadFactoryBuilder()
-                .setNameFormat("GTCEuM Datafixer Bootstrap").setDaemon(true).setPriority(1).build());
+        ExecutorService executor = Executors.newSingleThreadExecutor(
+                new ThreadFactoryBuilder().setNameFormat("GTCEu Datafixer Bootstrap")
+                        .setDaemon(true).setPriority(1).build());
         DataFixerBuilder.Result result = builder.build();
         result.optimize(DataFixTypes.TYPES_FOR_LEVEL_LIST, executor);
         api.registerFixer(GTCEuAPI.GT_DATA_VERSION, result.fixer());
@@ -72,14 +74,15 @@ public class GTDataFixers {
                 createRenamer(OilVariantsRenameFix.RENAMED_BLOCK_IDS)));
 
         builder.addFixer(new GTItemStackComponentizationFix(schemaV1));
+        Schema schemaV2 = builder.addSchema(2, SAME_NAMESPACED);
     }
 
-    private static UnaryOperator<String> createRenamer(String pOldName, String pNewName) {
-        return id -> Objects.equals(NamespacedSchema.ensureNamespaced(id), pOldName) ? pNewName : id;
+    private static UnaryOperator<String> createRenamer(String oldName, String newName) {
+        return id -> Objects.equals(NamespacedSchema.ensureNamespaced(id), oldName) ? newName : id;
     }
 
-    private static UnaryOperator<String> createRenamer(Map<String, String> pRenameMap) {
-        return id -> pRenameMap.getOrDefault(NamespacedSchema.ensureNamespaced(id), id);
+    private static UnaryOperator<String> createRenamer(Map<String, String> renameMap) {
+        return id -> renameMap.getOrDefault(NamespacedSchema.ensureNamespaced(id), id);
     }
 
     private static UnaryOperator<String> createRenamer(Pattern check, String replaceWith) {

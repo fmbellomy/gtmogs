@@ -424,7 +424,7 @@ public class StoneMachineRecipes {
 
     public static void registerStoneMaterialInfo(@NotNull StoneTypeEntry entry) {
         if (!entry.material.isNull() && entry.stone != null) {
-            if (entry.addStoneOreDict) {
+            if (entry.addStoneTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.block, entry.material, entry.stone);
             }
             if (entry.addStoneMaterialInfo) {
@@ -434,7 +434,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.polishedStone != null) {
-            if (entry.addStoneOreDict) {
+            if (entry.addStoneTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.block, entry.material, entry.polishedStone);
             }
             if (entry.addPolishedStoneMaterialInfo) {
@@ -444,7 +444,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.smeltStone != null) {
-            if (entry.addStoneOreDict) {
+            if (entry.addStoneTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.block, entry.material, entry.smeltStone);
             }
             if (entry.addSmeltStoneMaterialInfo) {
@@ -454,7 +454,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.chiselStone != null) {
-            if (entry.addStoneOreDict) {
+            if (entry.addStoneTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.block, entry.material, entry.chiselStone);
             }
             if (entry.addChiselStoneMaterialInfo) {
@@ -464,7 +464,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.crackedStone != null) {
-            if (entry.addStoneOreDict) {
+            if (entry.addStoneTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.block, entry.material, entry.crackedStone);
             }
             if (entry.addCrackedStoneMaterialInfo) {
@@ -474,7 +474,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.slab != null) {
-            if (entry.addSlabOreDict) {
+            if (entry.addSlabTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.slab, entry.material, entry.slab);
             }
             if (entry.addSlabMaterialInfo) {
@@ -484,7 +484,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.stair != null) {
-            if (entry.addStairOreDict) {
+            if (entry.addStairTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.stairs, entry.material, entry.stair);
             }
             if (entry.addStairMaterialInfo) {
@@ -494,7 +494,7 @@ public class StoneMachineRecipes {
         }
 
         if (!entry.material.isNull() && entry.wall != null) {
-            if (entry.addWallOreDict) {
+            if (entry.addWallTag) {
                 ItemMaterialData.registerMaterialInfoItems(TagPrefix.fence, entry.material, entry.wall);
             }
             if (entry.addWallMaterialInfo) {

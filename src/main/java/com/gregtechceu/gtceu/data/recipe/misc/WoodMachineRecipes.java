@@ -338,12 +338,12 @@ public class WoodMachineRecipes {
      */
     public static void registerWoodMaterialInfo(@NotNull WoodTypeEntry entry) {
         for (var log_ : entry.getLogs()) {
-            if (log_ != null && entry.addLogOreDict) {
+            if (log_ != null && entry.addLogTag) {
                 ItemMaterialData.registerMaterialInfoItems(log, entry.material, log_);
             }
         }
 
-        if (entry.addPlanksOreDict) {
+        if (entry.addPlanksTag) {
             ItemMaterialData.registerMaterialInfoItems(planks, entry.material, entry.planks);
         }
         if (entry.addPlanksMaterialInfo) {
@@ -352,7 +352,7 @@ public class WoodMachineRecipes {
         }
 
         if (entry.door != null) {
-            if (entry.addDoorsOreDict) {
+            if (entry.addDoorsTag) {
                 ItemMaterialData.registerMaterialInfoItems(door, entry.material, entry.door);
             }
             if (entry.addDoorsMaterialInfo) {
@@ -364,7 +364,7 @@ public class WoodMachineRecipes {
         }
 
         if (entry.slab != null) {
-            if (entry.addSlabsOreDict) {
+            if (entry.addSlabsTag) {
                 ItemMaterialData.registerMaterialInfoItems(slab, entry.material, entry.slab);
             }
             if (entry.addSlabsMaterialInfo) {
@@ -374,7 +374,7 @@ public class WoodMachineRecipes {
         }
 
         if (entry.fence != null) {
-            if (entry.addFencesOreDict) {
+            if (entry.addFencesTag) {
                 ItemMaterialData.registerMaterialInfoItems(fence, entry.material, entry.fence);
             }
             if (entry.addFencesMaterialInfo) {
@@ -384,7 +384,7 @@ public class WoodMachineRecipes {
         }
 
         if (entry.fenceGate != null) {
-            if (entry.addFenceGatesOreDict) {
+            if (entry.addFenceGatesTag) {
                 ItemMaterialData.registerMaterialInfoItems(fenceGate, entry.material, entry.fenceGate);
             }
             if (entry.addFenceGatesMaterialInfo) {
@@ -394,7 +394,7 @@ public class WoodMachineRecipes {
         }
 
         if (entry.stairs != null) {
-            if (entry.addStairsOreDict) {
+            if (entry.addStairsTag) {
                 ItemMaterialData.registerMaterialInfoItems(stairs, entry.material, entry.stairs);
             }
             if (entry.addStairsMaterialInfo) {

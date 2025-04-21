@@ -717,9 +717,10 @@ public class MetaTileEntityLoader {
                 new MaterialEntry(TagPrefix.pipeNormalFluid, GTMaterials.StainlessSteel));
 
         // TODO Crafting station
-        // VanillaRecipeHelper.addShapedRecipe(provider, true, "workbench_bronze", GTMachines.WORKBENCH.getStackForm(),
-        // "CSC", "PWP", "PsP", 'C', OreDictNames.chestWood, 'W', new ItemStack(Blocks.CRAFTING_TABLE), 'S',
-        // OreDictUnifier.get("slabWood"), 'P', new UnificationEntry(TagPrefix.plank, GTMaterials.Wood));
+        // VanillaRecipeHelper.addShapedRecipe(provider, true, "workbench", GTMachines.WORKBENCH.getStackForm(),
+        // "CSC", "PWP", "PsP",
+        // 'C', Tags.Items.CHESTS_WOODEN, 'W', Blocks.CRAFTING_TABLE,
+        // 'S', ItemTags.WOODEN_SLABS, 'P', ItemTags.PLANKS);
 
         VanillaRecipeHelper.addShapedRecipe(provider, true, "primitive_pump", GTMultiMachines.PRIMITIVE_PUMP.asStack(),
                 "RGS", "OWd", "CLC", 'R', new MaterialEntry(TagPrefix.ring, GTMaterials.Iron), 'G',
@@ -1239,7 +1240,7 @@ public class MetaTileEntityLoader {
                 recipe[i] = new ItemStack(item);
             } else if (recipe[i] instanceof Block block) {
                 recipe[i] = new ItemStack(block);
-            } else if (recipe[i] instanceof ItemProviderEntry<?> itemEntry) {
+            } else if (recipe[i] instanceof ItemProviderEntry<?, ?> itemEntry) {
                 recipe[i] = itemEntry.asStack();
             }
         }

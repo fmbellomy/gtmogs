@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import com.gregtechceu.gtceu.data.inject.GTEnumProxies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -40,7 +41,9 @@ public class BedrockOreVeinSavedData extends SavedData {
     public static BedrockOreVeinSavedData getOrCreate(ServerLevel serverLevel) {
         return serverLevel.getDataStorage()
                 .computeIfAbsent(new SavedData.Factory<>(() -> new BedrockOreVeinSavedData(serverLevel),
-                        (tag, provider) -> new BedrockOreVeinSavedData(serverLevel, tag)), "gtceu_bedrock_ore");
+                        (tag, provider) -> new BedrockOreVeinSavedData(serverLevel, tag),
+                                GTEnumProxies.SAVED_DATA_BEDROCK_ORE_PROXY.getValue()),
+                        "gtceu_bedrock_ore");
     }
 
     public BedrockOreVeinSavedData(ServerLevel serverLevel) {
@@ -106,10 +109,10 @@ public class BedrockOreVeinSavedData extends SavedData {
                         .asHolderIdMap();
                 for (var holder : registry) {
                     var oreDefinition = holder.value();
-                    int veinWeight = oreDefinition.weight() + (oreDefinition.biomeWeightModifier() != null ?
-                            oreDefinition.biomeWeightModifier().apply(biome) : 0);
+                    int veinWeight = oreDefinition.weight() + oreDefinition.biomeWeightModifier().apply(biome);
                     if (veinWeight > 0 &&
-                            (oreDefinition.dimensionFilter == null || oreDefinition.dimensionFilter().stream().anyMatch(
+                            (oreDefinition.dimensionFilter() == null ||
+                                    oreDefinition.dimensionFilter().stream().anyMatch(
                                     dim -> WorldGeneratorUtils.isSameDimension(dim, serverLevel.dimension())))) {
                         weight -= veinWeight;
                         if (weight < 0) {
@@ -173,10 +176,9 @@ public class BedrockOreVeinSavedData extends SavedData {
             int totalWeight = 0;
             for (var definition : serverLevel.registryAccess()
                     .registryOrThrow(GTRegistries.BEDROCK_ORE_REGISTRY)) {
-                if (definition.dimensionFilter == null || definition.dimensionFilter().stream()
+                if (definition.dimensionFilter() == null || definition.dimensionFilter().stream()
                         .anyMatch(dim -> WorldGeneratorUtils.isSameDimension(dim, serverLevel.dimension()))) {
-                    totalWeight += definition.biomeWeightModifier() != null ?
-                            definition.biomeWeightModifier().apply(biome) : 0;
+                    totalWeight += definition.biomeWeightModifier().apply(biome);
                     totalWeight += definition.weight();
                 }
             }
