@@ -25,7 +25,7 @@
       "constructor": "(Lcom/mojang/datafixers/DSL$TypeReference;)V",
       "parameters": {
         "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
-        "field": "TREATED_WOOD_BOAT_PROXY"
+        "field": "SAVED_DATA_BEDROCK_FLUID_PROXY"
       }
     },
     {
@@ -34,7 +34,7 @@
       "constructor": "(Lcom/mojang/datafixers/DSL$TypeReference;)V",
       "parameters": {
         "class": "com/gregtechceu/gtceu/data/enumproxy/GTEnumProxies",
-        "field": "TREATED_WOOD_BOAT_PROXY"
+        "field": "SAVED_DATA_BEDROCK_ORE_PROXY"
       }
     }
   ]
