@@ -34,6 +34,7 @@ import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +44,7 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@LDLRegister(name = "item_slot", group = "widget.container", priority = 50)
+@LDLRegister(name = "gtm_item_slot", group = "widget.gtm_container", priority = 50)
 public class SlotWidget extends com.lowdragmc.lowdraglib.gui.widget.SlotWidget {
 
     public SlotWidget() {

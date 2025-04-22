@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * A variant of the memoized supplier that stores a block explicitly.
  * Use this to save blocks to
- * {@link com.gregtechceu.gtceu.api.material.material.ItemMaterialData#registerMaterialInfoItems(MaterialEntry, Supplier[])}}
+ * {@link com.gregtechceu.gtceu.api.material.material.ItemMaterialData#registerMaterialInfoItem(MaterialEntry, Supplier)}}
  */
 public class MemoizedBlockSupplier<T extends Block> extends MemoizedSupplier<T> {
 

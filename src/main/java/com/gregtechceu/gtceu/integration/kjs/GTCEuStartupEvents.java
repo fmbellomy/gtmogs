@@ -14,4 +14,5 @@ public interface GTCEuStartupEvents {
     EventHandler TAG_PREFIXES = GROUP.startup("tagPrefixes", () -> TagPrefixKubeEvent.class);
 
     EventHandler MATERIAL_MODIFICATION = GROUP.startup("materialModification", () -> MaterialModificationKubeEvent.class);
+    EventHandler CRAFTING_COMPONENTS = GROUP.startup("craftingComponents", () -> CraftingComponentsKubeEvent.class);
 }

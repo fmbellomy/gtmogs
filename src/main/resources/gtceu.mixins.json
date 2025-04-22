@@ -61,6 +61,7 @@
         "SidedRedstoneConnectivityMixin",
         "TagLoaderMixin",
         "TagManagerMixin",
+        "emi.FillRecipePacketMixin",
         "emi.FluidEmiStackMixin",
         "jei.FluidHelperMixin",
         "neoforge.RegisterEventAccessor",

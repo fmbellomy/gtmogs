@@ -37,6 +37,9 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -53,6 +56,17 @@ import static com.gregtechceu.gtceu.api.material.material.properties.PropertyKey
 public class GTUtil {
 
     public static final Direction[] DIRECTIONS = Direction.values();
+
+    private static final Object2IntMap<String> RVN = new Object2IntArrayMap<>(GTValues.VN, GTValues.ALL_TIERS);
+
+    /**
+     * Convenience method to get from VN -> Tier
+     *
+     * @return the voltage tier by name, -1 if the tier name isn't valid
+     */
+    public static int getTierByName(String name) {
+        return RVN.getOrDefault(name, -1);
+    }
 
     @Nullable
     public static Direction determineWrenchingSide(Direction facing, float x, float y, float z) {

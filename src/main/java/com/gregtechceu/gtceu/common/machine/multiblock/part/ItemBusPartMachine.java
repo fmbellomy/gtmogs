@@ -27,12 +27,14 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemBusPartMachine extends TieredIOPartMachine implements IDistinctPart, IMachineLife, IHasCircuitSlot {
@@ -152,6 +154,19 @@ public class ItemBusPartMachine extends TieredIOPartMachine implements IDistinct
             }
         }
         setCircuitSlotEnabled(true);
+    }
+
+    @Override
+    public void loadCustomPersistedData(@NotNull CompoundTag tag) {
+        super.loadCustomPersistedData(tag);
+        // todo: delete for 1.8
+        // fix to preserve distinctness from pre 1.7 versions
+        if (tag.contains("inventory")) {
+            var invTag = tag.getCompound("inventory");
+            if (invTag.contains("isDistinct")) {
+                this.isDistinct = invTag.getBoolean("isDistinct");
+            }
+        }
     }
 
     //////////////////////////////////////

@@ -74,6 +74,7 @@ public class CokeOvenHatch extends MultiblockPartMachine {
             inputInventory.setProxy(cokeOven.importItems);
             outputInventory.setProxy(cokeOven.exportItems);
             tank.setProxy(cokeOven.exportFluids);
+            this.updateAutoIOSubscription();
         }
     }
 
