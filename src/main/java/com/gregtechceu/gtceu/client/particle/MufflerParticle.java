@@ -8,7 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
+import org.jetbrains.annotations.NotNull;
 
 @OnlyIn(Dist.CLIENT)
 public class MufflerParticle extends TextureSheetParticle {
@@ -17,8 +17,9 @@ public class MufflerParticle extends TextureSheetParticle {
 
     private final SpriteSet sprites;
 
-    protected MufflerParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed,
-                              double zSpeed, SpriteSet sprites) {
+    protected MufflerParticle(ClientLevel level,
+                              double x, double y, double z, double xSpeed, double ySpeed, double zSpeed,
+                              SimpleParticleType options, SpriteSet sprites) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.speedUpWhenYMotionIsBlocked = true;
         this.sprites = sprites;
@@ -75,11 +76,12 @@ public class MufflerParticle extends TextureSheetParticle {
             this.sprites = sprites;
         }
 
-        public Particle createParticle(SimpleParticleType options, ClientLevel level, double x, double y, double z,
+        public Particle createParticle(@NotNull SimpleParticleType options, ClientLevel level,
+                                       double x, double y, double z,
                                        double xSpeed, double ySpeed, double zSpeed) {
             RandomSource randomSource = level.random;
             ySpeed += (double) randomSource.nextFloat() * -1.9 * (double) randomSource.nextFloat() * 0.1 * 5.0;
-            return new MufflerParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites);
+            return new MufflerParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, options, this.sprites);
         }
     }
 }

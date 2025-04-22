@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.recipe.misc.RecyclingRecipes;
+import com.gregtechceu.gtceu.data.recipe.misc.StoneMachineRecipes;
 import com.gregtechceu.gtceu.data.recipe.misc.WoodMachineRecipes;
 import com.gregtechceu.gtceu.data.datagen.TagsHandler;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
@@ -31,6 +32,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.NotNull;
+
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -96,30 +99,58 @@ public class ItemMaterialData {
         }
     }
 
-    @SafeVarargs
-    public static void registerMaterialInfoItems(MaterialEntry materialEntry,
-                                                 Supplier<? extends ItemLike>... items) {
-        var entryList = MATERIAL_ENTRY_ITEM_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>());
-        for (Supplier<? extends ItemLike> item : items) {
-            ITEM_MATERIAL_ENTRY.add(Pair.of(item, materialEntry));
-            entryList.add(item);
-            if (item instanceof Block block) {
-                MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
-                        .add(() -> block);
-            } else if (item instanceof BlockEntry<?> blockEntry) {
-                MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
-                        .add(blockEntry);
-            } else if (item instanceof DeferredHolder<?, ?> registryObject) {
-                if (registryObject.getKey().isFor(Registries.BLOCK)) {
-                    //noinspection unchecked
-                    MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
-                            .add((DeferredHolder<Block, Block>) registryObject);
-                }
-            } else if (item instanceof MemoizedBlockSupplier<? extends Block> supplier) {
-                MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, entry -> new ArrayList<>())
-                        .add(supplier);
+    /**
+     * Register Material Entry for an item
+     *
+     * @param supplier      a supplier to the item
+     * @param materialEntry the entry to register
+     */
+    public static void registerMaterialEntry(@NotNull Supplier<? extends ItemLike> supplier,
+                                             @NotNull MaterialEntry materialEntry) {
+        registerItemEntry(supplier, materialEntry);
+        ITEM_MATERIAL_ENTRY.add(Pair.of(supplier, materialEntry));
+        switch (supplier) {
+            case BlockEntry<?> entry -> registerBlockEntry(entry, materialEntry);
+            case DeferredHolder<?, ?> deferredHolder -> registerDeferredHolderEntry(deferredHolder, materialEntry);
+            case MemoizedBlockSupplier<?> blockSupplier -> registerBlockEntry(blockSupplier, materialEntry);
+            default -> {
             }
         }
+    }
+
+    /**
+     * @see #registerMaterialEntry(Supplier, MaterialEntry)
+     */
+    public static void registerMaterialEntries(@NotNull Collection<Supplier<? extends ItemLike>> items,
+                                               @NotNull TagPrefix tagPrefix, @NotNull Material material) {
+        if (!items.isEmpty()) {
+            MaterialEntry entry = new MaterialEntry(tagPrefix, material);
+            for (var supplier : items) {
+                registerMaterialEntry(supplier, entry);
+            }
+        }
+    }
+
+    /**
+     * @see #registerMaterialEntry(Supplier, MaterialEntry)
+     */
+    public static void registerMaterialEntry(@NotNull Supplier<? extends ItemLike> item,
+                                             @NotNull TagPrefix tagPrefix, @NotNull Material material) {
+        registerMaterialEntry(item, new MaterialEntry(tagPrefix, material));
+    }
+
+    /**
+     * @see #registerMaterialEntry(Supplier, MaterialEntry)
+     */
+    public static void registerMaterialEntry(@NotNull ItemLike item,
+                                             @NotNull TagPrefix tagPrefix, @NotNull Material material) {
+        registerMaterialEntry(() -> item, new MaterialEntry(tagPrefix, material));
+    }
+
+    private static void registerItemEntry(@NotNull Supplier<? extends ItemLike> supplier,
+                                          @NotNull MaterialEntry materialEntry) {
+        MATERIAL_ENTRY_ITEM_MAP.computeIfAbsent(materialEntry, k -> new ArrayList<>())
+                .add(supplier);
         if (TagPrefix.ORES.containsKey(materialEntry.tagPrefix()) &&
                 !ORES_INVERSE.containsValue(materialEntry.tagPrefix())) {
             ORES_INVERSE.put(TagPrefix.ORES.get(materialEntry.tagPrefix()).stoneType(), materialEntry.tagPrefix());
@@ -131,18 +162,19 @@ public class ItemMaterialData {
         }
     }
 
-    @SafeVarargs
-    public static void registerMaterialInfoItems(TagPrefix tagPrefix, Material material,
-                                                 Supplier<? extends ItemLike>... items) {
-        registerMaterialInfoItems(new MaterialEntry(tagPrefix, material), items);
+    @SuppressWarnings("unchecked")
+    private static void registerDeferredHolderEntry(@NotNull DeferredHolder<?, ?> deferredHolder,
+                                                    @NotNull MaterialEntry materialEntry) {
+        var key = deferredHolder.getKey();
+        if (key.isFor(Registries.BLOCK)) {
+            registerBlockEntry((Supplier<? extends Block>) deferredHolder, materialEntry);
+        }
     }
 
-    public static void registerMaterialInfoItems(TagPrefix tagPrefix, Material material, ItemLike... items) {
-        registerMaterialInfoItems(new MaterialEntry(tagPrefix, material),
-                Arrays.stream(items).map(item -> (Supplier<ItemLike>) () -> item).toArray(Supplier[]::new));
-        for (ItemLike item : items) {
-            ITEM_MATERIAL_ENTRY_COLLECTED.put(item, new MaterialEntry(tagPrefix, material));
-        }
+    private static void registerBlockEntry(@NotNull Supplier<? extends Block> supplier,
+                                           @NotNull MaterialEntry materialEntry) {
+        MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, k -> new ArrayList<>())
+                .add(supplier);
     }
 
     public static void reinitializeMaterialData() {
@@ -155,14 +187,12 @@ public class ItemMaterialData {
         // Load new data
         TagsHandler.initExtraUnificationEntries();
         for (TagPrefix prefix : TagPrefix.values()) {
-            prefix.getIgnored().forEach((mat, items) -> {
-                if (items.length > 0) {
-                    registerMaterialInfoItems(prefix, mat, items);
-                }
-            });
+            prefix.getIgnored().forEach((mat, items) -> registerMaterialEntries(Arrays.asList(items), prefix, mat));
         }
-        GTMaterialItems.toUnify.forEach(ItemMaterialData::registerMaterialInfoItems);
+        GTMaterialItems.toUnify
+                .forEach((materialEntry, supplier) -> registerMaterialEntry(supplier, materialEntry));
         WoodMachineRecipes.registerMaterialInfo();
+        StoneMachineRecipes.registerMaterialInfo();
     }
 
     @ApiStatus.Internal

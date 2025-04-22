@@ -44,7 +44,7 @@ public class SimpleItemFilter implements ItemFilter {
         maxStackSize = 1;
     }
 
-    protected SimpleItemFilter(boolean isBlackList, boolean ignoreNbt, List<ItemStack> matches) {
+    public SimpleItemFilter(boolean isBlackList, boolean ignoreNbt, List<ItemStack> matches) {
         this.isBlackList = isBlackList;
         this.ignoreNbt = ignoreNbt;
         this.matches = matches.toArray(ItemStack[]::new);

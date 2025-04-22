@@ -58,6 +58,15 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
 
         ItemStack stack = context.getItemInHand();
 
+        if (!player.getOffhandItem().isEmpty()) {
+            return InteractionResult.PASS;
+        }
+
+        if (!stack.getOrDefault(GTDataComponents.ACTIVE, false)) {
+            return InteractionResult.PASS;
+        }
+
+
         ItemStack slotStack;
         if (this.cacheSlotKey) {
             if (cachedTorchSlot < 0) {

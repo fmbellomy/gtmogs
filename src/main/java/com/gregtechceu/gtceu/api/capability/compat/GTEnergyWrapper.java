@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.api.capability.compat;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
+import com.gregtechceu.gtceu.utils.GTMath;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.core.Direction;
@@ -29,21 +30,19 @@ public class GTEnergyWrapper implements IEnergyContainer {
         // Try to use the internal buffer before consuming a new packet
         if (feBuffer > 0) {
 
-            receive = energyStorage.receiveEnergy(safeCastLongToInt(feBuffer), true);
+            receive = energyStorage.receiveEnergy(GTMath.saturatedCast(feBuffer), true);
 
             if (receive == 0)
                 return 0;
 
             // Internal Buffer could provide the max RF the consumer could consume
             if (feBuffer > receive) {
-                feBuffer -= receive;
-                energyStorage.receiveEnergy(receive, false);
+                feBuffer -= energyStorage.receiveEnergy(receive, false);
                 return 0;
 
                 // Buffer could not provide max value, save the remainder and continue processing
             } else {
-                receive = safeCastLongToInt(feBuffer);
-                feBuffer = 0;
+                receive = GTMath.saturatedCast(feBuffer);
             }
         }
 
@@ -53,73 +52,66 @@ public class GTEnergyWrapper implements IEnergyContainer {
         // Try to consume our remainder buffer plus a fresh packet
         if (receive != 0) {
 
-            int consumable = energyStorage.receiveEnergy(safeCastLongToInt(maximalValue + receive), true);
+            int consumable = energyStorage.receiveEnergy(GTMath.saturatedCast(maximalValue + receive), true);
 
             // Machine unable to consume any power
             if (consumable == 0)
                 return 0;
 
-            // Only able to consume our buffered amount
-            if (consumable == receive) {
-                energyStorage.receiveEnergy(consumable, false);
-                return 0;
-            }
+            consumable = energyStorage.receiveEnergy(consumable, false);
 
-            // Able to consume our full packet as well as our remainder buffer
-            if (consumable == maximalValue + receive) {
-                energyStorage.receiveEnergy(consumable, false);
-                return amperage;
+            // Only able to consume less then our buffered amount
+            if (consumable <= receive) {
+                feBuffer = receive - consumable;
+                return 0;
             }
 
             long newPower = consumable - receive;
 
             // Able to consume buffered amount plus an even amount of packets (no buffer needed)
             if (newPower % maxPacket == 0) {
-                return energyStorage.receiveEnergy(consumable, false) / maxPacket;
+                feBuffer = 0;
+                return newPower / maxPacket;
             }
 
             // Able to consume buffered amount plus some amount of power with a packet remainder
-            int ampsToConsume = safeCastLongToInt((newPower / maxPacket) + 1);
-            feBuffer = safeCastLongToInt((maxPacket * ampsToConsume) - consumable);
-            energyStorage.receiveEnergy(consumable, false);
+            int ampsToConsume = GTMath.saturatedCast((newPower / maxPacket) + 1);
+            feBuffer = GTMath.saturatedCast((maxPacket * ampsToConsume) - newPower);
             return ampsToConsume;
 
             // Else try to draw 1 full packet
         } else {
 
-            int consumable = energyStorage.receiveEnergy(safeCastLongToInt(maximalValue), true);
+            int consumable = energyStorage.receiveEnergy(GTMath.saturatedCast(maximalValue), true);
 
             // Machine unable to consume any power
             if (consumable == 0)
                 return 0;
 
-            // Able to accept the full amount of power
-            if (consumable == maximalValue) {
-                energyStorage.receiveEnergy(consumable, false);
-                return amperage;
-            }
+            consumable = energyStorage.receiveEnergy(consumable, false);
+
+            // Machine unable to actually consume any power
+            if (consumable == 0)
+                return 0;
 
             // Able to consume an even amount of packets
             if (consumable % maxPacket == 0) {
-                return energyStorage.receiveEnergy(consumable, false) / maxPacket;
+                feBuffer = 0;
+                return consumable / maxPacket;
             }
 
             // Able to consume power with some amount of power remainder in the packet
-            int ampsToConsume = safeCastLongToInt((consumable / maxPacket) + 1);
-            feBuffer = safeCastLongToInt((maxPacket * ampsToConsume) - consumable);
-            energyStorage.receiveEnergy(consumable, false);
+            int ampsToConsume = GTMath.saturatedCast((consumable / maxPacket) + 1);
+            feBuffer = GTMath.saturatedCast((maxPacket * ampsToConsume) - consumable);
             return ampsToConsume;
         }
     }
 
     @Override
     public long changeEnergy(long delta) {
-        if (delta == 0)
-            return 0;
-        else if (delta < 0)
-            return FeCompat.extractEu(energyStorage, -delta, false);
-        else
-            return FeCompat.insertEu(energyStorage, delta, false);
+        if (delta == 0) return 0;
+        else if (delta < 0) return FeCompat.extractEu(energyStorage, -delta, false);
+        else return FeCompat.insertEu(energyStorage, delta, false);
     }
 
     @Override
@@ -133,12 +125,12 @@ public class GTEnergyWrapper implements IEnergyContainer {
     }
 
     /**
-     * Most RF/FE cables blindly try to receiveEnergy energy without checking if there is space, since the receiving
+     * Most RF/FE cables blindly try to insert energy without checking if there is space, since the receiving
      * IEnergyStorage should handle it.
-     * This simulates that behavior in most places by allowing our "is there space" checks to pass and letting the cable
-     * attempt to receiveEnergy energy.
-     * If the wrapped TE actually cannot accept any more energy, the energy transfer will return 0 before any changes to
-     * our internal rf buffer.
+     * This simulates that behavior in most places by allowing our "is there space" checks to pass and letting the
+     * cable attempt to insert energy.
+     * If the wrapped TE actually cannot accept any more energy, the energy transfer will return 0 before any
+     * changes to our internal rf buffer.
      */
     @Override
     public long getEnergyCanBeInserted() {
@@ -154,9 +146,9 @@ public class GTEnergyWrapper implements IEnergyContainer {
     public long getInputVoltage() {
         long maxInput = energyStorage.receiveEnergy(Integer.MAX_VALUE, true);
 
-        if (maxInput == 0)
-            return 0;
-        return GTValues.V[GTUtil.getTierByVoltage(FeCompat.toEu(maxInput, FeCompat.ratio(false)))];
+        if (maxInput == 0) return 0;
+        return GTValues.V[GTUtil
+                .getTierByVoltage(FeCompat.toEu(maxInput, FeCompat.ratio(false)))];
     }
 
     @Override
@@ -180,15 +172,5 @@ public class GTEnergyWrapper implements IEnergyContainer {
     @Override
     public boolean isOneProbeHidden() {
         return true;
-    }
-
-    /**
-     * Safely cast a Long to an Int without overflow.
-     *
-     * @param v The Long value to cast to an Int.
-     * @return v, cast to Int, or Integer.MAX_VALUE if it would overflow.
-     */
-    public static int safeCastLongToInt(long v) {
-        return v > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) v;
     }
 }

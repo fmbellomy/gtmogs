@@ -9,7 +9,6 @@ import java.util.function.Function;
 
 public class CodecUtils {
 
-
     public static final Codec<Long> NON_NEGATIVE_LONG = longRangeWithMessage(0, Long.MAX_VALUE, value -> "Value must be non-negative: " + value);
     public static final Codec<Long> POSITIVE_LONG = longRangeWithMessage(1, Long.MAX_VALUE, value -> "Value must be positive: " + value);
 

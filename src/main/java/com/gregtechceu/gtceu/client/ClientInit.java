@@ -4,10 +4,11 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.client.particle.HazardParticle;
 import com.gregtechceu.gtceu.client.particle.MufflerParticle;
 import com.gregtechceu.gtceu.client.renderer.entity.GTExplosiveRenderer;
-import com.gregtechceu.gtceu.client.renderer.item.GTItemBarRenderer;
+import com.gregtechceu.gtceu.client.renderer.item.decorator.*;
 import com.gregtechceu.gtceu.data.entity.GTEntityTypes;
 import com.gregtechceu.gtceu.data.particle.GTParticleTypes;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
@@ -47,10 +48,16 @@ public class ClientInit {
     }
 
     @SubscribeEvent
-    public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
+    public void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
         for (Item item : BuiltInRegistries.ITEM) {
-            if (item instanceof IGTTool || item instanceof IComponentItem) {
-                event.register(item, GTItemBarRenderer.INSTANCE);
+            if (item instanceof IComponentItem) {
+                event.register(item, GTComponentItemDecorator.INSTANCE);
+            }
+            if (item instanceof IGTTool) {
+                event.register(item, GTToolBarRenderer.INSTANCE);
+            }
+            if (item instanceof LampBlockItem) {
+                event.register(item, GTLampItemOverlayRenderer.INSTANCE);
             }
         }
     }

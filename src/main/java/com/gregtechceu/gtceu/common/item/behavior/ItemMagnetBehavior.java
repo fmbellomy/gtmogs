@@ -63,16 +63,16 @@ import java.util.*;
 
 public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAddInformation, IItemUIFactory {
 
-    public static final String FILTER_TAG = "MagnetFilter";
-    public static final String FILTER_ORDINAL_TAG = "FilterOrdinal";
-
     private final int range;
     private final long energyDraw;
 
     public ItemMagnetBehavior(int range) {
         this.range = range;
         this.energyDraw = GTValues.V[range > 8 ? GTValues.HV : GTValues.LV];
-        NeoForge.EVENT_BUS.register(this);
+    }
+
+    static {
+        NeoForge.EVENT_BUS.register(ItemMagnetBehavior.class);
     }
 
     @Override
@@ -236,14 +236,14 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
     }
 
     @SubscribeEvent
-    public void onItemToss(@NotNull ItemTossEvent event) {
+    public static void onItemToss(@NotNull ItemTossEvent event) {
         if (event.getPlayer() == null) return;
         if (hasMagnet(event.getPlayer())) {
             event.getEntity().setPickUpDelay(60);
         }
     }
 
-    private boolean hasMagnet(@NotNull Player player) {
+    private static boolean hasMagnet(@NotNull Player player) {
         Inventory inventory = player.getInventory();
         for (int i = 0; i < inventory.getContainerSize(); i++) {
             ItemStack stackInSlot = inventory.getItem(i);
