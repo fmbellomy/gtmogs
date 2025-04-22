@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -180,16 +181,17 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
      * Show the preview of structure.
      */
     @Override
-    default InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+    default InteractionResult onUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                     BlockHitResult hit) {
         if (!self().isFormed() && player.isShiftKeyDown() && player.getItemInHand(hand).isEmpty()) {
-            if (world.isClientSide()) {
-                MultiblockInWorldPreviewRenderer.showPreview(pos, self(),
-                        ConfigHolder.INSTANCE.client.inWorldPreviewDuration * 20);
+            if (level.isClientSide()) {
+                int duration = ConfigHolder.INSTANCE.client.inWorldPreviewDuration;
+                float tickRate = level.tickRateManager().tickrate();
+                MultiblockInWorldPreviewRenderer.showPreview(pos, self(), Mth.floor(duration * tickRate));
             }
             return InteractionResult.SUCCESS;
         }
-        return IInteractedMachine.super.onUse(state, world, pos, player, hand, hit);
+        return IInteractedMachine.super.onUse(state, level, pos, player, hand, hit);
     }
 
     default boolean allowCircuitSlots() {

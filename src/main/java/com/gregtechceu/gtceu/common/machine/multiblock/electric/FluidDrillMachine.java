@@ -23,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 
 import lombok.Getter;
@@ -76,9 +77,10 @@ public class FluidDrillMachine extends WorkableElectricMultiblockMachine impleme
                         .withStyle(ChatFormatting.GRAY));
 
                 // Fluid amount
-                Component amountInfo = Component.literal(FormattingUtil.formatNumbers(
-                        getRecipeLogic().getFluidToProduce() * 20L / FluidDrillLogic.MAX_PROGRESS) +
-                        " mB/s").withStyle(ChatFormatting.BLUE);
+                float produced = getRecipeLogic().getFluidToProduce() * getLevel().tickRateManager().tickrate();
+                produced = Mth.floor(produced / FluidDrillLogic.MAX_PROGRESS);
+                Component amountInfo = Component.literal(FormattingUtil.formatNumbers(produced) + " mB/s")
+                        .withStyle(ChatFormatting.BLUE);
                 textList.add(Component.translatable("gtceu.multiblock.fluid_rig.fluid_amount", amountInfo)
                         .withStyle(ChatFormatting.GRAY));
             } else {

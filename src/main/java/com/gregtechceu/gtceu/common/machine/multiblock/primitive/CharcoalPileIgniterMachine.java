@@ -359,13 +359,13 @@ public class CharcoalPileIgniterMachine extends WorkableMultiblockMachine implem
     }
 
     @Override
-    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+    public InteractionResult onUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                    BlockHitResult hit) {
-        BlockEntity be = world.getBlockEntity(pos);
+        BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof IMachineBlockEntity machineBe) {
             MetaMachine mte = machineBe.getMetaMachine();
             if (mte instanceof CharcoalPileIgniterMachine cpi && cpi.isFormed()) {
-                if (world.isClientSide) {
+                if (level.isClientSide) {
                     player.swing(hand);
                 } else if (!cpi.isActive()) {
                     boolean shouldActivate = false;
@@ -400,6 +400,6 @@ public class CharcoalPileIgniterMachine extends WorkableMultiblockMachine implem
                 }
             }
         }
-        return super.onUse(state, world, pos, player, hand, hit);
+        return super.onUse(state, level, pos, player, hand, hit);
     }
 }

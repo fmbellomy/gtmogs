@@ -33,8 +33,8 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -94,7 +94,7 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
 
         this.maxFluidTransferRate = maxTransferRate;
         this.transferRate = maxFluidTransferRate;
-        this.mBLeftToTransferLastSecond = transferRate * 20;
+        this.mBLeftToTransferLastSecond = Mth.floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
 
         subscriptionHandler = new ConditionalSubscriptionHandler(coverHolder, this::update, this::isSubscriptionActive);
         filterHandler = FilterHandlers.fluid(this)
@@ -216,7 +216,7 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
         }
 
         if (timer % 20 == 0) {
-            this.mBLeftToTransferLastSecond = transferRate * 20;
+            this.mBLeftToTransferLastSecond = Mth.floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
         }
 
         subscriptionHandler.updateSubscription();
