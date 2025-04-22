@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.worldgen;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.material.Material;
 
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -75,22 +76,14 @@ public class GTLayerPattern {
     }
 
     public static class Layer {
-
+        // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.list(Codec.either(TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec()))
-                        .fieldOf("targets")
-                        .forGetter(layer -> layer.targets),
-                Codec.intRange(0, Integer.MAX_VALUE)
-                        .fieldOf("min_size")
-                        .forGetter(layer -> layer.minSize),
-                Codec.intRange(0, Integer.MAX_VALUE)
-                        .fieldOf("max_size")
-                        .forGetter(layer -> layer.maxSize),
-                Codec.intRange(0, Integer.MAX_VALUE)
-                        .fieldOf("weight")
-                        .forGetter(layer -> layer.weight))
-                .apply(instance, Layer::new));
-
+                Codec.list(Codec.either(TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec())).fieldOf("targets").forGetter(layer -> layer.targets),
+                Codec.intRange(0, Integer.MAX_VALUE).fieldOf("min_size").forGetter(layer -> layer.minSize),
+                Codec.intRange(0, Integer.MAX_VALUE).fieldOf("max_size").forGetter(layer -> layer.maxSize),
+                Codec.intRange(0, Integer.MAX_VALUE).fieldOf("weight").forGetter(layer -> layer.weight)
+        ).apply(instance, Layer::new));
+        // spotless:on
         public final List<Either<List<TargetBlockState>, Material>> targets;
         public final int minSize;
         public final int maxSize;

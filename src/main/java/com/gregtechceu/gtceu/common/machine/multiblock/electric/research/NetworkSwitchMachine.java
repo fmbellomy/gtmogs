@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.common.machine.multiblock.electric.research;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IOpticalComputationHatch;
 import com.gregtechceu.gtceu.api.capability.IOpticalComputationProvider;
+import com.gregtechceu.gtceu.api.capability.recipe.CWURecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
@@ -10,24 +11,17 @@ import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockDisplayText;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableComputationContainer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class NetworkSwitchMachine extends DataBankMachine implements IOpticalComputationProvider {
 
     public static final int EUT_PER_HATCH = GTValues.VA[GTValues.IV];
@@ -43,7 +37,7 @@ public class NetworkSwitchMachine extends DataBankMachine implements IOpticalCom
         int receivers = 0;
         int transmitters = 0;
         for (var part : this.getParts()) {
-            Block block = part.self().getBlockState().getBlock();
+            net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
             if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
                 ++receivers;
             }
@@ -60,24 +54,24 @@ public class NetworkSwitchMachine extends DataBankMachine implements IOpticalCom
         List<IOpticalComputationHatch> receivers = new ArrayList<>();
         List<IOpticalComputationHatch> transmitters = new ArrayList<>();
         for (var part : this.getParts()) {
+            net.minecraft.world.level.block.Block block = part.self().getBlockState().getBlock();
+            List<IOpticalComputationHatch> list;
+            if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
+                list = receivers;
+            } else if (PartAbility.COMPUTATION_DATA_TRANSMISSION.isApplicable(block)) {
+                list = transmitters;
+            } else {
+                continue;
+            }
             if (part instanceof IOpticalComputationHatch hatch) {
-                Block block = part.self().getBlockState().getBlock();
-                if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
-                    receivers.add(hatch);
-                }
-                if (PartAbility.COMPUTATION_DATA_TRANSMISSION.isApplicable(block)) {
-                    transmitters.add(hatch);
-                }
-            } else if (part.getRecipeHandlers().stream().anyMatch(IOpticalComputationHatch.class::isInstance)) {
-                var hatch = part.getRecipeHandlers().stream().filter(IOpticalComputationHatch.class::isInstance)
-                        .map(IOpticalComputationHatch.class::cast).findFirst().orElse(null);
-                if (hatch != null) {
-                    Block block = part.self().getBlockState().getBlock();
-                    if (PartAbility.COMPUTATION_DATA_RECEPTION.isApplicable(block)) {
-                        receivers.add(hatch);
-                    }
-                    if (PartAbility.COMPUTATION_DATA_TRANSMISSION.isApplicable(block)) {
-                        transmitters.add(hatch);
+                list.add(hatch);
+            } else {
+                var handlerLists = part.getRecipeHandlers();
+                for (var handlerList : handlerLists) {
+                    for (var cwu : handlerList.getCapability(CWURecipeCapability.CAP)) {
+                        if (cwu instanceof IOpticalComputationHatch hatch) {
+                            list.add(hatch);
+                        }
                     }
                 }
             }

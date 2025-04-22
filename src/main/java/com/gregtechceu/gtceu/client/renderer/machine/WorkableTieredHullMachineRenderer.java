@@ -4,9 +4,11 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.IWorkable;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.client.model.WorkableOverlayModel;
 
+import com.lowdragmc.lowdraglib.client.bakedpipeline.Quad;
+
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.ModelState;
@@ -16,16 +18,13 @@ import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/2/19
- * @implNote WorkableTieredHullMachineRenderer
- */
 public class WorkableTieredHullMachineRenderer extends TieredHullMachineRenderer {
 
     protected final WorkableOverlayModel overlayModel;
@@ -38,18 +37,15 @@ public class WorkableTieredHullMachineRenderer extends TieredHullMachineRenderer
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, RandomSource rand, Direction modelFacing,
-                              ModelState modelState) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState);
-        Direction upwardsFacing = Direction.NORTH;
-        if (machine instanceof IMultiController multi) {
-            upwardsFacing = multi.self().getUpwardsFacing();
-        }
+                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand, Direction modelFacing,
+                              ModelState modelState, @NotNull ModelData data, RenderType renderType) {
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
         if (machine instanceof IWorkable workable) {
-            quads.addAll(overlayModel.bakeQuads(side, frontFacing, upwardsFacing, workable.isActive(),
-                    workable.isWorkingEnabled()));
+            overlayModel.bakeQuads(side, modelState, workable.isActive(), workable.isWorkingEnabled())
+                    .forEach(quad -> quads.add(Quad.from(quad, overlayQuadsOffset()).rebake()));
         } else {
-            quads.addAll(overlayModel.bakeQuads(side, frontFacing, upwardsFacing, false, false));
+            overlayModel.bakeQuads(side, modelState, false, false)
+                    .forEach(quad -> quads.add(Quad.from(quad, overlayQuadsOffset()).rebake()));
         }
     }
 
@@ -60,5 +56,9 @@ public class WorkableTieredHullMachineRenderer extends TieredHullMachineRenderer
         if (atlasName.equals(TextureAtlas.LOCATION_BLOCKS)) {
             overlayModel.registerTextureAtlas(register);
         }
+    }
+
+    public float overlayQuadsOffset() {
+        return 0.002f;
     }
 }

@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -71,11 +72,12 @@ public interface BlockPropertiesAccessor {
     @Accessor
     boolean isRequiresCorrectToolForDrops();
 
+    @Nullable
     @Accessor
     BlockBehaviour.OffsetFunction getOffsetFunction();
 
     @Accessor
-    void setOffsetFunction(BlockBehaviour.OffsetFunction function);
+    void setOffsetFunction(@Nullable BlockBehaviour.OffsetFunction function);
 
     @Accessor
     boolean isSpawnTerrainParticles();

@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.client.renderer;
 
 import com.lowdragmc.lowdraglib.client.renderer.ATESRRendererProvider;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
@@ -10,16 +9,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2022/11/3
- * @implNote TCRendererProvider
- */
 @OnlyIn(Dist.CLIENT)
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class GTRendererProvider extends ATESRRendererProvider<BlockEntity> {
 
     private static GTRendererProvider INSTANCE;

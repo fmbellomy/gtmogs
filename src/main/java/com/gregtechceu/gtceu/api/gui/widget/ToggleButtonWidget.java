@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.gui.widget;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
@@ -8,22 +9,15 @@ import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.SwitchWidget;
 
 import it.unimi.dsi.fastutil.booleans.BooleanConsumer;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
+import java.util.List;
 import java.util.function.BooleanSupplier;
 
-/**
- * @author KilaBash
- * @date 2023/2/22
- * @implNote ToggleButtonWidget
- */
-@Accessors(chain = true)
 public class ToggleButtonWidget extends SwitchWidget {
 
     private final IGuiTexture texture;
-    @Setter
     private String tooltipText;
+    private boolean isMultiLang;
 
     public ToggleButtonWidget(int xPosition, int yPosition, int width, int height, BooleanSupplier isPressedCondition,
                               BooleanConsumer setPressedExecutor) {
@@ -53,11 +47,26 @@ public class ToggleButtonWidget extends SwitchWidget {
         return this;
     }
 
-    @Override
-    public void updateScreen() {
-        super.updateScreen();
+    public ToggleButtonWidget setTooltipText(String tooltipText) {
+        this.tooltipText = tooltipText;
+        updateHoverTooltips();
+        return this;
+    }
+
+    public ToggleButtonWidget isMultiLang() {
+        isMultiLang = true;
+        updateHoverTooltips();
+        return this;
+    }
+
+    protected void updateHoverTooltips() {
         if (tooltipText != null) {
-            setHoverTooltips(tooltipText + (isPressed ? ".enabled" : ".disabled"));
+            if (!isMultiLang) {
+                setHoverTooltips(tooltipText + (isPressed ? ".enabled" : ".disabled"));
+            } else {
+                setHoverTooltips(
+                        List.copyOf(LangHandler.getMultiLang(tooltipText + (isPressed ? ".enabled" : ".disabled"))));
+            }
         }
     }
 }

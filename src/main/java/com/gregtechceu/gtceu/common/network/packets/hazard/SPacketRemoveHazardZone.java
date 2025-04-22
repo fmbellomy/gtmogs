@@ -11,6 +11,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 @AllArgsConstructor
 public class SPacketRemoveHazardZone implements CustomPacketPayload {
@@ -30,12 +31,12 @@ public class SPacketRemoveHazardZone implements CustomPacketPayload {
         return new SPacketRemoveHazardZone(buf.readChunkPos());
     }
 
-    public static void execute(SPacketRemoveHazardZone packet, IPayloadContext handler) {
-        EnvironmentalHazardClientHandler.INSTANCE.removeHazardZone(packet.pos);
+    public void execute(IPayloadContext handler) {
+        EnvironmentalHazardClientHandler.INSTANCE.removeHazardZone(this.pos);
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<SPacketRemoveHazardZone> type() {
         return TYPE;
     }
 }

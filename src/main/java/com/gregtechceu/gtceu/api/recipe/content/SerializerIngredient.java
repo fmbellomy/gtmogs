@@ -5,12 +5,13 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
 public class SerializerIngredient implements IContentSerializer<SizedIngredient> {
 
+    public static final SizedIngredient EMPTY = new SizedIngredient(Ingredient.EMPTY, 1);
     public static SerializerIngredient INSTANCE = new SerializerIngredient();
 
     private SerializerIngredient() {}
@@ -26,27 +27,27 @@ public class SerializerIngredient implements IContentSerializer<SizedIngredient>
     }
 
     @Override
-    public Codec<SizedIngredient> codec() {
-        return SizedIngredient.NESTED_CODEC;
-    }
-
-    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public SizedIngredient of(Object o) {
-        if (o instanceof SizedIngredient SizedIngredient) {
-            return SizedIngredient;
+        if (o instanceof SizedIngredient ingredient) {
+            return ingredient;
         } else if (o instanceof ItemStack itemStack) {
-            return SizedIngredient.of(itemStack.getItem(), itemStack.getCount());
+            return new SizedIngredient(Ingredient.of(itemStack), itemStack.getCount());
         } else if (o instanceof ItemLike itemLike) {
             return SizedIngredient.of(itemLike, 1);
         } else if (o instanceof TagKey tag) {
             return SizedIngredient.of(tag, 1);
         }
-        return new SizedIngredient(Ingredient.EMPTY, 1);
+        return EMPTY;
     }
 
     @Override
     public SizedIngredient defaultValue() {
-        return new SizedIngredient(Ingredient.EMPTY, 1);
+        return EMPTY;
+    }
+
+    @Override
+    public Codec<SizedIngredient> codec() {
+        return SizedIngredient.NESTED_CODEC;
     }
 }

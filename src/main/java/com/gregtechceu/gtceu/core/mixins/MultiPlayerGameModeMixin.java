@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.core.mixins;
 
-import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 
 import net.minecraft.client.Minecraft;
@@ -17,11 +16,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-/**
- * @author KilaBash
- * @date 2023/2/24
- * @implNote MultiPlayerGameModeMixin
- */
 @Mixin(MultiPlayerGameMode.class)
 public class MultiPlayerGameModeMixin {
 
@@ -30,15 +24,16 @@ public class MultiPlayerGameModeMixin {
     private Minecraft minecraft;
 
     @Inject(method = "destroyBlock", at = @At("HEAD"), cancellable = true)
-    private void gtceu$destroyBlock(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        ItemStack mainHandItem = minecraft.player.getMainHandItem();
-        if (minecraft.player == null ||
-                minecraft.level == null ||
-                !ToolHelper.hasBehaviorsComponent(mainHandItem) ||
-                ToolHelper.getAoEDefinition(mainHandItem) == AoESymmetrical.none() ||
-                minecraft.player.isShiftKeyDown() ||
-                !mainHandItem.isCorrectToolForDrops(minecraft.level.getBlockState(pos)))
+    private void gtceu$stopClientAOEBlockDestroy(BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
+        if (minecraft.player == null || minecraft.level == null || minecraft.player.isShiftKeyDown()) {
             return;
+        }
+        ItemStack mainHandItem = minecraft.player.getMainHandItem();
+        if (!ToolHelper.hasBehaviorsComponent((mainHandItem)) ||
+                ToolHelper.getAoEDefinition(mainHandItem).isNone() ||
+                !mainHandItem.isCorrectToolForDrops(minecraft.level.getBlockState(pos))) {
+            return;
+        }
 
         cir.setReturnValue(false);
         Level level = minecraft.level;

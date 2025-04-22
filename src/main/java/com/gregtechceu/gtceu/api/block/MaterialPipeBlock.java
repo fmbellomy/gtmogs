@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.pipenet.*;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.block.PipeBlockRenderer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.MutableComponent;
@@ -18,15 +17,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2023/2/28
- * @implNote MaterialPipeBlock
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class MaterialPipeBlock<
         PipeType extends Enum<PipeType> & IPipeType<NodeDataType> & IMaterialPipeType<NodeDataType>, NodeDataType,
         WorldPipeNetType extends LevelPipeNet<NodeDataType, ? extends PipeNet<NodeDataType>>>
@@ -49,7 +40,7 @@ public abstract class MaterialPipeBlock<
             if (blockState.getBlock() instanceof MaterialPipeBlock<?, ?, ?> block) {
                 if (blockPos != null && level != null &&
                         level.getBlockEntity(blockPos) instanceof PipeBlockEntity<?, ?> pipe) {
-                    if (pipe.getFrameMaterial() != null) {
+                    if (!pipe.getFrameMaterial().isNull()) {
                         if (index == 3) {
                             return pipe.getFrameMaterial().getMaterialRGB();
                         } else if (index == 4) {
@@ -86,7 +77,7 @@ public abstract class MaterialPipeBlock<
         PipeType pipeType = pipeTile.getPipeType();
         Material material = ((MaterialPipeBlock<PipeType, NodeDataType, WorldPipeNetType>) pipeTile
                 .getPipeBlock()).material;
-        if (pipeType == null || material == null) {
+        if (pipeType == null || material.isNull()) {
             return getFallbackType();
         }
         return createProperties(pipeType, material);

@@ -11,14 +11,18 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.client.model.ItemBakedModel;
 import com.gregtechceu.gtceu.client.renderer.block.TextureOverrideRenderer;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverableRenderer;
+import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
+import com.gregtechceu.gtceu.utils.GTMatrixUtils;
 
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
+import com.lowdragmc.lowdraglib.client.bakedpipeline.Quad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 import com.lowdragmc.lowdraglib.client.model.custommodel.ICTMPredicate;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
@@ -34,21 +38,17 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.util.TriState;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.common.util.TriState;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/2/26
- * @implNote MachineRenderer
- */
 public class MachineRenderer extends TextureOverrideRenderer
                              implements ICoverableRenderer, IPartRenderer, ICTMPredicate {
 
@@ -69,7 +69,7 @@ public class MachineRenderer extends TextureOverrideRenderer
     @Override
     @OnlyIn(Dist.CLIENT)
     public TriState useAO() {
-        return TriState.TRUE;
+        return TriState.DEFAULT;
     }
 
     @Override
@@ -83,12 +83,21 @@ public class MachineRenderer extends TextureOverrideRenderer
                     new ItemBakedModel() {
 
                         @Override
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state,
+                                                                 @Nullable Direction direction,
+                                                                 @NotNull RandomSource random) {
+                            return getQuads(state, direction, random, ModelData.EMPTY, null);
+                        }
+
+                        @Override
                         @OnlyIn(Dist.CLIENT)
-                        public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction direction,
-                                                        RandomSource random) {
+                        public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state,
+                                                                 @Nullable Direction direction,
+                                                                 @NotNull RandomSource random,
+                                                                 @NotNull ModelData data, RenderType renderType) {
                             List<BakedQuad> quads = new LinkedList<>();
                             renderMachine(quads, machineItem.getDefinition(), null, Direction.NORTH, direction, random,
-                                    direction, BlockModelRotation.X0_Y0);
+                                    direction, BlockModelRotation.X0_Y0, data, renderType);
                             return quads;
                         }
                     });
@@ -99,63 +108,57 @@ public class MachineRenderer extends TextureOverrideRenderer
     @Override
     @OnlyIn(Dist.CLIENT)
     public final List<BakedQuad> renderModel(@Nullable BlockAndTintGetter level, @Nullable BlockPos pos,
-                                             @Nullable BlockState state, @Nullable Direction side, RandomSource rand) {
+                                             @Nullable BlockState state, @Nullable Direction side,
+                                             @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         if (state != null && state.getBlock() instanceof MetaMachineBlock machineBlock) {
             var frontFacing = machineBlock.getFrontFacing(state);
             var machine = (level == null || pos == null) ? null : machineBlock.getMachine(level, pos);
             if (machine != null) {
                 var definition = machine.getDefinition();
-                var modelState = ModelFactory.getRotation(frontFacing);
+                var machineModelState = GTMatrixUtils.createRotationState(frontFacing,
+                        MetaMachine.getUpwardFacing(machine));
+                var blockModelState = ModelFactory.getRotation(frontFacing);
                 var modelFacing = side == null ? null : ModelFactory.modelFacing(side, frontFacing);
                 var quads = new LinkedList<BakedQuad>();
                 // render machine additional quads
-                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState);
+                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, machineModelState, data, renderType);
 
                 // render auto IO
                 if (machine instanceof IAutoOutputItem autoOutputItem) {
                     var itemFace = autoOutputItem.getOutputFacingItems();
                     if (itemFace != null && side == itemFace) {
-                        quads.add(
-                                FaceQuad.bakeFace(SLIGHTLY_OVER_BLOCK,
-                                        modelFacing, ModelFactory.getBlockSprite(PIPE_OVERLAY), modelState,
-                                        -1, 0, true, true));
-                    }
-                }
-                if (machine instanceof IAutoOutputFluid autoOutputFluid) {
-                    var fluidFace = autoOutputFluid.getOutputFacingFluids();
-                    if (fluidFace != null && side == fluidFace) {
-                        quads.add(
-                                FaceQuad.bakeFace(SLIGHTLY_OVER_BLOCK,
-                                        modelFacing, ModelFactory.getBlockSprite(PIPE_OVERLAY), modelState,
-                                        -1, 0, true, true));
-                    }
-                }
-
-                if (machine instanceof IAutoOutputItem autoOutputItem) {
-                    var itemFace = autoOutputItem.getOutputFacingItems();
-                    if (itemFace != null && side == itemFace) {
+                        quads.add(FaceQuad.bakeFace(StaticFaceBakery.OUTPUT_OVERLAY,
+                                modelFacing, ModelFactory.getBlockSprite(PIPE_OVERLAY), blockModelState,
+                                -1, 0, true, true));
                         if (autoOutputItem.isAutoOutputItems()) {
-                            quads.add(FaceQuad.bakeFace(SLIGHTLY_OVER_BLOCK,
-                                    modelFacing, ModelFactory.getBlockSprite(ITEM_OUTPUT_OVERLAY),
-                                    modelState, -101, 15, true, true));
+                            quads.add(FaceQuad.bakeFace(StaticFaceBakery.AUTO_OUTPUT_OVERLAY,
+                                    modelFacing, ModelFactory.getBlockSprite(ITEM_OUTPUT_OVERLAY), blockModelState,
+                                    -101, 15, true, true));
                         }
                     }
                 }
-
                 if (machine instanceof IAutoOutputFluid autoOutputFluid) {
                     var fluidFace = autoOutputFluid.getOutputFacingFluids();
                     if (fluidFace != null && side == fluidFace) {
+                        quads.add(FaceQuad.bakeFace(StaticFaceBakery.OUTPUT_OVERLAY,
+                                modelFacing, ModelFactory.getBlockSprite(PIPE_OVERLAY), blockModelState,
+                                -1, 0, true, true));
                         if (autoOutputFluid.isAutoOutputFluids()) {
-                            quads.add(FaceQuad.bakeFace(SLIGHTLY_OVER_BLOCK,
-                                    modelFacing, ModelFactory.getBlockSprite(FLUID_OUTPUT_OVERLAY),
-                                    modelState, -101, 15, true, true));
+                            quads.add(FaceQuad.bakeFace(StaticFaceBakery.AUTO_OUTPUT_OVERLAY,
+                                    modelFacing, ModelFactory.getBlockSprite(FLUID_OUTPUT_OVERLAY), blockModelState,
+                                    -101, 15, true, true));
                         }
                     }
                 }
 
                 // render covers
-                ICoverableRenderer.super.renderCovers(quads, side, rand, machine.getCoverContainer(), modelFacing,
-                        modelState);
+                int start = quads.size();
+                ICoverableRenderer.super.renderCovers(quads, side, rand, machine.getCoverContainer(), modelFacing, pos,
+                        level, blockModelState);
+                var iterator = quads.listIterator(start);
+                while (iterator.hasNext()) {
+                    iterator.set(Quad.from(iterator.next(), coverOverlayOffset()).rebake());
+                }
                 return quads;
             }
         }
@@ -164,8 +167,10 @@ public class MachineRenderer extends TextureOverrideRenderer
 
     @OnlyIn(Dist.CLIENT)
     public void renderBaseModel(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                                Direction frontFacing, @Nullable Direction side, RandomSource rand) {
-        quads.addAll(getRotatedModel(frontFacing).getQuads(definition.defaultBlockState(), side, rand));
+                                ModelState modelState, @Nullable Direction side,
+                                @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+        quads.addAll(getRotatedModel(MetaMachine.getFrontFacing(machine))
+                .getQuads(definition.defaultBlockState(), side, rand, data, renderType));
     }
 
     /**
@@ -179,14 +184,20 @@ public class MachineRenderer extends TextureOverrideRenderer
      * @param rand        random
      * @param modelFacing model facing before rotation
      * @param modelState  uvLocked rotation according to the front facing
+     * @param data        arbitrary NeoForge model data
+     * @param renderType  current render type. The breaking overlay as well as non-standard rendering uses null here, so
+     *                    all quads should be returned.
      */
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, RandomSource rand,
-                              @Nullable Direction modelFacing, ModelState modelState) {
+                              Direction frontFacing, @Nullable Direction side,
+                              @NotNull RandomSource rand, @Nullable Direction modelFacing,
+                              ModelState modelState, @NotNull ModelData data, RenderType renderType) {
         if (!(machine instanceof IMultiPart part) || !part.replacePartModelWhenFormed() ||
-                !renderReplacedPartMachine(quads, part, frontFacing, side, rand, modelFacing, modelState)) {
-            renderBaseModel(quads, definition, machine, frontFacing, side, rand);
+                !renderReplacedPartMachine(quads,
+                        part, frontFacing, side, rand, modelFacing,
+                        modelState, data, renderType)) {
+            renderBaseModel(quads, definition, machine, modelState, side, rand, data, renderType);
         }
     }
 
@@ -209,12 +220,10 @@ public class MachineRenderer extends TextureOverrideRenderer
                                BlockPos sourcePos, Direction side) {
         var stateAppearance = state.getAppearance(level, pos, side, sourceState, sourcePos);
         var sourceStateAppearance = sourceState.getAppearance(level, sourcePos, side, state, pos);
-        // var machine = MetaMachine.getMachine(level, pos);
-        // if (machine != null) {
-        // if (machine instanceof IMultiController controller && !controller.isFormed()) {
-        // return false;
-        // }
-        // }
         return stateAppearance == sourceStateAppearance;
+    }
+
+    public float coverOverlayOffset() {
+        return .008f;
     }
 }

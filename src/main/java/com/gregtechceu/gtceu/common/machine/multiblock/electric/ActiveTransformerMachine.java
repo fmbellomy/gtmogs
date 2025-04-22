@@ -26,11 +26,10 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -89,19 +88,23 @@ public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
         for (IMultiPart part : getPrioritySortedParts()) {
             IO io = ioMap.getOrDefault(part.self().getPos().asLong(), IO.BOTH);
             if (io == IO.NONE) continue;
-            for (var handler : part.getRecipeHandlers()) {
-                var handlerIO = handler.getHandlerIO();
-                // If IO not compatible
-                if (io != IO.BOTH && handlerIO != IO.BOTH && io != handlerIO) continue;
-                if (handler.getCapability() == EURecipeCapability.CAP &&
-                        handler instanceof IEnergyContainer container) {
-                    if (handlerIO == IO.IN) {
-                        powerInput.add(container);
-                    } else if (handlerIO == IO.OUT) {
-                        powerOutput.add(container);
-                    }
-                    traitSubscriptions.add(handler.addChangedListener(converterSubscription::updateSubscription));
+            var handlerLists = part.getRecipeHandlers();
+            for (var handlerList : handlerLists) {
+                if (!handlerList.isValid(io)) continue;
+
+                var containers = handlerList.getCapability(EURecipeCapability.CAP).stream()
+                        .filter(IEnergyContainer.class::isInstance)
+                        .map(IEnergyContainer.class::cast)
+                        .toList();
+
+                if (handlerList.getHandlerIO() == IO.IN) {
+                    powerInput.addAll(containers);
+                } else if (handlerList.getHandlerIO() == IO.OUT) {
+                    powerOutput.addAll(containers);
                 }
+
+                traitSubscriptions
+                        .add(handlerList.subscribe(converterSubscription::updateSubscription, EURecipeCapability.CAP));
             }
         }
 
@@ -120,7 +123,7 @@ public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
     private List<IMultiPart> getPrioritySortedParts() {
         return getParts().stream().sorted(Comparator.comparing(part -> {
             if (part instanceof MetaMachine partMachine) {
-                Block partBlock = partMachine.getBlockState().getBlock();
+                net.minecraft.world.level.block.Block partBlock = partMachine.getBlockState().getBlock();
 
                 if (PartAbility.OUTPUT_ENERGY.isApplicable(partBlock))
                     return 1;
@@ -159,7 +162,7 @@ public class ActiveTransformerMachine extends WorkableElectricMultiblockMachine
     }
 
     @Override
-    public void addDisplayText(List<Component> textList) {
+    public void addDisplayText(@NotNull List<Component> textList) {
         // super.addDisplayText(textList); idek what it does stop doing what you do for a minute pls
         // Assume That the Structure is ALWAYS formed, and has at least 1 In and 1 Out, there is never a case where this
         // does not occur.

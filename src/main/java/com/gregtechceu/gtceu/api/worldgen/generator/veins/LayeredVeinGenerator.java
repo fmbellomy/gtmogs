@@ -3,11 +3,12 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.worldgen.GTLayerPattern;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -22,32 +23,26 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@SuppressWarnings("UnusedReturnValue")
+@NoArgsConstructor
 public class LayeredVeinGenerator extends VeinGenerator {
-
-    public static final MapCodec<LayeredVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            GTLayerPattern.CODEC.listOf().fieldOf("layer_patterns")
-                    .forGetter(LayeredVeinGenerator::getLayerPatterns))
-            .apply(instance, LayeredVeinGenerator::new));
-
+    // spotless:off
+    public static final MapCodec<LayeredVeinGenerator> CODEC = GTLayerPattern.CODEC.listOf().fieldOf("layer_patterns")
+            .xmap(LayeredVeinGenerator::new, LayeredVeinGenerator::getLayerPatterns);
+    // spotless:on
     private final List<NonNullSupplier<GTLayerPattern>> bakingLayerPatterns = new ArrayList<>();
 
     public List<GTLayerPattern> layerPatterns;
-
-    public LayeredVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public List<GTLayerPattern> getLayerPatterns() {
         if (layerPatterns == null || this.layerPatterns.isEmpty()) {
@@ -78,7 +73,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
         var patternPool = this.getLayerPatterns();
@@ -128,11 +123,11 @@ public class LayeredVeinGenerator extends VeinGenerator {
                     int layerIndex = layerCoordinate == 0 ? zOffset : layerCoordinate == 1 ? xOffset : yOffset;
                     if (slantyCoordinate != layerCoordinate)
                         layerIndex += Mth.floor(
-                                slantyCoordinate == 0 ? zOffset : slantyCoordinate == 1 ? xOffset : yOffset) * slope;
+                                slantyCoordinate == 0 ? zOffset : slantyCoordinate == 1 ? xOffset : yOffset * slope);
 
                     while (layerIndex >= resolvedLayers.size()) {
                         GTLayerPattern.Layer next = layerPattern.rollNext(
-                                resolvedLayers.isEmpty() ? null : resolvedLayers.get(resolvedLayers.size() - 1),
+                                resolvedLayers.isEmpty() ? null : resolvedLayers.getLast(),
                                 random);
                         float offset = random.nextFloat() * .5f + .5f;
                         for (int i = 0; i < next.minSize + random.nextInt(1 + next.maxSize - next.minSize); i++) {
@@ -165,7 +160,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
     }
 
     private static void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed,
-                                   GTOreDefinition entry, float density,
+                                   OreVeinDefinition entry, float density,
                                    Either<List<OreConfiguration.TargetBlockState>, Material> state, BlockPos pos) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
         int x = SectionPos.sectionRelative(pos.getX());
@@ -205,13 +200,6 @@ public class LayeredVeinGenerator extends VeinGenerator {
         this.layerPatterns = layerPatterns;
     }
 
-    public LayeredVeinGenerator buildLayerPattern(Consumer<GTLayerPattern.Builder> config) {
-        var builder = GTLayerPattern.builder(parent().layer().getTarget());
-        config.accept(builder);
-
-        return withLayerPattern(builder::build);
-    }
-
     public LayeredVeinGenerator withLayerPattern(NonNullSupplier<GTLayerPattern> pattern) {
         this.bakingLayerPatterns.add(pattern);
         return this;
@@ -234,4 +222,5 @@ public class LayeredVeinGenerator extends VeinGenerator {
     public MapCodec<? extends VeinGenerator> codec() {
         return CODEC;
     }
+
 }

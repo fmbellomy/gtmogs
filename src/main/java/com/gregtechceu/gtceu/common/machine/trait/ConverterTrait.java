@@ -13,19 +13,16 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.core.Direction;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.energy.IEnergyStorage;
-
 import lombok.Getter;
 
 public class ConverterTrait extends NotifiableEnergyContainer {
 
-    public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ConverterTrait.class);
+    public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(ConverterTrait.class,
+            NotifiableEnergyContainer.MANAGED_FIELD_HOLDER);
 
     /**
      * If TRUE, the front facing of the machine will OUTPUT EU, other sides INPUT FE.
-     * <p>
      * If FALSE, the front facing of the machine will OUTPUT FE, other sides INPUT EU.
      */
     @Getter
@@ -40,7 +37,7 @@ public class ConverterTrait extends NotifiableEnergyContainer {
     @Getter
     private final FEContainer feContainer;
 
-    public ConverterTrait(ConverterMachine machine, int amps, boolean feToEu) {
+    public ConverterTrait(ConverterMachine machine, int amps) {
         super(machine, GTValues.V[machine.getTier()] * 16 * amps, GTValues.V[machine.getTier()], amps,
                 GTValues.V[machine.getTier()], amps);
         this.amps = amps;
@@ -86,12 +83,6 @@ public class ConverterTrait extends NotifiableEnergyContainer {
                 }
             }
         }
-    }
-
-    protected <T> T getCapabilityAtFront(BlockCapability<T, Direction> capability) {
-        return getMachine().getLevel().getCapability(capability,
-                getMachine().getPos().relative(getMachine().getFrontFacing()),
-                getMachine().getFrontFacing().getOpposite());
     }
 
     //////////////////////////////

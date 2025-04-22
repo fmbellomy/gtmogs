@@ -58,11 +58,6 @@ public class SerializerBlockState implements IContentSerializer<BlockState> {
     }
 
     @Override
-    public Codec<BlockState> codec() {
-        return BlockState.CODEC;
-    }
-
-    @Override
     public BlockState of(Object o) {
         if (o instanceof BlockState state) {
             return state;
@@ -73,5 +68,10 @@ public class SerializerBlockState implements IContentSerializer<BlockState> {
     @Override
     public BlockState defaultValue() {
         return Blocks.AIR.defaultBlockState();
+    }
+
+    @Override
+    public Codec<BlockState> codec() {
+        return BlockState.CODEC;
     }
 }

@@ -1,26 +1,30 @@
 package com.gregtechceu.gtceu.api.gui.misc;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.gui.texture.ProspectingTexture;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.stack.UnificationEntry;
+import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidVeinSavedData;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.FluidVeinWorldEntry;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreVeinSavedData;
-import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.api.gui.texture.ProspectingTexture;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
+import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -35,16 +39,14 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.*;
 
-/**
- * @author KilaBash
- * @date 2023/7/10
- * @implNote ProspectorMode
- */
 public abstract class ProspectorMode<T> {
 
     public static ProspectorMode<String> ORE = new ProspectorMode<>("metaitem.prospector.mode.ores", 16) {
@@ -64,9 +66,9 @@ public abstract class ProspectorMode<T> {
                         if (state.is(oreTag)) {
                             var itemName = BLOCK_CACHE.computeIfAbsent(state, blockState -> {
                                 var name = BuiltInRegistries.BLOCK.getKey(blockState.getBlock()).toString();
-                                var entry = ChemicalHelper.getUnificationEntry(blockState.getBlock());
-                                if (entry != null && entry.material != null) {
-                                    name = "material_" + entry.material.getResourceLocation();
+                                var entry = ChemicalHelper.getMaterialEntry(blockState.getBlock());
+                                if (!entry.isEmpty()) {
+                                    name = "material_" + entry.material().getResourceLocation();
                                 }
                                 return name;
                             });
@@ -81,7 +83,7 @@ public abstract class ProspectorMode<T> {
         public int getItemColor(String item) {
             if (item.startsWith("material_")) {
                 var mat = GTMaterials.get(item.substring(9));
-                if (mat != null) {
+                if (!mat.isNull()) {
                     return mat.getMaterialRGB();
                 }
             }
@@ -93,10 +95,10 @@ public abstract class ProspectorMode<T> {
             return ICON_CACHE.computeIfAbsent(item, name -> {
                 if (name.startsWith("material_")) {
                     var mat = GTMaterials.get(name.substring(9));
-                    if (mat != null) {
+                    if (!mat.isNull()) {
                         var list = new ArrayList<ItemStack>();
                         for (TagPrefix oreTag : TagPrefix.ORES.keySet()) {
-                            for (var block : ChemicalHelper.getBlocks(new UnificationEntry(oreTag, mat))) {
+                            for (var block : ChemicalHelper.getBlocks(new MaterialEntry(oreTag, mat))) {
                                 list.add(new ItemStack(block));
                             }
                         }
@@ -112,7 +114,7 @@ public abstract class ProspectorMode<T> {
         public MutableComponent getDescription(String item) {
             if (item.startsWith("material_")) {
                 var mat = GTMaterials.get(item.substring(9));
-                if (mat != null) {
+                if (!mat.isNull()) {
                     return mat.getLocalizedName();
                 }
             }
@@ -153,8 +155,41 @@ public abstract class ProspectorMode<T> {
         }
     };
 
-    public record FluidInfo(Fluid fluid, int left, int yield) {
+    @Accessors(fluent = true)
+    @AllArgsConstructor
+    public static final class FluidInfo {
 
+        @Getter
+        private final Fluid fluid;
+        @Getter
+        private final int yield;
+        @Getter
+        @Setter
+        private int left;
+
+        public static FluidInfo fromNbt(CompoundTag tag) {
+            Fluid fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(tag.getString("fluid")));
+            int left = tag.getInt("left");
+            int yield = tag.getInt("yield");
+            return new FluidInfo(fluid, yield, left);
+        }
+
+        public CompoundTag toNbt() {
+            CompoundTag tag = new CompoundTag();
+            tag.putString("fluid", BuiltInRegistries.FLUID.getKey(fluid).toString());
+            tag.putInt("left", left);
+            tag.putInt("yield", yield);
+            return tag;
+        }
+
+        public static FluidInfo fromVeinWorldEntry(@NotNull FluidVeinWorldEntry savedData) {
+            if (savedData.getDefinition() == null) {
+                return null;
+            }
+            return new FluidInfo(savedData.getDefinition().value().getStoredFluid().get(),
+                    savedData.getFluidYield(),
+                    100 * savedData.getOperationsRemaining() / BedrockFluidVeinSavedData.MAXIMUM_VEIN_OPERATIONS);
+        }
     }
 
     public static ProspectorMode<FluidInfo> FLUID = new ProspectorMode<>("metaitem.prospector.mode.fluid", 1) {
@@ -165,11 +200,8 @@ public abstract class ProspectorMode<T> {
                 var fluidVein = BedrockFluidVeinSavedData.getOrCreate(serverLevel)
                         .getFluidVeinWorldEntry(chunk.getPos().x, chunk.getPos().z);
                 if (fluidVein.getDefinition() != null) {
-                    var left = 100 * fluidVein.getOperationsRemaining() /
-                            BedrockFluidVeinSavedData.MAXIMUM_VEIN_OPERATIONS;
                     storage[0][0] = new FluidInfo[] {
-                            new FluidInfo(fluidVein.getDefinition().getStoredFluid().get(), left,
-                                    fluidVein.getFluidYield()),
+                            FluidInfo.fromVeinWorldEntry(fluidVein)
                     };
                 }
             }
@@ -181,7 +213,7 @@ public abstract class ProspectorMode<T> {
             if (fluidStack.getFluid() == Fluids.LAVA) {
                 return 0xFFFF7000;
             }
-            return FluidHelper.getColor(fluidStack);
+            return GTUtil.getFluidColor(fluidStack);
         }
 
         @Override
@@ -202,8 +234,8 @@ public abstract class ProspectorMode<T> {
         @Override
         public void serialize(FluidInfo item, FriendlyByteBuf buf) {
             buf.writeUtf(BuiltInRegistries.FLUID.getKey(item.fluid).toString());
-            buf.writeVarInt(item.left);
             buf.writeVarInt(item.yield);
+            buf.writeVarInt(item.left);
         }
 
         @Override
@@ -236,7 +268,7 @@ public abstract class ProspectorMode<T> {
                 float drawnV = (float) ProgressTexture.FillDirection.DOWN_TO_UP.getDrawnV(progress);
                 float drawnWidth = (float) ProgressTexture.FillDirection.DOWN_TO_UP.getDrawnWidth(progress);
                 float drawnHeight = (float) ProgressTexture.FillDirection.DOWN_TO_UP.getDrawnHeight(progress);
-                DrawerHelper.drawFluidForGui(graphics, new FluidStack(item.fluid(), item.left), 100,
+                DrawerHelper.drawFluidForGui(graphics, new FluidStack(item.fluid(), item.left),
                         (int) (x + drawnU * width), (int) (y + drawnV * height), ((int) (width * drawnWidth)),
                         ((int) (height * drawnHeight)));
             }
@@ -257,7 +289,7 @@ public abstract class ProspectorMode<T> {
                         chunk.getPos().z);
                 if (oreVein.getDefinition() != null) {
                     var left = 100 * oreVein.getOperationsRemaining() / BedrockOreVeinSavedData.MAXIMUM_VEIN_OPERATIONS;
-                    for (var entry : oreVein.getDefinition().materials()) {
+                    for (var entry : oreVein.getDefinition().value().materials()) {
                         storage[0][0] = ArrayUtils.add(storage[0][0],
                                 new OreInfo(entry.getFirst(), entry.getSecond(), left, oreVein.getOreYield()));
                     }
@@ -308,7 +340,7 @@ public abstract class ProspectorMode<T> {
         public OreInfo deserialize(FriendlyByteBuf buf) {
             ResourceLocation materialId = buf.readResourceLocation();
             return new OreInfo(
-                    GTCEuAPI.materialManager.getRegistry(materialId.getNamespace()).get(materialId.getPath()),
+                    GTCEuAPI.materialManager.getMaterial(materialId),
                     buf.readVarInt(), buf.readVarInt(), buf.readVarInt());
         }
 
@@ -324,8 +356,8 @@ public abstract class ProspectorMode<T> {
                 for (OreInfo item : array) {
                     float chance = (float) item.weight / totalWeight * 100;
                     tooltips.add(getDescription(item).append(" (")
-                            .append(Component.translatable("gtceu.gui.content.chance_1",
-                                    String.format("%.1f", chance) + "%"))
+                            .append(Component.translatable("gtceu.gui.content.chance_base",
+                                    FormattingUtil.formatNumber2Places(chance)))
                             .append(") --- %s (%s%%)".formatted(item.yield, item.left)));
                 }
             }

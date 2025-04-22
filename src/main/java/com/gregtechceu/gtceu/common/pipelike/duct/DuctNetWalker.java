@@ -1,8 +1,6 @@
 package com.gregtechceu.gtceu.common.pipelike.duct;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.capability.GTCapability;
-import com.gregtechceu.gtceu.api.capability.IHazardParticleContainer;
 import com.gregtechceu.gtceu.api.pipenet.PipeNetWalker;
 import com.gregtechceu.gtceu.common.blockentity.DuctPipeBlockEntity;
 
@@ -80,15 +78,7 @@ public class DuctNetWalker extends PipeNetWalker<DuctPipeBlockEntity, DuctPipePr
         if ((pipePos.equals(sourcePipe) && faceToNeighbour == facingToHandler)) {
             return;
         }
-        if (neighbourTile != null) {
-            IHazardParticleContainer handler = neighbourTile.getLevel().getCapability(
-                    GTCapability.CAPABILITY_HAZARD_CONTAINER,
-                    neighbourTile.getBlockPos(),
-                    faceToNeighbour.getOpposite());
-            if (handler != null) {
-                inventories.add(new DuctRoutePath(pipeTile, faceToNeighbour, getWalkedBlocks(), minProperties));
-            }
-        } else if (pipeTile.isConnected(faceToNeighbour)) {
+        if (pipeTile.isConnected(faceToNeighbour)) {
             inventories.add(new DuctRoutePath(pipeTile, faceToNeighbour, getWalkedBlocks(), minProperties));
         }
     }

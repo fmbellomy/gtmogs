@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.integration.ae2.machine.trait;
 
 import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.IGridConnectedMachine;
 import com.gregtechceu.gtceu.integration.ae2.utils.SerializableManagedGridNode;
 
-import com.lowdragmc.lowdraglib.Platform;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.annotation.ReadOnlyManaged;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
@@ -14,7 +14,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
-
 import appeng.api.networking.GridFlags;
 import appeng.me.helpers.BlockEntityNodeListener;
 import appeng.me.helpers.IGridConnectedBlockEntity;
@@ -24,10 +23,12 @@ import java.util.EnumSet;
 
 /**
  * A MachineTrait that is only used for hosting grid node and does not provide grid node capability.
- * Because IGridConnectedMachine has already extended IInWorldGridNodeHost.
+ * Because {@link IGridConnectedMachine} already extends {@link appeng.api.networking.IInWorldGridNodeHost}.
  *
  * @author GateGuardian
- * @date : 2024/7/14
+ * @date 2024/7/14
+ * @see appeng.api.networking.IInWorldGridNodeHost
+ * @see IGridConnectedMachine
  */
 public class GridNodeHolder extends MachineTrait {
 
@@ -89,12 +90,12 @@ public class GridNodeHolder extends MachineTrait {
 
     @SuppressWarnings("unused")
     public CompoundTag serializeGridNode(SerializableManagedGridNode node) {
-        return node.serializeNBT(Platform.getFrozenRegistry());
+        return node.serializeNBT(GTRegistries.builtinRegistry());
     }
 
     @SuppressWarnings("unused")
     public SerializableManagedGridNode deserializeGridNode(CompoundTag tag) {
-        this.mainNode.deserializeNBT(Platform.getFrozenRegistry(), tag);
+        this.mainNode.deserializeNBT(GTRegistries.builtinRegistry(), tag);
         return this.mainNode;
     }
 }

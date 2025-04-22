@@ -17,7 +17,6 @@ public class DuctPipeBlockItem extends PipeBlockItem implements IItemRendererPro
     }
 
     @Override
-    @NotNull
     public DuctPipeBlock getBlock() {
         return (DuctPipeBlock) super.getBlock();
     }

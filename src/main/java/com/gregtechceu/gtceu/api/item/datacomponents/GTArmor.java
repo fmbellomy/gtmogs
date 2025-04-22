@@ -1,7 +1,12 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
-import com.gregtechceu.gtceu.utils.StreamCodecUtils;
+import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
+import com.gregtechceu.gtceu.utils.codec.StreamCodecUtils;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -22,20 +27,21 @@ public record GTArmor(
                       byte runningTimer,
                       byte boostedJumpTimer,
                       byte consumerTicks) {
-
+    // spotless:off
     public static final Codec<GTArmor> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.BOOL.fieldOf("enabled").forGetter(GTArmor::enabled),
-            Codec.BOOL.fieldOf("hover").forGetter(GTArmor::hover),
-            Codec.BOOL.fieldOf("can_share").forGetter(GTArmor::canShare),
-            Codec.BOOL.fieldOf("night_vision").forGetter(GTArmor::nightVision),
-            Codec.BOOL.fieldOf("boosted_jump").forGetter(GTArmor::boostedJump),
-            Codec.BOOL.fieldOf("on_ground").forGetter(GTArmor::onGround),
-            Codec.BYTE.fieldOf("toggle_timer").forGetter(GTArmor::toggleTimer),
-            Codec.SHORT.fieldOf("burn_timer").forGetter(GTArmor::burnTimer),
-            Codec.INT.fieldOf("night_vision_timer").forGetter(GTArmor::nightVisionTimer),
-            Codec.BYTE.fieldOf("running_timer").forGetter(GTArmor::runningTimer),
-            Codec.BYTE.fieldOf("boosted_jump_timer").forGetter(GTArmor::boostedJumpTimer),
-            Codec.BYTE.fieldOf("consumer_ticks").forGetter(GTArmor::consumerTicks)).apply(instance, GTArmor::new));
+            Codec.BOOL.orElse(false).fieldOf("enabled").forGetter(GTArmor::enabled),
+            Codec.BOOL.orElse(false).fieldOf("hover").forGetter(GTArmor::hover),
+            Codec.BOOL.orElse(false).fieldOf("can_share").forGetter(GTArmor::canShare),
+            Codec.BOOL.orElse(false).fieldOf("night_vision").forGetter(GTArmor::nightVision),
+            Codec.BOOL.orElse(false).fieldOf("boosted_jump").forGetter(GTArmor::boostedJump),
+            Codec.BOOL.orElse(false).fieldOf("on_ground").forGetter(GTArmor::onGround),
+            Codec.BYTE.orElse((byte) 0).fieldOf("toggle_timer").forGetter(GTArmor::toggleTimer),
+            Codec.SHORT.orElse((short) 0).fieldOf("burn_timer").forGetter(GTArmor::burnTimer),
+            Codec.INT.orElse(ArmorUtils.NIGHTVISION_DURATION).fieldOf("night_vision_timer").forGetter(GTArmor::nightVisionTimer),
+            Codec.BYTE.orElse((byte) 0).fieldOf("running_timer").forGetter(GTArmor::runningTimer),
+            Codec.BYTE.orElse((byte) 0).fieldOf("boosted_jump_timer").forGetter(GTArmor::boostedJumpTimer),
+            Codec.BYTE.orElse((byte) 0).fieldOf("consumer_ticks").forGetter(GTArmor::consumerTicks)).apply(instance, GTArmor::new));
+    // spotless:on
     public static final StreamCodec<ByteBuf, GTArmor> STREAM_CODEC = StreamCodecUtils.composite(
             ByteBufCodecs.BOOL, GTArmor::enabled,
             ByteBufCodecs.BOOL, GTArmor::hover,
@@ -51,7 +57,9 @@ public record GTArmor(
             ByteBufCodecs.BYTE, GTArmor::consumerTicks,
             GTArmor::new);
 
-    public GTArmor() {
+    public static final GTArmor EMPTY = new GTArmor();
+
+    private GTArmor() {
         this(false, false, false, false, false, false, (byte) 0, (short) 0, 0, (byte) 0, (byte) 0, (byte) 0);
     }
 
@@ -113,5 +121,56 @@ public record GTArmor(
     public GTArmor setConsumerTicks(byte consumerTicks) {
         return new GTArmor(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
                 nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+    }
+
+    public Mutable toMutable() {
+        return new Mutable(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
+                nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+    }
+
+    @Accessors(chain = true, fluent = true)
+    @AllArgsConstructor
+    public static class Mutable {
+        @Getter
+        @Setter
+        private boolean enabled;
+        @Getter
+        @Setter
+        private boolean hover;
+        @Getter
+        @Setter
+        private boolean canShare;
+        @Getter
+        @Setter
+        private boolean nightVision;
+        @Getter
+        @Setter
+        private boolean boostedJump;
+        @Getter
+        @Setter
+        private boolean onGround;
+        @Getter
+        @Setter
+        private byte toggleTimer;
+        @Getter
+        @Setter
+        private short burnTimer;
+        @Getter
+        @Setter
+        private int nightVisionTimer;
+        @Getter
+        @Setter
+        private byte runningTimer;
+        @Getter
+        @Setter
+        private byte boostedJumpTimer;
+        @Getter
+        @Setter
+        private byte consumerTicks;
+
+        public GTArmor toImmutable() {
+            return new GTArmor(enabled, hover, canShare, nightVision, boostedJump, onGround, toggleTimer, burnTimer,
+                    nightVisionTimer, runningTimer, boostedJumpTimer, consumerTicks);
+        }
     }
 }

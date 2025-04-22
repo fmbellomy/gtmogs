@@ -15,11 +15,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-/**
- * @author KilaBash
- * @date 2023/3/20
- * @implNote GTFeatures
- */
 public class GTFeatures {
 
     public static final ResourceLocation NEW_ORE_VEIN_TOGGLE = GTCEu.id("vein_toggle");
@@ -28,10 +23,10 @@ public class GTFeatures {
     public static final DeferredRegister<Feature<?>> FEATURE_REGISTER = DeferredRegister.create(Registries.FEATURE,
             GTCEu.MOD_ID);
 
-    public static final DeferredHolder<Feature<?>, StoneBlobFeature> STONE_BLOB = FEATURE_REGISTER
-            .register("stone_blob", StoneBlobFeature::new);
-    public static final DeferredHolder<Feature<?>, FluidSproutFeature> FLUID_SPROUT = FEATURE_REGISTER
-            .register("fluid_sprout", FluidSproutFeature::new);
+    public static final DeferredHolder<Feature<?>, StoneBlobFeature> STONE_BLOB = FEATURE_REGISTER.register("stone_blob",
+            StoneBlobFeature::new);
+    public static final DeferredHolder<Feature<?>, FluidSproutFeature> FLUID_SPROUT = FEATURE_REGISTER.register("fluid_sprout",
+            FluidSproutFeature::new);
 
     public static void init() {
         Object inst = FrequencyModifier.FREQUENCY_MODIFIER; // seemingly useless access to init the class in time

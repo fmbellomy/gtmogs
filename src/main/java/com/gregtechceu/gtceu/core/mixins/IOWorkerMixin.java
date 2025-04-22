@@ -18,8 +18,8 @@ import java.util.concurrent.CompletableFuture;
 public class IOWorkerMixin {
 
     @Inject(method = "store", at = @At("HEAD"))
-    private void storeDFUVersion(ChunkPos chunkPos, @Nullable CompoundTag chunkData,
-                                 CallbackInfoReturnable<CompletableFuture<Void>> cir) {
+    private void gtceu$addModDataVersions(ChunkPos chunkPos, @Nullable CompoundTag chunkData,
+                                          CallbackInfoReturnable<CompletableFuture<Void>> cir) {
         if (chunkData != null)
             DataFixesInternals.get().addModDataVersions(chunkData);
     }

@@ -2,12 +2,14 @@ package com.gregtechceu.gtceu.integration.emi.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
-import com.gregtechceu.gtceu.client.ClientProxy;
+import com.gregtechceu.gtceu.client.ClientInit;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
 import dev.emi.emi.api.EmiRegistry;
@@ -24,14 +26,16 @@ public class GTBedrockOreEmiCategory extends EmiRecipeCategory {
     }
 
     public static void registerDisplays(EmiRegistry registry) {
-        for (BedrockOreDefinition fluid : ClientProxy.CLIENT_BEDROCK_ORE_VEINS.values()) {
-            registry.addRecipe(new GTBedrockOre(fluid));
-        }
+        var fluids = Minecraft.getInstance().level.registryAccess()
+                .registryOrThrow(GTRegistries.BEDROCK_ORE_REGISTRY);
+        fluids.holders().forEach(ore -> {
+            registry.addRecipe(new GTBedrockOre(ore));
+        });
     }
 
     public static void registerWorkStations(EmiRegistry registry) {
         registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_HV.asStack()));
-        registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_LUV.asStack()));
+        registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_LuV.asStack()));
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -15,7 +15,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -25,7 +24,7 @@ public class MultiblockDisplayText {
 
     /**
      * Construct a new Multiblock Display Text builder.
-     * <br>
+     * <br/>
      * Automatically adds the "Invalid Structure" line if the structure is not formed.
      */
     public static Builder builder(List<Component> textList, boolean isStructureFormed) {
@@ -37,6 +36,7 @@ public class MultiblockDisplayText {
         return new Builder(textList, isStructureFormed, showIncompleteStructureWarning);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public static class Builder {
 
         private final List<Component> textList;
@@ -76,7 +76,7 @@ public class MultiblockDisplayText {
         /**
          * Set custom translation keys for the three-state "Idling", "Paused", "Running" display text.
          * <strong>You still must call {@link Builder#addWorkingStatusLine()} for these to appear!</strong>
-         * <br>
+         * <br/>
          * Pass any key as null for it to continue to use the default key.
          *
          * @param idlingKey  The translation key for the Idle state, or "!isActive && isWorkingEnabled".
@@ -95,7 +95,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the max EU/t that this multiblock can use.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed energy container has greater than zero capacity.
          */
         public Builder addEnergyUsageLine(IEnergyContainer energyContainer) {
@@ -106,8 +106,9 @@ public class MultiblockDisplayText {
 
                 String energyFormatted = FormattingUtil.formatNumbers(maxVoltage);
                 // wrap in text component to keep it from being formatted
+                byte voltageTier = GTUtil.getFloorTierByVoltage(maxVoltage);
                 Component voltageName = Component.literal(
-                        GTValues.VNF[GTUtil.getFloorTierByVoltage(maxVoltage)]);
+                        GTValues.VNF[voltageTier]);
 
                 MutableComponent bodyText = Component.translatable("gtceu.multiblock.max_energy_per_tick",
                         energyFormatted, voltageName).withStyle(ChatFormatting.GRAY);
@@ -121,7 +122,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the max Recipe Tier that this multiblock can use for recipe lookup.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed tier is a valid energy tier index for
          * {@link GTValues#VNF}.
          */
@@ -144,7 +145,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the exact EU/t that this multiblock needs to run.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed value is greater than zero.
          */
         public Builder addEnergyUsageExactLine(long energyUsage) {
@@ -164,7 +165,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the max EU/t that this multiblock can produce.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the max voltage is greater than zero and the recipe EU/t.
          */
         public Builder addEnergyProductionLine(long maxVoltage, long recipeEUt) {
@@ -185,7 +186,7 @@ public class MultiblockDisplayText {
         /**
          * Adds the max EU/t that this multiblock can produce, including how many amps. Recommended for multi-amp
          * outputting multis.
-         * <br>
+         * <br/>
          * Added if the structure is formed, if the amperage is greater than zero and if the max voltage is greater than
          * zero.
          */
@@ -206,7 +207,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the max CWU/t that this multiblock can use.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the max CWU/t is greater than zero.
          */
         public Builder addComputationUsageLine(int maxCWUt) {
@@ -223,7 +224,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a currently used CWU/t line.
-         * <br>
+         * <br/>
          * Added if the structure is formed, the machine is active, and the current CWU/t is greater than zero.
          */
         public Builder addComputationUsageExactLine(int currentCWUt) {
@@ -241,7 +242,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a three-state indicator line, showing if the machine is running, paused, or idling.
-         * <br>
+         * <br/>
          * Added if the structure is formed.
          */
         public Builder addWorkingStatusLine() {
@@ -259,7 +260,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the "Work Paused." line.
-         * <br>
+         * <br/>
          * Added if working is not enabled, or if the checkState passed parameter is false.
          * Also added only if formed.
          */
@@ -274,7 +275,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the "Running Perfectly." line.
-         * <br>
+         * <br/>
          * Added if machine is active, or if the checkState passed parameter is false.
          * Also added only if formed.
          */
@@ -289,7 +290,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds the "Idling." line.
-         * <br>
+         * <br/>
          * Added if the machine is not active and working is enabled, or if the checkState passed parameter is false.
          * Also added only if formed.
          */
@@ -302,9 +303,17 @@ public class MultiblockDisplayText {
             return this;
         }
 
+        public Builder addProgressLineOnlyPercent(double progressPercent) {
+            if (!isStructureFormed || !isActive)
+                return this;
+            int currentProgress = (int) (progressPercent * 100);
+            textList.add(Component.translatable("gtceu.multiblock.progress_percent", currentProgress));
+            return this;
+        }
+
         /**
          * Adds a simple progress line that displays the current time of a recipe and its progress as a percentage.
-         * <br>
+         * <br/>
          * Added if structure is formed and the machine is active.
          *
          * @param currentDuration The current duration of the recipe in ticks
@@ -323,70 +332,57 @@ public class MultiblockDisplayText {
             return this;
         }
 
-        public Builder addOutputLines(GTRecipe recipe, int chanceTier) {
+        public Builder addOutputLines(GTRecipe recipe) {
             if (!isStructureFormed || !isActive)
                 return this;
             if (recipe != null) {
+                int recipeTier = RecipeHelper.getPreOCRecipeEuTier(recipe);
+                int chanceTier = recipeTier + recipe.ocLevel;
                 var function = recipe.getType().getChanceFunction();
                 double maxDurationSec = (double) recipe.duration / 20.0;
                 var itemOutputs = recipe.getOutputContents(ItemRecipeCapability.CAP);
                 var fluidOutputs = recipe.getOutputContents(FluidRecipeCapability.CAP);
 
                 for (var item : itemOutputs) {
-                    var stack = (ItemRecipeCapability.CAP.of(item.content).getItems()[0]);
-                    if (stack.getCount() < maxDurationSec) {
-                        if (item.chance < item.maxChance) {
-                            double averageDurationforRoll = (double) item.maxChance / (double) function
-                                    .getBoostedChance(item, RecipeHelper.getPreOCRecipeEuTier(recipe), chanceTier);
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.2", stack.getHoverName(),
-                                    stack.getCount(),
-                                    FormattingUtil.formatNumber2Places(averageDurationforRoll * maxDurationSec)));
-                        } else {
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.0", stack.getHoverName(),
-                                    stack.getCount(), maxDurationSec));
-                        }
+                    var stacks = ItemRecipeCapability.CAP.of(item.content).getItems();
+                    if (stacks.length == 0) continue;
+                    var stack = stacks[0];
+                    int count = stack.getCount();
+                    double countD = count;
+                    if (item.chance < item.maxChance) {
+                        countD = countD * recipe.parallels *
+                                function.getBoostedChance(item, recipeTier, chanceTier) / item.maxChance;
+                        count = countD < 1 ? 1 : (int) Math.round(countD);
+                    }
+                    if (count < maxDurationSec) {
+                        String key = "gtceu.multiblock.output_line." + (item.chance < item.maxChance ? "2" : "0");
+                        textList.add(Component.translatable(key, stack.getHoverName(), count,
+                                FormattingUtil.formatNumber2Places(maxDurationSec / countD)));
                     } else {
-                        double countPerSec = (double) stack.getCount() / maxDurationSec;
-                        if (item.chance < item.maxChance) {
-                            double averageDurationforRoll = (double) item.maxChance / (double) function
-                                    .getBoostedChance(item, RecipeHelper.getPreOCRecipeEuTier(recipe), chanceTier);
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.3",
-                                    stack.getHoverName(), stack.getCount(),
-                                    FormattingUtil.formatNumber2Places(averageDurationforRoll * countPerSec)));
-                        } else {
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.1",
-                                    stack.getHoverName(), stack.getCount(),
-                                    FormattingUtil.formatNumber2Places(countPerSec)));
-                        }
+                        String key = "gtceu.multiblock.output_line." + (item.chance < item.maxChance ? "3" : "1");
+                        textList.add(Component.translatable(key, stack.getHoverName(), count,
+                                FormattingUtil.formatNumber2Places(countD / maxDurationSec)));
                     }
                 }
                 for (var fluid : fluidOutputs) {
-                    var stack = (FluidRecipeCapability.CAP.of(fluid.content).getFluids()[0]);
-                    if (stack.getAmount() < maxDurationSec) {
-                        if (fluid.chance < fluid.maxChance) {
-                            double averageDurationforRoll = (double) fluid.maxChance / (double) function
-                                    .getBoostedChance(fluid, RecipeHelper.getPreOCRecipeEuTier(recipe), chanceTier);
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.2",
-                                    stack.getHoverName(), stack.getAmount(),
-                                    FormattingUtil.formatNumber2Places(averageDurationforRoll * maxDurationSec)));
-                        } else {
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.0",
-                                    stack.getHoverName(), stack.getAmount(),
-                                    FormattingUtil.formatNumber2Places(maxDurationSec)));
-                        }
+                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getFluids();
+                    if (stacks.length == 0) continue;
+                    var stack = stacks[0];
+                    int amount = stack.getAmount();
+                    double amountD = amount;
+                    if (fluid.chance < fluid.maxChance) {
+                        amountD = amountD * recipe.parallels *
+                                function.getBoostedChance(fluid, recipeTier, chanceTier) / fluid.maxChance;
+                        amount = amountD < 1 ? 1 : (int) Math.round(amountD);
+                    }
+                    if (amount < maxDurationSec) {
+                        String key = "gtceu.multiblock.output_line." + (fluid.chance < fluid.maxChance ? "2" : "0");
+                        textList.add(Component.translatable(key, stack.getHoverName(), amount,
+                                FormattingUtil.formatNumber2Places(maxDurationSec / amountD)));
                     } else {
-                        double countPerSec = (double) stack.getAmount() / maxDurationSec;
-                        if (fluid.chance < fluid.maxChance) {
-                            double averageDurationforRoll = (double) fluid.maxChance / (double) function
-                                    .getBoostedChance(fluid, RecipeHelper.getPreOCRecipeEuTier(recipe), chanceTier);
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.3",
-                                    stack.getHoverName(), stack.getAmount(),
-                                    FormattingUtil.formatNumber2Places(averageDurationforRoll * countPerSec)));
-                        } else {
-                            textList.add(Component.translatable("gtceu.multiblock.output_line.1",
-                                    stack.getHoverName(), stack.getAmount(),
-                                    FormattingUtil.formatNumber2Places(countPerSec)));
-                        }
+                        String key = "gtceu.multiblock.output_line." + (fluid.chance < fluid.maxChance ? "3" : "1");
+                        textList.add(Component.translatable(key, stack.getHoverName(), amount,
+                                FormattingUtil.formatNumber2Places(amountD / maxDurationSec)));
                     }
                 }
             }
@@ -405,21 +401,24 @@ public class MultiblockDisplayText {
             return this;
         }
 
+        public Builder addParallelsLine(int numParallels) {
+            return addParallelsLine(numParallels, false);
+        }
+
         /**
          * Adds a line indicating how many parallels this multi can potentially perform.
-         * <br>
+         * <br/>
          * Added if structure is formed and the number of parallels is greater than one.
          */
-        public Builder addParallelsLine(int numParallels) {
+        public Builder addParallelsLine(int numParallels, boolean exact) {
             if (!isStructureFormed)
                 return this;
             if (numParallels > 1) {
                 Component parallels = Component.literal(FormattingUtil.formatNumbers(numParallels))
                         .withStyle(ChatFormatting.DARK_PURPLE);
-
-                textList.add(Component.translatable(
-                        "gtceu.multiblock.parallel",
-                        parallels)
+                String key = "gtceu.multiblock.parallel";
+                if (exact) key += ".exact";
+                textList.add(Component.translatable(key, parallels)
                         .withStyle(ChatFormatting.GRAY));
             }
             return this;
@@ -427,7 +426,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a warning line when the machine is low on power.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed parameter is true.
          */
         public Builder addLowPowerLine(boolean isLowPower) {
@@ -442,7 +441,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a warning line when the machine is low on computation.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed parameter is true.
          */
         public Builder addLowComputationLine(boolean isLowComputation) {
@@ -457,7 +456,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a warning line when the machine's dynamo tier is too low for current conditions.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed parameter is true.
          */
         public Builder addLowDynamoTierLine(boolean isTooLow) {
@@ -472,8 +471,8 @@ public class MultiblockDisplayText {
 
         /**
          * Adds warning line(s) when the machine has maintenance problems.
-         * <br>
-         * Added if there are any maintenance problems, one line per problem as well as a header. <br>
+         * <br/>
+         * Added if there are any maintenance problems, one line per problem as well as a header. <br/>
          * Will check the config setting for if maintenance is enabled automatically.
          */
         public Builder addMaintenanceProblemLines(byte maintenanceProblems) {
@@ -528,7 +527,7 @@ public class MultiblockDisplayText {
 
         /**
          * Adds two error lines when the machine's muffler hatch is obstructed.
-         * <br>
+         * <br/>
          * Added if the structure is formed and if the passed parameter is true.
          */
         public Builder addMufflerObstructedLine(boolean isObstructed) {
@@ -545,11 +544,11 @@ public class MultiblockDisplayText {
 
         /**
          * Adds a fuel consumption line showing the fuel name and the number of ticks per recipe run.
-         * <br>
+         * <br/>
          * Added if structure is formed, the machine is active, and the passed fuelName parameter is not null.
          */
         public Builder addFuelNeededLine(String fuelName, int previousRecipeDuration) {
-            if (!isStructureFormed || !isActive)
+            if (!isStructureFormed || !isActive || fuelName == null)
                 return this;
             Component fuelNeeded = Component.literal(fuelName).withStyle(ChatFormatting.RED);
             Component numTicks = Component.literal(FormattingUtil.formatNumbers(previousRecipeDuration))
@@ -573,6 +572,15 @@ public class MultiblockDisplayText {
          */
         public Builder addCustom(Consumer<List<Component>> customConsumer) {
             customConsumer.accept(textList);
+            return this;
+        }
+
+        /*
+         * Add a line specifying the current EU/t
+         */
+        public Builder addCurrentEnergyProductionLine(long euOutput) {
+            textList.add(Component.translatable("gtceu.multiblock.turbine.energy_per_tick_maxed",
+                    FormattingUtil.formatNumbers(euOutput)).withStyle(ChatFormatting.GRAY));
             return this;
         }
     }

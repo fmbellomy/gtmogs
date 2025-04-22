@@ -4,9 +4,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.Element;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.integration.kjs.GTRegistryInfo;
-
-import net.neoforged.fml.ModLoader;
 
 public class GTElements {
 
@@ -152,19 +149,16 @@ public class GTElements {
     public static Element createAndRegister(long protons, long neutrons, long halfLifeSeconds, String decayTo,
                                             String name, String symbol, boolean isIsotope) {
         Element element = new Element(protons, neutrons, halfLifeSeconds, decayTo, name, symbol, isIsotope);
-        GTRegistries.ELEMENTS.register(name, element);
+        GTRegistries.ELEMENTS.register(GTCEu.id(name), element);
         return element;
     }
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.ELEMENTS));
-        if (GTCEu.isKubeJSLoaded()) {
-            GTRegistryInfo.registerFor(GTRegistries.ELEMENTS.getRegistryName());
-        }
+        GTCEuAPI.postRegisterEvent(GTRegistries.ELEMENTS);
         GTRegistries.ELEMENTS.freeze();
     }
 
     public static Element get(String name) {
-        return GTRegistries.ELEMENTS.get(name);
+        return GTRegistries.ELEMENTS.get(GTCEu.id(name));
     }
 }

@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.client.renderer.block;
 
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
-import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.models.BlockModelGenerators;
@@ -13,11 +13,6 @@ import net.minecraft.world.level.block.Block;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author KilaBash
- * @date 2023/2/27
- * @implNote MaterialBlockRenderer
- */
 public class MaterialBlockRenderer {
 
     public static final String LAYER_2_SUFFIX = "_layer2";

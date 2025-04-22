@@ -1,15 +1,12 @@
 package com.gregtechceu.gtceu.common.item.behavior;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-/**
- * @author KilaBash
- * @date 2023/2/22
- * @implNote ConsumedBehaviour
- */
 public abstract class ConsumedBehaviour {
 
     public final int totalUses;

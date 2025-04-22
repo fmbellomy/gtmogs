@@ -6,9 +6,8 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.OreProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.models.BlockModelGenerators;
@@ -24,12 +23,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author KilaBash
- * @date 2023/2/27
- * @implNote OreBlockRenderer
- */
-@MethodsReturnNonnullByDefault
 public class OreBlockRenderer {
 
     private static final Set<OreBlockRenderer> MODELS = new HashSet<>();

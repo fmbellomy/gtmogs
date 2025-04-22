@@ -21,11 +21,10 @@ import java.util.List;
 /**
  * Listen to PostMaterialEvent instead of doing this directly because it's a lot cleaner this way.
  */
-// @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class AlloyBlastPropertyAddition {
 
     public static void addAlloyBlastProperties(PostMaterialEvent event) {
-        for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material material : GTCEuAPI.materialManager) {
             if (!material.hasFlag(MaterialFlags.DISABLE_ALLOY_PROPERTY)) {
                 addAlloyBlastProperty(material);
             }

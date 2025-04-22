@@ -2,17 +2,17 @@ package com.gregtechceu.gtceu.common.machine.trait;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreVeinSavedData;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.OreVeinWorldEntry;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.BedrockOreMinerMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.core.SectionPos;
@@ -21,15 +21,9 @@ import net.minecraft.world.item.ItemStack;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author KilaBash
- * @date 2023/7/12
- * @implNote FluidDrillLogic
- */
 public class BedrockOreMinerLogic extends RecipeLogic {
 
     public static final int MAX_PROGRESS = 20;
@@ -64,10 +58,8 @@ public class BedrockOreMinerLogic extends RecipeLogic {
             }
             var match = getOreMinerRecipe();
             if (match != null) {
-                var copied = match.copy(new ContentModifier(match.duration, 0));
-                if (copied.matchRecipe(this.machine).isSuccess() &&
-                        copied.matchTickRecipe(this.machine).isSuccess()) {
-                    setupRecipe(copied);
+                if (RecipeHelper.matchContents(this.machine, match).isSuccess()) {
+                    setupRecipe(match);
                 }
             }
         }
@@ -80,14 +72,26 @@ public class BedrockOreMinerLogic extends RecipeLogic {
                     .get(GTUtil.getRandomItem(serverLevel.random, veinMaterials, veinMaterials.size())).getValue();
             ItemStack stack = ChemicalHelper.get(TagPrefix.get(ConfigHolder.INSTANCE.machines.bedrockOreDropTagPrefix),
                     material, getOreToProduce());
-            // backup 1: crushed; if raw ore doesn't exist
-            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.crushed, material, getOreToProduce());
-            // backup 2: gem; if crushed ore doesn't exist
-            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.gem, material, getOreToProduce());
-            // backup 3: normal ore; if gem doesn't exist.
-            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.ore, material, getOreToProduce());
-            // backup 4: fallback to dust
-            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.dust, material, getOreToProduce());
+            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.crushed, material, getOreToProduce()); // backup
+                                                                                                             // 1:
+                                                                                                             // crushed;
+                                                                                                             // if raw
+                                                                                                             // ore
+                                                                                                             // doesn't
+                                                                                                             // exist
+            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.gem, material, getOreToProduce()); // backup 2:
+                                                                                                         // gem; if
+                                                                                                         // crushed ore
+                                                                                                         // doesn't
+                                                                                                         // exist
+            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.ore, material, getOreToProduce()); // backup 3:
+                                                                                                         // normal ore;
+                                                                                                         // if gem
+                                                                                                         // doesn't
+                                                                                                         // exist.
+            if (stack.isEmpty()) stack = ChemicalHelper.get(TagPrefix.dust, material, getOreToProduce()); // backup 4:
+                                                                                                          // fallback to
+                                                                                                          // dust
             if (stack.isEmpty()) {
                 return null;
             }
@@ -96,8 +100,7 @@ public class BedrockOreMinerLogic extends RecipeLogic {
                     .EUt(GTValues.VA[getMachine().getEnergyTier()])
                     .outputItems(stack)
                     .build();
-            if (recipe.matchRecipe(getMachine()).isSuccess() &&
-                    recipe.matchTickRecipe(getMachine()).isSuccess()) {
+            if (RecipeHelper.matchContents(getMachine(), recipe).isSuccess()) {
                 return recipe;
             }
         }
@@ -107,7 +110,7 @@ public class BedrockOreMinerLogic extends RecipeLogic {
     private int getOreToProduce(OreVeinWorldEntry entry) {
         var definition = entry.getDefinition();
         if (definition != null) {
-            int depletedYield = definition.depletedYield();
+            int depletedYield = definition.value().depletedYield();
             int regularYield = entry.getOreYield();
             int remainingOperations = entry.getOperationsRemaining();
 
@@ -136,21 +139,24 @@ public class BedrockOreMinerLogic extends RecipeLogic {
     public void onRecipeFinish() {
         machine.afterWorking();
         if (lastRecipe != null) {
-            lastRecipe.postWorking(this.machine);
-            lastRecipe.handleRecipeIO(IO.OUT, this.machine, this.chanceCaches);
+            RecipeHelper.postWorking(this.machine, lastRecipe);
+            RecipeHelper.handleRecipeIO(this.machine, lastRecipe, IO.OUT, this.chanceCaches);
         }
         depleteVein();
         // try it again
         var match = getOreMinerRecipe();
         if (match != null) {
-            var copied = match.copy(new ContentModifier(match.duration, 0));
-            if (copied.matchRecipe(this.machine).isSuccess() &&
-                    copied.matchTickRecipe(this.machine).isSuccess()) {
-                setupRecipe(copied);
+            if (RecipeHelper.matchContents(this.machine, match).isSuccess()) {
+                setupRecipe(match);
                 return;
             }
         }
-        setStatus(Status.IDLE);
+        if (suspendAfterFinish) {
+            setStatus(Status.SUSPEND);
+            suspendAfterFinish = false;
+        } else {
+            setStatus(Status.IDLE);
+        }
         progress = 0;
         duration = 0;
     }

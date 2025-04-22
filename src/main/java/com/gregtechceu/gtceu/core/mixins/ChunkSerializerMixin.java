@@ -17,7 +17,7 @@ public abstract class ChunkSerializerMixin {
                     at = @At(value = "INVOKE",
                              target = "Lnet/minecraft/nbt/CompoundTag;putInt(Ljava/lang/String;I)V",
                              ordinal = 0))
-    private static CompoundTag addModDataVersions(CompoundTag compound) {
+    private static CompoundTag gtceu$addModDataVersions(CompoundTag compound) {
         return DataFixesInternals.get().addModDataVersions(compound);
     }
 }

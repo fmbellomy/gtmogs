@@ -12,11 +12,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote TooltipBehavior
- */
 public class TooltipBehavior implements IAddInformation {
 
     private final Consumer<List<Component>> tooltips;

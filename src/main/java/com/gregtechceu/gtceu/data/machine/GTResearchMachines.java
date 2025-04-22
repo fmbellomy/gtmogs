@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.data.machine;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.RotationState;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
@@ -14,6 +14,8 @@ import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.client.renderer.machine.HPCAPartRenderer;
 import com.gregtechceu.gtceu.client.renderer.machine.OverlayTieredActiveMachineRenderer;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.research.DataBankMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.research.HPCAMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.research.NetworkSwitchMachine;
@@ -27,9 +29,7 @@ import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAComputation
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCACoolerPartMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.hpca.HPCAEmptyPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.core.Direction;
@@ -47,9 +47,9 @@ import java.util.function.Function;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.*;
-import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
-import static com.gregtechceu.gtceu.data.machine.GTMachines.createCreativeTooltips;
+import static com.gregtechceu.gtceu.data.machine.GTMachines.CREATIVE_TOOLTIPS;
+import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
 @SuppressWarnings("unused")
 @net.minecraft.MethodsReturnNonnullByDefault
@@ -61,8 +61,8 @@ public class GTResearchMachines {
             .rotationState(RotationState.NON_Y_AXIS)
             .recipeType(GTRecipeTypes.RESEARCH_STATION_RECIPES)
             .appearanceBlock(ADVANCED_COMPUTER_CASING)
-            .tooltips(LangHandler.getMultiLang("gtceu.machine.research_station.tooltip").toArray(Component[]::new))
-            .pattern(defintion -> FactoryBlockPattern.start()
+            .tooltipBuilder((s, l) -> l.addAll(LangHandler.getMultiLang("gtceu.machine.research_station.tooltip")))
+            .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXX", "VVV", "PPP", "PPP", "PPP", "VVV", "XXX")
                     .aisle("XXX", "VAV", "AAA", "AAA", "AAA", "VAV", "XXX")
                     .aisle("XXX", "VAV", "XAX", "XSX", "XAX", "VAV", "XXX")
@@ -70,18 +70,16 @@ public class GTResearchMachines {
                     .aisle(" X ", "XAX", "---", "---", "---", "XAX", " X ")
                     .aisle(" X ", "XAX", "-A-", "-H-", "-A-", "XAX", " X ")
                     .aisle("   ", "XXX", "---", "---", "---", "XXX", "   ")
-                    .where('S', controller(blocks(defintion.getBlock())))
+                    .where('S', controller(blocks(definition.getBlock())))
                     .where('X', blocks(COMPUTER_CASING.get()))
                     .where(' ', any())
                     .where('-', air())
                     .where('V', blocks(COMPUTER_HEAT_VENT.get()))
                     .where('A', blocks(ADVANCED_COMPUTER_CASING.get()))
                     .where('P', blocks(COMPUTER_CASING.get())
-                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1))
-                            .or(abilities(PartAbility.MAINTENANCE)
-                                    .setMinGlobalLimited(ConfigHolder.INSTANCE.machines.enableMaintenance ? 1 : 0)
-                                    .setMaxGlobalLimited(1))
-                            .or(abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setExactLimit(1)))
+                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2, 1))
+                            .or(abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setExactLimit(1))
+                            .or(autoAbilities(true, false, false)))
                     .where('H', abilities(PartAbility.OBJECT_HOLDER))
                     .build())
             .shapeInfo(definition -> MultiblockShapeInfo.builder()
@@ -139,16 +137,12 @@ public class GTResearchMachines {
                     .where('X', blocks(COMPUTER_HEAT_VENT.get()))
                     .where('D', blocks(COMPUTER_CASING.get()).setMinGlobalLimited(3)
                             .or(abilities(PartAbility.DATA_ACCESS).setPreviewCount(3))
-                            .or(abilities(PartAbility.OPTICAL_DATA_TRANSMISSION)
-                                    .setMinGlobalLimited(1, 1))
+                            .or(abilities(PartAbility.OPTICAL_DATA_TRANSMISSION).setMinGlobalLimited(1, 1))
                             .or(abilities(PartAbility.OPTICAL_DATA_RECEPTION).setPreviewCount(1)))
                     .where('A', blocks(COMPUTER_CASING.get()))
-                    .where('C', blocks(HIGH_POWER_CASING.get())
-                            .setMinGlobalLimited(4)
-                            .or(autoAbilities())
-                            .or(autoAbilities(true, false, false))
-                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2)
-                                    .setPreviewCount(1)))
+                    .where('C', blocks(HIGH_POWER_CASING.get()).setMinGlobalLimited(4)
+                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2, 1))
+                            .or(autoAbilities(true, false, false)))
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/hpca/high_power_casing"),
                     GTCEu.id("block/multiblock/data_bank"))
@@ -172,10 +166,10 @@ public class GTResearchMachines {
                     .where('S', controller(blocks(definition.getBlock())))
                     .where('A', blocks(ADVANCED_COMPUTER_CASING.get()))
                     .where('X', blocks(COMPUTER_CASING.get()).setMinGlobalLimited(7)
-                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1, 1))
-                            .or(abilities(PartAbility.MAINTENANCE).setExactLimit(1))
+                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2, 1))
+                            .or(abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION).setMinGlobalLimited(1, 1))
                             .or(abilities(PartAbility.COMPUTATION_DATA_RECEPTION).setMinGlobalLimited(1, 2))
-                            .or(abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION).setMinGlobalLimited(1, 1)))
+                            .or(autoAbilities(true, false, false)))
                     .build())
             .shapeInfo(definition -> MultiblockShapeInfo.builder()
                     .aisle("XMX", "XSX", "XRX")
@@ -201,8 +195,8 @@ public class GTResearchMachines {
             // good API addition for packdevs
             .appearanceBlock(COMPUTER_CASING)
             .recipeType(GTRecipeTypes.DUMMY_RECIPES)
-            .tooltips(LangHandler.getMultiLang("gtceu.machine.high_performance_computation_array.tooltip")
-                    .toArray(Component[]::new))
+            .tooltipBuilder((s, l) -> l
+                    .addAll(LangHandler.getMultiLang("gtceu.machine.high_performance_computation_array.tooltip")))
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("AA", "CC", "CC", "CC", "AA")
                     .aisle("VA", "XV", "XV", "XV", "VA")
@@ -214,10 +208,10 @@ public class GTResearchMachines {
                     .where('V', blocks(COMPUTER_HEAT_VENT.get()))
                     .where('X', abilities(PartAbility.HPCA_COMPONENT))
                     .where('C', blocks(COMPUTER_CASING.get()).setMinGlobalLimited(5)
-                            .or(abilities(PartAbility.MAINTENANCE).setExactLimit(1))
-                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1))
+                            .or(abilities(PartAbility.INPUT_ENERGY).setMinGlobalLimited(1).setMaxGlobalLimited(2, 1))
                             .or(abilities(PartAbility.IMPORT_FLUIDS).setMaxGlobalLimited(1))
-                            .or(abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION).setExactLimit(1)))
+                            .or(abilities(PartAbility.COMPUTATION_DATA_TRANSMISSION).setExactLimit(1))
+                            .or(autoAbilities(true, false, false)))
                     .build())
             .shapeInfos(definition -> {
                 List<MultiblockShapeInfo> shapeInfo = new ArrayList<>();
@@ -349,8 +343,11 @@ public class GTResearchMachines {
             .tier(MAX)
             .rotationState(RotationState.ALL)
             .abilities(PartAbility.DATA_ACCESS)
-            .tooltips(Component.translatable("gtceu.machine.data_access_hatch.tooltip.0"))
-            .tooltipBuilder(createCreativeTooltips(true))
+            .tooltipBuilder((s, list) -> {
+                list.add(Component.translatable("gtceu.machine.data_access_hatch.tooltip.0"));
+                CREATIVE_TOOLTIPS.accept(s, list);
+                list.add(Component.translatable("gtceu.universal.enabled"));
+            })
             .overlayTieredHullRenderer("data_access_hatch_creative")
             .register();
 

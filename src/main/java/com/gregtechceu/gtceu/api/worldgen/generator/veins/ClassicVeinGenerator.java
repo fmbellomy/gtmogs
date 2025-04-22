@@ -1,13 +1,15 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
+import com.mojang.serialization.MapCodec;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.ExtraCodecs;
@@ -19,12 +21,11 @@ import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
-
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
@@ -41,6 +42,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 @Accessors(fluent = true, chain = true)
+@NoArgsConstructor
 public class ClassicVeinGenerator extends VeinGenerator {
 
     public static final MapCodec<ClassicVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
@@ -48,14 +50,15 @@ public class ClassicVeinGenerator extends VeinGenerator {
             Layer.CODEC.fieldOf("secondary").forGetter(val -> val.secondary),
             Layer.CODEC.fieldOf("between").forGetter(val -> val.between),
             Layer.CODEC.fieldOf("sporadic").forGetter(val -> val.sporadic),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius))
-            .apply(instance, ClassicVeinGenerator::new));
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius)
+    ).apply(instance, ClassicVeinGenerator::new));
 
     private Layer primary;
     private Layer secondary;
     private Layer between;
     private Layer sporadic;
-    private int yRadius = 3;
+    @Setter
+    private int yRadius = 6;
 
     // Provided for readability
     private int sporadicDivisor;
@@ -64,10 +67,6 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
     @Setter
     private RuleTest[] rules;
-
-    public ClassicVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public ClassicVeinGenerator(Layer primary, Layer secondary, Layer between, Layer sporadic, int yRadius) {
         this.primary = primary;
@@ -80,19 +79,18 @@ public class ClassicVeinGenerator extends VeinGenerator {
     @Override
     public List<Map.Entry<Either<BlockState, Material>, Integer>> getAllEntries() {
         List<Map.Entry<Either<BlockState, Material>, Integer>> result = new ArrayList<>();
-        int totalWeight = primary.layers + secondary.layers + between.layers;
         primary.target
                 .map(blockStates -> blockStates.stream().map(state -> Either.<BlockState, Material>left(state.state)),
                         material -> Stream.of(Either.<BlockState, Material>right(material)))
-                .forEach(entry -> result.add(Map.entry(entry, primary.layers / totalWeight)));
+                .forEach(entry -> result.add(Map.entry(entry, primary.layers)));
         secondary.target
                 .map(blockStates -> blockStates.stream().map(state -> Either.<BlockState, Material>left(state.state)),
                         material -> Stream.of(Either.<BlockState, Material>right(material)))
-                .forEach(entry -> result.add(Map.entry(entry, secondary.layers / totalWeight)));
+                .forEach(entry -> result.add(Map.entry(entry, secondary.layers)));
         between.target
                 .map(blockStates -> blockStates.stream().map(state -> Either.<BlockState, Material>left(state.state)),
                         material -> Stream.of(Either.<BlockState, Material>right(material)))
-                .forEach(entry -> result.add(Map.entry(entry, between.layers / totalWeight)));
+                .forEach(entry -> result.add(Map.entry(entry, between.layers)));
         sporadic.target
                 .map(blockStates -> blockStates.stream().map(state -> Either.<BlockState, Material>left(state.state)),
                         material -> Stream.of(Either.<BlockState, Material>right(material)))
@@ -101,11 +99,11 @@ public class ClassicVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
-        int radius = entry.clusterSize().sample(random);
+        int radius = entry.clusterSize().sample(random) / 2;
         int ySize = radius / 2;
         int xy2 = radius * radius * ySize * ySize;
         int xz2 = radius * radius * radius * radius;
@@ -143,7 +141,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
     }
 
     private void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed,
-                            GTOreDefinition entry,
+                            OreVeinDefinition entry,
                             BlockPos blockPos, BlockPos lowestPos) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
         int x = SectionPos.sectionRelative(blockPos.getX());
@@ -188,7 +186,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
         // Ensure "between" is not more than the total primary and secondary layers
         Preconditions.checkArgument(primary.layers + secondary.layers >= between.layers,
-                "Error: cannot be more \"between\" layers than primary and secondary layers combined!");
+                "Error: cannot have more \"between\" layers than primary and secondary layers combined!");
 
         this.sporadicDivisor = primary.layers + secondary.layers - 1;
         this.startPrimary = secondary.layers;
@@ -208,28 +206,32 @@ public class ClassicVeinGenerator extends VeinGenerator {
     }
 
     public ClassicVeinGenerator primary(Consumer<Layer.Builder> builder) {
-        Layer.Builder layerBuilder = new Layer.Builder(rules);
+        Layer.Builder layerBuilder = new Layer.Builder(
+                rules != null ? rules : new RuleTest[] { AlwaysTrueTest.INSTANCE });
         builder.accept(layerBuilder);
         primary = layerBuilder.build();
         return this;
     }
 
     public ClassicVeinGenerator secondary(Consumer<Layer.Builder> builder) {
-        Layer.Builder layerBuilder = new Layer.Builder(rules);
+        Layer.Builder layerBuilder = new Layer.Builder(
+                rules != null ? rules : new RuleTest[] { AlwaysTrueTest.INSTANCE });
         builder.accept(layerBuilder);
         secondary = layerBuilder.build();
         return this;
     }
 
     public ClassicVeinGenerator between(Consumer<Layer.Builder> builder) {
-        Layer.Builder layerBuilder = new Layer.Builder(rules);
+        Layer.Builder layerBuilder = new Layer.Builder(
+                rules != null ? rules : new RuleTest[] { AlwaysTrueTest.INSTANCE });
         builder.accept(layerBuilder);
         between = layerBuilder.build();
         return this;
     }
 
     public ClassicVeinGenerator sporadic(Consumer<Layer.Builder> builder) {
-        Layer.Builder layerBuilder = new Layer.Builder(rules);
+        Layer.Builder layerBuilder = new Layer.Builder(
+                rules != null ? rules : new RuleTest[] { AlwaysTrueTest.INSTANCE });
         builder.accept(layerBuilder);
         sporadic = layerBuilder.build();
         return this;
@@ -237,19 +239,17 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
     @AllArgsConstructor
     public static class Layer {
-
+        // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
-                        .fieldOf("targets").forGetter(layer -> layer.target),
-                ExtraCodecs.intRange(-1, Integer.MAX_VALUE).optionalFieldOf("layers", -1)
-                        .forGetter(layer -> layer.layers))
-                .apply(instance, Layer::new));
-
+                Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("targets").forGetter(layer -> layer.target),
+                ExtraCodecs.intRange(-1, Integer.MAX_VALUE).optionalFieldOf("layers", -1).forGetter(layer -> layer.layers)
+        ).apply(instance, Layer::new));
+        // spotless:on
         public final Either<List<OreConfiguration.TargetBlockState>, Material> target;
         public int layers;
 
         public void place(BlockState blockState, BulkSectionAccess access, LevelChunkSection section, long randomSeed,
-                          GTOreDefinition entry, BlockPos pos) {
+                          OreVeinDefinition entry, BlockPos pos) {
             RandomSource random = new XoroshiroRandomSource(randomSeed);
             int x = SectionPos.sectionRelative(pos.getX());
             int y = SectionPos.sectionRelative(pos.getY());
@@ -284,7 +284,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
         public static class Builder {
 
             private Either<List<OreConfiguration.TargetBlockState>, Material> target;
-            private int size = 1;
+            private int size = -1;
             private final RuleTest[] rules;
 
             protected Builder(RuleTest... rules) {

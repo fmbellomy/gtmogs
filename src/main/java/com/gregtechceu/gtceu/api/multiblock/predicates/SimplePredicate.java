@@ -1,13 +1,13 @@
 package com.gregtechceu.gtceu.api.multiblock.predicates;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockState;
 import com.gregtechceu.gtceu.api.multiblock.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.multiblock.error.PatternStringError;
 import com.gregtechceu.gtceu.api.multiblock.error.SinglePredicateError;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 
-import com.lowdragmc.lowdraglib.LDLib;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 
 import net.minecraft.client.Minecraft;
@@ -131,7 +131,7 @@ public class SimplePredicate {
             }
         }
         if (nbtParser != null && !blockWorldState.world.isClientSide) {
-            BlockEntity te = blockWorldState.getTileEntity();
+            BlockEntity te = blockWorldState.getBlockEntity();
             if (te != null) {
                 CompoundTag nbt = te.saveWithFullMetadata(blockWorldState.world.registryAccess());
                 if (Pattern.compile(nbtParser).matcher(nbt.toString()).find()) {
@@ -173,7 +173,7 @@ public class SimplePredicate {
     }
 
     public List<ItemStack> getCandidates() {
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             return candidates == null ? Collections.emptyList() :
                     Arrays.stream(this.candidates.get()).filter(info -> info.getBlockState().getBlock() != Blocks.AIR)
                             .map(blockInfo -> blockInfo.getItemStackForm(Minecraft.getInstance().level, BlockPos.ZERO))

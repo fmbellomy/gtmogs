@@ -2,7 +2,9 @@ package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 
+import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
@@ -18,6 +20,9 @@ public abstract class LivingEntityMixin {
     @Shadow
     public abstract Iterable<ItemStack> getArmorSlots();
 
+    @Shadow
+    public abstract void setItemSlot(EquipmentSlot slot, ItemStack stack);
+
     @Inject(method = "getDamageAfterArmorAbsorb",
             at = @At(value = "INVOKE",
                      target = "Lnet/minecraft/world/damagesource/CombatRules;getDamageAfterAbsorb(Lnet/minecraft/world/entity/LivingEntity;FLnet/minecraft/world/damagesource/DamageSource;FF)F"))
@@ -27,7 +32,11 @@ public abstract class LivingEntityMixin {
         int i = 0;
         for (ItemStack itemStack : this.getArmorSlots()) {
             if (itemStack.getItem() instanceof ArmorComponentItem armorItem) {
-                armorItem.damageArmor((LivingEntity) (Object) this, itemStack, damageSource, (int) armorDamage);
+                EquipmentSlot slot = GTUtil.equipmentSlotByTypeAndIndex(EquipmentSlot.Type.HUMANOID_ARMOR, i);
+                armorItem.damageArmor((LivingEntity) (Object) this, itemStack, damageSource, (int) armorDamage, slot);
+                if (itemStack.getCount() == 0) {
+                    this.setItemSlot(slot, ItemStack.EMPTY);
+                }
             }
             ++i;
         }

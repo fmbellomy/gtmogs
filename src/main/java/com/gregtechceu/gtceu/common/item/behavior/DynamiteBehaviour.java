@@ -15,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 public class DynamiteBehaviour implements IInteractionItem {
 
@@ -23,7 +24,7 @@ public class DynamiteBehaviour implements IInteractionItem {
         DispenserBlock.registerBehavior(item, new DefaultDispenseItemBehavior() {
 
             @Override
-            public ItemStack execute(BlockSource source, ItemStack stack) {
+            public @NotNull ItemStack execute(@NotNull BlockSource source, @NotNull ItemStack stack) {
                 Vec3 position = source.center();
                 Direction direction = source.state().getValue(DispenserBlock.FACING);
                 DynamiteEntity dynamite = Util.make(
@@ -40,14 +41,12 @@ public class DynamiteBehaviour implements IInteractionItem {
     @Override
     public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player,
                                                   InteractionHand usedHand) {
-        ItemStack itemstack = player.getItemInHand(usedHand);
-
         if (!player.isCreative()) {
-            itemstack.shrink(1);
+            item.shrink(1);
         }
 
         if (level.isClientSide) {
-            return InteractionResultHolder.success(itemstack);
+            return InteractionResultHolder.success(item);
         }
 
         DynamiteEntity entity = new DynamiteEntity(player, level);
@@ -55,6 +54,6 @@ public class DynamiteBehaviour implements IInteractionItem {
 
         level.addFreshEntity(entity);
 
-        return InteractionResultHolder.success(itemstack);
+        return InteractionResultHolder.success(item);
     }
 }

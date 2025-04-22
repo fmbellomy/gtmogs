@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.common.machine.multiblock.part;
 
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.ICleanroomReceiver;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.ICleanroomProvider;
@@ -8,31 +7,27 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.api.machine.multiblock.DummyCleanroom;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 
-import com.google.common.collect.ImmutableSet;
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import org.jetbrains.annotations.NotNull;
+import lombok.Getter;
 
-import java.util.Set;
+import java.util.Collections;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+import static com.gregtechceu.gtceu.api.GTValues.UHV;
+import static com.gregtechceu.gtceu.api.GTValues.UV;
+
 public class CleaningMaintenanceHatchPartMachine extends AutoMaintenanceHatchPartMachine {
 
-    protected static final Set<CleanroomType> CLEANED_TYPES = new ObjectOpenHashSet<>();
-
-    static {
-        CLEANED_TYPES.add(CleanroomType.CLEANROOM);
-    }
-
     // must come after the static block
-    private static final ICleanroomProvider DUMMY_CLEANROOM = DummyCleanroom.createForTypes(CLEANED_TYPES);
+    private final ICleanroomProvider DUMMY_CLEANROOM;
 
-    public CleaningMaintenanceHatchPartMachine(IMachineBlockEntity metaTileEntityId) {
+    @Getter
+    private final CleanroomType cleanroomType;
+
+    public CleaningMaintenanceHatchPartMachine(IMachineBlockEntity metaTileEntityId, CleanroomType cleanroomType) {
         super(metaTileEntityId);
+        this.cleanroomType = cleanroomType;
+        DUMMY_CLEANROOM = DummyCleanroom.createForTypes(Collections.singletonList(cleanroomType));
     }
 
     @Override
@@ -53,24 +48,6 @@ public class CleaningMaintenanceHatchPartMachine extends AutoMaintenanceHatchPar
 
     @Override
     public int getTier() {
-        return GTValues.UV;
-    }
-
-    /**
-     * Add an {@link CleanroomType} that is provided to multiblocks with this hatch
-     *
-     * @param type the type to add
-     */
-    @SuppressWarnings("unused")
-    public static void addCleanroomType(@NotNull CleanroomType type) {
-        CLEANED_TYPES.add(type);
-    }
-
-    /**
-     * @return the {@link CleanroomType}s this hatch provides to multiblocks
-     */
-    @SuppressWarnings("unused")
-    public static ImmutableSet<CleanroomType> getCleanroomTypes() {
-        return ImmutableSet.copyOf(CLEANED_TYPES);
+        return cleanroomType == CleanroomType.CLEANROOM ? UV : UHV;
     }
 }

@@ -1,63 +1,100 @@
 dependencies {
+    compileOnly(libs.jetbrains.annotations)
+
     // LDLib
-    api(forge.ldlib.neoforge) { transitive = false }
-    jarJar(forge.ldlib.neoforge)
+    jarJar(api(forge.ldlib.get()))
 
     // Registrate
-    api("com.tterrag.registrate:Registrate:${forge.versions.registrate.get()}")
-    jarJar("com.tterrag.registrate:Registrate:${forge.versions.registrate.get()}")
+    jarJar(api(forge.registrate.get()))
 
     // Configuration
-    api(forge.configuration)
-    jarJar(forge.configuration)
+    jarJar(api(forge.configuration.get()))
 
-    // Create and its dependencies
-    createCompileOnly("com.simibubi.create:create-${libs.versions.minecraftVeryOld.get()}:${forge.versions.createForge.get()}:all") { transitive = false }
-    createCompileOnly forge.flywheel
+    // Recipe Viewers
+    compileOnly(forge.bundles.jei)
+    compileOnly(forge.bundles.rei)
+    compileOnly(forge.emi)
 
-    // JEI
-    jeiCompileOnly(forge.jei.common.api) { transitive = false }
-    jeiCompileOnly(forge.jei.forge.api) { transitive = false }
-    jeiCompileOnly(forge.jei.forge.impl) { transitive = false }
-
-    // REI
-    reiCompileOnlyApi forge.rei.plugin
-    reiCompileOnlyApi forge.rei.api
-    reiCompileOnly forge.rei.forge
-
-    // EMI
-    emiCompileOnlyApi("dev.emi:emi-neoforge:${forge.versions.emi.get()}:api")
-    emiImplementation forge.emi
-
-    // TOP
-    topCompileOnlyApi(forge.theoneprobe) { transitive = false }
-
-    // Jade
-    jadeCompileOnlyApi(forge.jade)
+    // WAILA-likes
+    compileOnly(forge.theoneprobe)
+    compileOnly(forge.jade)
 
     // Curios
-    curiosCompileOnlyApi("top.theillusivec4.curios:curios-neoforge:${forge.versions.curios.get()}:api")
-    curiosRuntimeOnly(forge.curios)
+    compileOnly(variantOf(forge.curios) { classifier("api") })
 
     // AE2
-    ae2CompileOnlyApi(forge.ae2) { transitive = false }
-    compileOnly("curse.maven:ae2wtlib-459929:5217955")
+    compileOnly(forge.ae2)
+    compileOnly(forge.ae2wtlib)
 
     // KJS
-    kjsImplementation forge.kubejs
+    compileOnly(forge.kubejs)
+    compileOnly(forge.architectury)
+    compileOnly(forge.rhino)
 
     // Shimmer
-    shimmerCompileOnly(forge.shimmer.forge) { transitive = false }
-    compileOnly("maven.modrinth:embeddium:1.0.0-beta.1+mc1.21")
-    runtimeOnly("maven.modrinth:embeddium:1.0.0-beta.1+mc1.21")
-    shimmerCompileOnly("maven.modrinth:oculus:1.20.1-1.6.9")
+    compileOnly(forge.shimmer)
+    compileOnly(forge.sodium)
+    compileOnly(forge.iris)
 
     // JAVD
-    compileOnly(forge.javd) { transitive = false }
+    compileOnly(forge.javd)
 
-    compileOnly(forge.ftbteams)
+    // Teams
     compileOnly(forge.ftblibrary)
-
+    compileOnly(forge.ftbteams)
+    compileOnly(forge.ftbquests)
+    compileOnly(forge.resourcefullib)
     compileOnly(forge.argonauts)
-    compileOnly(forge.resourceful)
+    compileOnly(forge.heracles)
+
+    // Maps
+    compileOnly(forge.ftbchunks)
+    compileOnly(forge.xaerosminimap)
+    compileOnly(forge.xaerosworldmap)
+    compileOnly(forge.journeymap.api)
+    compileOnly(forge.journeymap.forge)
+
+    // GameStages
+    compileOnly(forge.gamestages)
+
+    // Standard runtime s //
+    runtimeOnly(forge.jade)
+    runtimeOnly(forge.ae2)
+    runtimeOnly(forge.kotlinforforge)
+
+    // Runtime Recipe Viewers - uncomment whichever one you want to use //
+    runtimeOnly(forge.emi)
+//    runtimeOnly(forge.jei.forge.impl)
+//    runtimeOnly(forge.bundles.rei.runtime)
+
+    //////////////////////////////////////////////////////
+    // Runtime s for dev testing with unclean client //
+    //////////////////////////////////////////////////////
+    extraRuntimeOnly(forge.javd)
+    extraRuntimeOnly(forge.trenzalore)
+    extraRuntimeOnly(forge.curios)
+//    extraRuntimeOnly(forge.worldstripper)
+
+    extraRuntimeOnly(forge.bundles.kjs)
+
+    extraRuntimeOnly(forge.ftblibrary)
+    extraRuntimeOnly(forge.ftbteams)
+    extraRuntimeOnly(forge.ftbquests)
+
+    extraRuntimeOnly(forge.heracles)
+    extraRuntimeOnly(forge.resourcefullib)
+
+//    extraRuntimeOnly(forge.xaerosminimap)
+//    extraRuntimeOnly(forge.xaerosworldmap)
+//    extraRuntimeOnly(forge.journeymap.forge)
+//    extraRuntimeOnly(forge.ftbchunks)
+
+    extraRuntimeOnly(forge.gamestages)
+    extraRuntimeOnly(forge.bookshelf)
+
+    extraRuntimeOnly(forge.spark)
+    extraRuntimeOnly(forge.observable)
+    //////////////////////////
+
+    testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 }

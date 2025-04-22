@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.tag.TagPrefix.dust;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.CHEMICAL_RECIPES;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.LARGE_CHEMICAL_RECIPES;
@@ -99,7 +99,7 @@ public class AcidRecipes {
                 .outputFluids(NitricOxide.getFluid(1000))
                 .duration(240).EUt(VA[LV]).save(provider);
 
-        CHEMICAL_RECIPES.recipeBuilder("nitric_oxide_from_dioxide_2")
+        CHEMICAL_RECIPES.recipeBuilder("nitric_acid_from_dioxide_2")
                 .circuitMeta(3)
                 .inputFluids(Water.getFluid(1000))
                 .inputFluids(Oxygen.getFluid(1000))

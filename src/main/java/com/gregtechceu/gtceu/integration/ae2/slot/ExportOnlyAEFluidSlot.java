@@ -1,21 +1,17 @@
 package com.gregtechceu.gtceu.integration.ae2.slot;
 
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
+import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
+import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
+import com.gregtechceu.gtceu.utils.GTMath;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.IFluidTank;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.GenericStack;
-import com.google.common.primitives.Ints;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHandlerModifiable, IFluidTank {
 
     public ExportOnlyAEFluidSlot() {
@@ -51,8 +47,8 @@ public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHan
 
     @Override
     public FluidStack getFluid() {
-        if (this.stock != null && this.stock.what() instanceof AEFluidKey fluidKey) {
-            return fluidKey.toStack(Ints.saturatedCast(this.stock.amount()));
+        if (this.stock != null) {
+            return AEUtil.toFluidStack(this.stock);
         }
         return FluidStack.EMPTY;
     }
@@ -64,7 +60,7 @@ public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHan
 
     @Override
     public int getFluidAmount() {
-        return this.stock != null ? Ints.saturatedCast(this.stock.amount()) : 0;
+        return this.stock != null ? GTMath.saturatedCast(this.stock.amount()) : 0;
     }
 
     @Override
@@ -80,8 +76,11 @@ public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHan
 
     @Override
     public FluidStack getFluidInTank(int tank) {
-        return null;
+        return getFluid();
     }
+
+    @Override
+    public void setFluidInTank(int tank, FluidStack stack) {}
 
     @Override
     public int getTankCapacity(int tank) {
@@ -89,17 +88,14 @@ public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHan
     }
 
     @Override
-    public boolean isFluidValid(int tank, FluidStack stack) {
+    public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
         return false;
     }
 
     @Override
-    public int fill(FluidStack resource, IFluidHandler.FluidAction action) {
+    public int fill(FluidStack resource, FluidAction action) {
         return 0;
     }
-
-    @Override
-    public void setFluidInTank(int tank, FluidStack stack) {}
 
     @Override
     public boolean supportsFill(int tank) {
@@ -107,9 +103,9 @@ public class ExportOnlyAEFluidSlot extends ExportOnlyAESlot implements IFluidHan
     }
 
     @Override
-    public FluidStack drain(FluidStack resource, FluidAction doDrain) {
-        if (FluidStack.isSameFluidSameComponents(this.getFluid(), resource)) {
-            return this.drain(resource.getAmount(), doDrain);
+    public FluidStack drain(FluidStack resource, FluidAction action) {
+        if (FluidStack.isSameFluid(this.getFluid(), resource)) {
+            return this.drain(resource.getAmount(), action);
         }
         return FluidStack.EMPTY;
     }

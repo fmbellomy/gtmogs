@@ -1,15 +1,9 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-
 import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.apache.commons.lang3.math.NumberUtils;
 
-/**
- * @author KilaBash
- * @date 2022/06/22
- * @implNote SerializerLong
- */
 public class SerializerLong implements IContentSerializer<Long> {
 
     public static SerializerLong INSTANCE = new SerializerLong();
@@ -27,11 +21,6 @@ public class SerializerLong implements IContentSerializer<Long> {
     }
 
     @Override
-    public Codec<Long> codec() {
-        return Codec.LONG;
-    }
-
-    @Override
     public Long of(Object o) {
         if (o instanceof Long) {
             return (Long) o;
@@ -46,5 +35,10 @@ public class SerializerLong implements IContentSerializer<Long> {
     @Override
     public Long defaultValue() {
         return 0L;
+    }
+
+    @Override
+    public Codec<Long> codec() {
+        return Codec.LONG;
     }
 }

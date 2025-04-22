@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.data.recipe.misc.alloyblast;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 
 import com.google.common.base.Preconditions;
 import org.jetbrains.annotations.NotNull;

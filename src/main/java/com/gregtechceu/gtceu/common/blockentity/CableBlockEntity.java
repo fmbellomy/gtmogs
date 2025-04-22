@@ -4,16 +4,18 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
+import com.gregtechceu.gtceu.api.material.material.properties.WireProperties;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
-import com.gregtechceu.gtceu.api.material.material.properties.WireProperties;
 import com.gregtechceu.gtceu.common.block.CableBlock;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.pipelike.cable.*;
-import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
+import com.gregtechceu.gtceu.utils.GTMath;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
@@ -22,12 +24,12 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,21 +37,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/1
- * @implNote CableBlockEntity
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties> implements IDataInfoProvider {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CableBlockEntity.class,
@@ -214,7 +206,7 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
         averageVoltageCounter.increment(getLevel(), voltage * amps);
         averageAmperageCounter.increment(getLevel(), amps);
 
-        int dif = (int) (averageAmperageCounter.getLast(getLevel()) - getMaxAmperage());
+        int dif = GTMath.saturatedCast(averageAmperageCounter.getLast(getLevel()) - getMaxAmperage());
         if (dif > 0) {
             applyHeat(dif * 40);
             return true;
@@ -266,7 +258,8 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
         int temp = temperature;
         setTemperature(getDefaultTemp());
         int index = getPipeType().insulationLevel;
-        CableBlock newBlock = GTBlocks.CABLE_BLOCKS.get(Insulation.values()[index].tagPrefix, getPipeBlock().material)
+        CableBlock newBlock = GTMaterialBlocks.CABLE_BLOCKS
+                .get(Insulation.values()[index].tagPrefix, getPipeBlock().material)
                 .get();
         level.setBlockAndUpdate(getBlockPos(), newBlock.defaultBlockState());
         CableBlockEntity newCable = (CableBlockEntity) level.getBlockEntity(getBlockPos());
@@ -287,7 +280,7 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
     public void setTemperature(int temperature) {
         this.temperature = temperature;
         level.getLightEngine().checkBlock(worldPosition);
-        if (!level.isClientSide) {
+        if (!level.isClientSide && temperature >= meltTemp) {
             var facing = Direction.UP;
             float xPos = facing.getStepX() * 0.76F + worldPosition.getX() + 0.25F;
             float yPos = facing.getStepY() * 0.76F + worldPosition.getY() + 0.25F;
@@ -322,13 +315,17 @@ public class CableBlockEntity extends PipeBlockEntity<Insulation, WireProperties
     }
 
     @Override
+    public boolean hasCorrectAction(ItemStack stack) {
+        return stack.canPerformAction(GTItemAbilities.WIRE_CUTTER_CONNECT);
+    }
+
+    @Override
     public ManagedFieldHolder getFieldHolder() {
         return MANAGED_FIELD_HOLDER;
     }
 
-    @NotNull
     @Override
-    public List<Component> getDataInfo(PortableScannerBehavior.DisplayMode mode) {
+    public @NotNull List<Component> getDataInfo(PortableScannerBehavior.DisplayMode mode) {
         List<Component> list = new ArrayList<>();
 
         if (mode == PortableScannerBehavior.DisplayMode.SHOW_ALL ||

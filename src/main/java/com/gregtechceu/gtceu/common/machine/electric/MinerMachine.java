@@ -9,28 +9,30 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.WidgetUtils;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.gui.editor.EditableUI;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.WorkableTieredMachine;
+import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputItem;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.machine.trait.miner.MinerLogic;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
-import com.gregtechceu.gtceu.data.machine.GTMachines;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.DraggableScrollableWidgetGroup;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
+import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
@@ -48,31 +50,41 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MinerMachine extends WorkableTieredMachine
-                          implements IMiner, IControllable, IFancyUIMachine, IDataInfoProvider {
+                          implements IMiner, IControllable, IFancyUIMachine, IDataInfoProvider, IAutoOutputItem {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MinerMachine.class,
             WorkableTieredMachine.MANAGED_FIELD_HOLDER);
 
     @Getter
-    @Persisted(subPersisted = true)
+    @Persisted
+    @DescSynced
+    @RequireRerender
+    protected Direction outputFacingItems;
+    @Getter
+    @Persisted
+    @DescSynced
+    @RequireRerender
+    protected boolean autoOutputItems;
+    @Getter
+    @Setter
+    @Persisted
+    protected boolean allowInputFromOutputSideItems;
+    @Getter
+    @Persisted
     protected final CustomItemStackHandler chargerInventory;
     private final long energyPerTick;
     @Nullable
@@ -82,7 +94,7 @@ public class MinerMachine extends WorkableTieredMachine
 
     public MinerMachine(IMachineBlockEntity holder, int tier, int speed, int maximumRadius, int fortune,
                         Object... args) {
-        super(holder, tier, GTMachines.defaultTankSizeFunction, args, (tier + 1) * (tier + 1), fortune, speed,
+        super(holder, tier, GTMachineUtils.defaultTankSizeFunction, args, (tier + 1) * (tier + 1), fortune, speed,
                 maximumRadius);
         this.energyPerTick = GTValues.V[tier - 1];
         this.chargerInventory = createChargerItemHandler();
@@ -98,22 +110,22 @@ public class MinerMachine extends WorkableTieredMachine
     }
 
     protected CustomItemStackHandler createChargerItemHandler(Object... args) {
-        var transfer = new CustomItemStackHandler();
-        transfer.setFilter(item -> item.get(GTDataComponents.ENERGY_CONTENT) != null ||
+        var handler = new CustomItemStackHandler();
+        handler.setFilter(item -> GTCapabilityHelper.getElectricItem(item) != null ||
                 (ConfigHolder.INSTANCE.compat.energy.nativeEUToFE &&
                         GTCapabilityHelper.getForgeEnergyItem(item) != null));
-        return transfer;
+        return handler;
     }
 
     @Override
     protected NotifiableItemStackHandler createImportItemHandler(Object... args) {
-        return new NotifiableItemStackHandler(this, 0, IO.NONE);
+        return new NotifiableItemStackHandler(this, 0, IO.IN);
     }
 
     @Override
     protected NotifiableItemStackHandler createExportItemHandler(Object... args) {
         if (args.length > 3 && args[args.length - 4] instanceof Integer invSize) {
-            return new NotifiableItemStackHandler(this, invSize, IO.OUT, IO.BOTH);
+            return new NotifiableItemStackHandler(this, invSize, IO.OUT);
         }
         throw new IllegalArgumentException(
                 "MinerMachine need args [inventorySize, fortune, speed, maximumRadius] for initialization");
@@ -143,7 +155,7 @@ public class MinerMachine extends WorkableTieredMachine
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateAutoOutputSubscription();
     }
@@ -180,9 +192,9 @@ public class MinerMachine extends WorkableTieredMachine
     // ********** LOGIC **********//
     //////////////////////////////////////
     protected void updateAutoOutputSubscription() {
-        var outputFacingItems = getFrontFacing();
-        if (!exportItems.isEmpty() && ItemTransferHelper.getItemTransfer(getLevel(),
-                getPos().relative(outputFacingItems), outputFacingItems.getOpposite()) != null) {
+        var outputFace = getOutputFacingItems();
+        if (isAutoOutputItems() && outputFace != null && !exportItems.isEmpty() &&
+                GTTransferUtils.hasAdjacentItemHandler(getLevel(), getPos(), outputFace)) {
             autoOutputSubs = subscribeServerTick(autoOutputSubs, this::autoOutput);
         } else if (autoOutputSubs != null) {
             autoOutputSubs.unsubscribe();
@@ -201,9 +213,25 @@ public class MinerMachine extends WorkableTieredMachine
 
     protected void autoOutput() {
         if (getOffsetTimer() % 5 == 0) {
-            exportItems.exportToNearby(getFrontFacing());
+            if (isAutoOutputItems() && getOutputFacingItems() != null) {
+                exportItems.exportToNearby(getOutputFacingItems());
+            }
         }
         updateAutoOutputSubscription();
+    }
+
+    @Override
+    public void setAutoOutputItems(boolean allow) {
+        this.autoOutputItems = allow;
+        updateAutoOutputSubscription();
+    }
+
+    @Override
+    public void setOutputFacingItems(@Nullable Direction outputFacing) {
+        if (outputFacing != Direction.DOWN) {
+            this.outputFacingItems = outputFacing;
+            updateAutoOutputSubscription();
+        }
     }
 
     protected void chargeBattery() {
@@ -345,7 +373,7 @@ public class MinerMachine extends WorkableTieredMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (isRemote()) return ItemInteractionResult.SUCCESS;
 

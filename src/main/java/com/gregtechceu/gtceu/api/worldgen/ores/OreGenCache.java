@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.ores;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -17,9 +16,9 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Used for caching ore veins between generated chunks.
@@ -27,8 +26,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * <p>
  * Uses the {@link OreGenerator} to generate new veins in case no vein is cached for a queried chunk.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class OreGenCache {
 
     @Getter
@@ -44,16 +41,19 @@ public class OreGenCache {
 
     private final Cache<ChunkPos, List<GeneratedVeinMetadata>> veinMetadataByOrigin = CacheBuilder.newBuilder()
             .maximumSize(veinMetadataCacheSize)
+            .expireAfterAccess(30, TimeUnit.SECONDS)
             .softValues()
             .build();
 
     private final Cache<ChunkPos, List<GeneratedVein>> generatedVeinsByOrigin = CacheBuilder.newBuilder()
             .maximumSize(oreGenerationCacheSize)
+            .expireAfterAccess(30, TimeUnit.SECONDS)
             .softValues()
             .build();
 
     private final Cache<ChunkPos, List<GeneratedIndicators>> indicatorsByOrigin = CacheBuilder.newBuilder()
             .maximumSize(oreIndicatorCacheSize)
+            .expireAfterAccess(30, TimeUnit.SECONDS)
             .softValues()
             .build();
 

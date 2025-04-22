@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.generator;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
 
@@ -11,13 +10,13 @@ import net.minecraft.resources.ResourceLocation;
 
 import com.mojang.serialization.MapCodec;
 
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class VeinGenerators {
 
     public static final MapCodec<NoopVeinGenerator> NO_OP = register(GTCEu.id("no_op"), NoopVeinGenerator.CODEC,
-            entry -> NoopVeinGenerator.INSTANCE);
+            () -> NoopVeinGenerator.INSTANCE);
 
     public static final MapCodec<StandardVeinGenerator> STANDARD = register(GTCEu.id("standard"),
             StandardVeinGenerator.CODEC, StandardVeinGenerator::new);
@@ -36,13 +35,13 @@ public class VeinGenerators {
 
     public static <
             T extends VeinGenerator> MapCodec<T> register(ResourceLocation id, MapCodec<T> codec,
-                                                          Function<GTOreDefinition, ? extends VeinGenerator> function) {
+                                                          Supplier<? extends VeinGenerator> function) {
         WorldGeneratorUtils.VEIN_GENERATORS.put(id, codec);
         WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.put(id, function);
         return codec;
     }
 
     public static void registerAddonGenerators() {
-        AddonFinder.getAddons().forEach(IGTAddon::registerVeinGenerators);
+        AddonFinder.getAddonList().forEach(IGTAddon::registerVeinGenerators);
     }
 }

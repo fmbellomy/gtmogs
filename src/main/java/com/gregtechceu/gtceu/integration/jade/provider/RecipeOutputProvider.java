@@ -2,8 +2,11 @@ package com.gregtechceu.gtceu.integration.jade.provider;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
+import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
+import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.integration.jade.GTElementHelper;
 
 import net.minecraft.ChatFormatting;
@@ -28,7 +31,6 @@ import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.fluid.JadeFluidObject;
 import snownee.jade.api.ui.IElementHelper;
 import snownee.jade.util.FluidTextHelper;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,26 +51,58 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
             data.putBoolean("Working", recipeLogic.isWorking());
             var recipe = recipeLogic.getLastRecipe();
             if (recipe != null) {
-                ListTag itemTags = new ListTag();
-                for (var stack : RecipeHelper.getOutputItems(recipe)) {
-                    if (stack != null && !stack.isEmpty()) {
-                        var itemTag = new CompoundTag();
+                int recipeTier = RecipeHelper.getPreOCRecipeEuTier(recipe);
+                int chanceTier = recipeTier + recipe.ocLevel;
+                var function = recipe.getType().getChanceFunction();
+                var itemContents = recipe.getOutputContents(ItemRecipeCapability.CAP);
+                var fluidContents = recipe.getOutputContents(FluidRecipeCapability.CAP);
 
-                        stack.save(recipeLogic.getMachine().getLevel().registryAccess(), itemTag);
-                        itemTags.add(itemTag);
+                var ops = GTRegistries.builtinRegistry().createSerializationContext(NbtOps.INSTANCE);
+
+                ListTag itemTags = new ListTag();
+                for (var item : itemContents) {
+                    var stacks = ItemRecipeCapability.CAP.of(item.content).getItems();
+                    if (stacks.length == 0) continue;
+                    if (stacks[0].isEmpty()) continue;
+                    var stack = stacks[0];
+
+                    CompoundTag itemTag = ItemStack.CODEC.encodeStart(ops, stack)
+                            .map(tag -> (CompoundTag) tag)
+                            .getOrThrow();
+                    if (item.chance < item.maxChance) {
+                        int count = stack.getCount();
+                        double countD = (double) count * recipe.parallels *
+                                function.getBoostedChance(item, recipeTier, chanceTier) / item.maxChance;
+                        count = countD < 1 ? 1 : (int) Math.round(countD);
+                        itemTag.putInt("Count", count);
                     }
+                    itemTags.add(itemTag);
                 }
+
                 if (!itemTags.isEmpty()) {
                     data.put("OutputItems", itemTags);
                 }
+
                 ListTag fluidTags = new ListTag();
-                for (var stack : RecipeHelper.getOutputFluids(recipe)) {
-                    if (stack != null && !stack.isEmpty()) {
-                        var fluidTag = new CompoundTag();
-                        stack.save(recipeLogic.getMachine().getLevel().registryAccess(), fluidTag);
-                        fluidTags.add(fluidTag);
+                for (var fluid : fluidContents) {
+                    var stacks = FluidRecipeCapability.CAP.of(fluid.content).getFluids();
+                    if (stacks.length == 0) continue;
+                    if (stacks[0].isEmpty()) continue;
+                    var stack = stacks[0];
+
+                    CompoundTag fluidTag = FluidStack.CODEC.encodeStart(ops, stack)
+                            .map(tag -> (CompoundTag) tag)
+                            .getOrThrow();
+                    if (fluid.chance < fluid.maxChance) {
+                        int amount = stack.getAmount();
+                        double amountD = (double) amount * recipe.parallels *
+                                function.getBoostedChance(fluid, recipeTier, chanceTier) / fluid.maxChance;
+                        amount = amountD < 1 ? 1 : (int) Math.round(amountD);
+                        fluidTag.putInt("Amount", amount);
                     }
+                    fluidTags.add(fluidTag);
                 }
+
                 if (!fluidTags.isEmpty()) {
                     data.put("OutputFluids", fluidTags);
                 }
@@ -80,20 +114,16 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
     protected void addTooltip(CompoundTag capData, ITooltip tooltip, Player player, BlockAccessor block,
                               BlockEntity blockEntity, IPluginConfig config) {
         if (capData.getBoolean("Working")) {
+            var ops = GTRegistries.builtinRegistry().createSerializationContext(NbtOps.INSTANCE);
+
             List<ItemStack> outputItems = new ArrayList<>();
             if (capData.contains("OutputItems", Tag.TAG_LIST)) {
                 ListTag itemTags = capData.getList("OutputItems", Tag.TAG_COMPOUND);
                 if (!itemTags.isEmpty()) {
                     for (Tag tag : itemTags) {
-                        if (tag instanceof CompoundTag tCompoundTag) {
-                            var stack = ItemStack.CODEC.parse(blockEntity
-                                    .getLevel()
-                                    .registryAccess()
-                                    .createSerializationContext(NbtOps.INSTANCE),
-                                    tCompoundTag).getOrThrow();
-                            if (!stack.isEmpty()) {
-                                outputItems.add(stack);
-                            }
+                        ItemStack stack = ItemStack.CODEC.parse(ops, tag).getOrThrow();
+                        if (!stack.isEmpty()) {
+                            outputItems.add(stack);
                         }
                     }
                 }
@@ -102,11 +132,9 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
             if (capData.contains("OutputFluids", Tag.TAG_LIST)) {
                 ListTag fluidTags = capData.getList("OutputFluids", Tag.TAG_COMPOUND);
                 for (Tag tag : fluidTags) {
-                    if (tag instanceof CompoundTag tCompoundTag) {
-                        var stack = FluidStack.parseOptional(blockEntity.getLevel().registryAccess(), tCompoundTag);
-                        if (!stack.isEmpty()) {
-                            outputFluids.add(stack);
-                        }
+                    FluidStack stack = FluidStack.CODEC.parse(ops, tag).getOrThrow();
+                    if (!stack.isEmpty()) {
+                        outputFluids.add(stack);
                     }
                 }
             }
@@ -145,13 +173,12 @@ public class RecipeOutputProvider extends CapabilityBlockProvider<RecipeLogic> {
                         .append(getFluidName(fluidOutput))
                         .withStyle(ChatFormatting.WHITE);
                 iTooltip.append(text);
-
             }
         }
     }
 
     private Component getItemName(ItemStack stack) {
-        return ComponentUtils.wrapInSquareBrackets(stack.getItem().getDescription()).withStyle(ChatFormatting.WHITE);
+        return ComponentUtils.wrapInSquareBrackets(stack.getHoverName()).withStyle(ChatFormatting.WHITE);
     }
 
     private Component getFluidName(FluidStack stack) {

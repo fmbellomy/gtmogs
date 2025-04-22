@@ -1,55 +1,85 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.block;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.block.ActiveBlock;
 import com.gregtechceu.gtceu.api.block.SimpleCoilType;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.common.block.CoilBlock;
-import com.gregtechceu.gtceu.integration.kjs.builders.RendererBlockItemBuilder;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import dev.latvian.mods.kubejs.block.BlockRenderType;
+import dev.latvian.mods.kubejs.client.VariantBlockStateGenerator;
+import dev.latvian.mods.kubejs.util.ID;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 
 import dev.latvian.mods.kubejs.block.BlockBuilder;
 import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
-import dev.latvian.mods.kubejs.item.ItemBuilder;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
 @Accessors(chain = true, fluent = true)
-public class CoilBlockBuilder extends BlockBuilder {
+public class CoilBlockBuilder extends ActiveBlockBuilder {
 
     @Setter
     public transient int temperature = 0, level = 0, energyDiscount = 1, tier = 0;
-    @NotNull
-    public transient Supplier<@Nullable Material> material = () -> null;
     @Setter
-    public transient ResourceLocation texture = ResourceLocation.withDefaultNamespace("missingno");
+    public transient Supplier<Material> material = () -> GTMaterials.NULL;
+    @Setter
+    public transient String texture = "minecraft:missingno";
 
     public CoilBlockBuilder(ResourceLocation i) {
         super(i);
+        property(ActiveBlock.ACTIVE);
+        renderType(BlockRenderType.CUTOUT_MIPPED);
+        noValidSpawns(true);
+        type = Type.CUSTOM;
     }
 
-    public CoilBlockBuilder coilMaterial(@NotNull Supplier<@Nullable Material> material) {
-        this.material = material;
+    @HideFromJS
+    @Override
+    public ActiveBlockBuilder simple(String base) {
+        return this;
+    }
+
+    @HideFromJS
+    @Override
+    public ActiveBlockBuilder bloom(String base) {
+        return this;
+    }
+
+    @HideFromJS
+    @Override
+    public ActiveBlockBuilder firebox(String bottom, String side, String top) {
         return this;
     }
 
     @Override
-    public void generateAssets(KubeAssetGenerator generator) {}
-
-    @Override
-    protected ItemBuilder getOrCreateItemBuilder() {
-        return itemBuilder == null ? (itemBuilder = new RendererBlockItemBuilder(id)) : itemBuilder;
+    protected void generateBlockModels(KubeAssetGenerator generator) {
+        if (modelGenerator != null) {
+            superGenerateBlockModels(generator);
+            return;
+        }
+        generator.blockModel(id, m -> {
+            m.parent(KubeAssetGenerator.CUBE_ALL_BLOCK_MODEL);
+            m.texture("all", texture);
+        });
+        generator.blockModel(id.withPath(ActiveBlockBuilder.ACTIVE), m -> {
+            m.parent(ActiveBlockBuilder.CUBE_2_LAYER_ALL_MODEL);
+            m.texture("bot_all", texture);
+            m.texture("top_all", ActiveBlockBuilder.BLOOM.apply(texture));
+        });
     }
 
     @Override
     public Block createObject() {
-        SimpleCoilType coilType = new SimpleCoilType(this.id.getPath(), temperature, level, energyDiscount, tier,
-                material, texture);
+        SimpleCoilType coilType = new SimpleCoilType(this.id.getPath(),
+                temperature, level, energyDiscount, tier,
+                material, ResourceLocation.parse(texture));
         CoilBlock result = new CoilBlock(this.createProperties(), coilType);
         GTCEuAPI.HEATING_COILS.put(coilType, () -> result);
         return result;

@@ -12,7 +12,7 @@ import com.lowdragmc.lowdraglib.rei.ModularUIDisplayCategory;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.item.Items;
 
 import lombok.Getter;
 import me.shedaniel.rei.api.client.gui.Renderer;
@@ -36,7 +36,7 @@ public class GTOreProcessingDisplayCategory extends ModularUIDisplayCategory<GTO
     private final Size size;
 
     public GTOreProcessingDisplayCategory() {
-        this.icon = IGui2Renderer.toDrawable(new ItemStackTexture(Blocks.IRON_ORE.asItem()));
+        this.icon = IGui2Renderer.toDrawable(new ItemStackTexture(Items.RAW_IRON));
         this.size = new Size(176, 166);
     }
 
@@ -62,7 +62,7 @@ public class GTOreProcessingDisplayCategory extends ModularUIDisplayCategory<GTO
     }
 
     public static void registerDisplays(DisplayRegistry registry) {
-        for (Material mat : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material mat : GTCEuAPI.materialManager) {
             if (mat.hasProperty(ORE) && !mat.hasFlag(MaterialFlags.NO_ORE_PROCESSING_TAB)) {
                 registry.add(new GTOreProcessingDisplay(mat));
             }

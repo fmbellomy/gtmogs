@@ -92,8 +92,8 @@ public abstract class DataFixesInternals {
     @Contract(value = "-> new", pure = true)
     public abstract @NotNull Schema createBaseSchema();
 
-    public abstract @NotNull Dynamic<?> updateWithAllFixers(DSL.TypeReference dataFixTypes,
-                                                            @NotNull Dynamic<?> dynamic);
+    public abstract @NotNull <T> Dynamic<T> updateWithAllFixers(DSL.TypeReference dataFixTypes,
+                                                            @NotNull Dynamic<T> dynamic);
 
     public abstract @NotNull CompoundTag addModDataVersions(@NotNull CompoundTag compound);
 }

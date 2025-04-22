@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.recipe.lookup.ingredient.item;
 
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredientEquality;
 import com.gregtechceu.gtceu.api.recipe.lookup.AbstractMapIngredient;
 
 import net.minecraft.world.item.crafting.Ingredient;
@@ -20,7 +19,6 @@ public class MapItemIntersectionIngredient extends AbstractMapIngredient {
     public MapItemIntersectionIngredient(IntersectionIngredient ingredient) {
         this.intersectionIngredient = ingredient;
         this.ingredients = new ArrayList<>(ingredient.children());
-        this.ingredients.sort(ItemIngredientEquality.INGREDIENT_COMPARATOR);
     }
 
     @Override

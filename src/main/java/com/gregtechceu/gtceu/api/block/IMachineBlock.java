@@ -1,9 +1,12 @@
 package com.gregtechceu.gtceu.api.block;
 
+import appeng.api.AECapabilities;
+import appeng.api.networking.IInWorldGridNodeHost;
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.RotationState;
 import com.gregtechceu.gtceu.api.capability.*;
 import com.gregtechceu.gtceu.api.capability.compat.EnergyStorageList;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
@@ -21,6 +24,15 @@ import com.gregtechceu.gtceu.common.machine.owner.PlayerOwner;
 import com.gregtechceu.gtceu.common.pipelike.fluidpipe.longdistance.LDFluidEndpointMachine;
 import com.gregtechceu.gtceu.common.pipelike.item.longdistance.LDItemEndpointMachine;
 
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMaintenanceMachine;
+import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
+import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
+import com.gregtechceu.gtceu.api.misc.EnergyInfoProviderList;
+import com.gregtechceu.gtceu.api.misc.LaserContainerList;
+import com.gregtechceu.gtceu.api.pipenet.longdistance.ILDEndpoint;
+import com.gregtechceu.gtceu.common.pipelike.fluidpipe.longdistance.LDFluidEndpointMachine;
+import com.gregtechceu.gtceu.common.pipelike.item.longdistance.LDItemEndpointMachine;
 import com.lowdragmc.lowdraglib.client.renderer.IBlockRendererProvider;
 
 import net.minecraft.core.BlockPos;
@@ -52,13 +64,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * @author KilaBash
- * @date 2023/3/31
- * @implNote IMachineBlock
- */
 public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
 
     DirectionProperty UPWARDS_FACING_PROPERTY = DirectionProperty.create("upwards_facing", Direction.Plane.HORIZONTAL);
@@ -222,41 +228,13 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
         }, this.self());
         event.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             if (blockEntity instanceof IMachineBlockEntity machineBe) {
-                MetaMachine machine = machineBe.getMetaMachine();
-                if (machine instanceof LDItemEndpointMachine fluidEndpointMachine) {
-                    if (machine.getLevel().isClientSide)
-                        return null;
-                    ILDEndpoint endpoint = fluidEndpointMachine.getLink();
-                    if (endpoint == null)
-                        return null;
-                    Direction outputFacing = fluidEndpointMachine.getOutputFacing();
-                    IItemHandler transfer = machine.getLevel().getCapability(Capabilities.ItemHandler.BLOCK,
-                            endpoint.getPos().relative(outputFacing), outputFacing.getOpposite());
-                    if (transfer != null) {
-                        new LDItemEndpointMachine.ItemHandlerWrapper(transfer);
-                    }
-                }
-                return machine.getItemTransferCap(side, true);
+                return machineBe.getMetaMachine().getItemHandlerCap(side, true);
             }
             return null;
         }, this.self());
         event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             if (blockEntity instanceof IMachineBlockEntity machineBe) {
-                MetaMachine machine = machineBe.getMetaMachine();
-                if (machine instanceof LDFluidEndpointMachine fluidEndpointMachine) {
-                    if (machine.getLevel().isClientSide)
-                        return null;
-                    ILDEndpoint endpoint = fluidEndpointMachine.getLink();
-                    if (endpoint == null)
-                        return null;
-                    Direction outputFacing = fluidEndpointMachine.getOutputFacing();
-                    IFluidHandler transfer = machine.getLevel().getCapability(Capabilities.FluidHandler.BLOCK,
-                            endpoint.getPos().relative(outputFacing), outputFacing.getOpposite());
-                    if (transfer != null) {
-                        return new LDFluidEndpointMachine.FluidHandlerWrapper(transfer);
-                    }
-                }
-                return machine.getFluidTransferCap(side, true);
+                return machineBe.getMetaMachine().getFluidHandlerCap(side, true);
             }
             return null;
         }, this.self());
@@ -310,17 +288,17 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
             }
             return null;
         }, this.self());
-        if (GTCEu.isAE2Loaded()) {
+        if (GTCEu.Mods.isAE2Loaded()) {
             event.registerBlock(AECapabilities.IN_WORLD_GRID_NODE_HOST, (level, pos, state, blockEntity, side) -> {
                 if (blockEntity instanceof IMachineBlockEntity machine) {
                     if (machine.getMetaMachine() instanceof IInWorldGridNodeHost nodeHost) {
                         return nodeHost;
                     }
-                    var list = getCapabilitiesFromTraits(machine.getMetaMachine().getTraits(), side,
+                    var list = getCapabilitiesFromTraits(machine.getMetaMachine().getTraits(), null,
                             IInWorldGridNodeHost.class);
                     if (!list.isEmpty()) {
                         // TODO wrap list in the future (or not.)
-                        return list.get(0);
+                        return list.getFirst();
                     }
                 }
                 return null;
@@ -328,7 +306,7 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
         }
     }
 
-    static <T> List<T> getCapabilitiesFromTraits(List<MachineTrait> traits, Direction accessSide,
+    static <T> List<T> getCapabilitiesFromTraits(List<MachineTrait> traits, @Nullable Direction accessSide,
                                                  Class<T> capability) {
         if (traits.isEmpty()) return Collections.emptyList();
         List<T> list = new ArrayList<>();
@@ -338,23 +316,5 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
             }
         }
         return list;
-    }
-
-    default void setMachineOwner(MetaMachine machine, ServerPlayer player) {
-        if (IMachineOwner.MachineOwnerType.FTB.isAvailable()) {
-            Optional<Team> team = FTBTeamsAPIImpl.INSTANCE.getManager().getTeamForPlayerID(player.getUUID());
-            if (team.isPresent()) {
-                machine.holder.setOwner(new FTBOwner(team.get(), player.getUUID()));
-                return;
-            }
-        }
-        if (IMachineOwner.MachineOwnerType.ARGONAUTS.isAvailable()) {
-            Guild guild = GuildHandler.read(player.server).get(player);
-            if (guild != null) {
-                machine.holder.setOwner(new ArgonautsOwner(guild, player.getUUID()));
-                return;
-            }
-        }
-        machine.holder.setOwner(new PlayerOwner(player.getUUID()));
     }
 }

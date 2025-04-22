@@ -6,12 +6,13 @@ import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.common.item.tool.rotation.ICustomRotationBehavior;
-import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.lowdragmc.lowdraglib.utils.RayTraceHelper;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.InteractionResult;
@@ -33,6 +34,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -41,10 +43,14 @@ public class BlockRotatingBehavior implements IToolBehavior<BlockRotatingBehavio
 
     public static final BlockRotatingBehavior INSTANCE = new BlockRotatingBehavior();
     public static final Codec<BlockRotatingBehavior> CODEC = Codec.unit(INSTANCE);
-    public static final StreamCodec<RegistryFriendlyByteBuf, BlockRotatingBehavior> STREAM_CODEC = StreamCodec
-            .unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, BlockRotatingBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    protected BlockRotatingBehavior() {/**/}
+    protected BlockRotatingBehavior() {}
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == GTItemAbilities.WRENCH_ROTATE;
+    }
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
@@ -73,7 +79,7 @@ public class BlockRotatingBehavior implements IToolBehavior<BlockRotatingBehavio
                     ToolHelper.onActionDone(player, level, context.getHand());
                     return InteractionResult.SUCCESS;
                 }
-            } else if (state.rotate(player.getDirection().getClockWise() == context.getClickedFace() ?
+            } else if (state.rotate(level, pos, player.getDirection().getClockWise() == context.getClickedFace() ?
                     Rotation.CLOCKWISE_90 : Rotation.COUNTERCLOCKWISE_90) != state) {
                         ToolHelper.onActionDone(player, level, context.getHand());
                         return InteractionResult.SUCCESS;
@@ -95,7 +101,7 @@ public class BlockRotatingBehavior implements IToolBehavior<BlockRotatingBehavio
 
     public static BlockHitResult retraceBlock(BlockGetter level, Player player, BlockPos pos) {
         Vec3 startVec = RayTraceHelper.getTraceOrigin(player);
-        Vec3 endVec = RayTraceHelper.getTraceTarget(player, ToolHelper.getPlayerBlockReach(player), startVec);
+        Vec3 endVec = RayTraceHelper.getTraceTarget(player, player.blockInteractionRange(), startVec);
         BlockState state = level.getBlockState(pos);
         VoxelShape baseShape = state.getShape(level, pos);
         BlockHitResult baseTraceResult = baseShape.clip(startVec, endVec, pos);

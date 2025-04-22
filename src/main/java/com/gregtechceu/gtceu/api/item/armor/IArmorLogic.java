@@ -42,7 +42,8 @@ public interface IArmorLogic {
         return false;
     }
 
-    default void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage) {}
+    default void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage,
+                             EquipmentSlot equipmentSlot) {}
 
     default List<ItemAttributeModifiers.Entry> getDefaultAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         return Collections.emptyList();
@@ -65,8 +66,8 @@ public interface IArmorLogic {
         return 0xFFFFFF;
     }
 
-    @Nullable
-    ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, ArmorMaterial.Layer layer);
+    @Nullable ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                               EquipmentSlot slot, ArmorMaterial.Layer layer);
 
     @NotNull
     default HumanoidModel<?> getArmorModel(LivingEntity entityLiving, ItemStack itemStack, EquipmentSlot armorSlot,

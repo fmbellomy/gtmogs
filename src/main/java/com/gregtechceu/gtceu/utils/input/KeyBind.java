@@ -3,23 +3,22 @@ package com.gregtechceu.gtceu.utils.input;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.network.packets.CPacketKeysPressed;
 
-import com.lowdragmc.lowdraglib.Platform;
-
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.*;
@@ -39,7 +38,9 @@ public enum KeyBind {
     JETPACK_ENABLE("gtceu.key.enable_jetpack", KeyConflictContext.IN_GAME, InputConstants.KEY_G),
     BOOTS_ENABLE("gtceu.key.enable_boots", KeyConflictContext.IN_GAME, InputConstants.KEY_PERIOD),
     ARMOR_CHARGING("gtceu.key.armor_charging", KeyConflictContext.IN_GAME, InputConstants.KEY_N),
-    TOOL_AOE_CHANGE("gtceu.key.tool_aoe_change", KeyConflictContext.IN_GAME, InputConstants.KEY_V);
+    TOOL_AOE_CHANGE("gtceu.key.tool_aoe_change", KeyConflictContext.IN_GAME, InputConstants.KEY_V),
+    ACTION("gtceu.key.action", KeyConflictContext.GUI, InputConstants.KEY_DELETE),
+    ;
 
     public static final KeyBind[] VALUES = values();
 
@@ -48,7 +49,7 @@ public enum KeyBind {
 
     public static void init() {
         GTCEu.LOGGER.info("Registering KeyBinds");
-        if (Platform.isClient()) {
+        if (GTCEu.isClientSide()) {
             NeoForge.EVENT_BUS.register(KeyBind.class);
         }
     }
@@ -67,7 +68,11 @@ public enum KeyBind {
             }
         }
         if (!updating.isEmpty()) {
-            Minecraft.getInstance().getConnection().send(new CPacketKeysPressed(updating));
+            try {
+                PacketDistributor.sendToServer(new CPacketKeysPressed(updating));
+            } catch (NullPointerException exception) {
+                GTCEu.LOGGER.error("Keys pressed packet failed to send with an exception", exception);
+            }
         }
     }
 
@@ -114,19 +119,19 @@ public enum KeyBind {
     // For Vanilla/Other Mod keybinds
     // Double Supplier to keep client classes from loading
     KeyBind(Supplier<Supplier<KeyMapping>> keybindingGetter) {
-        if (Platform.isClient()) {
+        if (GTCEu.isClientSide()) {
             this.keybindingGetter = keybindingGetter;
         }
     }
 
     KeyBind(String langKey, int button) {
-        if (Platform.isClient()) {
+        if (GTCEu.isClientSide()) {
             this.keybinding = new KeyMapping(langKey, button, GTCEu.NAME);
         }
     }
 
     KeyBind(String langKey, IKeyConflictContext ctx, int button) {
-        if (Platform.isClient()) {
+        if (GTCEu.isClientSide()) {
             this.keybinding = new KeyMapping(langKey, ctx, InputConstants.Type.KEYSYM, button, GTCEu.NAME);
         }
     }

@@ -2,8 +2,8 @@ package com.gregtechceu.gtceu.api.machine.trait;
 
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.core.Direction;
@@ -16,11 +16,6 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author KilaBash
- * @date 2023/3/16
- * @implNote ItemHandlerProxyTrait
- */
 @Accessors(chain = true)
 public class ItemHandlerProxyTrait extends MachineTrait implements IItemHandlerModifiable, ICapabilityTrait {
 
@@ -119,8 +114,9 @@ public class ItemHandlerProxyTrait extends MachineTrait implements IItemHandlerM
         var level = getMachine().getLevel();
         var pos = getMachine().getPos();
         for (Direction facing : facings) {
-            ItemTransferHelper.exportToTarget(this, Integer.MAX_VALUE, f -> true, level, pos.relative(facing),
-                    facing.getOpposite());
+            var filter = getMachine().getItemCapFilter(facing, IO.OUT);
+            GTTransferUtils.getAdjacentItemHandler(level, pos, facing)
+                    .ifPresent(adj -> GTTransferUtils.transferItemsFiltered(this, adj, filter));
         }
     }
 }

@@ -3,17 +3,17 @@ package com.gregtechceu.gtceu.integration.ae2.gui.widget.list;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.client.TooltipsHandler;
 import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
+import com.gregtechceu.gtceu.utils.GTMath;
 
-import com.lowdragmc.lowdraglib.Platform;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -28,11 +28,6 @@ import java.util.Optional;
 import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlotWidget.drawSelectionOverlay;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawText;
 
-/**
- * @author GlodBlock
- * @ Display a certain {@link net.neoforged.neoforge.fluids.FluidStack} element.
- * @date 2023/4/19-0:30
- */
 public class AEFluidDisplayWidget extends Widget {
 
     private final AEListGridWidget gridWidget;
@@ -54,9 +49,8 @@ public class AEFluidDisplayWidget extends Widget {
         int stackX = position.x + 1;
         int stackY = position.y + 1;
         if (fluid != null) {
-            FluidStack fluidStack = fluid.what() instanceof AEFluidKey key ?
-                    key.toStack((int) fluid.amount()) : FluidStack.EMPTY;
-            DrawerHelper.drawFluidForGui(graphics, fluidStack, fluid.amount(), stackX, stackY, 17, 17);
+            FluidStack fluidStack = AEUtil.toFluidStack(fluid);
+            DrawerHelper.drawFluidForGui(graphics, fluidStack, stackX, stackY, 16, 16);
             String amountStr = String.format("x%,d", fluid.amount());
             drawText(graphics, amountStr, stackX + 20, stackY + 5, 1, 0xFFFFFFFF);
         }
@@ -73,13 +67,9 @@ public class AEFluidDisplayWidget extends Widget {
                 FluidStack fluidStack = AEUtil.toFluidStack(fluid);
                 List<Component> tooltips = new ArrayList<>();
                 tooltips.add(fluidStack.getHoverName());
-                tooltips.add(Component.literal(String.format("%,d ", fluid.amount())).append(FluidHelper.getUnit()));
-                if (!Platform.isForge()) {
-                    tooltips.add(Component.literal(
-                            "§6mB:§r %d mB".formatted(fluidStack.getAmount() * 1000 / FluidHelper.getBucket())));
-                }
-                TooltipsHandler.appendFluidTooltips(fluidStack.getFluid(), fluidStack.getAmount(), tooltips::add,
-                        TooltipFlag.NORMAL);
+                tooltips.add(Component.literal(String.format("%,d mB", fluid.amount())));
+                TooltipsHandler.appendFluidTooltips(fluidStack, tooltips::add,
+                        TooltipFlag.NORMAL, Item.TooltipContext.of(Minecraft.getInstance().level));
                 graphics.renderTooltip(Minecraft.getInstance().font, tooltips, Optional.empty(), mouseX, mouseY);
             }
         }

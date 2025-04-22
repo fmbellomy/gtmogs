@@ -6,17 +6,18 @@ import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IDataItem;
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 
-import com.lowdragmc.lowdraglib.misc.ItemTransferList;
-
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -26,16 +27,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
 
 public final class ResearchManager {
 
@@ -69,11 +65,11 @@ public final class ResearchManager {
      */
     @Nullable
     public static Pair<GTRecipeType, String> readResearchId(@NotNull ItemStack stack) {
-        if (!stack.has(GTDataComponents.RESEARCH_ITEM)) return null;
-
         ResearchItem researchItem = stack.get(GTDataComponents.RESEARCH_ITEM);
+        if (researchItem == null) return null;
+
         ResourceLocation researchRecipeType = researchItem.researchRecipeType;
-        return researchItem.researchId.isEmpty() || researchRecipeType == null ? null :
+        return researchItem.researchId.isEmpty() ? null :
                 Pair.of(GTRegistries.RECIPE_TYPES.get(researchRecipeType), researchItem.researchId);
     }
 
@@ -124,7 +120,7 @@ public final class ResearchManager {
         writeResearchToComponent(dataItem, researchId, recipeType);
 
         if (CWUt > 0) {
-            GTRecipeTypes.RESEARCH_STATION_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
+            GTRecipeTypes.RESEARCH_STATION_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnder(researchId))
                     .inputItems(dataItem.getItem())
                     .inputItems(researchItem)
                     .outputItems(dataItem)
@@ -133,7 +129,7 @@ public final class ResearchManager {
                     .totalCWU(duration)
                     .save(provider);
         } else {
-            GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
+            GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnder(researchId))
                     .inputItems(dataItem.getItem())
                     .inputItems(researchItem)
                     .outputItems(dataItem)
@@ -148,8 +144,8 @@ public final class ResearchManager {
 
         public static final Codec<ResearchItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf("research_id").forGetter(ResearchItem::researchId),
-                ResourceLocation.CODEC.fieldOf("research_type").forGetter(ResearchItem::researchRecipeType))
-                .apply(instance, ResearchItem::new));
+                ResourceLocation.CODEC.fieldOf("research_type").forGetter(ResearchItem::researchRecipeType)
+        ).apply(instance, ResearchItem::new));
         public static final StreamCodec<ByteBuf, ResearchItem> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8, ResearchItem::researchId,
                 ResourceLocation.STREAM_CODEC, ResearchItem::researchRecipeType,
@@ -162,11 +158,12 @@ public final class ResearchManager {
         private static final int DURATION = 100;
 
         @Override
-        public GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder) {
-            var itemInputs = holder.getCapabilitiesProxy().get(IO.IN, ItemRecipeCapability.CAP).stream()
-                    .filter(IItemHandlerModifiable.class::isInstance).map(IItemHandlerModifiable.class::cast)
+        public @Nullable GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder) {
+            var itemInputs = holder.getCapabilitiesFlat(IO.IN, ItemRecipeCapability.CAP).stream()
+                    .filter(IItemHandlerModifiable.class::isInstance)
+                    .map(IItemHandlerModifiable.class::cast)
                     .toArray(IItemHandlerModifiable[]::new);
-            var inputs = new ItemTransferList(itemInputs);
+            var inputs = new CombinedInvWrapper(itemInputs);
             if (inputs.getSlots() > 1) {
                 // try the data recipe both ways, prioritizing overwriting the first
                 GTRecipe recipe = createDataRecipe(inputs.getStackInSlot(0), inputs.getStackInSlot(1));
@@ -177,39 +174,42 @@ public final class ResearchManager {
             return null;
         }
 
-        private GTRecipe createDataRecipe(@NotNull ItemStack first, @NotNull ItemStack second) {
-            DataComponentPatch components = second.getComponentsPatch();
+        private @Nullable GTRecipe createDataRecipe(@NotNull ItemStack first, @NotNull ItemStack second) {
+            DataComponentPatch patch = second.getComponentsPatch();
 
             // Both must be data items
             if (!isStackDataItem(first, true)) return null;
             if (!isStackDataItem(second, true)) return null;
 
             ItemStack output = first.copy();
-            output.applyComponents(components);
+            output.applyComponents(patch);
             return GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(GTStringUtils.itemStackToString(output))
                     .inputItems(first)
                     .notConsumable(second)
                     .outputItems(output)
-                    .duration(DURATION).EUt(EUT).build();
+                    .duration(DURATION).EUt(EUT)
+                    .build();
         }
 
-        @Nullable
         @Override
-        public List<GTRecipe> getRepresentativeRecipes() {
+        public void buildRepresentativeRecipes() {
             ItemStack copiedStick = GTItems.TOOL_DATA_STICK.asStack();
             copiedStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_from"));
             ItemStack emptyStick = GTItems.TOOL_DATA_STICK.asStack();
             emptyStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_empty"));
             ItemStack resultStick = GTItems.TOOL_DATA_STICK.asStack();
             resultStick.set(DataComponents.CUSTOM_NAME, Component.translatable("gtceu.scanner.copy_stick_to"));
-            return Collections.singletonList(
-                    GTRecipeTypes.SCANNER_RECIPES
-                            .recipeBuilder("copy_" + GTStringUtils.itemStackToString(copiedStick))
-                            .inputItems(emptyStick)
-                            .notConsumable(copiedStick)
-                            .outputItems(resultStick)
-                            .duration(DURATION).EUt(EUT)
-                            .build());
+
+            GTRecipe recipe = GTRecipeTypes.SCANNER_RECIPES
+                    .recipeBuilder("copy_" + GTStringUtils.itemStackToString(copiedStick))
+                    .inputItems(emptyStick)
+                    .notConsumable(copiedStick)
+                    .outputItems(resultStick)
+                    .duration(DURATION).EUt(EUT)
+                    .build();
+            // for EMI to detect it's a synthetic recipe (not ever in JSON)
+            recipe.setId(recipe.getId().withPrefix("/"));
+            GTRecipeTypes.SCANNER_RECIPES.addToMainCategory(recipe);
         }
     }
 }

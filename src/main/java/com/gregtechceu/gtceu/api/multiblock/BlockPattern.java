@@ -139,7 +139,7 @@ public class BlockPattern {
                             }
                         }
                         boolean canPartShared = true;
-                        if (worldState.getTileEntity() instanceof IMachineBlockEntity machineBlockEntity &&
+                        if (worldState.getBlockEntity() instanceof IMachineBlockEntity machineBlockEntity &&
                                 machineBlockEntity.getMetaMachine() instanceof IMultiPart part) { // add detected parts
                             if (!predicate.isAny()) {
                                 if (part.isFormed() && !part.canShared() &&
@@ -666,7 +666,9 @@ public class BlockPattern {
             ItemStack stack = handler.getStackInSlot(i);
             if (stack.isEmpty()) continue;
 
+            @Nullable
             IItemHandler stackCap = stack.getCapability(Capabilities.ItemHandler.ITEM);
+            // spotless:off
             if (stackCap != null) {
                 var rt = getMatchStackWithHandler(candidates, stackCap);
                 if (rt != null) {
@@ -675,8 +677,9 @@ public class BlockPattern {
             } else if (candidates.stream()
                     .anyMatch(candidate -> ItemStack.isSameItemSameComponents(candidate, stack)) &&
                     !stack.isEmpty() && stack.getItem() instanceof BlockItem) {
-                        return Pair.of(i, handler);
-                    }
+                return Pair.of(i, handler);
+            }
+            // spotless:on
         }
         return null;
     }

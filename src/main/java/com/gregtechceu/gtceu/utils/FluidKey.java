@@ -51,7 +51,7 @@ public class FluidKey {
     public String toString() {
         return "FluidKey{" +
                 "fluid=" + fluid +
-                ", tag=" + component +
+                ", component=" + component +
                 '}';
     }
 }

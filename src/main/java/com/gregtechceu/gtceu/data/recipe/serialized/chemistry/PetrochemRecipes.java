@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.api.tag.TagPrefix.dust;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
@@ -38,7 +38,7 @@ public class PetrochemRecipes {
                 .duration(20).EUt(96).save(provider);
 
         DISTILLATION_RECIPES.recipeBuilder("distill_light_oil")
-                .inputFluids(OilLight.getFluid(150))
+                .inputFluids(LightOil.getFluid(150))
                 .outputFluids(SulfuricHeavyFuel.getFluid(10))
                 .outputFluids(SulfuricLightFuel.getFluid(20))
                 .outputFluids(SulfuricNaphtha.getFluid(30))
@@ -46,7 +46,7 @@ public class PetrochemRecipes {
                 .duration(20).EUt(96).save(provider);
 
         DISTILLATION_RECIPES.recipeBuilder("distill_heavy_oil")
-                .inputFluids(OilHeavy.getFluid(100))
+                .inputFluids(HeavyOil.getFluid(100))
                 .outputFluids(SulfuricHeavyFuel.getFluid(250))
                 .outputFluids(SulfuricLightFuel.getFluid(45))
                 .outputFluids(SulfuricNaphtha.getFluid(15))

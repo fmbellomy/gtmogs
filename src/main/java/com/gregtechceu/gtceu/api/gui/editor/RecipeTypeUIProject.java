@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import com.lowdragmc.lowdraglib.LDLib;
-import com.lowdragmc.lowdraglib.Platform;
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.editor.Icons;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.LDLRegister;
@@ -15,9 +14,7 @@ import com.lowdragmc.lowdraglib.gui.editor.ui.Editor;
 import com.lowdragmc.lowdraglib.gui.editor.ui.tool.WidgetToolBox;
 import com.lowdragmc.lowdraglib.gui.texture.*;
 import com.lowdragmc.lowdraglib.gui.util.TreeBuilder;
-import com.lowdragmc.lowdraglib.gui.widget.TabButton;
-import com.lowdragmc.lowdraglib.gui.widget.Widget;
-import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.lowdragmc.lowdraglib.gui.widget.*;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -37,11 +34,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author KilaBash
- * @date 2023/3/29
- * @implNote RecipeTypeUIProject
- */
 @LDLRegister(name = "rtui", group = "editor.gtceu")
 public class RecipeTypeUIProject extends UIProject {
 
@@ -105,8 +97,11 @@ public class RecipeTypeUIProject extends UIProject {
                         new TextTexture("Main"))),
                 new UIMainPanel(editor, root, recipeType == null ? null : recipeType.getTranslationKey()));
         for (WidgetToolBox.Default tab : WidgetToolBox.Default.TABS) {
+            if (tab == WidgetToolBox.Default.CONTAINER) {
+                continue;
+            }
             editor.getToolPanel().addNewToolBox("ldlib.gui.editor.group." + tab.groupName, tab.icon,
-                    tab.createToolBox());
+                    tab::createToolBox);
         }
     }
 
@@ -144,7 +139,7 @@ public class RecipeTypeUIProject extends UIProject {
                             var nbt = recipeType.getRecipeUI().getCustomUI();
                             IConfigurableWidget.deserializeNBT(root, nbt.getCompound("root"),
                                     Resources.fromNBT(nbt.getCompound("resources")), false,
-                                    Platform.getFrozenRegistry());
+                                    GTRegistries.builtinRegistry());
                         } else {
                             var widget = recipeType.getRecipeUI().createEditableUITemplate(false, false)
                                     .createDefault();

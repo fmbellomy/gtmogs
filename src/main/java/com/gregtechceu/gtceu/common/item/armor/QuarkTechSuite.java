@@ -6,18 +6,17 @@ import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorLogicSuite;
 import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTArmor;
-import com.gregtechceu.gtceu.core.IFireImmuneEntity;
 import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.core.IFireImmuneEntity;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
-
-import com.lowdragmc.lowdraglib.Platform;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
@@ -48,7 +47,7 @@ import java.util.Map;
 
 public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
-    protected static final Map<Holder<MobEffect>, Integer> potionRemovalCost = new IdentityHashMap<>();
+    public static final Map<Holder<MobEffect>, Integer> potionRemovalCost = new IdentityHashMap<>();
     private float charge = 0.0F;
     private static final byte RUNNING_TIMER = 10; // .5 seconds
     private static final byte JUMPING_TIMER = 10; // .5 seconds
@@ -66,18 +65,18 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
         // potionRemovalCost.put(MobEffects.BAD_OMEN, 30000);
         potionRemovalCost.put(MobEffects.MOVEMENT_SLOWDOWN, 9000);
         potionRemovalCost.put(MobEffects.UNLUCK, 5000);
-        if (Platform.isClient() && this.shouldDrawHUD()) {
+        if (GTCEu.isClientSide() && this.shouldDrawHUD()) {
             HUD = new ArmorUtils.ModularHUD();
         }
     }
 
     @Override
-    public void onArmorTick(Level world, Player player, ItemStack itemStack) {
-        IElectricItem item = GTCapabilityHelper.getElectricItem(itemStack);
+    public void onArmorTick(Level level, Player player, ItemStack stack) {
+        IElectricItem item = GTCapabilityHelper.getElectricItem(stack);
         if (item == null)
             return;
 
-        GTArmor data = itemStack.getOrDefault(GTDataComponents.ARMOR_DATA, new GTArmor());
+        GTArmor.Mutable data = stack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY).toMutable();
         byte toggleTimer = data.toggleTimer();
         int nightVisionTimer = data.nightVisionTimer();
         byte runningTimer = data.runningTimer();
@@ -85,7 +84,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
         if (!player.getItemBySlot(EquipmentSlot.CHEST).is(GTItems.QUANTUM_CHESTPLATE.get()) &&
                 !player.getItemBySlot(EquipmentSlot.CHEST).is(GTItems.QUANTUM_CHESTPLATE_ADVANCED.get())) {
-            if (!world.isClientSide) ((IFireImmuneEntity) player).gtceu$setFireImmune(false);
+            if (!level.isClientSide) ((IFireImmuneEntity) player).gtceu$setFireImmune(false);
         }
 
         boolean ret = false;
@@ -109,28 +108,24 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
             if (nightVision) {
                 player.removeEffect(MobEffects.BLINDNESS);
-                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET) {
-                    nightVisionTimer = ArmorUtils.NIGHTVISION_DURATION;
+                float tickRate = level.tickRateManager().tickrate();
+                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET * tickRate) {
+                    nightVisionTimer = Mth.floor(ArmorUtils.NIGHTVISION_DURATION * tickRate);
                     player.addEffect(
-                            new MobEffectInstance(MobEffects.NIGHT_VISION, ArmorUtils.NIGHTVISION_DURATION, 0, true,
+                            new MobEffectInstance(MobEffects.NIGHT_VISION, nightVisionTimer, 0, true,
                                     false));
                     item.discharge((4), this.tier, true, false, false);
                 }
             } else {
                 player.removeEffect(MobEffects.NIGHT_VISION);
             }
-            final boolean finalNightvision = nightVision;
-            itemStack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                    data1 -> data1.setNightVision(finalNightvision));
+            data.nightVision(nightVision);
 
             if (nightVisionTimer > 0) nightVisionTimer--;
             if (toggleTimer > 0) toggleTimer--;
 
-            final int finalNightVisionTimer = nightVisionTimer;
-            final byte finalToggleTimer = toggleTimer;
-            itemStack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                    data1 -> data1.setNightVisionTimer(finalNightVisionTimer)
-                            .setToggleTimer(finalToggleTimer));
+            data.nightVisionTimer(nightVisionTimer);
+            data.toggleTimer(toggleTimer);
         } else if (type == ArmorItem.Type.CHESTPLATE && !player.fireImmune()) {
             ((IFireImmuneEntity) player).gtceu$setFireImmune(true);
             if (player.isOnFire()) player.extinguishFire();
@@ -164,9 +159,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
             }
 
             if (runningTimer > 0) runningTimer--;
-            final byte finalRunningTimer = runningTimer;
-            itemStack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                    data1 -> data1.setRunningTimer(finalRunningTimer));
+            data.runningTimer(runningTimer);
         } else if (type == ArmorItem.Type.BOOTS) {
             boolean canUseEnergy = item.canUse(energyPerUse / 100);
             boolean jumping = KeyBind.VANILLA_JUMP.isKeyDown(player);
@@ -178,7 +171,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
                         .translatable("metaarmor.nms.boosted_jump." + (boostedJump ? "enabled" : "disabled")), true);
             }
             if (boostedJump) {
-                if (!world.isClientSide) {
+                if (!level.isClientSide) {
                     boolean onGround = data.onGround();
                     if (onGround && !player.onGround() && jumping) {
                         item.discharge(energyPerUse / 100, item.getTier(), true, false, false);
@@ -186,9 +179,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
                     }
 
                     if (player.onGround() != onGround) {
-                        final boolean finalOnGround = onGround;
-                        itemStack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                                data1 -> data1.setOnGround(finalOnGround));
+                        data.onGround(player.onGround());
                     }
                 } else {
                     if (canUseEnergy && player.onGround()) {
@@ -210,15 +201,14 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
                     }
                 }
             }
+            data.boostedJump(boostedJump);
 
             if (boostedJumpTimer > 0) boostedJumpTimer--;
 
-            final boolean finalBoostedJump = boostedJump;
-            final byte finalBoostedJumpTimer = boostedJumpTimer;
-            itemStack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                    data1 -> data1.setBoostedJump(finalBoostedJump)
-                            .setBoostedJumpTimer(finalBoostedJumpTimer));
+            data.boostedJumpTimer(boostedJumpTimer);
         }
+
+        stack.set(GTDataComponents.ARMOR_DATA, data.toImmutable());
 
         if (ret) {
             player.inventoryMenu.sendAllDataToRemote();
@@ -265,7 +255,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
         return false;
     }
 
-    public void removeNegativeEffects(@NotNull IElectricItem item, Player player) {
+    public static void removeNegativeEffects(@NotNull IElectricItem item, Player player) {
         for (MobEffectInstance effect : new LinkedList<>(player.getActiveEffects())) {
             Holder<MobEffect> potion = effect.getEffect();
             Integer cost = potionRemovalCost.get(potion);
@@ -313,7 +303,8 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
      */
 
     @Override
-    public void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage) {
+    public void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage,
+                            EquipmentSlot equipmentSlot) {
         IElectricItem item = GTCapabilityHelper.getElectricItem(itemStack);
         if (item == null) {
             return;
@@ -355,7 +346,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
     public void addInfo(ItemStack itemStack, List<Component> lines) {
         super.addInfo(itemStack, lines);
         if (type == ArmorItem.Type.HELMET) {
-            GTArmor data = itemStack.getOrDefault(GTDataComponents.ARMOR_DATA, new GTArmor());
+            GTArmor data = itemStack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY);
             boolean nv = data.nightVision();
             if (nv) {
                 lines.add(Component.translatable("metaarmor.message.nightvision.enabled"));
@@ -367,6 +358,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
             lines.add(Component.translatable("metaarmor.tooltip.autoeat"));
         } else if (type == ArmorItem.Type.CHESTPLATE) {
             lines.add(Component.translatable("metaarmor.tooltip.burning"));
+            lines.add(Component.translatable("metaarmor.tooltip.freezing"));
         } else if (type == ArmorItem.Type.LEGGINGS) {
             lines.add(Component.translatable("metaarmor.tooltip.speed"));
         } else if (type == ArmorItem.Type.BOOTS) {

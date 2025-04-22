@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.block;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.MaterialBlock;
 import com.gregtechceu.gtceu.api.block.MaterialPipeBlock;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
@@ -8,18 +9,17 @@ import com.gregtechceu.gtceu.api.capability.IToolable;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.common.blockentity.FluidPipeBlockEntity;
+import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.common.pipelike.fluidpipe.FluidPipeType;
 import com.gregtechceu.gtceu.common.pipelike.fluidpipe.LevelFluidPipeNet;
-import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
 import com.gregtechceu.gtceu.utils.EntityDamageUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -30,26 +30,15 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
-
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.fluids.FluidUtil;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/1
- * @implNote FluidPipeBlock
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class FluidPipeBlock extends MaterialPipeBlock<FluidPipeType, FluidPipeProperties, LevelFluidPipeNet> {
 
     public FluidPipeBlock(Properties properties, FluidPipeType fluidPipeType, Material material) {
@@ -106,10 +95,9 @@ public class FluidPipeBlock extends MaterialPipeBlock<FluidPipeType, FluidPipePr
     }
 
     @Override
-    public boolean canPipeConnectToBlock(IPipeNode<FluidPipeType, FluidPipeProperties> selfTile, Direction side,
-                                         @Nullable BlockEntity tile) {
-        return tile != null && tile.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, tile.getBlockPos(),
-                tile.getBlockState(), tile, side.getOpposite()) != null;
+    public boolean canPipeConnectToBlock(IPipeNode<FluidPipeType, FluidPipeProperties> selfTile,
+                                         Direction side, Level level, BlockPos pos) {
+        return FluidUtil.getFluidHandler(level, pos, side.getOpposite()).isPresent();
     }
 
     @Override
@@ -149,8 +137,12 @@ public class FluidPipeBlock extends MaterialPipeBlock<FluidPipeType, FluidPipePr
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         // dont apply damage if there is a frame box
         var pipeNode = getPipeTile(level, pos);
-        if (pipeNode.getFrameMaterial() != null) {
-            BlockState frameState = GTBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
+        if (pipeNode == null) {
+            GTCEu.LOGGER.error("Pipe was null");
+            return;
+        }
+        if (!pipeNode.getFrameMaterial().isNull()) {
+            BlockState frameState = GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
                     .getDefaultState();
             ((MaterialBlock) frameState.getBlock()).entityInside(frameState, level, pos, entity);
             return;
@@ -167,7 +159,7 @@ public class FluidPipeBlock extends MaterialPipeBlock<FluidPipeType, FluidPipePr
                     int minTemperature = Integer.MAX_VALUE;
                     for (var tank : pipe.getFluidTanks()) {
                         FluidStack stack = tank.getFluid();
-                        if (tank.getFluid() != null && tank.getFluid().getAmount() > 0) {
+                        if (!tank.getFluid().isEmpty()) {
                             maxTemperature = Math.max(maxTemperature,
                                     stack.getFluid().getFluidType().getTemperature(stack));
                             minTemperature = Math.min(minTemperature,
@@ -182,7 +174,7 @@ public class FluidPipeBlock extends MaterialPipeBlock<FluidPipeType, FluidPipePr
                     }
                 } else {
                     var tank = pipe.getFluidTanks()[0];
-                    if (tank.getFluid() != null && tank.getFluid().getAmount() > 0) {
+                    if (!tank.getFluid().isEmpty()) {
                         // Apply temperature damage for the pipe (single fluid pipes)
                         FluidStack stack = tank.getFluid();
                         EntityDamageUtil.applyTemperatureDamage(livingEntity,

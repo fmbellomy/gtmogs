@@ -35,7 +35,7 @@ public class LampRenderer extends IModelRenderer implements ICTMPredicate {
     @Override
     @OnlyIn(Dist.CLIENT)
     public TriState useAO() {
-        return TriState.TRUE;
+        return TriState.DEFAULT;
     }
 
     @Override

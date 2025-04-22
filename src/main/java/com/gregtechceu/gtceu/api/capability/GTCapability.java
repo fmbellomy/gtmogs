@@ -8,11 +8,6 @@ import net.minecraft.core.Direction;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.ItemCapability;
 
-/**
- * @author KilaBash
- * @date 2023/2/18
- * @implNote GTCapabilities
- */
 public class GTCapability {
 
     public static final BlockCapability<IEnergyContainer, Direction> CAPABILITY_ENERGY_CONTAINER = BlockCapability

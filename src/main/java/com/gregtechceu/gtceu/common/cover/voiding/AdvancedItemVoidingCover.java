@@ -13,7 +13,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -23,10 +22,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class AdvancedItemVoidingCover extends ItemVoidingCover {
 
     @Persisted
@@ -50,19 +45,19 @@ public class AdvancedItemVoidingCover extends ItemVoidingCover {
 
     @Override
     protected void doVoidItems() {
-        IItemHandler itemTransfer = getOwnItemTransfer();
-        if (itemTransfer == null) {
+        IItemHandler handler = getOwnItemHandler();
+        if (handler == null) {
             return;
         }
 
         switch (voidingMode) {
-            case VOID_ANY -> voidAny(itemTransfer);
-            case VOID_OVERFLOW -> voidOverflow(itemTransfer);
+            case VOID_ANY -> voidAny(handler);
+            case VOID_OVERFLOW -> voidOverflow(handler);
         }
     }
 
-    private void voidOverflow(IItemHandler itemTransfer) {
-        Map<ItemStack, TypeItemInfo> sourceItemAmounts = countInventoryItemsByType(itemTransfer);
+    private void voidOverflow(IItemHandler handler) {
+        Map<ItemStack, TypeItemInfo> sourceItemAmounts = countInventoryItemsByType(handler);
 
         for (TypeItemInfo itemInfo : sourceItemAmounts.values()) {
             int itemToVoidAmount = itemInfo.totalCount - getFilteredItemAmount(itemInfo.itemStack);
@@ -71,10 +66,10 @@ public class AdvancedItemVoidingCover extends ItemVoidingCover {
                 continue;
             }
 
-            for (int slot = 0; slot < itemTransfer.getSlots(); slot++) {
-                ItemStack is = itemTransfer.getStackInSlot(slot);
+            for (int slot = 0; slot < handler.getSlots(); slot++) {
+                ItemStack is = handler.getStackInSlot(slot);
                 if (!is.isEmpty() && ItemStack.isSameItemSameComponents(is, itemInfo.itemStack)) {
-                    ItemStack extracted = itemTransfer.extractItem(slot, itemToVoidAmount, false);
+                    ItemStack extracted = handler.extractItem(slot, itemToVoidAmount, false);
 
                     if (!extracted.isEmpty()) {
                         itemToVoidAmount -= extracted.getCount();

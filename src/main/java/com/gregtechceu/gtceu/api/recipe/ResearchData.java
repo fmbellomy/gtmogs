@@ -6,7 +6,6 @@ import net.minecraft.world.item.ItemStack;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -56,39 +55,26 @@ public final class ResearchData implements Iterable<ResearchData.ResearchEntry> 
      * An entry containing information about a researchable recipe.
      * <p>
      * Used for internal research storage and JEI integration.
+     *
+     * @param researchId the id of the research
+     * @param dataItem   the item allowed to contain the research
      */
-    public static final class ResearchEntry {
+    public record ResearchEntry(@NotNull String researchId, @NotNull ItemStack dataItem) {
 
         public static final Codec<ResearchEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf("research_id").forGetter(val -> val.researchId),
-                ItemStack.CODEC.fieldOf("data_item").forGetter(val -> val.dataItem))
-                .apply(instance, ResearchEntry::new));
-
-        @NotNull
-        @Getter
-        private final String researchId;
-        @NotNull
-        @Getter
-        private final ItemStack dataItem;
-
-        /**
-         * @param researchId the id of the research
-         * @param dataItem   the item allowed to contain the research
-         */
-        public ResearchEntry(@NotNull String researchId, @NotNull ItemStack dataItem) {
-            this.researchId = researchId;
-            this.dataItem = dataItem;
-        }
+                ItemStack.CODEC.fieldOf("data_item").forGetter(val -> val.dataItem)
+        ).apply(instance, ResearchEntry::new));
 
         public static ResearchEntry fromNetwork(RegistryFriendlyByteBuf buf) {
             String researchId = buf.readUtf();
-            ItemStack dataItem = ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
+            ItemStack dataItem = ItemStack.STREAM_CODEC.decode(buf);
             return new ResearchEntry(researchId, dataItem);
         }
 
         public void toNetwork(RegistryFriendlyByteBuf buf) {
             buf.writeUtf(this.researchId);
-            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, this.dataItem);
+            ItemStack.STREAM_CODEC.encode(buf, this.dataItem);
         }
     }
 }

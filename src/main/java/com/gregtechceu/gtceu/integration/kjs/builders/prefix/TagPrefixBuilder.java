@@ -3,10 +3,10 @@ package com.gregtechceu.gtceu.integration.kjs.builders.prefix;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
-import com.gregtechceu.gtceu.api.registry.registrate.BuilderBase;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.integration.kjs.built.KJSTagPrefix;
 
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "UnusedReturnValue" })
 @Accessors(chain = true)
 public abstract class TagPrefixBuilder extends BuilderBase<TagPrefix> {
 
@@ -33,12 +33,17 @@ public abstract class TagPrefixBuilder extends BuilderBase<TagPrefix> {
     @Getter
     private final List<MaterialStack> secondaryMaterials = new ArrayList<>();
 
-    public TagPrefixBuilder(ResourceLocation id, Object... args) {
-        super(id, args);
+    public TagPrefixBuilder(ResourceLocation id) {
+        super(id);
         this.base = create(id.getPath());
     }
 
     public abstract KJSTagPrefix create(String id);
+
+    public TagPrefixBuilder idPattern(String idPattern) {
+        base.idPattern(idPattern);
+        return this;
+    }
 
     public TagPrefixBuilder langValue(String langValue) {
         base.langValue(langValue);
@@ -126,7 +131,7 @@ public abstract class TagPrefixBuilder extends BuilderBase<TagPrefix> {
     }
 
     @Override
-    public TagPrefix register() {
-        return value = base;
+    public TagPrefix createObject() {
+        return base;
     }
 }

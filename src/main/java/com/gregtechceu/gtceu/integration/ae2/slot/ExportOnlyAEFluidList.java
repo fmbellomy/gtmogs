@@ -3,21 +3,16 @@ package com.gregtechceu.gtceu.integration.ae2.slot;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfigurableSlotList {
@@ -28,7 +23,6 @@ public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfi
     @Getter
     @Persisted
     protected ExportOnlyAEFluidSlot[] inventory;
-    private CustomFluidTank[] fluidStorages;
 
     public ExportOnlyAEFluidList(MetaMachine machine, int slots) {
         this(machine, slots, ExportOnlyAEFluidSlot::new);
@@ -40,16 +34,8 @@ public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfi
         for (int i = 0; i < slots; i++) {
             this.inventory[i] = slotFactory.get();
             this.inventory[i].setOnContentsChanged(this::onContentsChanged);
+            this.storages[i] = new FluidStorageDelegate(inventory[i]);
         }
-    }
-
-    @Override
-    public CustomFluidTank[] getStorages() {
-        if (this.fluidStorages == null) {
-            this.fluidStorages = Arrays.stream(this.inventory)
-                    .map(FluidStorageDelegate::new).toArray(CustomFluidTank[]::new);
-        }
-        return this.fluidStorages;
     }
 
     @Override
@@ -86,13 +72,6 @@ public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfi
             if (maxDrain <= 0) break;
         }
         return totalDrained == null ? FluidStack.EMPTY : totalDrained;
-    }
-
-    @Override
-    public List<SizedFluidIngredient> handleRecipeInner(IO io, GTRecipe recipe,
-                                                        List<SizedFluidIngredient> left,
-                                                        @Nullable String slotName, boolean simulate) {
-        return handleIngredient(io, recipe, left, simulate, this.handlerIO, getStorages());
     }
 
     @Override
@@ -137,14 +116,19 @@ public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfi
         }
 
         @Override
+        @NotNull
         public FluidStack getFluid() {
             return this.fluid.getFluid();
         }
 
-        @NotNull
         @Override
-        public FluidStack drain(FluidStack maxDrain, FluidAction action) {
+        public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
             return fluid.drain(maxDrain, action);
+        }
+
+        @Override
+        public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+            return fluid.drain(resource, action);
         }
 
         @Override
@@ -155,19 +139,6 @@ public class ExportOnlyAEFluidList extends NotifiableFluidTank implements IConfi
         @Override
         public boolean supportsFill(int tank) {
             return false;
-        }
-
-        @Override
-        public CustomFluidTank copy() {
-            // because recipe testing uses copy storage instead of simulated operations
-            return new FluidStorageDelegate(fluid) {
-
-                @NotNull
-                @Override
-                public FluidStack drain(FluidStack maxDrain, FluidAction action) {
-                    return super.drain(maxDrain, FluidAction.SIMULATE);
-                }
-            };
         }
     }
 }

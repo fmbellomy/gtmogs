@@ -3,88 +3,190 @@ package com.gregtechceu.gtceu.common.machine.trait.customlogic;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
+import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.utils.GTStringUtils;
-
-import com.lowdragmc.lowdraglib.misc.ItemTransferList;
 
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
-import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
+import com.mojang.datafixers.util.Pair;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
-public class CannerLogic implements GTRecipeType.ICustomRecipeLogic {
+import static net.neoforged.neoforge.fluids.capability.IFluidHandler.*;
+
+public enum CannerLogic implements GTRecipeType.ICustomRecipeLogic {
+
+    INSTANCE;
 
     @Override
     public @Nullable GTRecipe createCustomRecipe(IRecipeCapabilityHolder holder) {
-        var itemInputs = Objects
-                .requireNonNullElseGet(holder.getCapabilitiesProxy().get(IO.IN, ItemRecipeCapability.CAP),
-                        ArrayList::new)
-                .stream()
-                .filter(IItemHandlerModifiable.class::isInstance).map(IItemHandlerModifiable.class::cast)
-                .toArray(IItemHandlerModifiable[]::new);
+        var handlerLists = holder.getCapabilitiesForIO(IO.IN);
+        if (handlerLists.isEmpty()) return null;
+        List<RecipeHandlerList> distinct = new ArrayList<>();
+        List<IRecipeHandler<?>> notDistinctItems = new ArrayList<>();
+        List<IRecipeHandler<?>> notDistinctFluids = new ArrayList<>();
 
-        var fluidInputs = Objects
-                .requireNonNullElseGet(holder.getCapabilitiesProxy().get(IO.IN, FluidRecipeCapability.CAP),
-                        ArrayList::new)
-                .stream()
-                .filter(IFluidHandler.class::isInstance).map(IFluidHandler.class::cast)
-                .toArray(IFluidHandler[]::new);
+        for (var handlerList : handlerLists) {
+            if (handlerList.isDistinct()) {
+                distinct.add(handlerList);
+            } else {
+                notDistinctItems.addAll(handlerList.getCapability(ItemRecipeCapability.CAP));
+                notDistinctFluids.addAll(handlerList.getCapability(FluidRecipeCapability.CAP));
+            }
+        }
 
-        var inputs = new ItemTransferList(itemInputs);
-        for (int i = 0; i < inputs.getSlots(); i++) {
-            ItemStack item = inputs.getStackInSlot(i);
-            if (!item.isEmpty()) {
-                ItemStack inputStack = item.copy();
-                inputStack.setCount(1);
+        if (distinct.isEmpty() && notDistinctItems.isEmpty() && notDistinctFluids.isEmpty()) return null;
 
-                ItemStack fluidHandlerStack = inputStack.copy();
-                IFluidHandlerItem fluidHandlerItem = fluidHandlerStack
-                        .getCapability(Capabilities.FluidHandler.ITEM);
-                if (fluidHandlerItem == null)
-                    continue;
+        List<ItemStack> itemStacks = new ArrayList<>();
+        List<FluidStack> fluidStacks = new ArrayList<>();
 
-                FluidStack fluid = fluidHandlerItem.drain(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
+        List<Pair<ItemStack, IFluidHandlerItem>> validItems = new ArrayList<>();
+        List<FluidStack> validFluids = new ArrayList<>();
+
+        for (var rhl : distinct) {
+            itemStacks.clear();
+            fluidStacks.clear();
+            if (!collect(rhl, itemStacks, fluidStacks)) continue;
+
+            for (var itemStack : itemStacks) {
+                var single = itemStack.copyWithCount(1);
+                var copy = itemStack.copyWithCount(1);
+                var fluidHandler = FluidUtil.getFluidHandler(copy).orElse(null);
+                if (fluidHandler == null) continue;
+                // Try to drain first
+                var fluid = fluidHandler.drain(Integer.MAX_VALUE, FluidAction.EXECUTE);
                 if (!fluid.isEmpty()) {
-                    return GTRecipeTypes.CANNER_RECIPES.recipeBuilder(GTStringUtils.itemStackToString(item))
-                            .inputItems(inputStack)
-                            .outputItems(fluidHandlerItem.getContainer())
+                    return GTRecipeTypes.CANNER_RECIPES
+                            .recipeBuilder("drain_fluid")
+                            .inputItems(single)
+                            .outputItems(fluidHandler.getContainer())
                             .outputFluids(fluid)
-                            .duration(Math.max(16, fluid.getAmount() / 64)).EUt(4)
+                            .duration(Math.max(16, fluid.getAmount() / 64))
+                            .EUt(4)
                             .build();
                 }
 
-                // nothing drained so try filling
-                for (IFluidHandler fluidInput : fluidInputs) {
-                    var fluidStack1 = fluidInput.getFluidInTank(0);
-                    if (fluidStack1.isEmpty()) {
-                        continue;
-                    }
-                    fluidStack1 = fluidStack1.copy();
-                    fluidStack1.setAmount(
-                            fluidHandlerItem.fill(new FluidStack(fluidStack1.getFluid(), fluidStack1.getAmount()),
-                                    IFluidHandler.FluidAction.EXECUTE));
-                    if (fluidStack1.getAmount() > 0) {
-                        return GTRecipeTypes.CANNER_RECIPES.recipeBuilder(GTStringUtils.itemStackToString(item))
-                                .inputItems(inputStack)
-                                .inputFluids(fluidStack1)
-                                .outputItems(fluidHandlerItem.getContainer())
-                                .duration(Math.max(16, fluid.getAmount() / 64)).EUt(4)
-                                .build();
-                    }
+                for (var fluidStack : fluidStacks) {
+                    var fluidCopy = fluidStack.copy();
+                    var filled = fluidHandler.fill(fluidCopy, FluidAction.EXECUTE);
+                    if (filled == 0) continue;
+                    fluidCopy.setAmount(filled);
+                    return GTRecipeTypes.CANNER_RECIPES
+                            .recipeBuilder("fill_fluid")
+                            .inputItems(single)
+                            .inputFluids(fluidCopy)
+                            .outputItems(fluidHandler.getContainer())
+                            .duration(Math.max(16, filled / 64))
+                            .EUt(4)
+                            .build();
+                }
+                validItems.add(Pair.of(copy, fluidHandler));
+            }
+            validFluids.addAll(fluidStacks);
+        }
+
+        itemStacks.clear();
+        fluidStacks.clear();
+        collect(notDistinctItems, notDistinctFluids, itemStacks, fluidStacks);
+        if (itemStacks.isEmpty() && validItems.isEmpty()) return null; // no items to fill/drain
+        fluidStacks.addAll(validFluids);
+
+        for (var itemStack : itemStacks) {
+            var single = itemStack.copyWithCount(1);
+            var copy = itemStack.copyWithCount(1);
+            var fluidHandler = FluidUtil.getFluidHandler(copy).orElse(null);
+            if (fluidHandler == null) continue;
+            // Try to drain first
+            var fluid = fluidHandler.drain(Integer.MAX_VALUE, FluidAction.EXECUTE);
+            if (!fluid.isEmpty()) {
+                return GTRecipeTypes.CANNER_RECIPES
+                        .recipeBuilder("drain_fluid")
+                        .inputItems(single)
+                        .outputItems(fluidHandler.getContainer())
+                        .outputFluids(fluid)
+                        .duration(Math.max(16, fluid.getAmount() / 64))
+                        .EUt(4)
+                        .build();
+            }
+
+            for (var fluidStack : fluidStacks) {
+                var fluidCopy = fluidStack.copy();
+                var filled = fluidHandler.fill(fluidCopy, FluidAction.EXECUTE);
+                if (filled == 0) continue;
+                fluidCopy.setAmount(filled);
+                return GTRecipeTypes.CANNER_RECIPES
+                        .recipeBuilder("fill_fluid")
+                        .inputItems(single)
+                        .inputFluids(fluidCopy)
+                        .outputItems(fluidHandler.getContainer())
+                        .duration(Math.max(16, filled / 64))
+                        .EUt(4)
+                        .build();
+            }
+        }
+
+        if (fluidStacks.isEmpty()) return null;
+
+        // Try filling containers from distinct handlers with fluids from indistinct handlers
+        // We already tried draining them on L72
+        for (var pair : validItems) {
+            var stack = pair.getFirst();
+            var single = stack.copyWithCount(1);
+            var fluidHandler = pair.getSecond();
+
+            for (var fluidStack : fluidStacks) {
+                var fluidCopy = fluidStack.copy();
+                var filled = fluidHandler.fill(fluidCopy, FluidAction.EXECUTE);
+                if (filled == 0) continue;
+                fluidCopy.setAmount(filled);
+                return GTRecipeTypes.CANNER_RECIPES
+                        .recipeBuilder("fill_fluid")
+                        .inputItems(single)
+                        .inputFluids(fluidCopy)
+                        .outputItems(fluidHandler.getContainer())
+                        .duration(Math.max(16, filled / 64))
+                        .EUt(4)
+                        .build();
+            }
+        }
+
+        return null;
+    }
+
+    private static boolean collect(RecipeHandlerList rhl, List<ItemStack> itemStacks, List<FluidStack> fluidStacks) {
+        return collect(rhl.getCapability(ItemRecipeCapability.CAP),
+                rhl.getCapability(FluidRecipeCapability.CAP),
+                itemStacks, fluidStacks);
+    }
+
+    private static boolean collect(List<IRecipeHandler<?>> itemHandlers, List<IRecipeHandler<?>> fluidHandlers,
+                                   List<ItemStack> itemStacks, List<FluidStack> fluidStacks) {
+        for (var handler : itemHandlers) {
+            if (!handler.shouldSearchContent()) continue;
+            for (var content : handler.getContents()) {
+                if (content instanceof ItemStack stack && !stack.isEmpty()) {
+                    itemStacks.add(stack);
                 }
             }
         }
-        return null;
+
+        for (var handler : fluidHandlers) {
+            if (!handler.shouldSearchContent()) continue;
+            for (var content : handler.getContents()) {
+                if (content instanceof FluidStack stack && !stack.isEmpty()) {
+                    fluidStacks.add(stack);
+                }
+            }
+        }
+
+        return !(itemStacks.isEmpty() || fluidStacks.isEmpty());
     }
 }

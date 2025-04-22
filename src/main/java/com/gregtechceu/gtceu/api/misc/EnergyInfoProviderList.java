@@ -2,15 +2,10 @@ package com.gregtechceu.gtceu.api.misc;
 
 import com.gregtechceu.gtceu.api.capability.IEnergyInfoProvider;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 
 import java.math.BigInteger;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class EnergyInfoProviderList implements IEnergyInfoProvider {
 
     private final List<? extends IEnergyInfoProvider> list;

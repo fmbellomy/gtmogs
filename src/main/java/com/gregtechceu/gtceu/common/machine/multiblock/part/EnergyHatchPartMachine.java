@@ -13,7 +13,6 @@ import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
@@ -21,15 +20,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/4
- * @implNote EnergyHatchPartMachine
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class EnergyHatchPartMachine extends TieredIOPartMachine implements IExplosionMachine {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
@@ -82,7 +72,7 @@ public class EnergyHatchPartMachine extends TieredIOPartMachine implements IExpl
     public void onLoad() {
         super.onLoad();
         // if machine need do check explosion conditions
-        if (ConfigHolder.INSTANCE.machines.doTerrainExplosion && shouldWeatherOrTerrainExplosion()) {
+        if (ConfigHolder.INSTANCE.machines.shouldWeatherOrTerrainExplosion && shouldWeatherOrTerrainExplosion()) {
             energyListener = energyContainer.addChangedListener(this::updateExplosionSubscription);
             updateExplosionSubscription();
         }
@@ -102,7 +92,7 @@ public class EnergyHatchPartMachine extends TieredIOPartMachine implements IExpl
     //////////////////////////////////////
 
     protected void updateExplosionSubscription() {
-        if (ConfigHolder.INSTANCE.machines.doTerrainExplosion && shouldWeatherOrTerrainExplosion() &&
+        if (ConfigHolder.INSTANCE.machines.shouldWeatherOrTerrainExplosion && shouldWeatherOrTerrainExplosion() &&
                 energyContainer.getEnergyStored() > 0) {
             explosionSubs = subscribeServerTick(explosionSubs, this::checkExplosion);
         } else if (explosionSubs != null) {
@@ -126,5 +116,9 @@ public class EnergyHatchPartMachine extends TieredIOPartMachine implements IExpl
             return GTValues.VC[getTier()];
         }
         return super.tintColor(index);
+    }
+
+    public static long getHatchEnergyCapacity(int tier, int amperage) {
+        return GTValues.V[tier] * 64L * amperage;
     }
 }

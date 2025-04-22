@@ -26,23 +26,24 @@ public class GradientUtil {
         return new float[] { r, g, b };
     }
 
+    @SuppressWarnings("PointlessBitwiseExpression")
     public static int multiplyBlendRGBA(int c1, int c2) {
-        int a1 = (c1 & 0xff);
         int r1 = ((c1 & 0xff000000) >> 24);
-        int g1 = ((c1 & 0xff0000) >> 16);
-        int b1 = ((c1 & 0xff00) >> 8);
+        int g1 = ((c1 & 0x00ff0000) >> 16);
+        int b1 = ((c1 & 0x0000ff00) >> 8);
+        int a1 = ((c1 & 0x000000ff) >> 0);
 
-        int a2 = (c2 & 0xff);
         int r2 = ((c2 & 0xff000000) >> 24);
-        int g2 = ((c2 & 0xff0000) >> 16);
-        int b2 = ((c2 & 0xff00) >> 8);
+        int g2 = ((c2 & 0x00ff0000) >> 16);
+        int b2 = ((c2 & 0x0000ff00) >> 8);
+        int a2 = ((c2 & 0x000000ff) >> 0);
 
-        int a = (a1 * a2) / 255;
         int r = (r1 * r2) / 255;
         int g = (g1 * g2) / 255;
         int b = (b1 * b2) / 255;
+        int a = (a1 * a2) / 255;
 
-        return a << 24 | r << 16 | g << 8 | b;
+        return r << 24 | g << 16 | b << 8 | a;
     }
 
     public static int blend(int c1, int c2, float ratio) {

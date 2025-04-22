@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.integration.ae2.utils;
 
 import com.lowdragmc.lowdraglib.syncdata.IContentChangeAware;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -27,7 +26,6 @@ import java.util.Iterator;
  * @author GateGuardian
  * @date : 2024/7/18
  */
-@MethodsReturnNonnullByDefault
 public class KeyStorage implements INBTSerializable<ListTag>, IContentChangeAware,
                         Iterable<Object2LongMap.Entry<AEKey>> {
 

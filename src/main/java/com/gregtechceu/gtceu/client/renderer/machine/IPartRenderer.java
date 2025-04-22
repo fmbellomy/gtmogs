@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
@@ -11,15 +12,11 @@ import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/3/16
- * @implNote IPartRenderer
- */
 public interface IPartRenderer {
 
     /**
@@ -30,7 +27,7 @@ public interface IPartRenderer {
     @OnlyIn(Dist.CLIENT)
     default boolean renderReplacedPartMachine(List<BakedQuad> quads, IMultiPart part, Direction frontFacing,
                                               @Nullable Direction side, RandomSource rand, Direction modelFacing,
-                                              ModelState modelState) {
+                                              ModelState modelState, @NotNull ModelData data, RenderType renderType) {
         var controllers = part.getControllers();
         for (IMultiController controller : controllers) {
             var state = controller.self().getBlockState();
@@ -41,8 +38,7 @@ public interface IPartRenderer {
                             modelState);
                     return true;
                 } else if (renderer instanceof MachineRenderer machineRenderer) {
-                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), frontFacing, side,
-                            rand);
+                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), modelState, side, rand, data, renderType);
                     return true;
                 }
             }

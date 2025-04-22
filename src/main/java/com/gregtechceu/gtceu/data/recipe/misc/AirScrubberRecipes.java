@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 import net.minecraft.data.recipes.RecipeOutput;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.CarbonMonoxide;
+import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.AIR_SCRUBBER_RECIPES;
 
 public class AirScrubberRecipes {

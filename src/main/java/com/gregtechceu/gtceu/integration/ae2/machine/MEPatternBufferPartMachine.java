@@ -1,8 +1,6 @@
 package com.gregtechceu.gtceu.integration.ae2.machine;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
@@ -13,45 +11,51 @@ import com.gregtechceu.gtceu.api.machine.fancyconfigurator.ButtonConfigurator;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyInvConfigurator;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.FancyTankConfigurator;
+import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.machine.GTAEMachines;
+import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.AETextInputButtonWidget;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEPatternViewSlotWidget;
-import com.gregtechceu.gtceu.integration.ae2.machine.trait.MEPatternBufferRecipeHandler;
-import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
-import com.gregtechceu.gtceu.utils.GTUtil;
+import com.gregtechceu.gtceu.integration.ae2.machine.trait.InternalSlotRecipeHandler;
+import com.gregtechceu.gtceu.utils.FluidStackHashStrategy;
+import com.gregtechceu.gtceu.utils.GTMath;
+import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
 import com.lowdragmc.lowdraglib.syncdata.IContentChangeAware;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
-
+import net.neoforged.neoforge.fluids.FluidType;
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
@@ -66,19 +70,22 @@ import appeng.crafting.pattern.EncodedPatternItem;
 import appeng.helpers.patternprovider.PatternContainer;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import it.unimi.dsi.fastutil.objects.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.commons.lang3.ArrayUtils;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
-import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@ExtensionMethod(SizedIngredientExtensions.class)
 public class MEPatternBufferPartMachine extends MEBusPartMachine
-                                        implements ICraftingProvider, PatternContainer {
+                                        implements ICraftingProvider, PatternContainer, IDataStickInteractable {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             MEPatternBufferPartMachine.class, MEBusPartMachine.MANAGED_FIELD_HOLDER);
@@ -136,20 +143,14 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
     private boolean needPatternSync;
 
     @Persisted
-    private HashSet<BlockPos> proxies = new HashSet<>();
+    private final Set<BlockPos> proxies = new ObjectOpenHashSet<>();
+    private final Set<MEPatternBufferProxyPartMachine> proxyMachines = new ReferenceOpenHashSet<>();
 
-    protected final MEPatternBufferRecipeHandler recipeHandler = new MEPatternBufferRecipeHandler(this);
+    @Getter
+    protected final InternalSlotRecipeHandler internalRecipeHandler;
 
     @Nullable
     protected TickableSubscription updateSubs;
-
-    @Override
-    public boolean isWorkingEnabled() {
-        return true;
-    }
-
-    @Override
-    public void setWorkingEnabled(boolean ignored) {}
 
     public MEPatternBufferPartMachine(IMachineBlockEntity holder, Object... args) {
         super(holder, IO.IN, args);
@@ -159,9 +160,11 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
         }
         getMainNode().addService(ICraftingProvider.class, this);
         this.circuitInventorySimulated = new NotifiableItemStackHandler(this, 1, IO.IN, IO.NONE)
-                .setFilter(IntCircuitBehaviour::isIntegratedCircuit);
+                .setFilter(IntCircuitBehaviour::isIntegratedCircuit)
+                .shouldSearchContent(false);
         this.shareInventory = new NotifiableItemStackHandler(this, 9, IO.IN, IO.NONE);
-        this.shareTank = new NotifiableFluidTank(this, 9, 8 * FluidHelper.getBucket(), IO.IN, IO.NONE);
+        this.shareTank = new NotifiableFluidTank(this, 9, 8 * FluidType.BUCKET_VOLUME, IO.IN, IO.NONE);
+        this.internalRecipeHandler = new InternalSlotRecipeHandler(this, internalInventory);
     }
 
     @Override
@@ -178,14 +181,33 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
                 }
             }));
         }
-        getRecipeHandlers().forEach(handler -> handler.addChangedListener(() -> getProxies().forEach(proxy -> {
-            if (handler.getCapability() == ItemRecipeCapability.CAP) {
-                proxy.itemProxyHandler.notifyListeners();
-            } else {
-                proxy.fluidProxyHandler.notifyListeners();
-            }
-        })));
     }
+
+    @Override
+    public List<RecipeHandlerList> getRecipeHandlers() {
+        return internalRecipeHandler.getSlotHandlers();
+    }
+
+    @Override
+    public NotifiableItemStackHandler getCircuitInventory() {
+        return getCircuitInventorySimulated();
+    }
+
+    @Override
+    public boolean isWorkingEnabled() {
+        return true;
+    }
+
+    @Override
+    public void setWorkingEnabled(boolean ignored) {}
+
+    @Override
+    public boolean isDistinct() {
+        return true;
+    }
+
+    @Override
+    public void setDistinct(boolean ignored) {}
 
     @Override
     public void onMainNodeStateChanged(IGridNodeListener.State reason) {
@@ -211,20 +233,25 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
 
     public void addProxy(MEPatternBufferProxyPartMachine proxy) {
         proxies.add(proxy.getPos());
+        proxyMachines.add(proxy);
     }
 
     public void removeProxy(MEPatternBufferProxyPartMachine proxy) {
         proxies.remove(proxy.getPos());
+        proxyMachines.remove(proxy);
     }
 
+    @UnmodifiableView
     public Set<MEPatternBufferProxyPartMachine> getProxies() {
-        Set<MEPatternBufferProxyPartMachine> proxies1 = new HashSet<>();
-        for (var pos : proxies) {
-            if (MetaMachine.getMachine(getLevel(), pos) instanceof MEPatternBufferProxyPartMachine p) {
-                proxies1.add(p);
+        if (proxyMachines.size() != proxies.size()) {
+            proxyMachines.clear();
+            for (var pos : proxies) {
+                if (MetaMachine.getMachine(getLevel(), pos) instanceof MEPatternBufferProxyPartMachine proxy) {
+                    proxyMachines.add(proxy);
+                }
             }
         }
-        return proxies1;
+        return Collections.unmodifiableSet(proxyMachines);
     }
 
     private void refundAll(ClickData clickData) {
@@ -259,7 +286,9 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
         configuratorPanel.attachConfigurators(new ButtonConfigurator(
                 new GuiTextureGroup(GuiTextures.BUTTON, GuiTextures.REFUND_OVERLAY), this::refundAll)
                 .setTooltips(List.of(Component.translatable("gui.gtceu.refund_all.desc"))));
-        configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventorySimulated.storage));
+        if (isCircuitSlotEnabled()) {
+            configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventorySimulated.storage));
+        }
         configuratorPanel.attachConfigurators(new FancyInvConfigurator(
                 shareInventory.storage, Component.translatable("gui.gtceu.share_inventory.title"))
                 .setTooltips(List.of(
@@ -318,14 +347,14 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
 
     @Override
     public boolean pushPattern(IPatternDetails patternDetails, KeyCounter[] inputHolder) {
-        if (!getMainNode().isActive() || !detailsSlotMap.containsKey(patternDetails) || !checkInput(inputHolder)) {
+        if (!isFormed() || !getMainNode().isActive() || !detailsSlotMap.containsKey(patternDetails) ||
+                !checkInput(inputHolder)) {
             return false;
         }
 
         var slot = detailsSlotMap.get(patternDetails);
         if (slot != null) {
             slot.pushPattern(patternDetails, inputHolder);
-            recipeHandler.onChanged();
             return true;
         }
         return false;
@@ -364,10 +393,9 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
 
     @Override
     public PatternContainerGroup getTerminalGroup() {
-        List<IMultiController> controllers = getControllers();
-        // has controller
-        if (!controllers.isEmpty()) {
-            IMultiController controller = controllers.get(0);
+        // Has controller
+        if (isFormed()) {
+            IMultiController controller = getControllers().first();
             MultiblockMachineDefinition controllerDefinition = controller.self().getDefinition();
             // has customName
             if (!customName.isEmpty()) {
@@ -409,21 +437,38 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
         clearInventory(shareInventory);
     }
 
+    @Override
+    public InteractionResult onDataStickShiftUse(Player player, ItemStack dataStick) {
+        dataStick.set(GTDataComponents.DATA_COPY_POS, getPos());
+        return InteractionResult.SUCCESS;
+    }
+
+    public record BufferData(Object2LongMap<ItemStack> items, Object2LongMap<FluidStack> fluids) {}
+
+    public BufferData mergeInternalSlots() {
+        var items = new Object2LongOpenCustomHashMap<>(ItemStackHashStrategy.comparingAllButCount());
+        var fluids = new Object2LongOpenHashMap<FluidStack>();
+        for (InternalSlot slot : internalInventory) {
+            slot.itemInventory.object2LongEntrySet().fastForEach(e -> items.addTo(e.getKey(), e.getLongValue()));
+            slot.fluidInventory.object2LongEntrySet().fastForEach(e -> fluids.addTo(e.getKey(), e.getLongValue()));
+        }
+        return new BufferData(items, fluids);
+    }
+
     public class InternalSlot implements INBTSerializable<CompoundTag>, IContentChangeAware {
 
         @Getter
         @Setter
-        protected Runnable onContentsChanged = () -> {
-            /**/
-        };
+        private Runnable onContentsChanged = () -> {};
 
-        private final Set<ItemStack> itemInventory;
-        private final Set<FluidStack> fluidInventory;
+        private final Object2LongOpenCustomHashMap<ItemStack> itemInventory = new Object2LongOpenCustomHashMap<>(
+                ItemStackHashStrategy.comparingAllButCount());
+        private final Object2LongOpenCustomHashMap<FluidStack> fluidInventory = new Object2LongOpenCustomHashMap<>(
+                FluidStackHashStrategy.comparingAllButAmount());
+        private List<ItemStack> itemStacks = null;
+        private List<FluidStack> fluidStacks = null;
 
-        public InternalSlot() {
-            this.itemInventory = new HashSet<>();
-            this.fluidInventory = new HashSet<>();
-        }
+        public InternalSlot() {}
 
         public boolean isItemEmpty() {
             return itemInventory.isEmpty();
@@ -433,48 +478,40 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
             return fluidInventory.isEmpty();
         }
 
-        private void addItem(AEItemKey key, long amount) {
+        public void onContentsChanged() {
+            itemStacks = null;
+            fluidStacks = null;
+            onContentsChanged.run();
+        }
+
+        private void add(AEKey what, long amount) {
             if (amount <= 0L) return;
-            for (ItemStack item : itemInventory) {
-                if (key.matches(item)) {
-                    long sum = item.getCount() + amount;
-                    if (sum <= Integer.MAX_VALUE) {
-                        item.grow((int) amount);
-                    } else {
-                        itemInventory.remove(item);
-                        itemInventory.addAll(List.of(AEUtil.toItemStacks(key, sum)));
-                    }
-                    return;
-                }
+            if (what instanceof AEItemKey itemKey) {
+                var stack = itemKey.toStack();
+                itemInventory.addTo(stack, amount);
+            } else if (what instanceof AEFluidKey fluidKey) {
+                var stack = fluidKey.toStack(1);
+                fluidInventory.addTo(stack, amount);
             }
-            itemInventory.addAll(List.of(AEUtil.toItemStacks(key, amount)));
-            recipeHandler.getItemInputHandler().notifyListeners();
         }
 
-        private void addFluid(AEFluidKey key, long amount) {
-            if (amount <= 0L) return;
-            for (FluidStack fluid : fluidInventory) {
-                if (AEUtil.matches(key, fluid)) {
-                    long free = Long.MAX_VALUE - fluid.getAmount();
-                    if (amount <= free) {
-                        fluid.grow((int) amount);
-                    } else {
-                        fluid.setAmount(Integer.MAX_VALUE);
-                        fluidInventory.add(AEUtil.toFluidStack(key, amount - free));
-                    }
-                    return;
-                }
+        public List<ItemStack> getItems() {
+            if (itemStacks == null) {
+                itemStacks = new ArrayList<>();
+                itemInventory.object2LongEntrySet().stream()
+                        .map(e -> GTMath.splitStacks(e.getKey(), e.getLongValue()))
+                        .forEach(itemStacks::addAll);
             }
-            fluidInventory.add(AEUtil.toFluidStack(key, amount));
-            recipeHandler.getFluidInputHandler().notifyListeners();
+            return itemStacks;
         }
 
-        public ItemStack[] getItemInputs() {
-            return ArrayUtils.addAll(itemInventory.toArray(new ItemStack[0]));
-        }
-
-        public FluidStack[] getFluidInputs() {
-            return ArrayUtils.addAll(fluidInventory.toArray(new FluidStack[0]));
+        public List<FluidStack> getFluids() {
+            if (fluidStacks == null) {
+                fluidStacks = fluidInventory.object2LongEntrySet().stream()
+                        .map(e -> e.getKey().copyWithAmount(GTMath.saturatedCast(e.getLongValue())))
+                        .toList();
+            }
+            return fluidStacks;
         }
 
         public void refund() {
@@ -482,174 +519,194 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
             if (network != null) {
                 MEStorage networkInv = network.getStorageService().getInventory();
                 var energy = network.getEnergyService();
-                for (ItemStack stack : itemInventory) {
-                    if (stack == null) continue;
+
+                for (var it = itemInventory.object2LongEntrySet().iterator(); it.hasNext();) {
+                    var entry = it.next();
+                    var stack = entry.getKey();
+                    var count = entry.getLongValue();
+                    if (stack.isEmpty() || count == 0) {
+                        it.remove();
+                        continue;
+                    }
 
                     var key = AEItemKey.of(stack);
                     if (key == null) continue;
 
-                    long inserted = StorageHelper.poweredInsert(energy, networkInv, key, stack.getCount(),
-                            actionSource);
+                    long inserted = StorageHelper.poweredInsert(energy, networkInv, key, count, actionSource);
                     if (inserted > 0) {
-                        stack.shrink((int) inserted);
-                        if (stack.isEmpty()) {
-                            itemInventory.remove(stack);
-                        }
+                        count -= inserted;
+                        if (count == 0) it.remove();
+                        else entry.setValue(count);
                     }
                 }
 
-                for (FluidStack stack : fluidInventory) {
-                    if (stack == null || stack.isEmpty()) continue;
+                for (var it = fluidInventory.object2LongEntrySet().iterator(); it.hasNext();) {
+                    var entry = it.next();
+                    var stack = entry.getKey();
+                    var amount = entry.getLongValue();
+                    if (stack.isEmpty() || amount == 0) {
+                        it.remove();
+                        continue;
+                    }
 
-                    int inserted = (int) StorageHelper.poweredInsert(
-                            energy,
-                            networkInv,
-                            AEFluidKey.of(stack),
-                            stack.getAmount(),
-                            actionSource);
+                    var key = AEFluidKey.of(stack);
+                    if (key == null) continue;
+
+                    long inserted = StorageHelper.poweredInsert(energy, networkInv, key, amount, actionSource);
                     if (inserted > 0) {
-                        stack.shrink(inserted);
-                        if (stack.isEmpty()) {
-                            fluidInventory.remove(stack);
-                        }
+                        amount -= inserted;
+                        if (amount == 0) it.remove();
+                        else entry.setValue(amount);
                     }
                 }
-                onContentsChanged.run();
+                onContentsChanged();
             }
         }
 
         public void pushPattern(IPatternDetails patternDetails, KeyCounter[] inputHolder) {
-            patternDetails.pushInputsToExternalInventory(inputHolder, (what, amount) -> {
-                if (what instanceof AEFluidKey key) {
-                    addFluid(key, amount);
-                }
-
-                if (what instanceof AEItemKey key) {
-                    addItem(key, amount);
-                }
-            });
-            onContentsChanged.run();
+            patternDetails.pushInputsToExternalInventory(inputHolder, this::add);
+            onContentsChanged();
         }
 
         public @Nullable List<SizedIngredient> handleItemInternal(List<SizedIngredient> left, boolean simulate) {
-            Iterator<SizedIngredient> iterator = left.iterator();
-            while (iterator.hasNext()) {
-                SizedIngredient ingredient = iterator.next();
-                SLOT_LOOKUP:
-                for (ItemStack stack : itemInventory) {
-                    if (ingredient.test(stack)) {
-                        ItemStack[] ingredientStacks = ingredient.getItems();
-                        for (ItemStack ingredientStack : ingredientStacks) {
-                            if (ingredientStack.is(stack.getItem())) {
-                                int extracted = Math.min(ingredientStack.getCount(), stack.getCount());
-                                if (!simulate) {
-                                    stack.shrink(extracted);
-                                    if (stack.isEmpty()) {
-                                        itemInventory.remove(stack);
-                                    }
-                                    onContentsChanged.run();
-                                }
-                                ingredientStack.shrink(extracted);
-                                if (ingredientStack.isEmpty()) {
-                                    iterator.remove();
-                                    break SLOT_LOOKUP;
-                                }
-                            }
-                        }
+            boolean changed = false;
+            for (var it = left.listIterator(); it.hasNext();) {
+                var ingredient = it.next();
+                if (ingredient.ingredient().hasNoItems()) {
+                    it.remove();
+                    continue;
+                }
+
+                var items = ingredient.getItems();
+                if (items.length == 0 || items[0].isEmpty()) {
+                    it.remove();
+                    continue;
+                }
+
+                int amount = items[0].getCount();
+                for (var it2 = itemInventory.object2LongEntrySet().iterator(); it2.hasNext();) {
+                    var entry = it2.next();
+                    var stack = entry.getKey();
+                    var count = entry.getLongValue();
+                    if (stack.isEmpty() || count == 0) {
+                        it2.remove();
+                        continue;
+                    }
+                    if (!ingredient.test(stack)) continue;
+                    int extracted = Math.min(GTMath.saturatedCast(count), amount);
+                    if (!simulate && extracted > 0) {
+                        changed = true;
+                        count -= extracted;
+                        if (count == 0) it2.remove();
+                        else entry.setValue(count);
+                    }
+                    amount -= extracted;
+
+                    if (amount <= 0) {
+                        it.remove();
+                        break;
                     }
                 }
+
+                if (amount > 0) {
+                    it.set(ingredient.copyWithCount(amount));
+                }
             }
+            if (changed) onContentsChanged();
             return left.isEmpty() ? null : left;
         }
 
-        public @Nullable List<SizedFluidIngredient> handleFluidInternal(List<SizedFluidIngredient> left,
-                                                                        boolean simulate) {
-            ListIterator<SizedFluidIngredient> iterator = left.listIterator();
-            while (iterator.hasNext()) {
-                SizedFluidIngredient fluidStack = iterator.next();
-                if (fluidStack.ingredient().isEmpty()) {
-                    iterator.remove();
+        public @Nullable List<SizedFluidIngredient> handleFluidInternal(List<SizedFluidIngredient> left, boolean simulate) {
+            boolean changed = false;
+            for (var it = left.listIterator(); it.hasNext();) {
+                var ingredient = it.next();
+                if (ingredient.ingredient().hasNoFluids()) {
+                    it.remove();
                     continue;
                 }
-                boolean found = false;
-                FluidStack foundStack = null;
-                for (FluidStack stack : fluidInventory) {
-                    if (!fluidStack.test(stack)) {
-                        continue;
-                    }
-                    found = true;
-                    foundStack = stack;
-                }
-                if (!found) continue;
-                int drained = Math.min(foundStack.getAmount(), fluidStack.amount());
-                if (!simulate) {
-                    foundStack.shrink(drained);
-                    if (foundStack.isEmpty()) {
-                        fluidInventory.remove(foundStack);
-                    }
-                    onContentsChanged.run();
+
+                var fluids = ingredient.getFluids();
+                if (fluids.length == 0 || fluids[0].isEmpty()) {
+                    it.remove();
+                    continue;
                 }
 
-                fluidStack = new SizedFluidIngredient(fluidStack.ingredient(), fluidStack.amount() - drained);
-                iterator.set(fluidStack);
-                if (fluidStack.amount() <= 0) {
-                    iterator.remove();
+                int amount = fluids[0].getAmount();
+                for (var it2 = fluidInventory.object2LongEntrySet().iterator(); it2.hasNext();) {
+                    var entry = it2.next();
+                    var stack = entry.getKey();
+                    var count = entry.getLongValue();
+                    if (stack.isEmpty() || count == 0) {
+                        it2.remove();
+                        continue;
+                    }
+                    if (!ingredient.test(stack)) continue;
+                    int extracted = Math.min(GTMath.saturatedCast(count), amount);
+                    if (!simulate && extracted > 0) {
+                        changed = true;
+                        count -= extracted;
+                        if (count == 0) it2.remove();
+                        else entry.setValue(count);
+                    }
+                    amount -= extracted;
+
+                    if (amount <= 0) {
+                        it.remove();
+                        break;
+                    }
+                }
+
+                if (amount > 0) {
+                    it.set(ingredient.copyWithAmount(amount));
                 }
             }
+
+            if (changed) onContentsChanged();
             return left.isEmpty() ? null : left;
         }
 
         @Override
         public CompoundTag serializeNBT(HolderLookup.Provider provider) {
-            var ops = provider.createSerializationContext(NbtOps.INSTANCE);
             CompoundTag tag = new CompoundTag();
 
-            ListTag itemInventoryTag = new ListTag();
-            for (ItemStack itemStack : this.itemInventory) {
-                itemInventoryTag.add(GTUtil.ANY_SIZE_ITEM_STACK_CODEC.encodeStart(ops, itemStack).getOrThrow());
+            ListTag itemsTag = new ListTag();
+            for (var entry : itemInventory.object2LongEntrySet()) {
+                var ct = (CompoundTag) entry.getKey().save(provider);
+                ct.putLong("real", entry.getLongValue());
+                itemsTag.add(ct);
             }
-            tag.put("inventory", itemInventoryTag);
+            if (!itemsTag.isEmpty()) tag.put("inventory", itemsTag);
 
-            ListTag fluidInventoryTag = new ListTag();
-            for (FluidStack fluidStack : fluidInventory) {
-                fluidInventoryTag.add(FluidStack.OPTIONAL_CODEC.encodeStart(ops, fluidStack).getOrThrow());
+            ListTag fluidsTag = new ListTag();
+            for (var entry : fluidInventory.object2LongEntrySet()) {
+                var ct = (CompoundTag) entry.getKey().save(provider);
+                ct.putLong("real", entry.getLongValue());
+                fluidsTag.add(ct);
             }
-            tag.put("fluidInventory", fluidInventoryTag);
+            if (!fluidsTag.isEmpty()) tag.put("fluidInventory", fluidsTag);
 
             return tag;
         }
 
         @Override
         public void deserializeNBT(HolderLookup.Provider provider, CompoundTag tag) {
-            var ops = provider.createSerializationContext(NbtOps.INSTANCE);
-
-            ListTag inv = tag.getList("inventory", Tag.TAG_COMPOUND);
-            for (int i = 0; i < inv.size(); i++) {
-                CompoundTag tagItemStack = inv.getCompound(i);
-                var item = GTUtil.ANY_SIZE_ITEM_STACK_CODEC.parse(ops, tagItemStack).getOrThrow();
-                if (item != null) {
-                    if (!item.isEmpty()) {
-                        itemInventory.add(item);
-                    }
-                } else {
-                    GTCEu.LOGGER.warn(
-                            "An error occurred while loading contents of ME Crafting Input Bus. This item has been voided: " +
-                                    tagItemStack);
+            ListTag items = tag.getList("inventory", Tag.TAG_COMPOUND);
+            for (Tag t : items) {
+                if (!(t instanceof CompoundTag ct)) continue;
+                var stack = ItemStack.parse(provider, ct);
+                var count = ct.getLong("real");
+                if (stack.isPresent() && !stack.get().isEmpty() && count > 0) {
+                    itemInventory.put(stack.get(), count);
                 }
             }
-            ListTag fluidInv = tag.getList("fluidInventory", Tag.TAG_COMPOUND);
-            for (int i = 0; i < fluidInv.size(); i++) {
-                CompoundTag tagFluidStack = fluidInv.getCompound(i);
-                var fluid = FluidStack.OPTIONAL_CODEC.parse(ops, tagFluidStack).getOrThrow();
-                if (fluid != null) {
-                    if (!fluid.isEmpty()) {
-                        fluidInventory.add(fluid);
-                    }
-                } else {
-                    GTCEu.LOGGER
-                            .warn(
-                                    "An error occurred while loading contents of ME Crafting Input Bus. This fluid has been voided: " +
-                                            tagFluidStack);
+
+            ListTag fluids = tag.getList("fluidInventory", Tag.TAG_COMPOUND);
+            for (Tag t : fluids) {
+                if (!(t instanceof CompoundTag ct)) continue;
+                var stack = FluidStack.parse(provider, ct);
+                var amount = ct.getLong("real");
+                if (stack.isPresent() && !stack.get().isEmpty() && amount > 0) {
+                    fluidInventory.put(stack.get(), amount);
                 }
             }
         }

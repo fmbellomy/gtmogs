@@ -1,7 +1,6 @@
 build/
 *.ipr
-runs/
-run/
+run*/
 *.iws
 out/
 *.iml

@@ -9,11 +9,6 @@ import org.jetbrains.annotations.VisibleForTesting;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-/**
- * @author KilaBash
- * @date 2023/3/15
- * @implNote RecipeManagerAccessor
- */
 @Mixin(RecipeManager.class)
 public interface RecipeManagerAccessor {
 

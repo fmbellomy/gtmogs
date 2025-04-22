@@ -1,12 +1,6 @@
 {
   "values": [
-    {
-      "id": "#gtceu:needs_duranium_tool",
-      "required": false
-    },
-    {
-      "id": "#gtceu:needs_neutronium_tool",
-      "required": false
-    }
+    "gtceu:glass_lens",
+    "gtceu:nether_star_lens"
   ]
 }

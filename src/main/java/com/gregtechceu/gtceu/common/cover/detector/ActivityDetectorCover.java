@@ -4,13 +4,8 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ActivityDetectorCover extends DetectorCover {
 
     public ActivityDetectorCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
@@ -19,7 +14,8 @@ public class ActivityDetectorCover extends DetectorCover {
 
     @Override
     public boolean canAttach() {
-        return GTCapabilityHelper.getWorkable(coverHolder.getLevel(), coverHolder.getPos(), attachedSide) != null;
+        return super.canAttach() &&
+                GTCapabilityHelper.getWorkable(coverHolder.getLevel(), coverHolder.getPos(), attachedSide) != null;
     }
 
     @Override

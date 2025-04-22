@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.capability.recipe;
 
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
@@ -10,18 +10,19 @@ import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import com.lowdragmc.lowdraglib.Platform;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
+import com.mojang.serialization.codecs.DispatchedMapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import com.mojang.serialization.Codec;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.neoforged.neoforge.network.connection.ConnectionType;
 import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,8 +34,8 @@ import java.util.*;
  */
 public abstract class RecipeCapability<T> {
 
-    public static final Codec<RecipeCapability<?>> DIRECT_CODEC = GTRegistries.RECIPE_CAPABILITIES.codec();
-    public static final Codec<Map<RecipeCapability<?>, List<Content>>> CODEC = Codec.dispatchedMap(
+    public static final Codec<RecipeCapability<?>> DIRECT_CODEC = GTRegistries.RECIPE_CAPABILITIES.byNameCodec();
+    public static final Codec<Map<RecipeCapability<?>, List<Content>>> CODEC = new DispatchedMapCodec<>(
             RecipeCapability.DIRECT_CODEC,
             RecipeCapability::contentCodec);
     public static final Comparator<RecipeCapability<?>> COMPARATOR = Comparator.comparingInt(o -> o.sortIndex);
@@ -61,9 +62,9 @@ public abstract class RecipeCapability<T> {
     /**
      * deep copy of this content. recipe need it for searching and such things
      */
-    public T copyInner(@NotNull T content) {
+    public T copyInner(T content) {
         RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(),
-                Platform.getFrozenRegistry(), ConnectionType.NEOFORGE);
+                GTRegistries.builtinRegistry(), ConnectionType.NEOFORGE);
         serializer.toNetwork(buf, content);
         return serializer.fromNetwork(buf);
     }
@@ -110,7 +111,7 @@ public abstract class RecipeCapability<T> {
 
     /**
      * Convert the passed object to a list of recipe lookup filters.
-     * 
+     *
      * @param ingredient ingredient. e.g. for ITEM, this can be Ingredient or ItemStack
      * @return a list of recipe lookup filters.
      */
@@ -120,6 +121,14 @@ public abstract class RecipeCapability<T> {
 
     public List<Object> compressIngredients(Collection<Object> ingredients) {
         return new ArrayList<>(ingredients);
+    }
+
+    public List<List<AbstractMapIngredient>> convertCompressedIngredients(List<Object> ingredients) {
+        List<List<AbstractMapIngredient>> ret = new ObjectArrayList<>(ingredients.size());
+        for (var ingredient : ingredients) {
+            ret.add(convertToMapIngredient(ingredient));
+        }
+        return ret;
     }
 
     /**
@@ -136,10 +145,11 @@ public abstract class RecipeCapability<T> {
      * @param recipe     the recipe from which we get the input to product ratio
      * @param holder     the {@link IRecipeCapabilityHolder} that contains all the inputs and outputs of the machine.
      * @param multiplier the maximum possible multiplied we can get from the input inventory
-     *                   see {@link ParallelLogic#getMaxRecipeMultiplier(GTRecipe, IRecipeCapabilityHolder, int)}
+     *                   see {@link ParallelLogic#limitByInput}
      * @return the amount of times a {@link GTRecipe} outputs can be merged into an inventory without voiding products.
      */
     // returns Integer.MAX_VALUE by default, to skip processing.
+    // TODO: kross - make it so caps check both regular outputs and tick outputs
     public int limitParallel(GTRecipe recipe, IRecipeCapabilityHolder holder, int multiplier) {
         return Integer.MAX_VALUE;
     }
@@ -181,6 +191,9 @@ public abstract class RecipeCapability<T> {
         return null;
     }
 
+    /**
+     * Return the class of the supported widget that should be used to display this capability.
+     */
     @Nullable
     public Class<? extends Widget> getWidgetClass() {
         return null;
@@ -194,12 +207,7 @@ public abstract class RecipeCapability<T> {
                                 @NotNull GTRecipeType recipeType,
                                 @Nullable("null when content == null") GTRecipe recipe,
                                 @Nullable Content content,
-                                @Nullable Object storage) {}
-
-    // TODO
-    public double calculateAmount(List<T> left) {
-        return 1;
-    }
+                                @Nullable Object storage, int recipeTier, int chanceTier) {}
 
     /**
      * Create a cache map for chanced outputs

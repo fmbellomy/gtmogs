@@ -34,8 +34,8 @@ public class BiomePlacement extends PlacementModifier {
     public Stream<BlockPos> getPositions(PlacementContext context, RandomSource random, BlockPos pos) {
         Stream<BlockPos> positions = Stream.of(pos);
         for (BiomeWeightModifier modifier : modifiers) {
-            if (modifier.addedWeight < 100 && random.nextInt(100) >= modifier.addedWeight) {
-                if (modifier.biomes.get().contains(context.getLevel().getBiome(pos))) {
+            if (modifier.biomes.contains(context.getLevel().getBiome(pos))) {
+                if (modifier.addedWeight < 100 && random.nextInt(100) >= modifier.addedWeight) {
                     return Stream.of();
                 }
             }

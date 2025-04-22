@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid;
 
 import com.gregtechceu.gtceu.api.recipe.lookup.AbstractMapIngredient;
-
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 
@@ -18,7 +17,6 @@ public class MapFluidTagIngredient extends AbstractMapIngredient {
         return tag.location().hashCode();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public boolean equals(Object obj) {
         if (super.equals(obj)) {

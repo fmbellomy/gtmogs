@@ -1,16 +1,17 @@
 package com.gregtechceu.gtceu.api.material.material.properties;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
+import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.GTBucketItem;
 import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.stack.UnificationEntry;
-import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.StringRepresentable;
@@ -19,9 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
-
 import lombok.Getter;
-import org.jetbrains.annotations.Nullable;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotResult;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
@@ -34,7 +33,7 @@ import java.util.*;
  * @date 2024/2/12
  * @implNote HazardProperty
  */
-public class HazardProperty implements IMaterialProperty<HazardProperty> {
+public class HazardProperty implements IMaterialProperty {
 
     public final MedicalCondition condition;
     public final HazardTrigger hazardTrigger;
@@ -99,7 +98,7 @@ public class HazardProperty implements IMaterialProperty<HazardProperty> {
         /**
          * Equipment validity is treated in an OR fashion.
          * that is, EITHER all curio slots are valid, OR all equipment slots are valid.
-         *
+         * 
          * @param curioSlots     curio slot names to test for
          * @param equipmentTypes armor slots to test for
          */
@@ -121,7 +120,7 @@ public class HazardProperty implements IMaterialProperty<HazardProperty> {
                     correctArmorItems.add(equipmentType);
                 }
             }
-            if (!GTCEu.isCuriosLoaded() || this.curioSlots.isEmpty()) {
+            if (!GTCEu.Mods.isCuriosLoaded() || this.curioSlots.isEmpty()) {
                 return correctArmorItems.containsAll(equipmentTypes);
             }
             Set<String> correctCurios = new HashSet<>();
@@ -152,7 +151,7 @@ public class HazardProperty implements IMaterialProperty<HazardProperty> {
                         armor.hurtAndBreak(amount, player, type.getSlot());
                     }
                 }
-                if (GTCEu.isCuriosLoaded() && player.level() instanceof ServerLevel serverLevel) {
+                if (GTCEu.Mods.isCuriosLoaded() && player.level() instanceof ServerLevel serverLevel) {
                     ICuriosItemHandler curiosInventory = CuriosApi.getCuriosInventory(player).orElse(null);
                     if (curiosInventory != null) {
                         for (String curioItem : this.getCurioSlots()) {
@@ -174,10 +173,9 @@ public class HazardProperty implements IMaterialProperty<HazardProperty> {
         }
     }
 
-    @Nullable
     public static Material getValidHazardMaterial(ItemStack item) {
-        Material material = null;
-        TagPrefix prefix = null;
+        Material material = GTMaterials.NULL;
+        TagPrefix prefix = TagPrefix.NULL_PREFIX;
         boolean isFluid = false;
         if (item.getItem() instanceof TagPrefixItem prefixItem) {
             material = prefixItem.material;
@@ -188,21 +186,18 @@ public class HazardProperty implements IMaterialProperty<HazardProperty> {
                 isFluid = true;
             }
         } else if (ConfigHolder.INSTANCE.gameplay.universalHazards) {
-            UnificationEntry entry = ChemicalHelper.getUnificationEntry(item.getItem());
-            if (entry != null && entry.material != null) {
-                material = entry.material;
-                prefix = entry.tagPrefix;
+            MaterialEntry entry = ChemicalHelper.getMaterialEntry(item.getItem());
+            if (!entry.isEmpty()) {
+                material = entry.material();
+                prefix = entry.tagPrefix();
             }
-        }
-        if (material == null) {
-            return null;
         }
         HazardProperty property = material.getProperty(PropertyKey.HAZARD);
         if (property == null) {
-            return null;
+            return GTMaterials.NULL;
         }
         if (!isFluid && !property.hazardTrigger.isAffected(prefix)) {
-            return null;
+            return GTMaterials.NULL;
         }
         return material;
     }

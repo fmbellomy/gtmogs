@@ -4,60 +4,56 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
-import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.item.capability.ElectricItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
+import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.data.machine.GTMachines;
+import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
+import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
 import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
 
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -68,52 +64,43 @@ import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.event.EventHooks;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.Table;
-import com.google.common.collect.Tables;
+import it.unimi.dsi.fastutil.chars.Char2ReferenceMap;
+import it.unimi.dsi.fastutil.chars.Char2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.chars.CharSet;
+import it.unimi.dsi.fastutil.chars.CharSets;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote ToolHelper
- */
+@ExtensionMethod(SizedIngredientExtensions.class)
 public class ToolHelper {
 
     // Crafting Symbols
-    private static final BiMap<Character, GTToolType> symbols = HashBiMap.create();
+    private static final Char2ReferenceMap<GTToolType> symbols = new Char2ReferenceOpenHashMap<>();
 
     private ToolHelper() {/**/}
 
     /**
-     * @return finds the registered crafting symbol with the tool
-     */
-    public static Character getSymbolFromTool(GTToolType tool) {
-        return symbols.inverse().get(tool);
-    }
-
-    /**
      * @return finds the registered tool with the crafting symbol
      */
-    public static GTToolType getToolFromSymbol(Character symbol) {
+    public static GTToolType getToolFromSymbol(char symbol) {
         return symbols.get(symbol);
     }
 
-    public static Set<Character> getToolSymbols() {
-        return symbols.keySet();
+    @UnmodifiableView
+    public static CharSet getToolSymbols() {
+        return CharSets.unmodifiable(symbols.keySet());
     }
 
     /**
      * Registers the tool against a crafting symbol, this is used in
      * {@link com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper}
      */
-    public static void registerToolSymbol(Character symbol, GTToolType tool) {
+    public static void registerToolSymbol(char symbol, GTToolType tool) {
         symbols.put(symbol, tool);
     }
 
@@ -127,7 +114,7 @@ public class ToolHelper {
 
     public static ItemStack get(GTToolType toolType, Material material) {
         if (material.hasProperty(PropertyKey.TOOL)) {
-            var entry = GTItems.TOOL_ITEMS.get(material, toolType);
+            var entry = GTMaterialItems.TOOL_ITEMS.get(material, toolType);
             if (entry != null) {
                 return entry.get().get();
             }
@@ -150,7 +137,7 @@ public class ToolHelper {
             if (stack.has(DataComponents.UNBREAKABLE)) {
                 return;
             }
-            if (!(user instanceof Player player) || !player.isCreative()) {
+            if (!(user instanceof Player player) || !player.hasInfiniteMaterials()) {
                 RandomSource random = user == null ? GTValues.RNG : user.getRandom();
                 if (tool.isElectric()) {
                     int electricDamage = damage * ConfigHolder.INSTANCE.machines.energyUsageMultiplier;
@@ -192,8 +179,8 @@ public class ToolHelper {
         }
     }
 
-    public static void playToolSound(GTToolType toolType, ServerPlayer player) {
-        if (toolType.soundEntry != null) {
+    public static void playToolSound(@Nullable GTToolType toolType, ServerPlayer player) {
+        if (toolType != null && toolType.soundEntry != null) {
             toolType.soundEntry.playOnServer(player.level(), player.blockPosition());
         }
     }
@@ -201,44 +188,15 @@ public class ToolHelper {
     public static ItemStack getAndSetToolData(GTToolType toolType, Material material, int maxDurability,
                                               int harvestLevel,
                                               float toolSpeed, float attackDamage) {
-        var entry = GTItems.TOOL_ITEMS.get(material, toolType);
+        var entry = GTMaterialItems.TOOL_ITEMS.get(material, toolType);
         if (entry == null) return ItemStack.EMPTY;
         ItemStack stack = entry.get().getRaw();
-        stack.update(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(Collections.emptyList(), true),
-                val -> val.withTooltip(false));
+        stack.update(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, val -> val.withTooltip(false));
         stack.set(DataComponents.MAX_DAMAGE, maxDurability);
         GTTool toolComponent = new GTTool(Optional.of(toolSpeed), Optional.of(attackDamage), Optional.empty(),
                 Optional.of(harvestLevel), Optional.empty());
         stack.set(GTDataComponents.GT_TOOL, toolComponent);
-        ToolProperty toolProperty = material.getProperty(PropertyKey.TOOL);
-        if (toolProperty != null) {
-            toolProperty.getEnchantments().forEach((enchantment, level) -> {
-                Registry<Enchantment> registry = GTRegistries.builtinRegistry()
-                        .registryOrThrow(Registries.ENCHANTMENT);
-                Holder<Enchantment> enchant = registry.getHolderOrThrow(enchantment);
-                if (enchant.value().canEnchant(stack)) {
-                    stack.enchant(enchant, level);
-                }
-            });
-        }
         return stack;
-    }
-
-    /**
-     * Attempts to get an electric item variant with override of max charge
-     *
-     * @param maxCharge new max charge of this electric item
-     * @return item stack with given max charge
-     * @throws IllegalStateException if this item is not electric item or uses custom implementation
-     */
-    public static ItemStack getMaxChargeOverrideStack(Item item, long maxCharge) {
-        ItemStack itemStack = item.getDefaultInstance();
-        IElectricItem iElectricItem = GTCapabilityHelper.getElectricItem(itemStack);
-        if (!(iElectricItem instanceof ElectricItem electricItem)) {
-            throw new IllegalStateException("Not an electric item.");
-        }
-        electricItem.setMaxChargeOverride(maxCharge);
-        return itemStack;
     }
 
     /**
@@ -252,7 +210,7 @@ public class ToolHelper {
         if (!harvestableBlocks.isEmpty()) {
             int blocksBroken = 0;
             for (BlockPos pos : harvestableBlocks) {
-                if (!breakBlockRoutine(player, stack, pos, blocksBroken++ == 0)) {
+                if (!destroyBlock(player, stack, pos, blocksBroken++ == 0)) {
                     return true;
                 }
 
@@ -280,14 +238,12 @@ public class ToolHelper {
         return stack.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none());
     }
 
-    public static Set<BlockPos> iterateAoE(ItemStack stack, AoESymmetrical aoeDefinition, Level world,
-                                           Player player, HitResult rayTraceResult,
-                                           AOEFunction function) {
-        if (aoeDefinition != null && aoeDefinition != AoESymmetrical.none() &&
-                rayTraceResult instanceof BlockHitResult blockHit && blockHit.getDirection() != null) {
-            int column = aoeDefinition.column;
-            int row = aoeDefinition.row;
-            int layer = aoeDefinition.layer;
+    public static Set<BlockPos> iterateAoE(ItemStack stack, @Nullable AoESymmetrical aoeDefinition, Level world,
+                                           Player player, HitResult hit, AOEFunction function) {
+        if (aoeDefinition != null && !aoeDefinition.isNone() && hit instanceof BlockHitResult blockHit) {
+            int column = aoeDefinition.column();
+            int row = aoeDefinition.row();
+            int layer = aoeDefinition.layer();
             Direction playerFacing = player.getDirection();
             Direction.Axis playerAxis = playerFacing.getAxis();
             Direction.Axis sideHitAxis = blockHit.getDirection().getAxis();
@@ -370,41 +326,39 @@ public class ToolHelper {
     public static void applyHammerDropConversion(ServerLevel world, BlockPos pos, ItemStack tool, BlockState state,
                                                  List<ItemStack> drops, int fortune, float dropChance,
                                                  RandomSource random) {
-        if (is(tool, GTToolType.HARD_HAMMER) || /*
-                                                 * EnchantmentHelper.getEnchantmentLevel(EnchantmentHardHammer.INSTANCE,
-                                                 * tool)
-                                                 */ -1 > 0) {
-            List<ItemStack> silktouchDrops = getSilkTouchDrop(world, pos, state);
-            for (ItemStack silktouchDrop : silktouchDrops) {
-                if (silktouchDrop.isEmpty()) continue;
+        // || EnchantmentHelper.getEnchantmentLevel(EnchantmentHardHammer.INSTANCE, tool) > 0
+        if (is(tool, GTToolType.HARD_HAMMER)) {
+            List<ItemStack> silkTouchDrops = getSilkTouchDrop(world, pos, state);
+            for (ItemStack silkTouchDrop : silkTouchDrops) {
+                if (silkTouchDrop.isEmpty()) continue;
                 // Stack lists can be immutable going into Recipe#matches barring no rewrites
                 // Search for forge hammer recipes from all drops individually (only LV or under)
 
-                Table<IO, RecipeCapability<?>, List<IRecipeHandler<?>>> caps = Tables
-                        .newCustomTable(new EnumMap<>(IO.class), IdentityHashMap::new);
                 DummyMachineBlockEntity be = new DummyMachineBlockEntity(GTValues.LV,
-                        GTRecipeTypes.FORGE_HAMMER_RECIPES, GTMachines.defaultTankSizeFunction, caps);
-                caps.put(IO.IN, EURecipeCapability.CAP, List.of(new InfiniteEnergyContainer(be.getMetaMachine(),
-                        GTValues.V[GTValues.LV], GTValues.V[GTValues.LV], 1, GTValues.V[GTValues.LV], 1)));
-                caps.put(IO.IN, ItemRecipeCapability.CAP, List.of(new NotifiableItemStackHandler(be.getMetaMachine(), 1,
-                        IO.IN, IO.IN, (slots) -> new CustomItemStackHandler(silktouchDrop))));
-                caps.put(IO.OUT, ItemRecipeCapability.CAP,
-                        List.of(new NotifiableItemStackHandler(be.getMetaMachine(), 2, IO.OUT)));
-                be.getMetaMachine().reinitializeCapabilities(caps);
+                        GTRecipeTypes.FORGE_HAMMER_RECIPES, GTMachineUtils.defaultTankSizeFunction,
+                        Collections.emptyList());
+                RecipeHandlerList dummyInputs = RecipeHandlerList.of(IO.IN,
+                        new InfiniteEnergyContainer(be.getMetaMachine(), GTValues.V[GTValues.LV],
+                                GTValues.V[GTValues.LV], 1, GTValues.V[GTValues.LV], 1),
+                        new NotifiableItemStackHandler(be.getMetaMachine(), 1, IO.IN, IO.IN,
+                                (slots) -> new CustomItemStackHandler(silkTouchDrop)));
 
-                Iterator<GTRecipe> hammerRecipes = GTRecipeTypes.FORGE_HAMMER_RECIPES
-                        .searchRecipe(be.metaMachine);
-                GTRecipe hammerRecipe = hammerRecipes == null || !hammerRecipes.hasNext() ? null :
-                        hammerRecipes.next();
-                if (hammerRecipe != null && hammerRecipe.handleRecipeIO(IO.IN, be.metaMachine,
-                        be.getMetaMachine().recipeLogic.getChanceCaches())) {
+                RecipeHandlerList dummyOutputs = RecipeHandlerList.of(IO.OUT,
+                        new NotifiableItemStackHandler(be.getMetaMachine(), 2, IO.OUT));
+                be.getMetaMachine().reinitializeHandlers(List.of(dummyInputs, dummyOutputs));
+
+                Iterator<GTRecipe> hammerRecipes = GTRecipeTypes.FORGE_HAMMER_RECIPES.searchRecipe(be.metaMachine,
+                        r -> RecipeHelper.matchContents(be.metaMachine, r).isSuccess());
+                GTRecipe hammerRecipe = !hammerRecipes.hasNext() ? null : hammerRecipes.next();
+                if (hammerRecipe != null && RecipeHelper.handleRecipeIO(be.metaMachine, hammerRecipe, IO.IN,
+                        be.getMetaMachine().recipeLogic.getChanceCaches()).isSuccess()) {
                     drops.clear();
-                    TagPrefix prefix = ChemicalHelper.getPrefix(silktouchDrop.getItem());
-                    if (prefix == null) {
+                    TagPrefix prefix = ChemicalHelper.getPrefix(silkTouchDrop.getItem());
+                    if (prefix.isEmpty()) {
                         for (Content output : hammerRecipe.getOutputContents(ItemRecipeCapability.CAP)) {
                             if (dropChance >= 1.0F || random.nextFloat() <= dropChance) {
-                                drops.add(ItemRecipeCapability.CAP
-                                        .copyInner(ItemRecipeCapability.CAP.of(output.content)).getItems()[0]);
+                                drops.add(ItemRecipeCapability.CAP.of(output.content).copy()
+                                        .getItems()[0]);
                             }
                         }
                     } else if (TagPrefix.ORES.containsKey(prefix)) {
@@ -425,82 +379,64 @@ public class ToolHelper {
         }
     }
 
-    public static final ThreadLocal<Boolean> isAoeBreakingBlocks = ThreadLocal.withInitial(() -> false);
+    public static final ThreadLocal<Boolean> DO_BLOCK_BREAK_SOUND_PARTICLES = ThreadLocal.withInitial(() -> true);
+    public static final ThreadLocal<Boolean> IS_AOE_BREAKING_BLOCKS = ThreadLocal.withInitial(() -> false);
 
-    public static boolean breakBlockRoutine(ServerPlayer player, ItemStack tool, BlockPos pos, boolean playSound) {
+    public static boolean destroyBlock(ServerPlayer player, ItemStack tool, BlockPos pos, boolean playSound) {
+        DO_BLOCK_BREAK_SOUND_PARTICLES.set(playSound);
         // This is *not* a vanilla/forge convention, Forge never added "shears" to ItemShear's tool classes.
         if (isTool(tool, GTToolType.SHEARS) && shearBlockRoutine(player, tool, pos) == 0) {
             return false;
         }
-        Level world = player.level();
+        Level level = player.level();
 
-        isAoeBreakingBlocks.set(true);
-        boolean canBreak = onBlockBreakEvent(world, player.gameMode.getGameModeForPlayer(), player, pos);
-        if (!canBreak) {
-            isAoeBreakingBlocks.set(false);
+        // we set this flag when firing the event so the event listener that starts this whole thing doesn't cascade
+        IS_AOE_BREAKING_BLOCKS.set(true);
+        BlockState state = level.getBlockState(pos);
+        var event = CommonHooks.fireBlockBreak(level, player.gameMode.getGameModeForPlayer(), player, pos, state);
+        // ...and the easiest way to make sure it's false after is to set it before we return at all.
+        IS_AOE_BREAKING_BLOCKS.set(false);
+        if (event.isCanceled()) {
             return false;
         } else {
-            BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
-            BlockEntity tile = world.getBlockEntity(pos);
             if (block instanceof GameMasterBlock && !player.canUseGameMasterBlocks()) {
-                world.sendBlockUpdated(pos, state, state, 3);
-                isAoeBreakingBlocks.set(false);
+                level.sendBlockUpdated(pos, state, state, 3);
                 return false;
-            } else if (player.blockActionRestricted(world, pos, player.gameMode.getGameModeForPlayer())) {
-                isAoeBreakingBlocks.set(false);
+            } else if (player.blockActionRestricted(level, pos, player.gameMode.getGameModeForPlayer())) {
                 return false;
-            } else if (player.isCreative()) {
-                boolean returnValue = removeBlockRoutine(state, world, player, pos, playSound);
-                isAoeBreakingBlocks.set(false);
-                return returnValue;
             } else {
-                world.levelEvent(player, LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
-                boolean successful = removeBlockRoutine(state, world, player, pos, playSound);
+                BlockState newState = block.playerWillDestroy(level, pos, state, player);
 
-                ItemStack copiedTool = tool.copy();
-                boolean canHarvest = player.hasCorrectToolForDrops(state);
-                tool.mineBlock(world, state, pos, player);
-                if (tool.isEmpty() && !copiedTool.isEmpty()) {
-                    onPlayerDestroyItem(player, copiedTool, InteractionHand.MAIN_HAND);
+                if (player.isCreative()) {
+                    removeBlock(level, player, pos, newState, false);
+                } else {
+                    ItemStack toolCopy = tool.copy();
+                    // previously player.hasCorrectToolForDrops(newState)
+                    boolean canDropLoot = newState.canHarvestBlock(level, pos, player);
+                    tool.mineBlock(level, newState, pos, player);
+                    boolean wasActuallyBroken = removeBlock(level, player, pos, newState, canDropLoot);
+
+                    if (canDropLoot && wasActuallyBroken) {
+                        block.playerDestroy(level, player, pos, newState, level.getBlockEntity(pos), toolCopy);
+                    }
+
+                    // Neo: Fire the PlayerDestroyItemEvent if the tool was broken at any point during the break process
+                    if (tool.isEmpty() && !toolCopy.isEmpty()) {
+                        EventHooks.onPlayerDestroyItem(player, toolCopy, InteractionHand.MAIN_HAND);
+                    }
                 }
-
-                if (successful && canHarvest) {
-                    block.playerDestroy(world, player, pos, state, tile, copiedTool);
-                }
-
-                isAoeBreakingBlocks.set(false);
-                return successful;
+                return true;
             }
         }
     }
 
-    public static boolean onBlockBreakEvent(Level level, GameType gameType, ServerPlayer player, BlockPos pos) {
-        return !CommonHooks.fireBlockBreak(level, gameType, player, pos, level.getBlockState(pos)).isCanceled();
-    }
-
-    public static void onPlayerDestroyItem(Player player, ItemStack stack, InteractionHand hand) {
-        EventHooks.onPlayerDestroyItem(player, stack, hand);
-    }
-
-    public static double getPlayerBlockReach(@NotNull Player player) {
-        return player.blockInteractionRange();
-    }
-
-    public static boolean removeBlockRoutine(@Nullable BlockState state, Level world, ServerPlayer player, BlockPos pos,
-                                             boolean playSound) {
-        state = state == null ? world.getBlockState(pos) : state;
-        state.getBlock().playerWillDestroy(world, pos, state, player);
-
-        boolean successful = world.removeBlock(pos, false);
-
-        if (playSound)
-            world.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
-
-        if (successful) {
-            state.getBlock().destroy(world, pos, state);
+    public static boolean removeBlock(Level level, ServerPlayer player, BlockPos pos, BlockState state, boolean canDropLoot) {
+        boolean removed = state.onDestroyedByPlayer(level, pos, player, canDropLoot, level.getFluidState(pos));
+        if (removed) {
+            state.getBlock().destroy(level, pos, state);
         }
-        return successful;
+        return removed;
     }
 
     public static Set<BlockPos> getHarvestableBlocks(ItemStack stack, Level world, Player player,
@@ -511,17 +447,17 @@ public class ToolHelper {
     public static Set<BlockPos> getHarvestableBlocks(ItemStack stack, Player player) {
         if (!hasBehaviorsComponent(stack)) return Collections.emptySet();
 
-        AoESymmetrical aoeDefiniton = getAoEDefinition(stack);
-        if (aoeDefiniton == AoESymmetrical.none()) {
+        AoESymmetrical aoeDefinition = getAoEDefinition(stack);
+        if (aoeDefinition.isNone()) {
             return Collections.emptySet();
         }
 
-        HitResult rayTraceResult = getPlayerDefaultRaytrace(player);
-        return getHarvestableBlocks(stack, aoeDefiniton, player.level(), player, rayTraceResult);
+        HitResult hit = getPlayerDefaultRaytrace(player);
+        return getHarvestableBlocks(stack, aoeDefinition, player.level(), player, hit);
     }
 
     public static HitResult getPlayerDefaultRaytrace(@NotNull Player player) {
-        return player.pick(getPlayerBlockReach(player), 1.0f, false);
+        return player.pick(player.blockInteractionRange(), 0.0f, false);
     }
 
     /**
@@ -545,14 +481,20 @@ public class ToolHelper {
     }
 
     @NotNull
-    public static Set<GTToolType> getToolTypes(ItemStack tool) {
+    public static Set<GTToolType> getToolTypes(final ItemStack tool) {
         Set<GTToolType> types = new HashSet<>();
         if (tool.getItem() instanceof IGTTool gtTool) {
             return gtTool.getToolClasses(tool);
         }
         for (GTToolType toolType : GTToolType.getTypes().values()) {
             if (toolType.itemTags.stream().anyMatch(tool::is)) types.add(toolType);
+            if (toolType.defaultAbilities.stream().anyMatch(tool::canPerformAction)) types.add(toolType);
         }
+        GTItemAbilities.DEFAULT_TYPE_ASSOCIATIONS.forEach((action, type) -> {
+            if (tool.canPerformAction(action)) {
+                types.add(type);
+            }
+        });
         return types;
     }
 
@@ -580,36 +522,9 @@ public class ToolHelper {
     }
 
     // encompasses all vanilla special case tool checks for harvesting
-    public static boolean isToolEffective(ItemStack stack, BlockState state, Set<GTToolType> toolClasses,
-                                          int harvestLevel) {
-        Block block = state.getBlock();
-
-        if (toolClasses.contains(GTToolType.PICKAXE)) {
-            if (Blocks.OBSIDIAN == block && harvestLevel >= 3) return true;
-            if (state.is(BlockTags.NEEDS_IRON_TOOL) && harvestLevel >= 2) return true;
-            if (state.is(BlockTags.NEEDS_STONE_TOOL) && harvestLevel >= 1) return true;
-            if (state.is(BlockTags.MINEABLE_WITH_PICKAXE)) return true;
-        }
-        if (toolClasses.contains(GTToolType.SHOVEL)) {
-            if (state.is(BlockTags.MINEABLE_WITH_SHOVEL)) return true;
-            if (block == Blocks.SNOW_BLOCK || block == Blocks.SNOW) return true;
-        }
-        if (toolClasses.contains(GTToolType.AXE)) {
-            if (state.is(BlockTags.MINEABLE_WITH_AXE)) return true;
-        }
-        if (toolClasses.contains(GTToolType.SWORD)) {
-            if (block instanceof WebBlock) return true;
-        }
-        if (toolClasses.contains(GTToolType.SCYTHE)) {}
-        if (toolClasses.contains(GTToolType.FILE)) {
-            if (block instanceof IronBarsBlock) {
-                return true;
-            }
-        }
-        if (toolClasses.contains(GTToolType.CROWBAR)) {
-            return block instanceof BaseRailBlock;
-        }
-        return stack.get(DataComponents.TOOL).isCorrectForDrops(state);
+    public static boolean isToolEffective(ItemStack stack, BlockState state, Set<GTToolType> toolClasses, int harvestLevel) {
+        Tool tool = stack.get(DataComponents.TOOL);
+        return tool != null && tool.isCorrectForDrops(state);
     }
 
     /**
@@ -716,14 +631,18 @@ public class ToolHelper {
      * @return the silk touch drop
      */
     @NotNull
-    public static List<ItemStack> getSilkTouchDrop(ServerLevel world, BlockPos origin, @NotNull BlockState state) {
-        ItemStack tool = GTItems.TOOL_ITEMS.get(GTMaterials.Neutronium, GTToolType.PICKAXE).get().get();
-        tool.enchant(
-                world.registryAccess().registryOrThrow(Registries.ENCHANTMENT)
-                        .getHolderOrThrow(Enchantments.SILK_TOUCH),
-                1);
+    public static List<ItemStack> getSilkTouchDrop(ServerLevel level, BlockPos origin, @NotNull BlockState state) {
+        ItemStack tool = GTMaterialItems.TOOL_ITEMS.get(GTMaterials.Neutronium, GTToolType.PICKAXE).get().get();
+        // oh wow, this exists now. cool!
+        EnchantmentHelper.enchantItemFromProvider(
+                tool,
+                level.registryAccess(),
+                GTEnchantmentProviders.SILK_TOUCH,
+                level.getCurrentDifficultyAt(origin),
+                level.getRandom()
+        );
 
-        return state.getDrops(new LootParams.Builder(world).withParameter(LootContextParams.BLOCK_STATE, state)
+        return state.getDrops(new LootParams.Builder(level).withParameter(LootContextParams.BLOCK_STATE, state)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(origin))
                 .withParameter(LootContextParams.TOOL, tool));
     }

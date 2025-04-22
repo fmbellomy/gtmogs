@@ -1,30 +1,32 @@
 package com.gregtechceu.gtceu.data.recipe.misc.alloyblast;
 
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialFlags;
 import com.gregtechceu.gtceu.api.material.material.properties.BlastProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
+import com.gregtechceu.gtceu.data.recipe.GCYMRecipeTypes;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.recipe.CraftingComponent;
-import com.gregtechceu.gtceu.data.recipe.GCyMRecipeTypes;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.data.recipe.builder.GTRecipeBuilder;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import lombok.experimental.ExtensionMethod;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.jetbrains.annotations.NotNull;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.ingotHot;
 
+@ExtensionMethod(SizedIngredientExtensions.class)
 public class AlloyBlastRecipeProducer {
 
     public static final AlloyBlastRecipeProducer DEFAULT_PRODUCER = new AlloyBlastRecipeProducer();
@@ -35,7 +37,8 @@ public class AlloyBlastRecipeProducer {
      * @param material the material to generate for
      * @param property the blast property of the material
      */
-    public void produce(@NotNull Material material, @NotNull BlastProperty property, RecipeOutput provider) {
+    public void produce(@NotNull Material material, @NotNull BlastProperty property,
+                        RecipeOutput provider) {
         // do not generate for disabled materials
         if (material.hasFlag(MaterialFlags.DISABLE_ALLOY_BLAST)) return;
 
@@ -72,7 +75,7 @@ public class AlloyBlastRecipeProducer {
     @SuppressWarnings("MethodMayBeStatic")
     @NotNull
     protected GTRecipeBuilder createBuilder(@NotNull BlastProperty property, @NotNull Material material) {
-        GTRecipeBuilder builder = GCyMRecipeTypes.ALLOY_BLAST_RECIPES.recipeBuilder(material.getName());
+        GTRecipeBuilder builder = GCYMRecipeTypes.ALLOY_BLAST_RECIPES.recipeBuilder(material.getName());
         // apply the duration override
         int duration = property.getDurationOverride();
         if (duration < 0) duration = Math.max(1, (int) (material.getMass() * property.getBlastTemperature() / 100L));
@@ -133,8 +136,8 @@ public class AlloyBlastRecipeProducer {
         // build the gas recipe if it exists
         if (property.getGasTier() != null) {
             GTRecipeBuilder builderGas = builder.copy(builder.id.getPath() + "_gas");
-            SizedFluidIngredient gas = CraftingComponent.EBF_GASES.get(property.getGasTier());
-            gas = new SizedFluidIngredient(gas.ingredient(), gas.amount() * outputAmount);
+            SizedFluidIngredient gas = property.getGasTier().getFluid();
+            gas = gas.copyWithAmount(gas.amount() * outputAmount);
             builderGas.circuitMeta(getGasCircuitNum(componentAmount))
                     .inputFluids(gas)
                     .duration((int) (duration * 0.67))

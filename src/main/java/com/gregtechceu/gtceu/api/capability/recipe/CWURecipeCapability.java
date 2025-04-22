@@ -1,6 +1,6 @@
 package com.gregtechceu.gtceu.api.capability.recipe;
 
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import com.gregtechceu.gtceu.api.recipe.content.SerializerInteger;
@@ -14,11 +14,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/2/20
- * @implNote ItemRecipeCapability
- */
 public class CWURecipeCapability extends RecipeCapability<Integer> {
 
     public final static CWURecipeCapability CAP = new CWURecipeCapability();
@@ -34,7 +29,7 @@ public class CWURecipeCapability extends RecipeCapability<Integer> {
 
     @Override
     public Integer copyWithModifier(Integer content, ContentModifier modifier) {
-        return modifier.apply(content).intValue();
+        return modifier.apply(content);
     }
 
     @Override

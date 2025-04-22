@@ -25,11 +25,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/7/1
- * @implNote OverclockFancyConfigurator
- */
 public class OverclockFancyConfigurator implements IFancyConfigurator {
 
     protected IOverclockMachine overclockMachine;
@@ -52,18 +47,18 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
     }
 
     @Override
-    public void writeInitialData(FriendlyByteBuf buffer) {
+    public void writeInitialData(RegistryFriendlyByteBuf buffer) {
         this.currentTier = overclockMachine.getOverclockTier();
         buffer.writeVarInt(currentTier);
     }
 
     @Override
-    public void readInitialData(FriendlyByteBuf buffer) {
+    public void readInitialData(RegistryFriendlyByteBuf buffer) {
         this.currentTier = buffer.readVarInt();
     }
 
     @Override
-    public void detectAndSendChange(BiConsumer<Integer, Consumer<FriendlyByteBuf>> sender) {
+    public void detectAndSendChange(BiConsumer<Integer, Consumer<RegistryFriendlyByteBuf>> sender) {
         var newTier = overclockMachine.getOverclockTier();
         if (newTier != currentTier) {
             this.currentTier = newTier;
@@ -72,7 +67,7 @@ public class OverclockFancyConfigurator implements IFancyConfigurator {
     }
 
     @Override
-    public void readUpdateInfo(int id, FriendlyByteBuf buf) {
+    public void readUpdateInfo(int id, RegistryFriendlyByteBuf buf) {
         if (id == 0) {
             this.currentTier = buf.readVarInt();
         }

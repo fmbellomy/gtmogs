@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.ModelState;
@@ -18,16 +19,12 @@ import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import net.neoforged.neoforge.client.model.data.ModelData;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.Consumer;
 
-/**
- * @author lucifer_ll
- * @date 2023/7/13
- * @implNote ChargerRenderer
- */
 public class ChargerRenderer extends TieredHullMachineRenderer {
 
     public final static ResourceLocation CHARGER_IDLE = GTCEu.id("block/machines/charger/overlay_charger_idle");
@@ -45,40 +42,39 @@ public class ChargerRenderer extends TieredHullMachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, RandomSource rand, Direction modelFacing,
-                              ModelState modelState) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState);
+                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand, Direction modelFacing,
+                              ModelState modelState, @NotNull ModelData data, RenderType renderType) {
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
         var state = ChargerMachine.State.IDLE;
         if (machine instanceof ChargerMachine charger) {
             state = charger.getState();
         }
 
-        if (side == frontFacing && modelFacing != null) {
-            var bakedFaces = new ArrayList<BakedQuad>();
-            switch (state) {
-                case IDLE -> bakedFaces.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_IDLE),
-                        modelState, -1, 0, false, true));
-                case RUNNING -> {
-                    bakedFaces.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_RUNNING),
-                            modelState, -1, 0, true, true));
-                    if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
-                        bakedFaces.add(
-                                FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_RUNNING_EMISSIVE),
-                                        modelState, -101, 15, true, false));
-                    }
-                }
-                case FINISHED -> {
-                    bakedFaces.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_FINISHED),
-                            modelState, -1, 0, true, true));
-                    if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
-                        bakedFaces.add(
-                                FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_FINISHED_EMISSIVE),
-                                        modelState, -101, 15, true, false));
-                    }
+        if (side != frontFacing || modelFacing == null) {
+            return;
+        }
+        switch (state) {
+            case IDLE -> quads.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_IDLE),
+                    modelState, -1, 0, false, true));
+            case RUNNING -> {
+                quads.add(FaceQuad.bakeFace(modelFacing,
+                        ModelFactory.getBlockSprite(CHARGER_RUNNING),
+                        modelState, -1, 0, true, true));
+                if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
+                    quads.add(FaceQuad.bakeFace(modelFacing,
+                            ModelFactory.getBlockSprite(CHARGER_RUNNING_EMISSIVE),
+                            modelState, -101, 15, true, false));
                 }
             }
-            quads.addAll(bakedFaces);
-
+            case FINISHED -> {
+                quads.add(FaceQuad.bakeFace(modelFacing, ModelFactory.getBlockSprite(CHARGER_FINISHED),
+                        modelState, -1, 0, true, true));
+                if (ConfigHolder.INSTANCE.client.machinesEmissiveTextures) {
+                    quads.add(FaceQuad.bakeFace(modelFacing,
+                            ModelFactory.getBlockSprite(CHARGER_FINISHED_EMISSIVE),
+                            modelState, -101, 15, true, false));
+                }
+            }
         }
     }
 

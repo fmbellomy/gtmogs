@@ -5,6 +5,9 @@ pluginManagement {
         maven { url = 'https://maven.neoforged.net/releases' }
         maven { url = "https://maven.quiltmc.org/repository/release" }
     }
+    plugins {
+        id 'org.jetbrains.kotlin.jvm' version '2.0.21'
+    }
 }
 
 plugins {
@@ -16,139 +19,8 @@ dependencyResolutionManagement {
         mavenCentral()
     }
     versionCatalogs {
-        // Minecraft Version
-        def minecraftVersionVeryOld = "1.20.1"
-        def minecraftVersionOld = "1.21"
-        def minecraftVersion = "1.21.1"
-
-        // Mod Dependencies Versions
-        // Common
-        def jeiVersion = "19.17.0.193"
-        def reiVersion = "16.0.762"
-        def emiVersion = "1.1.13"
-        def ae2Version = "19.0.4-alpha"
-        def kjsVersion = "2101.7.1-build.181"
-
-        // NeoForge
-        def neoForgeVersion = "21.1.47"
-        def registrateForgeVersion = "MC1.21-1.3.0+53"
-        def createForgeVersion = "0.5.1.d-9"
-        def flywheelForgeVersion = "0.6.9-5"
-        def topForgeVersion = "1.20.4_neo-11.0.0-1"
-        def curiosForgeVersion = "9.0.9"
-        def jadeForgeVersion = "5366595"
-        def worldStripperForgeFile = "4578579"
-        def javdVersion = "4803995"
-        def ftbteamsForgeFile = "5631446"
-        def ftblibraryForgeFile = "5754910"
-        def argonautsForgeFile = "5263580"
-        def resourcefulForgeFile = "5659871"
-
-        // Libs
-        def parchmentVersion = "2024.07.28" // https://parchmentmc.org/docs/getting-started
-        def shadowVersion = "7.1.2"
-        def spotlessVersion = "6.25.0"
-        def vineFlowerVersion = "1.+"
-        def macheteVersion = "1.+"
-        def configurationVersion = "5616143"
-        def ldLibVersion = "1.0.28.d"
-        def shimmerVersion = "0.2.4"
-        def modDevGradleVersion = "2.0.28-beta"
-        def lombokPluginVersion = "8.7.1"
-
         forge {
-            def neoForge = version("neoForge", "${neoForgeVersion}")
-            library("neoForge", "net.neoforged", "neoforge").versionRef(neoForge)
-
-            def ldLib = version("ldlib", ldLibVersion)
-            library("ldlib-neoforge", "com.lowdragmc.ldlib", "ldlib-neoforge-${minecraftVersion}").versionRef(ldLib)
-
-            def shimmer = version("shimmer", "${minecraftVersionVeryOld}-${shimmerVersion}")
-            library("shimmer-forge", "com.lowdragmc.shimmer", "Shimmer-forge").versionRef(shimmer)
-
-            def registrate = version("registrate", registrateForgeVersion)
-            library("registrate", "com.tterrag.registrate", "Registrate").versionRef(registrate)
-
-            def createForge = version("createForge", createForgeVersion)
-            library("createForge", "com.simibubi.create", "create-${minecraftVersionVeryOld}").versionRef(createForge)
-
-            def flywheel = version("flywheel", flywheelForgeVersion)
-            library("flywheel", "com.jozufozu.flywheel", "flywheel-forge-${minecraftVersionVeryOld}").versionRef(flywheel)
-
-            def jei = version("jei", jeiVersion)
-            library("jei-common-api", "mezz.jei", "jei-${minecraftVersion}-common-api").versionRef(jei)
-            library("jei-forge-api", "mezz.jei", "jei-${minecraftVersion}-neoforge-api").versionRef(jei)
-            library("jei-forge-impl", "mezz.jei", "jei-${minecraftVersion}-neoforge").versionRef(jei)
-
-            def rei = version("rei", reiVersion)
-            library("rei-plugin", "me.shedaniel", "RoughlyEnoughItems-default-plugin-neoforge").versionRef(rei)
-            library("rei-api", "me.shedaniel", "RoughlyEnoughItems-api-neoforge").versionRef(rei)
-            library("rei-forge", "me.shedaniel", "RoughlyEnoughItems-neoforge").versionRef(rei)
-
-            def emi = version("emi", emiVersion + "+" + minecraftVersion)
-            library("emi", "dev.emi", "emi-neoforge").versionRef(emi)
-
-            def theoneprobe = version("theoneprobe", topForgeVersion)
-            library("theoneprobe", "mcjty.theoneprobe", "theoneprobe").versionRef(theoneprobe)
-
-            def curios = version("curios", curiosForgeVersion + "+" + minecraftVersionOld)
-            library("curios", "top.theillusivec4.curios", "curios-neoforge").versionRef(curios)
-
-            def jade = version("jade", jadeForgeVersion)
-            library("jade", "curse.maven", "jade-324717").versionRef(jade)
-
-            def kubejs = version("kubejs", kjsVersion)
-            library("kubejs", "dev.latvian.mods", "kubejs-neoforge").versionRef(kubejs)
-
-            def configuration = version("configuration", configurationVersion)
-            library("configuration", "curse.maven", "configuration-444699").versionRef(configuration)
-
-            def worldStripper = version("worldStripper", worldStripperForgeFile)
-            library("worldStripper", "curse.maven", "worldStripper-250603").versionRef(worldStripper)
-
-            def ae2 = version("ae2", ae2Version)
-            library("ae2", "appeng", "appliedenergistics2-neoforge").versionRef(ae2)
-
-            def javd = version("javd", javdVersion)
-            library("javd", "curse.maven", "javd-370890").versionRef(javd)
-
-            def ftbteams = version("ftbteams", ftbteamsForgeFile)
-            library("ftbteams", "curse.maven", "ftb-teams-forge-404468").versionRef(ftbteams)
-
-            def ftblibrary = version("ftblibrary", ftblibraryForgeFile)
-            library("ftblibrary", "curse.maven", "ftb-library-forge-404465").versionRef(ftblibrary)
-
-            def argonautslib = version("argonauts", argonautsForgeFile)
-            library("argonauts", "curse.maven", "argonauts-845833").versionRef(argonautslib)
-
-            def resourceful = version("resourceful", resourcefulForgeFile)
-            library("resourceful", "curse.maven", "resourceful-lib-570073").versionRef(resourceful)
-        }
-
-        libs {
-            version("parchment", parchmentVersion)
-
-            version("minecraft", minecraftVersion)
-            version("minecraftOld", minecraftVersionOld)
-            version("minecraftVeryOld", minecraftVersionVeryOld)
-
-            def shadow = version("shadow", shadowVersion)
-            plugin("shadow", "com.github.johnrengelman.shadow").versionRef(shadow)
-
-            def spotless = version("spotless", spotlessVersion)
-            plugin("spotless", "com.diffplug.spotless").versionRef(spotless)
-
-            def vineFlower = version("vineFlower", vineFlowerVersion)
-            plugin("vineFlower", "io.github.juuxel.loom-vineflower").versionRef(vineFlower)
-
-            def machete = version("machete", macheteVersion)
-            plugin("machete", "io.github.p03w.machete").versionRef(machete)
-
-            def modDevGradle = version("modDevGradle", modDevGradleVersion)
-            plugin("modDevGradle", "net.neoforged.moddev").versionRef(modDevGradle)
-
-            def lombok = version("lombok", lombokPluginVersion)
-            plugin("lombok", "io.freefair.lombok").versionRef(lombok)
+            from(files("gradle/forge.versions.toml"))
         }
     }
 }

@@ -1,10 +1,10 @@
 package com.gregtechceu.gtceu.data.recipe.misc;
 
-import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.api.material.material.MarkerMaterials.Color;
-import com.gregtechceu.gtceu.api.material.material.stack.UnificationEntry;
+import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
+import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
 import net.minecraft.data.recipes.RecipeOutput;
@@ -35,17 +35,17 @@ public class BatteryRecipes {
         // :trol:
         VanillaRecipeHelper.addShapedRecipe(provider, "tantalum_capacitor", BATTERY_ULV_TANTALUM.asStack(2),
                 " F ", "FDF", "B B",
-                'F', new UnificationEntry(foil, Manganese),
-                'D', new UnificationEntry(dust, Tantalum),
-                'B', new UnificationEntry(bolt, Iron));
+                'F', new MaterialEntry(foil, Manganese),
+                'D', new MaterialEntry(dust, Tantalum),
+                'B', new MaterialEntry(bolt, Iron));
 
         // Battery Hull Recipes
 
         // LV
         VanillaRecipeHelper.addShapedRecipe(provider, "battery_hull_lv", BATTERY_HULL_LV.asStack(),
                 "C", "P", "P",
-                'C', new UnificationEntry(cableGtSingle, Tin),
-                'P', new UnificationEntry(plate, BatteryAlloy));
+                'C', new MaterialEntry(cableGtSingle, Tin),
+                'P', new MaterialEntry(plate, BatteryAlloy));
 
         ASSEMBLER_RECIPES.recipeBuilder("battery_hull_lv")
                 .inputItems(cableGtSingle, Tin)
@@ -57,8 +57,8 @@ public class BatteryRecipes {
         // MV
         VanillaRecipeHelper.addShapedRecipe(provider, "battery_hull_mv", BATTERY_HULL_MV.asStack(),
                 "C C", "PPP", "PPP",
-                'C', new UnificationEntry(cableGtSingle, Copper),
-                'P', new UnificationEntry(plate, BatteryAlloy));
+                'C', new MaterialEntry(cableGtSingle, Copper),
+                'P', new MaterialEntry(plate, BatteryAlloy));
 
         ASSEMBLER_RECIPES.recipeBuilder("battery_hull_mv_copper")
                 .inputItems(cableGtSingle, Copper, 2)
@@ -85,7 +85,7 @@ public class BatteryRecipes {
         // EV
         ASSEMBLER_RECIPES.recipeBuilder("battery_hull_ev")
                 .inputItems(cableGtSingle, Aluminium, 2)
-                .inputItems(plate, BlueSteel, 2)
+                .inputItems(plate, RedSteel, 2)
                 .inputFluids(Polytetrafluoroethylene.getFluid(L))
                 .outputItems(BATTERY_HULL_SMALL_VANADIUM)
                 .duration(100).EUt(VA[HV]).save(provider);
@@ -101,7 +101,7 @@ public class BatteryRecipes {
         // LuV
         ASSEMBLER_RECIPES.recipeBuilder("battery_hull_luv")
                 .inputItems(cableGtSingle, NiobiumTitanium, 2)
-                .inputItems(plate, RedSteel, 18)
+                .inputItems(plate, BlueSteel, 18)
                 .inputFluids(Polybenzimidazole.getFluid(L))
                 .outputItems(BATTERY_HULL_LARGE_VANADIUM)
                 .duration(300).EUt(VA[IV]).save(provider);
@@ -199,7 +199,7 @@ public class BatteryRecipes {
         CANNER_RECIPES.recipeBuilder("vanadium_battery_luv")
                 .inputItems(BATTERY_HULL_LARGE_VANADIUM)
                 .inputItems(dust, Vanadium, 16)
-                .outputItems(BATTERY_LUV_VANADIUM)
+                .outputItems(BATTERY_LuV_VANADIUM)
                 .duration(200).EUt(VA[EV]).save(provider);
 
         // ZPM
@@ -241,7 +241,7 @@ public class BatteryRecipes {
                 .outputItems(BATTERY_HULL_SMALL_VANADIUM).save(provider);
         EXTRACTOR_RECIPES.recipeBuilder("unpackage_iv_vanadium_battery").inputItems(BATTERY_IV_VANADIUM)
                 .outputItems(BATTERY_HULL_MEDIUM_VANADIUM).save(provider);
-        EXTRACTOR_RECIPES.recipeBuilder("unpackage_luv_vanadium_battery").inputItems(BATTERY_LUV_VANADIUM)
+        EXTRACTOR_RECIPES.recipeBuilder("unpackage_luv_vanadium_battery").inputItems(BATTERY_LuV_VANADIUM)
                 .outputItems(BATTERY_HULL_LARGE_VANADIUM).save(provider);
 
         EXTRACTOR_RECIPES.recipeBuilder("unpackage_zpm_naquadria_battery").inputItems(BATTERY_ZPM_NAQUADRIA)
@@ -279,7 +279,7 @@ public class BatteryRecipes {
 
         AUTOCLAVE_RECIPES.recipeBuilder("energy_crystal_blue_steel")
                 .inputItems(ENERGIUM_DUST, 9)
-                .inputFluids(BlueSteel.getFluid(L / 2))
+                .inputFluids(RedSteel.getFluid(L / 2))
                 .outputItems(ENERGIUM_CRYSTAL)
                 .duration(150).EUt(192).save(provider);
 
@@ -305,13 +305,13 @@ public class BatteryRecipes {
 
         AUTOCLAVE_RECIPES.recipeBuilder("lapotron_gem_blue_steel")
                 .inputItems(dust, Lapotron, 15)
-                .inputFluids(BlueSteel.getFluid(L * 2))
+                .inputFluids(RedSteel.getFluid(L * 2))
                 .outputItems(gem, Lapotron)
                 .duration(300).EUt(256).save(provider);
 
         AUTOCLAVE_RECIPES.recipeBuilder("lapotron_gem_red_steel")
                 .inputItems(dust, Lapotron, 15)
-                .inputFluids(RedSteel.getFluid(L / 2))
+                .inputFluids(BlueSteel.getFluid(L / 2))
                 .outputItems(gem, Lapotron)
                 .duration(150).EUt(192).save(provider);
 

@@ -8,6 +8,7 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -41,6 +42,20 @@ public abstract class ConfigWidget extends WidgetGroup {
         this.amountSetWidget.getAmountText().setVisible(false);
     }
 
+    @OnlyIn(Dist.CLIENT)
+    public void enableAmountClient(int slotIndex) {
+        this.amountSetWidget.setSlotIndexClient(slotIndex);
+        this.amountSetWidget.setVisible(true);
+        this.amountSetWidget.getAmountText().setVisible(true);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public void disableAmountClient() {
+        this.amountSetWidget.setSlotIndexClient(-1);
+        this.amountSetWidget.setVisible(false);
+        this.amountSetWidget.getAmountText().setVisible(false);
+    }
+
     public void enableAmount(int slotIndex) {
         this.amountSetWidget.setSlotIndex(slotIndex);
         this.amountSetWidget.setVisible(true);
@@ -66,7 +81,7 @@ public abstract class ConfigWidget extends WidgetGroup {
                 slot.setSelect(false);
             }
         }
-        this.disableAmount();
+        this.disableAmountClient();
         return super.mouseClicked(mouseX, mouseY, button);
     }
 

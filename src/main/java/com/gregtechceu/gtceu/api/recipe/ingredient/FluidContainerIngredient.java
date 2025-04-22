@@ -1,11 +1,10 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
 import com.gregtechceu.gtceu.api.tag.TagUtil;
+
 import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
-import com.gregtechceu.gtceu.utils.InfiniteFluidTransfer;
-
-import com.lowdragmc.lowdraglib.side.fluid.*;
-
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -13,13 +12,15 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
+import net.neoforged.neoforge.fluids.FluidActionResult;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import net.neoforged.neoforge.fluids.capability.templates.VoidFluidHandler;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
@@ -28,12 +29,10 @@ import java.util.stream.Stream;
 import javax.annotation.Nonnull;
 
 public class FluidContainerIngredient implements ICustomIngredient {
-
-    public static final MapCodec<FluidContainerIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
-            .group(
-                    SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid").forGetter(FluidContainerIngredient::getFluid))
-            .apply(instance, FluidContainerIngredient::new));
-
+    // spotless:off
+    public static final MapCodec<FluidContainerIngredient> CODEC = SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid")
+            .xmap(FluidContainerIngredient::new, FluidContainerIngredient::getFluid);
+    // spotless:on
     @Getter
     private final SizedFluidIngredient fluid;
 
@@ -53,7 +52,7 @@ public class FluidContainerIngredient implements ICustomIngredient {
 
     private Stream<ItemStack> cachedStacks;
 
-    @Nonnull
+    @NotNull
     @Override
     public Stream<ItemStack> getItems() {
         if (cachedStacks == null)
@@ -67,8 +66,8 @@ public class FluidContainerIngredient implements ICustomIngredient {
     public boolean test(@Nullable ItemStack stack) {
         if (stack == null || stack.isEmpty())
             return false;
-        IFluidHandler transfer = FluidTransferHelper.getFluidTransfer(stack);
-        return transfer != null && this.extractFrom(transfer, true);
+        IFluidHandler handler = FluidUtil.getFluidHandler(stack).orElse(null);
+        return handler != null && this.extractFrom(handler, true);
     }
 
     @Override
@@ -82,13 +81,13 @@ public class FluidContainerIngredient implements ICustomIngredient {
     }
 
     public ItemStack getExtractedStack(ItemStack input) {
-        FluidActionResult result = FluidTransferHelper.tryEmptyContainer(input,
-                new InfiniteFluidTransfer(1),
-                (int) this.fluid.amount(),
+        FluidActionResult result = FluidUtil.tryEmptyContainer(input,
+                VoidFluidHandler.INSTANCE,
+                fluid.amount(),
                 CommonHooks.getCraftingPlayer(),
                 true);
-        if (result.success) {
-            return result.result;
+        if (result.isSuccess()) {
+            return result.getResult();
         }
         return input;
     }

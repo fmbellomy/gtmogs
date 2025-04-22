@@ -3,11 +3,14 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -38,34 +41,28 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@NoArgsConstructor
 public class StandardVeinGenerator extends VeinGenerator {
 
-    public static final MapCodec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder
-            .mapCodec(instance -> instance.group(
+    // spotless:off
+    public static final MapCodec<StandardVeinGenerator> CODEC_SEPARATE = RecordCodecBuilder.mapCodec(instance -> instance.group(
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("block").forGetter(ext -> ext.block.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("deep_block").forGetter(ext -> ext.deepBlock.get()),
-                    BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block")
-                            .forGetter(ext -> ext.netherBlock.get()))
-                    .apply(instance, StandardVeinGenerator::new));
-
-    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = RecordCodecBuilder.mapCodec(instance -> instance
-            .group(
-                    Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTCEuAPI.materialManager.codec())
-                            .fieldOf("targets").forGetter(ext -> ext.blocks))
-            .apply(instance, StandardVeinGenerator::new));
-
+                    BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block").forGetter(ext -> ext.netherBlock.get())
+    ).apply(instance, StandardVeinGenerator::new));
+    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec())
+            .fieldOf("targets")
+            .xmap(StandardVeinGenerator::new, StandardVeinGenerator::getBlocks);
+    // spotless:on
     public static final MapCodec<StandardVeinGenerator> CODEC = Codec.mapEither(CODEC_SEPARATE, CODEC_LIST)
-            .xmap(either -> either.map(Function.identity(), Function.identity()), Either::left);
+            .xmap(Either::unwrap, Either::left);
 
     public NonNullSupplier<? extends Block> block;
     public NonNullSupplier<? extends Block> deepBlock;
     public NonNullSupplier<? extends Block> netherBlock;
 
+    @Getter
     public Either<List<OreConfiguration.TargetBlockState>, Material> blocks;
-
-    public StandardVeinGenerator(GTOreDefinition entry) {
-        super(entry);
-    }
 
     public StandardVeinGenerator(Block block, Block deepBlock, Block netherBlock) {
         this.block = NonNullSupplier.of(() -> block);
@@ -142,7 +139,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         Map<BlockPos, OreBlockPlacer> generatedBlocks = new Object2ObjectOpenHashMap<>();
 
@@ -177,7 +174,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     protected void doPlaceNormal(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
-                                 GTOreDefinition entry, BlockPos origin,
+                                 OreVeinDefinition entry, BlockPos origin,
                                  Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                  double pMinX, double pMaxX, double pMinZ, double pMaxZ, double pMinY, double pMaxY,
                                  int pX, int pY, int pZ, int pWidth, int pHeight) {
@@ -241,7 +238,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     private static void generateShape(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
-                                      GTOreDefinition entry, BlockPos origin,
+                                      OreVeinDefinition entry, BlockPos origin,
                                       Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                       int pX, int pY, int pZ, int pWidth, int pHeight, double[] shape,
                                       int shapeIdxOffset,
@@ -295,7 +292,7 @@ public class StandardVeinGenerator extends VeinGenerator {
         }
     }
 
-    private static void placeBlock(BulkSectionAccess access, long randomSeed, GTOreDefinition entry,
+    private static void placeBlock(BulkSectionAccess access, long randomSeed, OreVeinDefinition entry,
                                    Either<List<OreConfiguration.TargetBlockState>, Material> targets,
                                    BlockPos pos,
                                    float density, MutableInt placedAmount) {
@@ -335,4 +332,5 @@ public class StandardVeinGenerator extends VeinGenerator {
             placedAmount.increment();
         });
     }
+
 }

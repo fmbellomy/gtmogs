@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.data.recipe.misc;
 
+import com.gregtechceu.gtceu.data.recipe.GTRecipeCategories;
+
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.DyeColor;
 
@@ -24,7 +26,7 @@ public class DecorationRecipes {
                 .circuitMeta(8)
                 .outputItems(METAL_SHEETS.get(DyeColor.WHITE), 32)
                 .EUt(4).duration(20)
-                .save(provider);
+                .addMaterialInfo(true).save(provider);
 
         ASSEMBLER_RECIPES.recipeBuilder("large_metal_sheet_white")
                 .inputItems(block, Concrete, 5)
@@ -32,7 +34,7 @@ public class DecorationRecipes {
                 .circuitMeta(9)
                 .outputItems(LARGE_METAL_SHEETS.get(DyeColor.WHITE), 32)
                 .EUt(4).duration(20)
-                .save(provider);
+                .addMaterialInfo(true).save(provider);
 
         ASSEMBLER_RECIPES.recipeBuilder("studs_black")
                 .inputItems(block, Concrete, 3)
@@ -40,7 +42,7 @@ public class DecorationRecipes {
                 .circuitMeta(8)
                 .outputItems(STUDS.get(DyeColor.BLACK), 32)
                 .EUt(4).duration(20)
-                .save(provider);
+                .addMaterialInfo(true).save(provider);
     }
 
     private static void dyeRecipes(RecipeOutput provider) {
@@ -52,6 +54,7 @@ public class DecorationRecipes {
                     .inputFluids(CHEMICAL_DYES[i].getFluid(9))
                     .outputItems(METAL_SHEETS.get(color))
                     .EUt(2).duration(10)
+                    .category(GTRecipeCategories.CHEM_DYES)
                     .save(provider);
 
             CHEMICAL_BATH_RECIPES.recipeBuilder("large_metal_sheet_%s".formatted(colorName))
@@ -59,6 +62,7 @@ public class DecorationRecipes {
                     .inputFluids(CHEMICAL_DYES[i].getFluid(9))
                     .outputItems(LARGE_METAL_SHEETS.get(color))
                     .EUt(2).duration(10)
+                    .category(GTRecipeCategories.CHEM_DYES)
                     .save(provider);
 
             CHEMICAL_BATH_RECIPES.recipeBuilder("studs_%s".formatted(colorName))
@@ -66,6 +70,7 @@ public class DecorationRecipes {
                     .inputFluids(CHEMICAL_DYES[i].getFluid(9))
                     .outputItems(STUDS.get(color))
                     .EUt(2).duration(10)
+                    .category(GTRecipeCategories.CHEM_DYES)
                     .save(provider);
         }
     }

@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.transfer.fluid;
 
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
-
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
@@ -14,9 +12,17 @@ public class ModifiableFluidHandlerWrapper implements IFluidHandlerModifiable {
     private IFluidHandler handler;
 
     @Override
-    public void setFluidInTank(int i, FluidStack fluidStack) {
-        drain(handler.getFluidInTank(i), FluidAction.EXECUTE);
-        fill(fluidStack, FluidAction.EXECUTE);
+    public void setFluidInTank(int tank, FluidStack fluidStack) {
+        if (handler instanceof IFluidHandlerModifiable modifiable) {
+            modifiable.setFluidInTank(tank, fluidStack);
+            return;
+        }
+        var fluid = handler.getFluidInTank(tank);
+        var canDrain = handler.drain(fluid, FluidAction.SIMULATE);
+        if (!canDrain.isEmpty()) {
+            drain(canDrain, FluidAction.EXECUTE);
+            fill(fluidStack, FluidAction.EXECUTE);
+        }
     }
 
     @Override

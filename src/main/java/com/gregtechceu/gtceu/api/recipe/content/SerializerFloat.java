@@ -1,8 +1,7 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-
 import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class SerializerFloat implements IContentSerializer<Float> {
@@ -22,11 +21,6 @@ public class SerializerFloat implements IContentSerializer<Float> {
     }
 
     @Override
-    public Codec<Float> codec() {
-        return Codec.FLOAT;
-    }
-
-    @Override
     public Float of(Object o) {
         if (o instanceof Float) {
             return (Float) o;
@@ -41,5 +35,10 @@ public class SerializerFloat implements IContentSerializer<Float> {
     @Override
     public Float defaultValue() {
         return 0f;
+    }
+
+    @Override
+    public Codec<Float> codec() {
+        return Codec.FLOAT;
     }
 }

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.gregtechceu.gtceu.config.ConfigHolder;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.RandomSource;
@@ -10,16 +11,15 @@ import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
-
 import lombok.Getter;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Responsible for placing ores of surrounding veins for the current chunk.
@@ -28,8 +28,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * Surrounding veins are resolved from the {@link OreGenCache} and placed using each block position's
  * {@link OreBlockPlacer}.
  */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class OrePlacer {
 
     @Getter
@@ -43,6 +41,8 @@ public class OrePlacer {
      * once all of its chunks have been generated.
      */
     public void placeOres(WorldGenLevel level, ChunkGenerator chunkGenerator, ChunkAccess chunk) {
+        if (!ConfigHolder.INSTANCE.dev.doSuperflatOres && chunkGenerator instanceof FlatLevelSource) return;
+
         var random = new XoroshiroRandomSource(level.getSeed() ^ chunk.getPos().toLong());
         var generatedVeins = oreGenCache.consumeChunkVeins(level, chunkGenerator, chunk);
         var generatedIndicators = oreGenCache.consumeChunkIndicators(level, chunkGenerator, chunk);
@@ -83,6 +83,7 @@ public class OrePlacer {
     }
 
     private void placeIndicators(ChunkAccess chunk, BulkSectionAccess access, GeneratedIndicators generatedVein) {
+        if (!ConfigHolder.INSTANCE.worldgen.oreVeins.oreIndicators) return;
         generatedVein.consumeIndicators(chunk.getPos()).forEach(placer -> {
             placer.placeIndicators(access);
         });

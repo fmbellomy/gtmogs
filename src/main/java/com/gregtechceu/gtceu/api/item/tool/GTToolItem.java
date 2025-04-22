@@ -1,43 +1,35 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
-import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 
-import com.lowdragmc.lowdraglib.Platform;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote GTToolItem
- */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class GTToolItem extends TieredItem implements IGTTool {
 
     @Getter
@@ -47,7 +39,7 @@ public class GTToolItem extends TieredItem implements IGTTool {
     @Getter
     protected final Material material;
     @Getter
-    private IGTToolDefinition toolStats;
+    private final IGTToolDefinition toolStats;
 
     protected GTToolItem(GTToolType toolType, MaterialToolTier tier, Material material, IGTToolDefinition definition,
                          Properties properties) {
@@ -56,7 +48,7 @@ public class GTToolItem extends TieredItem implements IGTTool {
         this.material = material;
         this.electricTier = toolType.electricTier;
         this.toolStats = definition;
-        if (Platform.isClient()) {
+        if (GTCEu.isClientSide()) {
             ToolItemRenderer.create(this, toolType);
         }
         definition$init();
@@ -70,6 +62,11 @@ public class GTToolItem extends TieredItem implements IGTTool {
     @Override
     public ItemStack getDefaultInstance() {
         return get();
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return definition$canPerformAction(stack, action);
     }
 
     @Override
@@ -128,6 +125,7 @@ public class GTToolItem extends TieredItem implements IGTTool {
         return definition$hurtEnemy(stack, target, attacker);
     }
 
+
     public boolean onBlockStartBreak(ItemStack stack, BlockPos pos, Player player) {
         return definition$onBlockStartBreak(stack, pos, player);
     }
@@ -138,6 +136,7 @@ public class GTToolItem extends TieredItem implements IGTTool {
         definition$appendHoverText(stack, context, tooltipComponents, isAdvanced);
     }
 
+    @Override
     public int getEnchantmentValue(ItemStack stack) {
         return getTotalEnchantability(stack);
     }
@@ -148,30 +147,41 @@ public class GTToolItem extends TieredItem implements IGTTool {
     }
 
     @Override
-    public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
-        return definition$getDefaultAttributeModifiers(stack);
+    public ItemEnchantments getAllEnchantments(ItemStack stack, HolderLookup.RegistryLookup<Enchantment> lookup) {
+        return definition$getAllEnchantments(stack, lookup);
     }
 
+    @Override
+    public int getEnchantmentLevel(ItemStack stack, Holder<Enchantment> enchantment) {
+        return definition$getEnchantmentLevel(stack, enchantment);
+    }
+
+    @Override
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
         return definition$canDisableShield(shield, shield, entity, attacker);
     }
 
+    @Override
     public boolean doesSneakBypassUse(ItemStack stack, LevelReader level, BlockPos pos, Player player) {
         return definition$doesSneakBypassUse(stack, level, pos, player);
     }
 
+    @Override
     public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
         return definition$shouldCauseBlockBreakReset(oldStack, newStack);
     }
 
+    @Override
     public boolean hasCraftingRemainingItem(ItemStack stack) {
         return definition$hasCraftingRemainingItem(stack);
     }
 
+    @Override
     public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
         return definition$getCraftingRemainingItem(itemStack);
     }
 
+    @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return definition$shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
@@ -179,5 +189,10 @@ public class GTToolItem extends TieredItem implements IGTTool {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         return definition$use(level, player, usedHand);
+    }
+
+    @Override
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+        return this.definition$isCorrectToolForDrops(stack, state);
     }
 }

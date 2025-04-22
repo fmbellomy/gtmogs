@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.multiblock.IMEStockingPart;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEFluidList;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEFluidSlot;
@@ -18,14 +19,15 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -39,13 +41,8 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.function.Predicate;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implements IMEStockingPart {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
@@ -213,7 +210,7 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
     ////////////////////////////////
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (!isRemote()) {
             setAutoPull(!autoPull);
@@ -305,21 +302,21 @@ public class MEStockingHatchPartMachine extends MEInputHatchPartMachine implemen
         }
 
         @Override
-        public FluidStack drain(int maxDrain, FluidAction fluidAction) {
+        public FluidStack drain(int maxDrain, FluidAction action) {
             if (this.stock != null && this.config != null) {
                 // Extract the items from the real net to either validate (simulate)
                 // or extract (modulate) when this is called
                 if (!isOnline()) return FluidStack.EMPTY;
                 MEStorage aeNetwork = getMainNode().getGrid().getStorageService().getInventory();
 
-                Actionable action = fluidAction.simulate() ? Actionable.SIMULATE : Actionable.MODULATE;
+                Actionable actionable = action.simulate() ? Actionable.SIMULATE : Actionable.MODULATE;
                 var key = config.what();
-                long extracted = aeNetwork.extract(key, maxDrain, action, actionSource);
+                long extracted = aeNetwork.extract(key, maxDrain, actionable, actionSource);
 
                 if (extracted > 0) {
                     FluidStack resultStack = key instanceof AEFluidKey fluidKey ?
                             AEUtil.toFluidStack(fluidKey, extracted) : FluidStack.EMPTY;
-                    if (fluidAction.execute()) {
+                    if (action.execute()) {
                         // may as well update the display here
                         this.stock = ExportOnlyAESlot.copy(stock, stock.amount() - extracted);
                         if (this.stock.amount() == 0) {

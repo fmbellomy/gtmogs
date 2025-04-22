@@ -3,9 +3,9 @@ package com.gregtechceu.gtceu.data.worldgen;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.worldgen.feature.configurations.FluidSproutConfiguration;
 import com.gregtechceu.gtceu.common.worldgen.feature.configurations.StoneBlobConfiguration;
+
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.data.worldgen.features.FeatureUtils;
@@ -23,15 +23,10 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import net.minecraft.world.level.levelgen.feature.trunkplacers.ForkingTrunkPlacer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
-/**
- * @author KilaBash
- * @date 2023/3/26
- * @implNote GTConfiguredFeatures
- */
 public class GTConfiguredFeatures {
 
-    public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER = ResourceKey.create(Registries.CONFIGURED_FEATURE,
-            GTCEu.id("rubber_tree"));
+    public static final ResourceKey<ConfiguredFeature<?, ?>> RUBBER_TREE = ResourceKey.create(
+            Registries.CONFIGURED_FEATURE, GTCEu.id("rubber_tree"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> RED_GRANITE_BLOB = ResourceKey
             .create(Registries.CONFIGURED_FEATURE, GTCEu.id("red_granite_blob"));
     public static final ResourceKey<ConfiguredFeature<?, ?>> MARBLE_BLOB = ResourceKey
@@ -40,7 +35,7 @@ public class GTConfiguredFeatures {
             .create(Registries.CONFIGURED_FEATURE, GTCEu.id("raw_oil_sprout"));
 
     public static void bootstrap(BootstrapContext<ConfiguredFeature<?, ?>> ctx) {
-        FeatureUtils.register(ctx, RUBBER, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
+        FeatureUtils.register(ctx, RUBBER_TREE, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
                 BlockStateProvider
                         .simple(GTBlocks.RUBBER_LOG.get().changeNatural(GTBlocks.RUBBER_LOG.getDefaultState(), true)),
                 new ForkingTrunkPlacer(5, 1, 3),

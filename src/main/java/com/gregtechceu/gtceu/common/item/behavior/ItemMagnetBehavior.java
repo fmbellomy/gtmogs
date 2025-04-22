@@ -1,18 +1,42 @@
 package com.gregtechceu.gtceu.common.item.behavior;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
+import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
+import com.gregtechceu.gtceu.api.cover.filter.SimpleItemFilter;
+import com.gregtechceu.gtceu.api.cover.filter.TagItemFilter;
+import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.UITemplate;
+import com.gregtechceu.gtceu.api.gui.widget.EnumSelectorWidget;
+import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.IItemLifeCycle;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
+import com.gregtechceu.gtceu.data.item.GTItems;
 
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
+import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
+import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
+import com.lowdragmc.lowdraglib.gui.widget.Widget;
+
+import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -25,17 +49,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
+import com.tterrag.registrate.util.entry.ItemEntry;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import oshi.util.tuples.Triplet;
+import top.theillusivec4.curios.api.CuriosApi;
+import java.util.*;
 
-import java.util.List;
-
-public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAddInformation {
+public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAddInformation, IItemUIFactory {
 
     private final int range;
     private final long energyDraw;
@@ -43,7 +69,52 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
     public ItemMagnetBehavior(int range) {
         this.range = range;
         this.energyDraw = GTValues.V[range > 8 ? GTValues.HV : GTValues.LV];
-        NeoForge.EVENT_BUS.register(this);
+    }
+
+    static {
+        NeoForge.EVENT_BUS.register(ItemMagnetBehavior.class);
+    }
+
+    @Override
+    public ModularUI createUI(HeldItemUIFactory.HeldItemHolder holder, Player entityPlayer) {
+        final ItemStack held = holder.getHeld();
+        MagnetComponent magnetData = held.getOrDefault(GTDataComponents.MAGNET, MagnetComponent.EMPTY);
+        Filter selected = magnetData.filterType();
+
+        HashSet<Triplet<Filter, Widget, Widget>> widgets = new HashSet<>();
+        HashMap<Filter, ItemFilter> filters = new HashMap<>();
+        ModularUI ui = new ModularUI(176, 157, holder, entityPlayer)
+                .background(GuiTextures.BACKGROUND)
+                .widget(new EnumSelectorWidget<>(146, 5, 20, 20,
+                        Filter.values(), selected, (val) -> updateSelection(held, val, widgets)))
+                .widget(UITemplate.bindPlayerInventory(entityPlayer.getInventory(), GuiTextures.SLOT, 7, 75, true));
+        for (Filter f : Filter.values()) {
+            ItemStack stack = f.getFilter(held);
+            ItemFilter filter = ItemFilter.loadFilter(stack);
+            filters.put(f, filter);
+            LabelWidget description = new LabelWidget(5, 5, stack.getDescriptionId());
+            WidgetGroup config = filter.openConfigurator((176 - 80) / 2, (60 - 55) / 2 + 15);
+            boolean visible = f == selected;
+            description.setVisible(visible);
+            config.setVisible(visible);
+            widgets.add(new Triplet<>(f, description, config));
+            ui.widget(description);
+            ui.widget(config);
+        }
+        ui.registerCloseListener(() -> {
+            Filter selection = magnetData.filterType();
+            selection.saveFilter(held, filters.get(selection));
+        });
+        return ui;
+    }
+
+    private void updateSelection(ItemStack stack, Filter filter, Collection<Triplet<Filter, Widget, Widget>> widgets) {
+        stack.update(GTDataComponents.MAGNET, MagnetComponent.EMPTY, c -> new MagnetComponent(c.active(), filter));
+        widgets.forEach(tri -> {
+            var visible = tri.getA() == filter;
+            tri.getB().setVisible(visible);
+            tri.getC().setVisible(visible);
+        });
     }
 
     @Override
@@ -52,6 +123,8 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
         if (!player.level().isClientSide && player.isShiftKeyDown()) {
             player.displayClientMessage(Component.translatable(toggleActive(player.getItemInHand(hand)) ?
                     "behavior.item_magnet.enabled" : "behavior.item_magnet.disabled"), true);
+        } else {
+            IItemUIFactory.super.use(item, world, player, hand);
         }
         return InteractionResultHolder.pass(player.getItemInHand(hand));
     }
@@ -60,14 +133,17 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
         if (stack == ItemStack.EMPTY) {
             return false;
         }
-        return stack.getOrDefault(GTDataComponents.ITEM_MAGNET, false);
+        return stack.getOrDefault(GTDataComponents.MAGNET, MagnetComponent.EMPTY).active();
     }
 
     private static boolean toggleActive(ItemStack stack) {
-        boolean isActive = isActive(stack);
-        // noinspection ConstantConditions
-        stack.set(GTDataComponents.ITEM_MAGNET, !isActive);
-        return !isActive;
+        MutableBoolean active = new MutableBoolean();
+        stack.update(GTDataComponents.MAGNET, MagnetComponent.EMPTY,
+                c -> {
+                    active.setValue(!c.active);
+                    return new MagnetComponent(!c.active, c.filterType);
+                });
+        return active.booleanValue();
     }
 
     @Override
@@ -85,6 +161,7 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
                     new AABB(entity.getX(), entity.getY(), entity.getZ(), entity.getX(), entity.getY(), entity.getZ())
                             .inflate(range, range, range));
 
+            ItemFilter filter = null;
             boolean didMoveEntity = false;
             for (ItemEntity itemEntity : items) {
                 if (itemEntity.isRemoved()) {
@@ -107,6 +184,14 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
                 }
 
                 if (!world.isClientSide) {
+                    if (filter == null) {
+                        filter = stack.get(GTDataComponents.MAGNET).filterType().loadFilter(stack);
+                    }
+
+                    if (!filter.test(itemEntity.getItem())) {
+                        continue;
+                    }
+
                     if (itemEntity.hasPickUpDelay()) {
                         itemEntity.setNoPickUpDelay();
                     }
@@ -151,25 +236,29 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
     }
 
     @SubscribeEvent
-    public void onItemToss(@NotNull ItemTossEvent event) {
+    public static void onItemToss(@NotNull ItemTossEvent event) {
         if (event.getPlayer() == null) return;
-
-        Inventory inventory = event.getPlayer().getInventory();
-        // TODO work out curios compat
-        // if (Platform.isModLoaded(GTValues.MODID_CURIOS)) {
-        // inventory = BaublesModule.getBaublesWrappedInventory(event.getPlayer());
-        // }
-
-        for (int i = 0; i < inventory.getContainerSize(); i++) {
-            ItemStack stackInSlot = inventory.getItem(i);
-            if (isMagnet(stackInSlot) && isActive(stackInSlot)) {
-                event.getEntity().setPickUpDelay(60);
-                return;
-            }
+        if (hasMagnet(event.getPlayer())) {
+            event.getEntity().setPickUpDelay(60);
         }
     }
 
-    private boolean isMagnet(@NotNull ItemStack stack) {
+    private static boolean hasMagnet(@NotNull Player player) {
+        Inventory inventory = player.getInventory();
+        for (int i = 0; i < inventory.getContainerSize(); i++) {
+            ItemStack stackInSlot = inventory.getItem(i);
+            if (isMagnet(stackInSlot) && isActive(stackInSlot)) {
+                return true;
+            }
+        }
+
+        if (!GTCEu.Mods.isCuriosLoaded()) {
+            return false;
+        }
+        return CuriosUtils.hasMagnetCurios(player);
+    }
+
+    private static boolean isMagnet(@NotNull ItemStack stack) {
         if (stack.getItem() instanceof IComponentItem metaItem) {
             for (var behavior : metaItem.getComponents()) {
                 if (behavior instanceof ItemMagnetBehavior) {
@@ -189,9 +278,96 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
     }
 
     @Override
-    public void appendHoverText(ItemStack itemStack, @Nullable Item.TooltipContext context, List<Component> lines,
+    public void appendHoverText(ItemStack itemStack, Item.TooltipContext context, List<Component> lines,
                                 TooltipFlag isAdvanced) {
         lines.add(Component
                 .translatable(isActive(itemStack) ? "behavior.item_magnet.enabled" : "behavior.item_magnet.disabled"));
+    }
+
+    private static class CuriosUtils {
+
+        public static boolean hasMagnetCurios(Player player) {
+            return CuriosApi.getCuriosInventory(player)
+                    .map(curios -> curios.findFirstCurio(i -> isMagnet(i) && isActive(i)).isPresent())
+                    .orElse(false);
+        }
+    }
+
+    public enum Filter implements EnumSelectorWidget.SelectableEnum, StringRepresentable {
+
+        SIMPLE(GTItems.ITEM_FILTER, "item_filter"),
+        TAG(GTItems.TAG_FILTER, "item_tag_filter");
+
+        public static final Codec<Filter> CODEC = StringRepresentable.fromEnum(Filter::values);
+
+        public final ItemEntry<ComponentItem> item;
+        public final String name;
+
+        Filter(ItemEntry<ComponentItem> item, String name) {
+            this.item = item;
+            this.name = name;
+        }
+
+        public ItemStack getFilter(ItemStack magnet) {
+            var mockStack = new ItemStack(item.asItem());
+            switch (this) {
+                case SIMPLE -> mockStack.set(GTDataComponents.SIMPLE_ITEM_FILTER, magnet.get(GTDataComponents.SIMPLE_ITEM_FILTER));
+                case TAG -> mockStack.set(GTDataComponents.TAG_FILTER_EXPRESSION, magnet.get(GTDataComponents.TAG_FILTER_EXPRESSION));
+            }
+            return mockStack;
+        }
+
+        public ItemFilter loadFilter(ItemStack magnet) {
+            var stack = getFilter(magnet);
+            return ItemFilter.loadFilter(stack);
+        }
+
+        public void saveFilter(ItemStack stack, ItemFilter filter) {
+            switch (this) {
+                case SIMPLE -> {
+                    if (filter instanceof SimpleItemFilter simple) {
+                        stack.set(GTDataComponents.SIMPLE_ITEM_FILTER, simple);
+                    }
+                }
+                case TAG -> {
+                    if (filter instanceof TagItemFilter tag) {
+                        stack.set(GTDataComponents.TAG_FILTER_EXPRESSION, tag.getTagFilterExpression());
+                    }
+                }
+            }
+        }
+
+        public static Filter get(int ordinal) {
+            return Filter.values()[ordinal];
+        }
+
+        @Override
+        public @NotNull String getTooltip() {
+            return item.asItem().getDescriptionId();
+        }
+
+        @Override
+        public @NotNull IGuiTexture getIcon() {
+            return new ResourceTexture("gtceu:textures/item/" + name + ".png");
+        }
+
+        @Override
+        public String getSerializedName() {
+            return name;
+        }
+    }
+
+    public record MagnetComponent(boolean active, Filter filterType) {
+        public static final Codec<MagnetComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+                Codec.BOOL.orElse(false).fieldOf("active").forGetter(MagnetComponent::active),
+                Filter.CODEC.fieldOf("filter_type").forGetter(MagnetComponent::filterType)
+        ).apply(instance, MagnetComponent::new));
+        public static final StreamCodec<ByteBuf, MagnetComponent> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.BOOL, MagnetComponent::active,
+                ByteBufCodecs.VAR_INT, c -> c.filterType().ordinal(),
+                (active, ordinal) -> new MagnetComponent(active, Filter.get(ordinal))
+        );
+
+        public static final MagnetComponent EMPTY = new MagnetComponent(false, Filter.SIMPLE);
     }
 }

@@ -22,26 +22,15 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.*;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/6
- * @implNote WorkableElectricMachine
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class WorkableElectricMultiblockMachine extends WorkableMultiblockMachine implements IFancyUIMachine,
                                                IDisplayUIMachine, ITieredMachine, IOverclockMachine {
 
@@ -83,24 +72,28 @@ public class WorkableElectricMultiblockMachine extends WorkableMultiblockMachine
     //////////////////////////////////////
 
     @Override
-    public void addDisplayText(List<Component> textList) {
-        int numParallels = 0;
-        Optional<IParallelHatch> optional = this.getParts().stream().filter(IParallelHatch.class::isInstance)
-                .map(IParallelHatch.class::cast).findAny();
-        if (optional.isPresent()) {
-            IParallelHatch parallelHatch = optional.get();
-            numParallels = parallelHatch.getCurrentParallel();
+    public void addDisplayText(@NotNull List<Component> textList) {
+        int numParallels;
+        boolean exact = false;
+        if (recipeLogic.isActive() && recipeLogic.getLastRecipe() != null) {
+            numParallels = recipeLogic.getLastRecipe().parallels;
+            exact = true;
+        } else {
+            numParallels = getParallelHatch()
+                    .map(IParallelHatch::getCurrentParallel)
+                    .orElse(0);
         }
+
         MultiblockDisplayText.builder(textList, isFormed())
                 .setWorkingStatus(recipeLogic.isWorkingEnabled(), recipeLogic.isActive())
                 .addEnergyUsageLine(energyContainer)
                 .addEnergyTierLine(tier)
                 .addMachineModeLine(getRecipeType(), getRecipeTypes().length > 1)
-                .addParallelsLine(numParallels)
+                .addParallelsLine(numParallels, exact)
                 .addWorkingStatusLine()
                 .addProgressLine(recipeLogic.getProgress(), recipeLogic.getMaxProgress(),
                         recipeLogic.getProgressPercent())
-                .addOutputLines(recipeLogic.getLastRecipe(), this.getChanceTier());
+                .addOutputLines(recipeLogic.getLastRecipe());
         getDefinition().getAdditionalDisplay().accept(this, textList);
         IDisplayUIMachine.super.addDisplayText(textList);
     }
@@ -189,21 +182,11 @@ public class WorkableElectricMultiblockMachine extends WorkableMultiblockMachine
 
     public EnergyContainerList getEnergyContainer() {
         List<IEnergyContainer> containers = new ArrayList<>();
-        var capabilities = capabilitiesProxy.get(IO.IN, EURecipeCapability.CAP);
-        if (capabilities != null) {
-            for (IRecipeHandler<?> handler : capabilities) {
-                if (handler instanceof IEnergyContainer container) {
-                    containers.add(container);
-                }
-            }
-        } else {
-            capabilities = capabilitiesProxy.get(IO.OUT, EURecipeCapability.CAP);
-            if (capabilities != null) {
-                for (IRecipeHandler<?> handler : capabilities) {
-                    if (handler instanceof IEnergyContainer container) {
-                        containers.add(container);
-                    }
-                }
+        var handlers = getCapabilitiesFlat(IO.IN, EURecipeCapability.CAP);
+        if (handlers.isEmpty()) handlers = getCapabilitiesFlat(IO.OUT, EURecipeCapability.CAP);
+        for (IRecipeHandler<?> handler : handlers) {
+            if (handler instanceof IEnergyContainer container) {
+                containers.add(container);
             }
         }
         return new EnergyContainerList(containers);

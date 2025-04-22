@@ -1,19 +1,35 @@
 package com.gregtechceu.gtceu.data.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
+import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.info.MaterialFlags;
 import com.gregtechceu.gtceu.data.recipe.configurable.RecipeAddition;
 import com.gregtechceu.gtceu.data.recipe.configurable.RecipeRemoval;
 import com.gregtechceu.gtceu.data.recipe.generated.*;
 import com.gregtechceu.gtceu.data.recipe.misc.*;
 import com.gregtechceu.gtceu.data.recipe.serialized.chemistry.ChemistryRecipes;
 
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.level.block.ComposterBlock;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.neoforged.neoforge.common.conditions.ICondition;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GTRecipes {
+
+    public static final Set<ResourceLocation> RECIPE_FILTERS = new ObjectOpenHashSet<>();
 
     /*
      * Called on resource reload in-game.
@@ -24,28 +40,52 @@ public class GTRecipes {
      * This should also be used for recipes that need
      * to respond to a config option in ConfigHolder.
      */
-    public static void recipeAddition(final RecipeOutput consumer) {
+    public static void recipeAddition(RecipeOutput originalConsumer) {
+        RecipeOutput consumer = new RecipeOutput() {
+            @Override
+            public Advancement.@NotNull Builder advancement() {
+                return originalConsumer.advancement();
+            }
+
+            @Override
+            public void accept(@NotNull ResourceLocation id, @NotNull Recipe<?> recipe,
+                               @Nullable AdvancementHolder advancement, ICondition @NotNull ... conditions) {
+                if (!RECIPE_FILTERS.contains(id)) {
+                    originalConsumer.accept(id, recipe, advancement, conditions);
+                }
+
+            }
+        };
+
         // Decomposition info loading
         MaterialInfoLoader.init();
 
         // com.gregtechceu.gtceu.data.recipe.generated.*
-        DecompositionRecipeHandler.init(consumer);
-        MaterialRecipeHandler.init(consumer);
-        OreRecipeHandler.init(consumer);
-        PartsRecipeHandler.init(consumer);
-        PipeRecipeHandler.init(consumer);
-        PolarizingRecipeHandler.init(consumer);
-        RecyclingRecipeHandler.init(consumer);
-        ToolRecipeHandler.init(consumer);
-        WireCombiningHandler.init(consumer);
-        WireRecipeHandler.init(consumer);
+        for (Material material : GTCEuAPI.materialManager) {
+            if (material.hasFlag(MaterialFlags.DISABLE_MATERIAL_RECIPES)) {
+                continue;
+            }
 
+            DecompositionRecipeHandler.run(consumer, material);
+            MaterialRecipeHandler.run(consumer, material);
+            OreRecipeHandler.run(consumer, material);
+            PartsRecipeHandler.run(consumer, material);
+            PipeRecipeHandler.run(consumer, material);
+            PolarizingRecipeHandler.run(consumer, material);
+            RecyclingRecipeHandler.run(consumer, material);
+            ToolRecipeHandler.run(consumer, material);
+            WireCombiningHandler.run(consumer, material);
+            WireRecipeHandler.run(consumer, material);
+        }
+
+        CustomToolRecipes.init(consumer);
         AirScrubberRecipes.init(consumer);
         ChemistryRecipes.init(consumer);
         MetaTileEntityMachineRecipeLoader.init(consumer);
         MiscRecipeLoader.init(consumer);
         VanillaStandardRecipes.init(consumer);
         WoodMachineRecipes.init(consumer);
+        StoneMachineRecipes.init(consumer);
         CraftingRecipeLoader.init(consumer);
         FuelRecipes.init(consumer);
         FusionLoader.init(consumer);
@@ -59,20 +99,18 @@ public class GTRecipes {
         ComponentRecipes.init(consumer);
         MetaTileEntityLoader.init(consumer);
 
-        // GCyM
-        GCyMRecipes.init(consumer);
+        // GCYM
+        GCYMRecipes.init(consumer);
 
         // Config-dependent recipes
         RecipeAddition.init(consumer);
+
         // Must run recycling recipes very last
-        RecyclingRecipes.init(consumer);
-
-        // Kinetic Machines
-        if (GTCEu.isCreateLoaded()) {
-            CreateRecipeLoader.init(consumer);
+        if (!GTCEu.Mods.isKubeJSLoaded()) {
+            RecyclingRecipes.init(consumer);
+            ItemMaterialData.resolveItemMaterialInfos(consumer);
         }
-
-        AddonFinder.getAddons().forEach(addon -> addon.addRecipes(consumer));
+        AddonFinder.getAddonList().forEach(addon -> addon.addRecipes(consumer));
     }
 
     /*
@@ -80,8 +118,11 @@ public class GTRecipes {
      *
      * This is also where any recipe removals should happen.
      */
-    public static void recipeRemoval(final Consumer<ResourceLocation> filter) {
-        RecipeRemoval.init(filter);
-        AddonFinder.getAddons().forEach(addon -> addon.removeRecipes(filter));
+    public static void recipeRemoval(Consumer<ResourceLocation> registry) {
+        final Consumer<ResourceLocation> actualConsumer = registry.andThen(RECIPE_FILTERS::add);
+        RECIPE_FILTERS.clear();
+
+        RecipeRemoval.init(actualConsumer);
+        AddonFinder.getAddonList().forEach(addon -> addon.removeRecipes(actualConsumer));
     }
 }

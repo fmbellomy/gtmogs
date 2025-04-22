@@ -4,16 +4,16 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
-import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
-import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -25,15 +25,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.LevelEvent;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Set;
 
@@ -41,10 +37,14 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
 
     public static final HarvestCropsBehavior INSTANCE = new HarvestCropsBehavior();
     public static final Codec<HarvestCropsBehavior> CODEC = Codec.unit(INSTANCE);
-    public static final StreamCodec<RegistryFriendlyByteBuf, HarvestCropsBehavior> STREAM_CODEC = StreamCodec
-            .unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, HarvestCropsBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected HarvestCropsBehavior() {/**/}
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == GTItemAbilities.HOE_HARVEST;
+    }
 
     @NotNull
     @Override
@@ -53,43 +53,31 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
             return InteractionResult.PASS;
         }
 
+        Level level = context.getLevel();
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
-        InteractionHand hand = context.getHand();
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
 
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
         Set<BlockPos> blocks;
-
-        if (aoeDefinition == AoESymmetrical.none()) {
+        if (aoeDefinition.isNone() || player == null) {
             blocks = ImmutableSet.of(pos);
         } else {
-            HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
-
-            if (rayTraceResult == null) return InteractionResult.PASS;
-            if (rayTraceResult.getType() != HitResult.Type.BLOCK) return InteractionResult.PASS;
-            if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                return InteractionResult.PASS;
-            if (blockHitResult.getDirection() == null)
-                return InteractionResult.PASS;
-
-            blocks = ToolHelper.iterateAoE(stack, aoeDefinition, player.level(), player, rayTraceResult,
+            blocks = ToolHelper.iterateAoE(stack, aoeDefinition, level, player, context.getHitResult(),
                     HarvestCropsBehavior::isBlockCrops);
-            if (isBlockCrops(stack, context.getLevel(), player, blockHitResult.getBlockPos(), context)) {
-                blocks.add(blockHitResult.getBlockPos());
-            }
+            blocks.add(pos);
         }
 
         boolean harvested = false;
         for (BlockPos blockPos : blocks) {
-            if (harvestBlockRoutine(stack, blockPos, player)) {
+            if (harvestBlockRoutine(stack, blockPos, level, player)) {
                 harvested = true;
             }
         }
 
-        return harvested ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        return harvested ? InteractionResult.sidedSuccess(level.isClientSide) : InteractionResult.PASS;
     }
 
     private static boolean isBlockCrops(ItemStack stack, Level world, Player player, BlockPos pos,
@@ -101,19 +89,28 @@ public class HarvestCropsBehavior implements IToolBehavior<HarvestCropsBehavior>
         return false;
     }
 
-    private static boolean harvestBlockRoutine(ItemStack stack, BlockPos pos, Player player) {
-        BlockState blockState = player.level().getBlockState(pos);
-        Block block = blockState.getBlock();
-        CropBlock blockCrops = (CropBlock) block;
-        if (blockCrops.isMaxAge(blockState)) {
-            NonNullList<ItemStack> drops = NonNullList.create();
-            drops.addAll(Block.getDrops(blockState, (ServerLevel) player.level(), pos, null));
-            dropListOfItems(player.level(), pos, drops);
-            player.level().levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(blockState));
-            player.level().setBlock(pos, blockCrops.getStateForAge(0), Block.UPDATE_ALL);
-            if (!player.isCreative()) {
-                ToolHelper.damageItem(stack, player);
+    private static boolean harvestBlockRoutine(ItemStack stack, BlockPos pos, Level level, @Nullable Player player) {
+        var blockState = level.getBlockState(pos);
+        var block = blockState.getBlock();
+        var cropBlock = (CropBlock) block;
+        final var seed = cropBlock.getCloneItemStack(level, pos, blockState).getItem();
+        if (cropBlock.isMaxAge(blockState)) {
+            var drops = Block.getDrops(blockState, (ServerLevel) level, pos, null);
+            var iterator = drops.listIterator();
+            while (iterator.hasNext()) {
+                var drop = iterator.next();
+                if (drop.is(seed)) {
+                    drop.shrink(1);
+                    if (drop.isEmpty()) {
+                        iterator.remove();
+                    }
+                    break;
+                }
             }
+            dropListOfItems(level, pos, drops);
+            level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(blockState));
+            level.setBlock(pos, cropBlock.getStateForAge(0), Block.UPDATE_ALL_IMMEDIATE);
+            ToolHelper.damageItem(stack, player);
             return true;
         }
 

@@ -12,20 +12,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
-import lombok.NonNull;
 import lombok.Setter;
 import org.apache.commons.lang3.function.TriFunction;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
-/**
- * @author KilaBash
- * @date 2023/3/4
- * @implNote MultiblockMachineDefinition
- */
 public class MultiblockMachineDefinition extends MachineDefinition {
 
     @Getter
@@ -33,15 +27,11 @@ public class MultiblockMachineDefinition extends MachineDefinition {
     private boolean generator;
     @Setter
     @Getter
-    @NonNull
+    @NotNull
     private Supplier<BlockPattern> patternFactory;
     @Setter
     @Getter
     private Supplier<List<MultiblockShapeInfo>> shapes;
-    /** Whether this multi can be rotated or face upwards. */
-    @Getter
-    @Setter
-    private boolean allowExtendedFacing;
     /** Set this to false only if your multiblock is set up such that it could have a wall-shared controller. */
     @Getter
     @Setter

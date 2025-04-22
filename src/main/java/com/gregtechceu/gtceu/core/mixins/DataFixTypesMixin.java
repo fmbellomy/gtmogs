@@ -22,7 +22,7 @@ public class DataFixTypesMixin {
     // ModifyReturnValue to inject our fixes *after* vanilla ones
     @ModifyReturnValue(method = "update(Lcom/mojang/datafixers/DataFixer;Lcom/mojang/serialization/Dynamic;II)Lcom/mojang/serialization/Dynamic;",
                        at = @At(value = "RETURN"))
-    private Dynamic<?> gtceu$injectDataFixers(Dynamic<?> value) {
+    private <T> Dynamic<T> gtceu$injectDataFixers(Dynamic<T> value) {
         return DataFixesInternals.get().updateWithAllFixers(this.type, value);
     }
 }

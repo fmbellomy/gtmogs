@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.api.gui.misc;
 
-import com.lowdragmc.lowdraglib.LDLib;
+import com.gregtechceu.gtceu.GTCEu;
+
 import com.lowdragmc.lowdraglib.gui.ingredient.IGhostIngredientTarget;
 import com.lowdragmc.lowdraglib.gui.ingredient.Target;
 
 import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -53,18 +53,16 @@ public interface IGhostItemTarget extends IGhostIngredientTarget {
     }
 
     default Object convertIngredient(Object ingredient) {
-        if (LDLib.isEmiLoaded() && ingredient instanceof EmiStack itemEmiStack) {
+        if (GTCEu.Mods.isEMILoaded() && ingredient instanceof EmiStack itemEmiStack) {
             Item item = itemEmiStack.getKeyOfType(Item.class);
             ItemStack itemStack = item == null ? ItemStack.EMPTY : new ItemStack(item, (int) itemEmiStack.getAmount());
             if (!itemStack.isEmpty()) {
-                for (var entry : itemEmiStack.getComponentChanges().entrySet()) {
-                    itemStack.set((DataComponentType) entry.getKey(), entry.getValue().orElse(null));
-                }
+                itemStack.applyComponents(itemEmiStack.getComponentChanges());
             }
             ingredient = itemStack;
         }
 
-        if (LDLib.isJeiLoaded() && ingredient instanceof ITypedIngredient<?> itemJeiStack) {
+        if (GTCEu.Mods.isJEILoaded() && ingredient instanceof ITypedIngredient<?> itemJeiStack) {
             return itemJeiStack.getItemStack().orElse(ItemStack.EMPTY);
         }
         return ingredient;

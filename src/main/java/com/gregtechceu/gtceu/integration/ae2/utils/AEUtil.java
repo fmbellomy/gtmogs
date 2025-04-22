@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.integration.ae2.utils;
 
+import com.gregtechceu.gtceu.utils.GTMath;
+
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -7,10 +9,6 @@ import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
-
-import static com.gregtechceu.gtceu.utils.GTMath.split;
 
 public class AEUtil {
 
@@ -29,28 +27,22 @@ public class AEUtil {
     }
 
     public static FluidStack toFluidStack(AEFluidKey key, long amount) {
-        return key.toStack((int) amount);
+        return key.toStack(GTMath.saturatedCast(amount));
     }
 
-    public static ItemStack[] toItemStacks(GenericStack stack) {
+    public static ItemStack toItemStack(GenericStack stack) {
         var key = stack.what();
         if (key instanceof AEItemKey itemKey) {
-            return toItemStacks(itemKey, stack.amount());
+            return toItemStack(itemKey, stack.amount());
         }
-        return new ItemStack[0];
+        return ItemStack.EMPTY;
     }
 
-    public static ItemStack[] toItemStacks(AEItemKey key, long amount) {
-        var ints = split(amount);
-        var itemStacks = new ItemStack[ints.length];
-        for (int i = 0; i < ints.length; i++) {
-            itemStacks[i] = key.toStack(ints[i]);
-        }
-        return itemStacks;
+    public static ItemStack toItemStack(AEItemKey key, long amount) {
+        return key.toStack(GTMath.saturatedCast(amount));
     }
 
     public static boolean matches(AEFluidKey key, FluidStack stack) {
-        return !stack.isEmpty() && key.getFluid().isSame(stack.getFluid()) &&
-                Objects.equals(key.toStack(1).getComponents(), stack.getComponents());
+        return key.matches(stack);
     }
 }

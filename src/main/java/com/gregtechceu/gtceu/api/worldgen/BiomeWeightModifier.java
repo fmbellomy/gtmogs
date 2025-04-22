@@ -14,23 +14,23 @@ import java.util.function.Supplier;
 
 public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
 
-    public static final BiomeWeightModifier EMPTY = new BiomeWeightModifier(HolderSet::direct, 0);
+    public static final BiomeWeightModifier EMPTY = new BiomeWeightModifier(HolderSet.empty(), 0);
 
     public static final Codec<BiomeWeightModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(mod -> mod.biomes.get()),
-            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight))
-            .apply(instance, (biomes, weight) -> new BiomeWeightModifier(() -> biomes, weight)));
+            RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(mod -> mod.biomes),
+            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight)
+    ).apply(instance, BiomeWeightModifier::new));
 
-    public Supplier<HolderSet<Biome>> biomes;
+    public HolderSet<Biome> biomes;
     public int addedWeight;
 
-    public BiomeWeightModifier(Supplier<HolderSet<Biome>> biomes, int addedWeight) {
+    public BiomeWeightModifier(HolderSet<Biome> biomes, int addedWeight) {
         this.biomes = biomes;
         this.addedWeight = addedWeight;
     }
 
     @Override
     public Integer apply(Holder<Biome> biome) {
-        return biomes.get().contains(biome) ? addedWeight : 0;
+        return biomes.contains(biome) ? addedWeight : 0;
     }
 }

@@ -1,17 +1,19 @@
 package com.gregtechceu.gtceu.utils;
 
 import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
-import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.enchantment.EnchantedItemInUse;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 
 public class EntityDamageUtil {
@@ -70,22 +72,39 @@ public class EntityDamageUtil {
         // snow/frost mobs cannot be chilled
         if (entity.getType().is(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES))
             return;
-        // frost walker entities cannot be chilled
-        ItemStack stack = entity.getItemBySlot(EquipmentSlot.FEET);
-        // check for empty in order to force damage to be applied if armor breaks
-        if (!stack.isEmpty()) {
-            var registry = entity.registryAccess().registryOrThrow(Registries.ENCHANTMENT);
-            var holder = registry.getHolderOrThrow(Enchantments.FROST_WALKER);
-            if (stack.getEnchantmentLevel(holder) > 0) {
-                stack.hurtAndBreak(1, entity, EquipmentSlot.FEET);
-                return;
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            // frost walker entities cannot be chilled
+            DamageSource source = serverLevel.damageSources().hotFloor();
+            MutableBoolean isImmune = new MutableBoolean();
+            MutableObject<EnchantedItemInUse> mutable = new MutableObject<>(null);
+            EnchantmentHelper.runIterationOnEquipment(
+                    entity,
+                    (enchant, level, used) -> {
+                        // if we already found a valid item, skip the rest. We don't want to damage all of them.
+                        if (isImmune.isTrue()) {
+                            return;
+                        }
+                        if (enchant.value().isImmuneToDamage(serverLevel, level, entity, source)) {
+                            mutable.setValue(used);
+                            isImmune.setTrue();
+                        }
+                    });
+
+            if (isImmune.isTrue() && mutable.getValue() != null) {
+                var usedItem = mutable.getValue();
+                // check for empty in order to force damage to be applied if armor breaks
+                if (!usedItem.itemStack().isEmpty()) {
+                    //noinspection DataFlowIssue
+                    usedItem.itemStack().hurtAndBreak(1, entity, usedItem.inSlot());
+                    return;
+                }
             }
         }
 
         entity.hurt(entity.damageSources().freeze(), damage);
         // TODO advancements
         // if (entity instanceof ServerPlayer) {
-        // AdvancementTriggers.COLD_DEATH.trigger((EntityPlayerMP) entity);
+        // AdvancementTriggers.COLD_DEATH.trigger((ServerPlayer) entity);
         // }
     }
 
@@ -104,6 +123,6 @@ public class EntityDamageUtil {
         entity.hurt(GTDamageTypes.CHEMICAL.source(entity.level()), damage);
         entity.addEffect(new MobEffectInstance(MobEffects.POISON, damage * 100, 1));
         // TODO advancements
-        // if (entity instanceof ServerPlayer) AdvancementTriggers.CHEMICAL_DEATH.trigger((EntityPlayerMP) entity);
+        // if (entity instanceof ServerPlayer) AdvancementTriggers.CHEMICAL_DEATH.trigger((ServerPlayer) entity);
     }
 }

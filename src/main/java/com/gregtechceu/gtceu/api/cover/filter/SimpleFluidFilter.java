@@ -4,11 +4,10 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.ScrollablePhantomFluidWidget;
 import com.gregtechceu.gtceu.api.gui.widget.ToggleButtonWidget;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 
@@ -20,22 +19,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/13
- * @implNote ItemFilterHandler
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleFluidFilter implements FluidFilter {
 
     public static final Codec<SimpleFluidFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("is_blacklist").forGetter(val -> val.isBlackList),
             Codec.BOOL.fieldOf("ignore_components").forGetter(val -> val.ignoreNbt),
-            FluidStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList()))
-            .apply(instance, SimpleFluidFilter::new));
+            FluidStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList())
+    ).apply(instance, SimpleFluidFilter::new));
     @Getter
     protected boolean isBlackList;
     @Getter
@@ -73,6 +63,11 @@ public class SimpleFluidFilter implements FluidFilter {
             this.itemWriter.accept(filter);
             onUpdated.accept(filter);
         };
+    }
+
+    @Override
+    public boolean isBlank() {
+        return !isBlackList && !ignoreNbt && Arrays.stream(matches).allMatch(FluidStack::isEmpty);
     }
 
     public void setBlackList(boolean blackList) {

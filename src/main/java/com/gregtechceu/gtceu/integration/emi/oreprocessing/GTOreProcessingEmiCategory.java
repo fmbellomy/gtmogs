@@ -2,9 +2,9 @@ package com.gregtechceu.gtceu.integration.emi.oreprocessing;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
-import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialFlags;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
@@ -26,11 +26,11 @@ public class GTOreProcessingEmiCategory extends EmiRecipeCategory {
     public static final GTOreProcessingEmiCategory CATEGORY = new GTOreProcessingEmiCategory();
 
     public GTOreProcessingEmiCategory() {
-        super(GTCEu.id("ore_processing_diagram"), EmiStack.of(Items.IRON_ORE));
+        super(GTCEu.id("ore_processing_diagram"), EmiStack.of(Items.RAW_IRON));
     }
 
     public static void registerDisplays(EmiRegistry registry) {
-        for (Material mat : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+        for (Material mat : GTCEuAPI.materialManager) {
             if (mat.hasProperty(ORE) && !mat.hasFlag(MaterialFlags.NO_ORE_PROCESSING_TAB)) {
                 registry.addRecipe(new GTEmiOreProcessing(mat));
             }

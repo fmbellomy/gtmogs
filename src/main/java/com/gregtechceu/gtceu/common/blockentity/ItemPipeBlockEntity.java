@@ -8,9 +8,8 @@ import com.gregtechceu.gtceu.common.pipelike.item.ItemNetHandler;
 import com.gregtechceu.gtceu.common.pipelike.item.ItemPipeNet;
 import com.gregtechceu.gtceu.common.pipelike.item.ItemPipeType;
 import com.gregtechceu.gtceu.utils.FacingPos;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import com.gregtechceu.gtceu.utils.GTUtil;
-
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -90,7 +89,7 @@ public class ItemPipeBlockEntity extends PipeBlockEntity<ItemPipeType, ItemPipeP
         if (level.getBlockEntity(getBlockPos().relative(side)) instanceof ItemPipeBlockEntity) {
             return false;
         }
-        return ItemTransferHelper.getItemTransfer(level, getBlockPos().relative(side), side.getOpposite()) != null;
+        return GTTransferUtils.hasAdjacentItemHandler(level, getBlockPos(), side);
     }
 
     @Nullable
@@ -153,11 +152,13 @@ public class ItemPipeBlockEntity extends PipeBlockEntity<ItemPipeType, ItemPipeP
 
     public IItemHandlerModifiable getHandler(@Nullable Direction side, boolean useCoverCapability) {
         ensureHandlersInitialized();
+        checkNetwork();
+        if (this.currentItemPipeNet.get() == null) return null;
 
         ItemNetHandler handler = getHandlers().getOrDefault(side, getDefaultHandler());
         if (!useCoverCapability || side == null) return handler;
 
         CoverBehavior cover = getCoverContainer().getCoverAtSide(side);
-        return cover != null ? cover.getItemTransferCap(handler) : handler;
+        return cover != null ? cover.getItemHandlerCap(handler) : handler;
     }
 }

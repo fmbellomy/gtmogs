@@ -1,19 +1,8 @@
-artifacts {
-    archives tasks.jar
-    archives tasks.slimJar
-    archives tasks.sourcesJar
-}
-
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            groupId = project.maven_group
-            artifactId = project.archivesBaseName
-            version = project.version
-
+            artifactId = base.archivesName.get()
             from components.java
-
-            artifact sourcesJar
         }
     }
 
@@ -21,44 +10,11 @@ publishing {
     repositories {
         // Add repositories to publish to here.
         maven {
-            url "https://maven.gtceu.com"
+            url = "https://maven.gtceu.com"
             credentials {
-                username System.getenv("MAVEN_USER")
-                password System.getenv("MAVEN_PASSWORD")
+                username = System.getenv("MAVEN_USER")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
-    }
-}
-
-java {
-    registerFeature("create") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("jei") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("rei") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("emi") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("top") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("jade") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("curios") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("ae2") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("kjs") {
-        usingSourceSet(sourceSets.main)
-    }
-    registerFeature("shimmer") {
-        usingSourceSet(sourceSets.main)
     }
 }

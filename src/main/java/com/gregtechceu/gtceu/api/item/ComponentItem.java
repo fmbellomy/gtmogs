@@ -8,10 +8,11 @@ import com.gregtechceu.gtceu.api.item.component.*;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
+import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
@@ -30,29 +31,21 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+public class ComponentItem extends Item implements IUIHolder.Item, IItemRendererProvider, IComponentItem {
 
-/**
- * @author KilaBash
- * @date 2023/2/22
- * @implNote ComponentItem
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class ComponentItem extends Item
-                           implements HeldItemUIFactory.IHeldItemUIHolder, IItemRendererProvider, IComponentItem {
-
-    protected int burnTime = 0;
+    protected int burnTime = -1;
 
     @Getter
     protected List<IItemComponent> components;
@@ -60,10 +53,6 @@ public class ComponentItem extends Item
     public ComponentItem(Properties properties) {
         super(properties);
         components = new ArrayList<>();
-    }
-
-    public static ComponentItem create(Item.Properties properties) {
-        return new ComponentItem(properties);
     }
 
     public void attachComponents(IItemComponent component) {
@@ -131,19 +120,6 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
-        for (IItemComponent component : components) {
-            if (component instanceof IInteractionItem interactionItem) {
-                var result = interactionItem.useOn(context);
-                if (result != InteractionResult.PASS) {
-                    return result;
-                }
-            }
-        }
-        return super.useOn(context);
-    }
-
-    @Override
     public ItemAttributeModifiers getDefaultAttributeModifiers(ItemStack stack) {
         for (IItemComponent component : components) {
             if (component instanceof IItemAttributes itemAttributes) {
@@ -159,8 +135,8 @@ public class ComponentItem extends Item
     @Override
     public boolean isEnchantable(ItemStack stack) {
         for (IItemComponent component : components) {
-            if (component instanceof IEnchantableItem enchantableItem) {
-                return enchantableItem.isEnchantable(stack);
+            if (component instanceof IEnchantableItem enchantableItem && enchantableItem.isEnchantable(stack)) {
+                return true;
             }
         }
         return super.isEnchantable(stack);
@@ -177,6 +153,40 @@ public class ComponentItem extends Item
     }
 
     @Override
+    public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
+        for (IItemComponent component : components) {
+            if (component instanceof IEnchantableItem enchantableItem &&
+                    enchantableItem.supportsEnchantment(stack, enchantment)) {
+                return true;
+            }
+        }
+        return super.supportsEnchantment(stack, enchantment);
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        for (IItemComponent component : components) {
+            if (component instanceof IAbilityItem abilityItem && abilityItem.canPerformAction(stack, action)) {
+                return true;
+            }
+        }
+        return super.canPerformAction(stack, action);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        for (IItemComponent component : components) {
+            if (component instanceof IInteractionItem interactionItem) {
+                var result = interactionItem.useOn(context);
+                if (result != InteractionResult.PASS) {
+                    return result;
+                }
+            }
+        }
+        return super.useOn(context);
+    }
+
+    @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand usedHand) {
         for (IItemComponent component : components) {
             if (component instanceof IInteractionItem interactionItem) {
@@ -187,6 +197,19 @@ public class ComponentItem extends Item
             }
         }
         return super.use(level, player, usedHand);
+    }
+
+    @Override
+    public InteractionResult onItemUseFirst(ItemStack itemStack, UseOnContext context) {
+        for (IItemComponent component : components) {
+            if (component instanceof IInteractionItem interactionItem) {
+                var result = interactionItem.onItemUseFirst(itemStack, context);
+                if (result != InteractionResult.PASS) {
+                    return result;
+                }
+            }
+        }
+        return InteractionResult.PASS;
     }
 
     @Override
@@ -210,16 +233,15 @@ public class ComponentItem extends Item
     }
 
     @Override
-    public InteractionResult onItemUseFirst(ItemStack itemStack, UseOnContext context) {
+    public boolean onEntitySwing(ItemStack stack, LivingEntity entity, InteractionHand hand) {
         for (IItemComponent component : components) {
             if (component instanceof IInteractionItem interactionItem) {
-                var result = interactionItem.onItemUseFirst(itemStack, context);
-                if (result != InteractionResult.PASS) {
-                    return result;
-                }
+                // this will cancel the left click animation
+                return interactionItem.onEntitySwing(stack, entity, hand);
             }
         }
-        return InteractionResult.PASS;
+        // normal behavior
+        return super.onEntitySwing(stack, entity, hand);
     }
 
     @Override

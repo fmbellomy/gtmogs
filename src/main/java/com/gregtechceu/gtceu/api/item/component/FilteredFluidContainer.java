@@ -4,8 +4,6 @@ import com.gregtechceu.gtceu.api.item.component.forge.IComponentCapability;
 import com.gregtechceu.gtceu.api.misc.forge.FilteredFluidHandlerItemStack;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
-import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -14,6 +12,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import net.neoforged.neoforge.fluids.FluidUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -39,7 +38,7 @@ public class FilteredFluidContainer implements IItemComponent, IComponentCapabil
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
                                 TooltipFlag isAdvanced) {
-        FluidStack tank = FluidTransferHelper.getFluidContained(stack);
+        FluidStack tank = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
         if (!tank.isEmpty()) {
             tooltipComponents
                     .add(Component.translatable("gtceu.universal.tooltip.fluid_stored", tank.getHoverName(),

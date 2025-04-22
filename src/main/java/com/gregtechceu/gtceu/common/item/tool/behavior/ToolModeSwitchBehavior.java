@@ -1,12 +1,13 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
-import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
-import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
-import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -19,53 +20,45 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static com.gregtechceu.gtceu.api.item.tool.ToolHelper.getBehaviorsComponent;
-
 public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehavior> {
 
-    public static final ToolModeSwitchBehavior INSTANCE = new ToolModeSwitchBehavior(ModeType.BOTH);
+    public static final ToolModeSwitchBehavior INSTANCE = new ToolModeSwitchBehavior();
 
-    public static final Codec<ToolModeSwitchBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ModeType.CODEC.lenientOptionalFieldOf("mode_type", ModeType.BOTH)
-                    .forGetter(val -> val.modeType))
-            .apply(instance, ToolModeSwitchBehavior::new));
+    public static final Codec<ToolModeSwitchBehavior> CODEC = Codec.unit(INSTANCE);
+    public static final StreamCodec<ByteBuf, ToolModeSwitchBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ToolModeSwitchBehavior> STREAM_CODEC = StreamCodec
-            .composite(
-                    ModeType.STREAM_CODEC, ToolModeSwitchBehavior::getModeType,
-                    ToolModeSwitchBehavior::new);
+    protected ToolModeSwitchBehavior() {}
 
-    @Getter
-    private final ToolModeSwitchBehavior.ModeType modeType;
-
-    protected ToolModeSwitchBehavior(ToolModeSwitchBehavior.ModeType type) {
-        this.modeType = type;
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        var mode = stack.getOrDefault(GTDataComponents.TOOL_MODE, ModeType.BOTH);
+        boolean canWrenchConfigureAll = action == GTItemAbilities.WRENCH_CONFIGURE_ALL;
+        return action == GTItemAbilities.WRENCH_CONFIGURE || switch (mode) {
+            case ITEM -> canWrenchConfigureAll || action == GTItemAbilities.WRENCH_CONFIGURE_ITEMS;
+            case FLUID -> canWrenchConfigureAll || action == GTItemAbilities.WRENCH_CONFIGURE_FLUIDS;
+            case BOTH -> GTItemAbilities.WRENCH_CONFIGURE_ACTIONS.contains(action);
+        };
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> onItemRightClick(@NotNull Level world, @NotNull Player player,
+    public @NotNull InteractionResultHolder<ItemStack> onItemRightClick(@NotNull Level level, @NotNull Player player,
                                                                         @NotNull InteractionHand hand) {
-        var itemStack = player.getItemInHand(hand);
-        if (player.isShiftKeyDown()) {
-            ToolModeSwitchBehavior.ModeType type = ModeType.values()[(this.modeType.ordinal() + 1) %
-                    ModeType.values().length];
-            itemStack.update(GTDataComponents.TOOL_BEHAVIORS, ToolBehaviors.EMPTY,
-                    behavior -> behavior.withBehavior(new ToolModeSwitchBehavior(type)));
-
-            player.displayClientMessage(Component.translatable("metaitem.machine_configuration.mode", type.getName()),
-                    true);
-            return InteractionResultHolder.success(itemStack.copy());
+        var held = player.getItemInHand(hand);
+        if (level.isClientSide || !player.isShiftKeyDown()) {
+            return InteractionResultHolder.pass(held);
         }
+        var newMode = held.getOrDefault(GTDataComponents.TOOL_MODE, ModeType.BOTH).nextMode();
+        held.set(GTDataComponents.TOOL_MODE, newMode);
 
-        return IToolBehavior.super.onItemRightClick(world, player, hand);
+        player.displayClientMessage(Component.translatable("metaitem.machine_configuration.mode", newMode.getName()),
+                true);
+        return InteractionResultHolder.success(held);
     }
 
     @Override
@@ -76,10 +69,8 @@ public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehav
     @Override
     public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
-        var component = getBehaviorsComponent(stack);
-        ToolModeSwitchBehavior behavior = component.getBehavior(GTToolBehaviors.MODE_SWITCH);
-        tooltip.add(Component.translatable("metaitem.machine_configuration.mode",
-                (behavior != null ? behavior.modeType : ModeType.BOTH).getName()));
+        ModeType behavior = stack.getOrDefault(GTDataComponents.TOOL_MODE, ModeType.BOTH);
+        tooltip.add(Component.translatable("metaitem.machine_configuration.mode", behavior.getName()));
     }
 
     public enum ModeType implements StringRepresentable {
@@ -102,9 +93,18 @@ public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehav
             this.name = name;
         }
 
+        public ModeType nextMode() {
+            return switch (this) {
+                case ITEM -> FLUID;
+                case FLUID -> BOTH;
+                case BOTH -> ITEM;
+            };
+        }
+
         @Override
-        public String getSerializedName() {
+        public @NotNull String getSerializedName() {
             return id;
         }
     }
+
 }

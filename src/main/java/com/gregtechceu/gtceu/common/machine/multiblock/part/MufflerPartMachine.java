@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.common.machine.multiblock.part;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.UITemplate;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IUIMachine;
@@ -14,30 +15,18 @@ import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import lombok.Getter;
 
 import java.util.stream.IntStream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/8
- * @implNote MufflerPartMachine
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MufflerPartMachine extends TieredPartMachine implements IMufflerMachine, IUIMachine {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MufflerPartMachine.class,
@@ -45,7 +34,7 @@ public class MufflerPartMachine extends TieredPartMachine implements IMufflerMac
     @Getter
     private final int recoveryChance;
     @Getter
-    @Persisted(subPersisted = true)
+    @Persisted
     private final CustomItemStackHandler inventory;
 
     public MufflerPartMachine(IMachineBlockEntity holder, int tier) {
@@ -71,7 +60,7 @@ public class MufflerPartMachine extends TieredPartMachine implements IMufflerMac
         int numRolls = Math.min(recoveryItems.length, inventory.getSlots());
         IntStream.range(0, numRolls).forEach(slot -> {
             if (calculateChance()) {
-                ItemTransferHelper.insertItemStacked(inventory, recoveryItems[slot].copy(), false);
+                ItemHandlerHelper.insertItemStacked(inventory, recoveryItems[slot].copy(), false);
             }
         });
     }

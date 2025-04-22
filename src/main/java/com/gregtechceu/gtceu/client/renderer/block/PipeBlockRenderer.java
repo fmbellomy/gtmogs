@@ -1,22 +1,23 @@
 package com.gregtechceu.gtceu.client.renderer.block;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
-import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverableRenderer;
-import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 
-import com.lowdragmc.lowdraglib.LDLib;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -27,22 +28,17 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.common.util.TriState;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.common.util.TriState;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-/**
- * @author KilaBash
- * @date 2023/3/1
- * @implNote PipeBlockRenderer
- */
 public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
 
     @Getter
@@ -50,7 +46,7 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
 
     public PipeBlockRenderer(PipeModel pipeModel) {
         this.pipeModel = pipeModel;
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             registerEvent();
         }
     }
@@ -68,7 +64,7 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
 
     @Override
     public TriState useAO() {
-        return TriState.TRUE;
+        return TriState.DEFAULT;
     }
 
     @Override
@@ -80,20 +76,22 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                       RandomSource rand) {
+                                       @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         if (level == null) {
-            return pipeModel.bakeQuads(side, PipeModel.ITEM_CONNECTIONS);
+            return pipeModel.bakeQuads(side, PipeModel.ITEM_CONNECTIONS, 0);
         } else if (level.getBlockEntity(pos) instanceof IPipeNode<?, ?> pipeNode) {
-            var quads = new LinkedList<>(pipeModel.bakeQuads(side, pipeNode.getVisualConnections()));
+            var quads = new LinkedList<>(
+                    pipeModel.bakeQuads(side, pipeNode.getVisualConnections(), pipeNode.getBlockedConnections()));
             var modelState = ModelFactory.getRotation(pipeNode.getCoverContainer().getFrontFacing());
             var modelFacing = side == null ? null :
                     ModelFactory.modelFacing(side, pipeNode.getCoverContainer().getFrontFacing());
-            ICoverableRenderer.super.renderCovers(quads, side, rand, pipeNode.getCoverContainer(), modelFacing,
-                    modelState);
-            if (pipeNode.getFrameMaterial() != null) {
+            ICoverableRenderer.super.renderCovers(quads, side, rand, pipeNode.getCoverContainer(), modelFacing, pos,
+                    level, modelState);
+            if (!pipeNode.getFrameMaterial().isNull()) {
                 ResourceLocation rl = MaterialIconType.frameGt
                         .getBlockTexturePath(pipeNode.getFrameMaterial().getMaterialIconSet(), true);
-                BlockState blockState = GTBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
+                BlockState blockState = GTMaterialBlocks.MATERIAL_BLOCKS
+                        .get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
                         .getDefaultState();
                 var frameModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
                 for (Direction face : Direction.values()) {

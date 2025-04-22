@@ -5,7 +5,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 
@@ -45,6 +45,11 @@ public class MachineDefinition implements Supplier<IMachineBlock> {
 
     @Getter
     private final ResourceLocation id;
+    // This is only stored here for KJS use.
+    @Getter
+    @Setter
+    @Nullable
+    private String langValue;
     @Setter
     private Supplier<? extends Block> blockSupplier;
     @Setter
@@ -55,8 +60,7 @@ public class MachineDefinition implements Supplier<IMachineBlock> {
     private Function<IMachineBlockEntity, MetaMachine> machineSupplier;
     @Getter
     @Setter
-    @Nullable
-    private GTRecipeType[] recipeTypes;
+    private GTRecipeType @Nullable [] recipeTypes;
     @Getter
     @Setter
     private int tier;
@@ -85,6 +89,13 @@ public class MachineDefinition implements Supplier<IMachineBlock> {
     @Getter
     @Setter
     private Consumer<IRecipeLogicMachine> afterWorking = (machine) -> {};
+    @Getter
+    @Setter
+    private boolean regressWhenWaiting = true;
+    /** Whether this machine can be rotated or face upwards. */
+    @Getter
+    @Setter
+    private boolean allowExtendedFacing;
 
     @Getter
     @Setter

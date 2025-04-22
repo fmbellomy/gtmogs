@@ -1,9 +1,11 @@
 package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
 import com.gregtechceu.gtceu.core.MixinHelpers;
-import com.gregtechceu.gtceu.data.pack.GTDynamicDataPack;
+import com.gregtechceu.gtceu.data.loot.DungeonLootLoader;
+import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
+import com.gregtechceu.gtceu.data.recipe.GTCraftingComponents;
 import com.gregtechceu.gtceu.data.recipe.GTRecipes;
 
 import net.minecraft.advancements.Advancement;
@@ -21,6 +23,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.ICondition;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,8 +41,8 @@ public abstract class ReloadableServerResourcesMixin {
                                    FeatureFlagSet featureFlags, Commands.CommandSelection commands,
                                    int functionCompilationLevel, Executor backgroundExecutor, Executor gameExecutor,
                                    CallbackInfoReturnable<CompletableFuture<ReloadableServerResources>> cir) {
-        // load and loot tables recipes *before* other data so that we have the registries loaded before saving recipes
-        // to JSON.
+        // load and loot tables recipes *before* other data so that we have the registries loaded
+        // before saving recipes to JSON.
         // because it breaks if we don't do that.
 
         // this doesn't have dynamic registries available, by the way.
@@ -47,22 +50,25 @@ public abstract class ReloadableServerResourcesMixin {
 
         // Register recipes & unification data again
         long startTime = System.currentTimeMillis();
-        ChemicalHelper.reinitializeUnification();
+        ItemMaterialData.reinitializeMaterialData();
+        GTCraftingComponents.init();
         GTRecipes.recipeAddition(new RecipeOutput() {
 
             @Override
-            public Advancement.Builder advancement() {
+            public Advancement.@NotNull Builder advancement() {
                 // noinspection removal
                 return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
             }
 
             @Override
-            public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement,
-                               ICondition... conditions) {
+            public void accept(@NotNull ResourceLocation id,@NotNull Recipe<?> recipe,
+                               @Nullable AdvancementHolder advancement, ICondition @NotNull ... conditions) {
                 GTDynamicDataPack.addRecipe(id, recipe, advancement, frozen);
             }
         });
         MixinHelpers.generateGTDynamicLoot(GTDynamicDataPack::addLootTable, frozen);
+        // Initialize dungeon loot additions
+        DungeonLootLoader.init();
 
         GTCEu.LOGGER.info("GregTech Data loading took {}ms", System.currentTimeMillis() - startTime);
     }

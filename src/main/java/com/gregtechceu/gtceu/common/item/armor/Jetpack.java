@@ -6,10 +6,8 @@ import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.armor.ArmorLogicSuite;
 import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTArmor;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
-
-import com.lowdragmc.lowdraglib.Platform;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.particles.ParticleOptions;
@@ -38,7 +36,7 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
 
     public Jetpack(int energyPerUse, long capacity, int tier) {
         super(energyPerUse, capacity, tier, ArmorItem.Type.CHESTPLATE);
-        if (Platform.isClient() && this.shouldDrawHUD()) {
+        if (GTCEu.isClientSide() && this.shouldDrawHUD()) {
             // noinspection NewExpressionSideOnly
             HUD = new ArmorUtils.ModularHUD();
         }
@@ -46,10 +44,7 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
 
     @Override
     public void onArmorTick(Level world, Player player, @NotNull ItemStack stack) {
-        GTArmor data = stack.get(GTDataComponents.ARMOR_DATA);
-        if (data == null) {
-            return;
-        }
+        GTArmor.Mutable data = stack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY).toMutable();
         byte toggleTimer = data.toggleTimer();
         boolean hoverMode = data.hover();
         boolean jetpackEnabled = data.enabled();
@@ -59,13 +54,11 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
             if (KeyBind.JETPACK_ENABLE.isKeyDown(player)) {
                 jetpackEnabled = !jetpackEnabled;
                 messageKey = "metaarmor.jetpack.flight." + (jetpackEnabled ? "enable" : "disable");
-                final boolean finalEnabled = jetpackEnabled;
-                stack.update(GTDataComponents.ARMOR_DATA, new GTArmor(), data1 -> data1.setEnabled(finalEnabled));
+                data.enabled(jetpackEnabled);
             } else if (KeyBind.ARMOR_HOVER.isKeyDown(player)) {
                 hoverMode = !hoverMode;
                 messageKey = "metaarmor.jetpack.hover." + (hoverMode ? "enable" : "disable");
-                final boolean finalHover = hoverMode;
-                stack.update(GTDataComponents.ARMOR_DATA, new GTArmor(), data1 -> data1.setHover(finalHover));
+                data.hover(hoverMode);
             }
 
             if (messageKey != null) {
@@ -75,17 +68,9 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
         }
 
         if (toggleTimer > 0) toggleTimer--;
+        data.toggleTimer(toggleTimer);
 
-        if (toggleTimer > 0) toggleTimer--;
-
-        final boolean finalHover = hoverMode;
-        final byte finalToggleTimer = toggleTimer;
-        final boolean finalEnabled = jetpackEnabled;
-        stack.update(GTDataComponents.ARMOR_DATA, new GTArmor(),
-                data1 -> data1.setHover(finalHover)
-                        .setToggleTimer(finalToggleTimer)
-                        .setEnabled(finalEnabled));
-
+        stack.set(GTDataComponents.ARMOR_DATA, data.toImmutable());
         performFlying(player, jetpackEnabled, hoverMode, stack);
     }
 
@@ -119,8 +104,8 @@ public class Jetpack extends ArmorLogicSuite implements IJetpack {
     }
 
     @Override
-    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot,
-                                            ArmorMaterial.Layer layer) {
+    public ResourceLocation getArmorTexture(ItemStack stack, Entity entity,
+                                            EquipmentSlot slot, ArmorMaterial.Layer layer) {
         return GTCEu.id("textures/armor/jetpack.png");
     }
 

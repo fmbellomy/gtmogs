@@ -1,14 +1,16 @@
 package com.gregtechceu.gtceu.core.mixins;
 
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.common.item.tool.ToolEventHandlers;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -34,14 +36,22 @@ public abstract class BlockMixin {
                                                      BlockPos pos, @Nullable BlockEntity blockEntity,
                                                      @Nullable Entity entity, ItemStack tool) {
         if (!tool.isEmpty() && entity instanceof Player player) {
-            boolean isSilktouch = EnchantmentHelper
-                    .getItemEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.SILK_TOUCH), tool) > 0;
-            int fortuneLevel = EnchantmentHelper
-                    .getItemEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.FORTUNE), tool);
-            return ToolEventHandlers.onHarvestDrops(player, tool, level, pos, state, isSilktouch,
-                    fortuneLevel,
-                    original, 1);
+            boolean isSilkTouch = tool
+                    .getEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.SILK_TOUCH)) > 0;
+            int fortuneLevel = tool.getEnchantmentLevel(level.registryAccess().holderOrThrow(Enchantments.FORTUNE));
+            return ToolEventHandlers.onHarvestDrops(player, tool, level, pos, state,
+                    isSilkTouch, fortuneLevel, original, 1);
         }
         return original;
+    }
+
+    @WrapWithCondition(method = "playerWillDestroy",
+                       at = @At(
+                               value = "INVOKE",
+                               target = "Lnet/minecraft/world/level/block/Block;spawnDestroyParticles(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V"
+                       ))
+    private boolean gtceu$disableAoeBlockParticles(Block instance, Level level, Player player,
+                                                   BlockPos pos, BlockState state) {
+        return ToolHelper.DO_BLOCK_BREAK_SOUND_PARTICLES.get();
     }
 }

@@ -8,25 +8,24 @@ import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.gui.editor.EditableUI;
 import com.gregtechceu.gtceu.api.gui.fancy.ConfiguratorPanel;
 import com.gregtechceu.gtceu.api.gui.widget.GhostCircuitSlotWidget;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputBoth;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
+import com.gregtechceu.gtceu.api.machine.feature.IHasCircuitSlot;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.lang.LangHandler;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.FluidTransferHelper;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -43,20 +42,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.google.common.collect.Tables;
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.BiFunction;
-
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * @author KilaBash
@@ -64,9 +59,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * @implNote SimpleMachine
  *           All simple single machines are implemented here.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoOutputBoth, IFancyUIMachine {
+public class SimpleTieredMachine extends WorkableTieredMachine
+                                 implements IAutoOutputBoth, IFancyUIMachine, IHasCircuitSlot {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(SimpleTieredMachine.class,
             WorkableTieredMachine.MANAGED_FIELD_HOLDER);
@@ -98,7 +92,7 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     @Persisted
     protected boolean allowInputFromOutputSideFluids;
     @Getter
-    @Persisted(subPersisted = true)
+    @Persisted
     protected final CustomItemStackHandler chargerInventory;
     @Getter
     @Persisted
@@ -114,7 +108,7 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
         this.outputFacingItems = hasFrontFacing() ? getFrontFacing().getOpposite() : Direction.UP;
         this.outputFacingFluids = outputFacingItems;
         this.chargerInventory = createChargerItemHandler(args);
-        this.circuitInventory = createCircuitItemHandler(args);
+        this.circuitInventory = createCircuitItemHandler(args).shouldSearchContent(false);
     }
 
     //////////////////////////////////////
@@ -126,11 +120,16 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     }
 
     protected CustomItemStackHandler createChargerItemHandler(Object... args) {
-        var transfer = new CustomItemStackHandler();
-        transfer.setFilter(item -> item.get(GTDataComponents.ENERGY_CONTENT) != null ||
+        var handler = new CustomItemStackHandler() {
+
+            public int getSlotLimit(int slot) {
+                return 1;
+            }
+        };
+        handler.setFilter(item -> GTCapabilityHelper.getElectricItem(item) != null ||
                 (ConfigHolder.INSTANCE.compat.energy.nativeEUToFE &&
                         GTCapabilityHelper.getForgeEnergyItem(item) != null));
-        return transfer;
+        return handler;
     }
 
     protected NotifiableItemStackHandler createCircuitItemHandler(Object... args) {
@@ -238,7 +237,7 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     }
 
     @Override
-    public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {
+    public void onNeighborChanged(net.minecraft.world.level.block.Block block, BlockPos fromPos, boolean isMoving) {
         super.onNeighborChanged(block, fromPos, isMoving);
         updateAutoOutputSubscription();
     }
@@ -246,12 +245,10 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     protected void updateAutoOutputSubscription() {
         var outputFacingItems = getOutputFacingItems();
         var outputFacingFluids = getOutputFacingFluids();
-        if ((isAutoOutputItems() && !exportItems.isEmpty()) && outputFacingItems != null &&
-                ItemTransferHelper.getItemTransfer(getLevel(), getPos().relative(outputFacingItems),
-                        outputFacingItems.getOpposite()) != null ||
-                (isAutoOutputFluids() && !exportFluids.isEmpty()) && outputFacingFluids != null &&
-                        FluidTransferHelper.getFluidTransfer(getLevel(), getPos().relative(outputFacingFluids),
-                                outputFacingFluids.getOpposite()) != null) {
+        if ((isAutoOutputItems() && !exportItems.isEmpty() && outputFacingItems != null &&
+                GTTransferUtils.hasAdjacentItemHandler(getLevel(), getPos(), outputFacingItems)) ||
+                (isAutoOutputFluids() && !exportFluids.isEmpty() && outputFacingFluids != null &&
+                        GTTransferUtils.hasAdjacentFluidHandler(getLevel(), getPos(), outputFacingFluids))) {
             autoOutputSubs = subscribeServerTick(autoOutputSubs, this::autoOutput);
         } else if (autoOutputSubs != null) {
             autoOutputSubs.unsubscribe();
@@ -313,7 +310,9 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     @Override
     public void attachConfigurators(ConfiguratorPanel configuratorPanel) {
         IFancyUIMachine.super.attachConfigurators(configuratorPanel);
-        configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventory.storage));
+        if (isCircuitSlotEnabled()) {
+            configuratorPanel.attachConfigurators(new CircuitFancyConfigurator(circuitInventory.storage));
+        }
     }
 
     @SuppressWarnings("UnstableApiUsage")
@@ -402,7 +401,7 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
     //////////////////////////////////////
     @Override
     public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+                                    ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.WRENCH)) {
             if (!player.isShiftKeyDown()) {
                 if (!hasFrontFacing() || side != getFrontFacing()) {
@@ -415,6 +414,6 @@ public class SimpleTieredMachine extends WorkableTieredMachine implements IAutoO
                 return GuiTextures.TOOL_ALLOW_INPUT;
             }
         }
-        return super.sideTips(player, pos, state, toolTypes, side);
+        return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 }

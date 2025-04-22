@@ -1,11 +1,13 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe.components;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import dev.latvian.mods.kubejs.recipe.match.ReplacementMatchInfo;
 import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
@@ -13,10 +15,17 @@ import dev.latvian.mods.rhino.type.TypeInfo;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 
-public record CapabilityMapComponent(boolean isTick) implements RecipeComponent<CapabilityMap> {
+public record CapabilityMapComponent() implements RecipeComponent<CapabilityMap> {
 
     public static final Codec<CapabilityMap> CODEC = RecipeCapability.CODEC
             .xmap(CapabilityMap::new, Function.identity());
+    public static final CapabilityMapComponent INSTANCE = new CapabilityMapComponent();
+    public static final RecipeComponentType<CapabilityMap> TYPE = RecipeComponentType.unit(GTCEu.id("capability_map"), INSTANCE);
+
+    @Override
+    public RecipeComponentType<?> type() {
+        return TYPE;
+    }
 
     @Override
     public Codec<CapabilityMap> codec() {
@@ -44,10 +53,5 @@ public record CapabilityMapComponent(boolean isTick) implements RecipeComponent<
             }
         });
         return changed.get() ? new CapabilityMap(original) : original;
-    }
-
-    @Override
-    public String toString() {
-        return "capability_map[tick=" + isTick + "]";
     }
 }

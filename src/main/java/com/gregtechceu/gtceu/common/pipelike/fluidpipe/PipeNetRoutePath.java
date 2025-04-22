@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.common.pipelike.fluidpipe;
 
 import com.gregtechceu.gtceu.api.pipenet.IRoutePath;
+import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Getter;
@@ -43,6 +43,6 @@ public class PipeNetRoutePath implements IRoutePath<IFluidHandler> {
 
     @Nullable
     public IFluidHandler getHandler(Level world) {
-        return world.getCapability(Capabilities.FluidHandler.BLOCK, getTargetPipePos(), targetFacing.getOpposite());
+        return GTTransferUtils.getAdjacentFluidHandler(world, pipePos, targetFacing).orElse(null);
     }
 }

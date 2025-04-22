@@ -1,16 +1,17 @@
 package com.gregtechceu.gtceu.data.material;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.fluid.FluidBuilder;
-import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
+import com.gregtechceu.gtceu.api.fluid.FluidBuilder;
+import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
 
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialFlags.*;
 import static com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet.*;
+import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
 public class UnknownCompositionMaterials {
@@ -112,7 +113,6 @@ public class UnknownCompositionMaterials {
 
         SulfuricLightFuel = new Material.Builder(GTCEu.id("sulfuric_light_fuel"))
                 .liquid(new FluidBuilder()
-                        .temperature(775)
                         .customStill())
                 .flags(FLAMMABLE).buildAndRegister();
 
@@ -277,7 +277,7 @@ public class UnknownCompositionMaterials {
                 .flags(STICKY, FLAMMABLE)
                 .buildAndRegister();
 
-        OilHeavy = new Material.Builder(GTCEu.id("heavy_oil"))
+        HeavyOil = new Material.Builder(GTCEu.id("heavy_oil"))
                 .liquid(new FluidBuilder().block().customStill())
                 .color(0x0A0A0A)
                 .flags(STICKY, FLAMMABLE)
@@ -289,7 +289,7 @@ public class UnknownCompositionMaterials {
                 .flags(STICKY, FLAMMABLE)
                 .buildAndRegister();
 
-        OilLight = new Material.Builder(GTCEu.id("light_oil"))
+        LightOil = new Material.Builder(GTCEu.id("light_oil"))
                 .liquid(new FluidBuilder().block().customStill())
                 .color(0x0A0A0A)
                 .flags(STICKY, FLAMMABLE)
@@ -355,6 +355,12 @@ public class UnknownCompositionMaterials {
 
         Lava = new Material.Builder(GTCEu.id("lava"))
                 .fluid().color(0xFF4000).buildAndRegister();
+
+        Netherite = new Material.Builder(GTCEu.id("netherite"))
+                .ingot().color(0x4b4042).secondaryColor(0x474447)
+                .toolStats(ToolProperty.Builder.of(10.0F, 14.0F, 900, 4)
+                        .enchantability(21).build())
+                .buildAndRegister();
 
         Glowstone = new Material.Builder(GTCEu.id("glowstone"))
                 .dust(1)
@@ -535,7 +541,8 @@ public class UnknownCompositionMaterials {
         Lapotron = new Material.Builder(GTCEu.id("lapotron"))
                 .gem()
                 .color(0x7497ea).secondaryColor(0x1c0b39).iconSet(DIAMOND)
-                .flags(NO_UNIFICATION)
+                .flags(DISABLE_MATERIAL_RECIPES)
+                .ignoredTagPrefixes(dustTiny, dustSmall)
                 .buildAndRegister();
 
         TreatedWood = new Material.Builder(GTCEu.id("treated_wood"))

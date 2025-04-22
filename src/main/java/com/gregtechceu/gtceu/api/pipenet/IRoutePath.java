@@ -29,7 +29,7 @@ public interface IRoutePath<T> {
 
     @Nullable
     default <I> I getTargetCapability(BlockCapability<I, Direction> capability, Level level) {
-        return level.getCapability(capability, getTargetPipePos().relative(getTargetFacing()),
-                getTargetFacing().getOpposite());
+        return level.getCapability(capability,
+                getTargetPipePos().relative(getTargetFacing()), getTargetFacing().getOpposite());
     }
 }

@@ -1,18 +1,17 @@
 package com.gregtechceu.gtceu.api.block;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.PipeBlockItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.client.renderer.block.MaterialBlockRenderer;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
-import com.lowdragmc.lowdraglib.Platform;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,10 +21,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
@@ -41,6 +42,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -50,15 +52,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 import java.util.Set;
 
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
 
-/**
- * @author KilaBash
- * @date 2023/2/27
- * @implNote MaterialBlock
- */
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class MaterialBlock extends AppearanceBlock {
 
     public final TagPrefix tagPrefix;
@@ -68,7 +62,7 @@ public class MaterialBlock extends AppearanceBlock {
         super(properties);
         this.material = material;
         this.tagPrefix = tagPrefix;
-        if (registerModel && Platform.isClient()) {
+        if (registerModel && GTCEu.isClientSide()) {
             MaterialBlockRenderer.create(this, tagPrefix.materialIconType(), material.getMaterialIconSet());
         }
     }
@@ -98,7 +92,6 @@ public class MaterialBlock extends AppearanceBlock {
     }
 
     /** Start falling ore stuff */
-    @SuppressWarnings("deprecation")
     @Override
     public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean isMoving) {
         if (TagPrefix.ORES.containsKey(this.tagPrefix) && TagPrefix.ORES.get(tagPrefix).isSand() &&
@@ -107,7 +100,6 @@ public class MaterialBlock extends AppearanceBlock {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public BlockState updateShape(BlockState state, Direction direction, BlockState neighborState, LevelAccessor level,
                                   BlockPos currentPos, BlockPos neighborPos) {
@@ -118,7 +110,6 @@ public class MaterialBlock extends AppearanceBlock {
         return super.updateShape(state, direction, neighborState, level, currentPos, neighborPos);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (!FallingBlock.isFree(level.getBlockState(pos.below())) || pos.getY() < level.getMinBuildHeight()) {
@@ -190,7 +181,7 @@ public class MaterialBlock extends AppearanceBlock {
                 continue;
             }
             BlockEntity te = level.getBlockEntity(blockPos);
-            if (te instanceof PipeBlockEntity<?, ?> pbe && pbe.getFrameMaterial() != null) {
+            if (te instanceof PipeBlockEntity<?, ?> pbe && !pbe.getFrameMaterial().isNull()) {
                 blockPos.move(Direction.UP);
                 continue;
             }
@@ -199,7 +190,7 @@ public class MaterialBlock extends AppearanceBlock {
                 if (!player.isCreative())
                     stack.shrink(1);
                 return ItemInteractionResult.SUCCESS;
-            } else if (te instanceof PipeBlockEntity<?, ?> pbe && pbe.getFrameMaterial() == null) {
+            } else if (te instanceof PipeBlockEntity<?, ?> pbe && pbe.getFrameMaterial().isNull()) {
                 pbe.setFrameMaterial(frameBlock.material);
 
                 if (!player.isCreative())
@@ -228,8 +219,8 @@ public class MaterialBlock extends AppearanceBlock {
         BlockEntity te = level.getBlockEntity(pos);
         if (te instanceof PipeBlockEntity<?, ?> pipeTile) {
             Material mat = pipeTile.getFrameMaterial();
-            if (mat != null) {
-                pipeTile.setFrameMaterial(null);
+            if (!mat.isNull()) {
+                pipeTile.setFrameMaterial(GTMaterials.NULL);
                 Block.popResource(level, pos, this.asItem().getDefaultInstance());
                 ToolHelper.damageItem(stack, player);
                 ToolHelper.playToolSound(GTToolType.CROWBAR, (ServerPlayer) player);
@@ -242,7 +233,7 @@ public class MaterialBlock extends AppearanceBlock {
     @Override
     public boolean canBeReplaced(BlockState state, BlockPlaceContext useContext) {
         if (this.tagPrefix == TagPrefix.frameGt && useContext.getItemInHand().getItem() instanceof PipeBlockItem &&
-                !useContext.getPlayer().isCrouching())
+                !useContext.getPlayer().isShiftKeyDown())
             return true;
         return super.canBeReplaced(state, useContext);
     }
@@ -279,7 +270,26 @@ public class MaterialBlock extends AppearanceBlock {
     }
 
     @Override
-    public void entityInside(BlockState p_60495_, Level p_60496_, BlockPos p_60497_, Entity p_60498_) {
-        super.entityInside(p_60495_, p_60496_, p_60497_, p_60498_);
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
+        if (this.tagPrefix == TagPrefix.frameGt && entity instanceof LivingEntity livingEntity) {
+            double currentAccel = 0.15D * (livingEntity.getDeltaMovement().y < 0.3D ? 2.5D : 1.0D);
+            double currentSpeedVertical = 0.9D * (livingEntity.isInWater() ? 0.4D : 1.0D);
+            Vec3 deltaMovement = livingEntity.getDeltaMovement();
+            livingEntity.resetFallDistance();
+            float f = 0.15F;
+            double d0 = Mth.clamp(deltaMovement.x, -f, f);
+            double d1 = Mth.clamp(deltaMovement.z, -f, f);
+            double d2 = Math.max(deltaMovement.y, -f);
+            if (d2 < 0.0 && !livingEntity.getBlockStateOn().isScaffolding(livingEntity) &&
+                    livingEntity.isSuppressingSlidingDownLadder() &&
+                    livingEntity instanceof Player) {
+                d2 = Math.min(deltaMovement.y + currentAccel, 0.0D);
+            }
+            if (livingEntity.horizontalCollision) {
+                d2 = 0.3;
+            }
+            deltaMovement = new Vec3(d0, d2, d1);
+            entity.setDeltaMovement(deltaMovement);
+        }
     }
 }

@@ -3,10 +3,12 @@ package com.gregtechceu.gtceu.api.worldgen.generator;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -16,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.util.*;
@@ -35,14 +36,7 @@ public abstract class VeinGenerator {
     public static final Codec<VeinGenerator> DIRECT_CODEC = REGISTRY_CODEC.dispatchStable(VeinGenerator::codec,
             Function.identity());
 
-    protected GTOreDefinition entry;
-
     public VeinGenerator() {}
-
-    public VeinGenerator(GTOreDefinition entry) {
-        this.entry = entry;
-    }
-
     /**
      * @return List of [block|material, chance]
      */
@@ -57,9 +51,11 @@ public abstract class VeinGenerator {
         return getAllEntries().stream()
                 .sorted(Comparator.comparingInt(Map.Entry::getValue))
                 .map(Map.Entry::getKey)
-                .map(either -> either.map(state -> ChemicalHelper.getMaterial(state.getBlock()) != null ?
-                        ChemicalHelper.getMaterial(state.getBlock()).material() : null, Function.identity()))
-                .filter(Objects::nonNull)
+                .map(either -> either.map(state -> {
+                    var matStack = ChemicalHelper.getMaterialStack(state.getBlock());
+                    return matStack.material();
+                }, Function.identity()))
+                .filter(mat -> !mat.isNull())
                 .toList();
     }
 
@@ -70,12 +66,12 @@ public abstract class VeinGenerator {
     public List<Map.Entry<Integer, Material>> getValidMaterialsChances() {
         return getAllEntries().stream()
                 .filter(entry -> entry.getKey()
-                        .map(state -> ChemicalHelper.getMaterial(state.getBlock()) != null ?
-                                ChemicalHelper.getMaterial(state.getBlock()).material() : null, Function.identity()) !=
-                        null)
+                        .map(state -> ChemicalHelper.getMaterialStack(state.getBlock()).material(),
+                                Function.identity()) !=
+                        GTMaterials.NULL)
                 .map(entry -> Map.entry(entry.getValue(), entry.getKey()
-                        .map(state -> ChemicalHelper.getMaterial(state.getBlock()) != null ?
-                                ChemicalHelper.getMaterial(state.getBlock()).material() : null, Function.identity())))
+                        .map(state -> ChemicalHelper.getMaterialStack(state.getBlock()).material(),
+                                Function.identity())))
                 .collect(Collectors.toList());
     }
 
@@ -88,17 +84,12 @@ public abstract class VeinGenerator {
      */
     @HideFromJS
     public abstract Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random,
-                                                           GTOreDefinition entry, BlockPos origin);
+                                                           OreVeinDefinition entry, BlockPos origin);
 
     @HideFromJS
     public abstract VeinGenerator build();
 
     public abstract VeinGenerator copy();
-
-    @HideFromJS
-    public GTOreDefinition parent() {
-        return entry;
-    }
 
     public abstract MapCodec<? extends VeinGenerator> codec();
 }

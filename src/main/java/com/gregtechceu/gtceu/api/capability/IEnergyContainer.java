@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.capability;
 
 import net.minecraft.core.Direction;
-
 import java.math.BigInteger;
 
 public interface IEnergyContainer extends IEnergyInfoProvider {
@@ -122,14 +121,6 @@ public interface IEnergyContainer extends IEnergyInfoProvider {
      */
     default long getOutputPerSec() {
         return 0L;
-    }
-
-    /**
-     * @return true if information like energy capacity should be hidden from TOP.
-     *         Useful for cables
-     */
-    default boolean isOneProbeHidden() {
-        return false;
     }
 
     IEnergyContainer DEFAULT = new IEnergyContainer() {

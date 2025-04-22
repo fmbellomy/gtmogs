@@ -19,7 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 public abstract class GTExplosiveEntity extends PrimedTnt {
 
-    public GTExplosiveEntity(EntityType<? extends GTExplosiveEntity> type, Level level, double x, double y, double z,
+    public GTExplosiveEntity(EntityType<? extends GTExplosiveEntity> type,
+                             Level level, double x, double y, double z,
                              @Nullable LivingEntity owner) {
         this(type, level);
         this.setPos(x, y, z);
@@ -32,8 +33,8 @@ public abstract class GTExplosiveEntity extends PrimedTnt {
         ((PrimedTntAccessor) this).setOwner(owner);
     }
 
-    public GTExplosiveEntity(EntityType<? extends GTExplosiveEntity> type, Level world) {
-        super(type, world);
+    public GTExplosiveEntity(EntityType<? extends GTExplosiveEntity> type, Level level) {
+        super(type, level);
     }
 
     /**
@@ -63,9 +64,8 @@ public abstract class GTExplosiveEntity extends PrimedTnt {
         explode(level(), this, this.getX(), this.getY(0.0625), this.getZ(), getStrength(), dropsAllBlocks());
     }
 
-    protected void explode(
-                           Level level, @Nullable Entity source,
-                           double x, double y, double z, float radius, boolean dropBlocks) {
+    protected void explode(Level level, @Nullable Entity source, double x, double y, double z,
+                           float radius, boolean dropBlocks) {
         Explosion explosion = new Explosion(
                 level, source,
                 x, y, z,

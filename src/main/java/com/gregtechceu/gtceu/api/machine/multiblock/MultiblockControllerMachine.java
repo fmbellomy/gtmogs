@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.api.machine.multiblock;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
+import com.gregtechceu.gtceu.api.capability.IParallelHatch;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
@@ -10,7 +11,6 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockState;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockWorldSavedData;
-import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -18,42 +18,35 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.annotation.UpdateListener;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
-
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/3
- * @implNote MultiblockControllerMachine
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class MultiblockControllerMachine extends MetaMachine implements IMultiController {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
             MultiblockControllerMachine.class, MetaMachine.MANAGED_FIELD_HOLDER);
     private MultiblockState multiblockState;
     private final List<IMultiPart> parts = new ArrayList<>();
+    private @Nullable IParallelHatch parallelHatch = null;
     @Getter
     @DescSynced
     @UpdateListener(methodName = "onPartsUpdated")
@@ -140,6 +133,11 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
         return this.parts;
     }
 
+    @Override
+    public Optional<IParallelHatch> getParallelHatch() {
+        return Optional.ofNullable(parallelHatch);
+    }
+
     //////////////////////////////////////
     // *** Multiblock LifeCycle ***//
     //////////////////////////////////////
@@ -178,6 +176,9 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
         }
         this.parts.sort(getDefinition().getPartSorter());
         for (var part : parts) {
+            if (part instanceof IParallelHatch pHatch) {
+                parallelHatch = pHatch;
+            }
             part.addedToController(this);
         }
         updatePartPositions();
@@ -189,6 +190,7 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
         for (IMultiPart part : parts) {
             part.removedFromController(this);
         }
+        parallelHatch = null;
         parts.clear();
         updatePartPositions();
     }
@@ -220,32 +222,21 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
         }
     }
 
-    public boolean allowExtendedFacing() {
-        return getDefinition().isAllowExtendedFacing();
-    }
-
     public boolean allowFlip() {
         return getDefinition().isAllowFlip();
     }
 
     @Override
-    public boolean isFacingValid(Direction facing) {
-        return allowExtendedFacing() || super.isFacingValid(facing);
-    }
-
-    public Direction getUpwardsFacing() {
-        return this.allowExtendedFacing() ? this.getBlockState().getValue(IMachineBlock.UPWARDS_FACING_PROPERTY) :
-                Direction.NORTH;
-    }
-
     public void setUpwardsFacing(@NotNull Direction upwardsFacing) {
-        if (!getDefinition().isAllowExtendedFacing()) return;
-        if (upwardsFacing == null || upwardsFacing == Direction.UP || upwardsFacing == Direction.DOWN) {
+        if (!getDefinition().isAllowExtendedFacing()) {
+            return;
+        }
+        if (upwardsFacing.getAxis() == Direction.Axis.Y) {
             GTCEu.LOGGER.error("Tried to set upwards facing to invalid facing {}! Skipping", upwardsFacing);
             return;
         }
-        BlockState blockState = getBlockState();
-        if (blockState.getBlock() instanceof MetaMachineBlock metaMachineBlock &&
+        var blockState = getBlockState();
+        if (blockState.getBlock() instanceof MetaMachineBlock &&
                 blockState.getValue(IMachineBlock.UPWARDS_FACING_PROPERTY) != upwardsFacing) {
             getLevel().setBlockAndUpdate(getPos(),
                     blockState.setValue(IMachineBlock.UPWARDS_FACING_PROPERTY, upwardsFacing));
@@ -258,38 +249,10 @@ public class MultiblockControllerMachine extends MetaMachine implements IMultiCo
     }
 
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, Direction gridSide,
-                                                  BlockHitResult hitResult) {
-        if (gridSide == getFrontFacing() && allowExtendedFacing()) {
-            setUpwardsFacing(playerIn.isShiftKeyDown() ? getUpwardsFacing().getCounterClockWise() :
-                    getUpwardsFacing().getClockWise());
-            return ItemInteractionResult.CONSUME;
-        }
-        if (playerIn.isShiftKeyDown()) {
-            if (gridSide == getFrontFacing() || !isFacingValid(gridSide)) {
-                return ItemInteractionResult.FAIL;
-            }
-            if (!isRemote()) {
-                setFrontFacing(gridSide);
-            }
-            return ItemInteractionResult.CONSUME;
-        }
-        return super.onWrenchClick(playerIn, hand, gridSide, hitResult);
-    }
-
-    @Override
     public void setFrontFacing(Direction facing) {
-        Direction oldFacing = getFrontFacing();
-
-        if (allowExtendedFacing()) {
-            Direction newUpwardsFacing = RelativeDirection.simulateAxisRotation(facing, oldFacing, getUpwardsFacing());
-            setUpwardsFacing(newUpwardsFacing);
-        }
         super.setFrontFacing(facing);
 
         if (getLevel() != null && !getLevel().isClientSide) {
-            notifyBlockUpdate();
-            markDirty();
             checkPattern();
         }
     }

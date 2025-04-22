@@ -20,10 +20,10 @@ import java.util.function.Supplier;
 
 public class Symptom {
 
-    public static final ResourceLocation SYMPTOM_HEALTH_DEBUFF_UUID = GTCEu.id("health_debuff");
-    public static final ResourceLocation SYMPTOM_ATTACK_SPEED_DEBUFF_UUID = GTCEu.id("attack_speed_debuff");
-    public static final ResourceLocation SYMPTOM_WEAKNESS_UUID = GTCEu.id("weakness_debuff");
-    public static final ResourceLocation SYMPTOM_SLOWNESS_UUID = GTCEu.id("slowness_debuff");
+    public static final ResourceLocation SYMPTOM_HEALTH_DEBUFF_ID = GTCEu.id("health_debuff");
+    public static final ResourceLocation SYMPTOM_ATTACK_SPEED_DEBUFF_ID = GTCEu.id("attack_speed_debuff");
+    public static final ResourceLocation SYMPTOM_WEAKNESS_ID = GTCEu.id("weakness_debuff");
+    public static final ResourceLocation SYMPTOM_SLOWNESS_ID = GTCEu.id("slowness_debuff");
 
     public static final Symptom DEATH = new Symptom(defaultKey("death"), 1, 1,
             ((medicalConditionTracker, condition, configuredSymptom, baseSymptom, modifier) -> {
@@ -41,13 +41,13 @@ public class Symptom {
                 }
             });
     public static final Symptom HEALTH_DEBUFF = new Symptom(defaultKey("health_debuff"), 10, 1, 1,
-            Attributes.MAX_HEALTH, SYMPTOM_HEALTH_DEBUFF_UUID);
+            Attributes.MAX_HEALTH, SYMPTOM_HEALTH_DEBUFF_ID);
     public static final Symptom ATTACK_SPEED_DEBUFF = new Symptom(defaultKey("attack_speed_debuff"), 10, 1, .2f,
-            Attributes.ATTACK_SPEED, SYMPTOM_ATTACK_SPEED_DEBUFF_UUID);
+            Attributes.ATTACK_SPEED, SYMPTOM_ATTACK_SPEED_DEBUFF_ID);
     public static final Symptom WEAKNESS = new Symptom(defaultKey("weakness"), 10, 1, .1f, Attributes.ATTACK_DAMAGE,
-            SYMPTOM_WEAKNESS_UUID);
+            SYMPTOM_WEAKNESS_ID);
     public static final Symptom SLOWNESS = new Symptom(defaultKey("slowness"), 7, 1, .005f, Attributes.MOVEMENT_SPEED,
-            SYMPTOM_SLOWNESS_UUID);
+            SYMPTOM_SLOWNESS_ID);
     public static final Symptom AIR_SUPPLY_DEBUFF = new Symptom(defaultKey("air_supply_debuff"), 10, 1,
             (hazardEffectTracker, damageSource, configuredSymptom, baseSymptom, modifier) -> hazardEffectTracker
                     .setMaxAirSupply(300 - 10 * modifier));
@@ -58,7 +58,7 @@ public class Symptom {
     public static final Symptom WITHER = new Symptom(defaultKey("wither"), 1, 1,
             MobEffects.WITHER);
     public static final Symptom WEAK_POISONING = new Symptom(defaultKey("weak_poisoning"), 10,
-            1, GTMobEffects.WEAK_POISON::getDelegate);
+            1, GTMobEffects.WEAK_POISON);
     public static final Symptom POISONING = new Symptom(defaultKey("poisoning"), 10,
             1, MobEffects.POISON);
     public static final Symptom HUNGER = new Symptom(defaultKey("hunger"), 5, 1, MobEffects.HUNGER);
@@ -88,7 +88,7 @@ public class Symptom {
     /**
      * @param multiplier multiplier for Attribute modification
      * @param attribute  Attribute to modify
-     * @param id         AttributeModifier UUID
+     * @param id         AttributeModifier ID
      */
     public Symptom(String name, int defaultStages, float defaultProgressionThreshold, float multiplier,
                    Holder<Attribute> attribute, ResourceLocation id) {
@@ -126,8 +126,7 @@ public class Symptom {
      * @param amplifierMultiplier amplifier added to MobEffect every progression
      */
     public Symptom(String name, int defaultStages, float defaultProgressionThreshold,
-                   Supplier<Holder<MobEffect>> mobEffect,
-                   int amplifierMultiplier) {
+                   Supplier<Holder<MobEffect>> mobEffect, int amplifierMultiplier) {
         this(name, defaultStages, defaultProgressionThreshold,
                 (hazardEffectTracker, $1, $2, $3, modifier) -> hazardEffectTracker.setMobEffect(mobEffect.get(),
                         amplifierMultiplier * modifier));

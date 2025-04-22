@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.common.block;
 
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -18,10 +17,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class FoamBlock extends Block {
 
     private final boolean isReinforced;
@@ -33,7 +28,7 @@ public class FoamBlock extends Block {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
-                                              Player player, InteractionHand hand, BlockHitResult hit) {
+                                              Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!stack.isEmpty() && stack.is(ItemTags.SAND)) {
             level.setBlockAndUpdate(pos, getPetrifiedBlock(state));
             level.playSound(player, pos, SoundEvents.SAND_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
@@ -41,11 +36,10 @@ public class FoamBlock extends Block {
                 stack.shrink(1);
             return ItemInteractionResult.SUCCESS;
         }
-        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
     }
 
     @Override
-    @SuppressWarnings("deprecation")
     public void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         super.randomTick(state, level, pos, random);
         int lightLevel = (level.canSeeSky(pos) && level.isDay()) ? 16 : level.getRawBrightness(pos, 0);

@@ -1,18 +1,12 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.RegistryFriendlyByteBuf;
-
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Lifecycle;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 import java.math.BigInteger;
 
-/**
- * @author KilaBash
- * @date 2022/06/22
- * @implNote SerializerBigInteger
- */
 public class SerializerBigInteger implements IContentSerializer<BigInteger> {
 
     public static final Codec<BigInteger> CODEC = Codec.STRING.comapFlatMap(str -> {
@@ -26,11 +20,6 @@ public class SerializerBigInteger implements IContentSerializer<BigInteger> {
     public static SerializerBigInteger INSTANCE = new SerializerBigInteger();
 
     private SerializerBigInteger() {}
-
-    @Override
-    public Codec<BigInteger> codec() {
-        return CODEC;
-    }
 
     @Override
     public void toNetwork(RegistryFriendlyByteBuf buf, BigInteger content) {
@@ -57,5 +46,10 @@ public class SerializerBigInteger implements IContentSerializer<BigInteger> {
     @Override
     public BigInteger defaultValue() {
         return BigInteger.ZERO;
+    }
+
+    @Override
+    public Codec<BigInteger> codec() {
+        return CODEC;
     }
 }

@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.stack.UnificationEntry;
+import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
 import net.minecraft.data.recipes.RecipeOutput;
@@ -127,16 +127,16 @@ public class MixerRecipes {
 
         // Alloys
         VanillaRecipeHelper.addShapelessRecipe(provider, "dust_brass", ChemicalHelper.get(dust, Brass, 3),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Zinc));
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Zinc));
 
         VanillaRecipeHelper.addShapelessRecipe(provider, "dust_bronze", ChemicalHelper.get(dust, Bronze, 3),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Copper),
-                new UnificationEntry(dust, Tin));
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Copper),
+                new MaterialEntry(dust, Tin));
 
         MIXER_RECIPES.recipeBuilder("red_alloy").duration(100).EUt(VA[ULV])
                 .inputItems(dust, Copper)
@@ -271,22 +271,22 @@ public class MixerRecipes {
                 .outputItems(dust, Gunpowder, 6)
                 .save(provider);
 
-        MIXER_RECIPES.recipeBuilder("blue_steel").duration(800).EUt(VA[ULV])
+        MIXER_RECIPES.recipeBuilder("red_steel").duration(800).EUt(VA[ULV])
                 .inputItems(dust, RoseGold)
                 .inputItems(dust, Brass)
                 .inputItems(dust, BlackSteel, 4)
                 .inputItems(dust, Steel, 2)
                 .circuitMeta(1)
-                .outputItems(dust, BlueSteel, 8)
+                .outputItems(dust, RedSteel, 8)
                 .save(provider);
 
-        MIXER_RECIPES.recipeBuilder("red_steel").duration(800).EUt(VA[ULV])
+        MIXER_RECIPES.recipeBuilder("blue_steel").duration(800).EUt(VA[ULV])
                 .inputItems(dust, SterlingSilver)
                 .inputItems(dust, BismuthBronze)
                 .inputItems(dust, BlackSteel, 4)
                 .inputItems(dust, Steel, 2)
                 .circuitMeta(1)
-                .outputItems(dust, RedSteel, 8)
+                .outputItems(dust, BlueSteel, 8)
                 .save(provider);
 
         MIXER_RECIPES.recipeBuilder("cobalt_brass").duration(900).EUt(VA[ULV])
@@ -360,7 +360,7 @@ public class MixerRecipes {
                 .outputItems(dust, Graphene)
                 .save(provider);
 
-        MIXER_RECIPES.recipeBuilder("vanadiumsteel").duration(400).EUt(VA[MV])
+        MIXER_RECIPES.recipeBuilder("vanadium_steel").duration(400).EUt(VA[MV])
                 .inputItems(dust, Steel, 7)
                 .inputItems(dust, Vanadium)
                 .inputItems(dust, Chromium)
@@ -377,14 +377,14 @@ public class MixerRecipes {
                 .outputItems(dust, Ultimet, 9)
                 .save(provider);
 
-        MIXER_RECIPES.recipeBuilder("tungstencarbide").duration(200).EUt(VA[EV])
+        MIXER_RECIPES.recipeBuilder("tungsten_carbide").duration(200).EUt(VA[EV])
                 .inputItems(dust, Tungsten)
                 .inputItems(dust, Carbon)
-                .circuitMeta(1)
+                .circuitMeta(2)
                 .outputItems(dust, TungstenCarbide, 2)
                 .save(provider);
 
-        MIXER_RECIPES.recipeBuilder("tungstensteel").duration(200).EUt(VA[EV])
+        MIXER_RECIPES.recipeBuilder("tungsten_steel").duration(200).EUt(VA[EV])
                 .inputItems(dust, Tungsten)
                 .inputItems(dust, Steel)
                 .circuitMeta(1)

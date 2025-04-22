@@ -6,25 +6,22 @@ import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class DetectorCover extends CoverBehavior implements IControllable {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(DetectorCover.class,
@@ -77,10 +74,13 @@ public abstract class DetectorCover extends CoverBehavior implements IControllab
     }
 
     @Override
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
-        ItemInteractionResult superResult = super.onScrewdriverClick(playerIn, hand, hitResult);
-        if (superResult != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+        ItemInteractionResult superResult = super.onScrewdriverClick(playerIn, hand, held, hitResult);
+        if (superResult.consumesAction()) {
             return superResult;
+        }
+        if (!held.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
+            return ItemInteractionResult.FAIL;
         }
 
         if (!this.coverHolder.isRemote()) {
@@ -97,5 +97,10 @@ public abstract class DetectorCover extends CoverBehavior implements IControllab
     @Override
     public boolean canConnectRedstone() {
         return true;
+    }
+
+    @Override
+    public boolean canPipePassThrough() {
+        return false;
     }
 }

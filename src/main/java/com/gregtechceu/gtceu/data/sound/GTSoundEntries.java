@@ -9,11 +9,6 @@ import net.neoforged.fml.ModLoader;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
-/**
- * @author KilaBash
- * @date 2023/3/3
- * @implNote GTSounds
- */
 public class GTSoundEntries {
 
     static {
@@ -62,8 +57,8 @@ public class GTSoundEntries {
     public static final SoundEntry METAL_PIPE = REGISTRATE.sound("metal_pipe").build();
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.SOUNDS));
-        GTRegistries.SOUNDS.values().forEach(SoundEntry::prepare);
+        GTCEuAPI.postRegisterEvent(GTRegistries.SOUNDS);
+        GTRegistries.SOUNDS.forEach(SoundEntry::prepare);
         registerSounds();
 
         GTRegistries.SOUNDS.freeze();
@@ -71,9 +66,8 @@ public class GTSoundEntries {
 
     private static void registerSounds() {
         for (SoundEntry entry : GTRegistries.SOUNDS) {
-
-            entry.register(soundEvent -> GTRegistries.register(BuiltInRegistries.SOUND_EVENT, soundEvent.getLocation(),
-                    soundEvent));
+            entry.register(soundEvent ->
+                    GTRegistries.register(BuiltInRegistries.SOUND_EVENT, soundEvent.getLocation(), soundEvent));
         }
     }
 }

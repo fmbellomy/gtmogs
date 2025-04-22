@@ -2,74 +2,71 @@ package com.gregtechceu.gtceu.utils;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-
-import com.lowdragmc.lowdraglib.LDLib;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
-import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.Tuple;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import static com.gregtechceu.gtceu.api.material.material.properties.PropertyKey.HAZARD;
 
-/**
- * @author KilaBash
- * @date 2023/2/17
- * @implNote GTUtil
- */
 public class GTUtil {
 
-    public static final Codec<ItemStack> ANY_SIZE_ITEM_STACK_CODEC = Codec.lazyInitialized(() -> ExtraCodecs
-            .<ItemStack>optionalEmptyMap(RecordCodecBuilder.create(instance -> instance.group(
-                    ItemStack.ITEM_NON_AIR_CODEC.fieldOf("id").forGetter(ItemStack::getItemHolder),
-                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("count").orElse(1)
-                            .forGetter(ItemStack::getCount),
-                    DataComponentPatch.CODEC.optionalFieldOf("components", DataComponentPatch.EMPTY)
-                            .forGetter(stack -> stack.getComponentsPatch()))
-                    .apply(instance, ItemStack::new)))
-            .xmap(optional -> optional.orElse(ItemStack.EMPTY),
-                    stack -> stack.isEmpty() ? Optional.empty() : Optional.of(stack)));
-
     public static final Direction[] DIRECTIONS = Direction.values();
+
+    private static final Object2IntMap<String> RVN = new Object2IntArrayMap<>(GTValues.VN, GTValues.ALL_TIERS);
+
+    /**
+     * Convenience method to get from VN -> Tier
+     *
+     * @return the voltage tier by name, -1 if the tier name isn't valid
+     */
+    public static int getTierByName(String name) {
+        return RVN.getOrDefault(name, -1);
+    }
 
     @Nullable
     public static Direction determineWrenchingSide(Direction facing, float x, float y, float z) {
@@ -231,42 +228,42 @@ public class GTUtil {
         return (byte) ((60 - Long.numberOfLeadingZeros(voltage)) >> 1);
     }
 
-    public static ItemStack copy(ItemStack... stacks) {
-        for (ItemStack stack : stacks)
-            if (!stack.isEmpty()) return stack.copy();
+    /**
+     * Copies first non-empty ItemStack from stacks.
+     *
+     * @param stacks list of candidates for copying
+     * @return a copy of ItemStack, or {@link ItemStack#EMPTY} if all the candidates are empty
+     * @throws IllegalArgumentException if {@code stacks} is empty
+     */
+    public static @NotNull ItemStack copyFirst(@NotNull ItemStack... stacks) {
+        if (stacks.length == 0) {
+            throw new IllegalArgumentException("Empty ItemStack candidates");
+        }
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty()) {
+                return stack.copy();
+            }
+        }
         return ItemStack.EMPTY;
     }
 
-    public static ItemStack copyAmount(int amount, ItemStack... stacks) {
-        ItemStack stack = copy(stacks);
-        if (stack.isEmpty()) return ItemStack.EMPTY;
-        if (amount > 64) amount = 64;
-        else if (amount == -1) amount = 111;
-        else if (amount < 0) amount = 0;
-        stack.setCount(amount);
-        return stack;
-    }
-
-    public static FluidStack copyAmount(int amount, FluidStack fluidStack) {
-        if (fluidStack == null) return null;
-        FluidStack stack = fluidStack.copy();
-        stack.setAmount(amount);
-        return stack;
-    }
-
-    public static <M> M selectItemInList(int index, M replacement, List<M> list, Class<M> minClass) {
-        if (list.isEmpty())
-            return replacement;
-
-        M maybeResult;
-        if (list.size() <= index) {
-            maybeResult = list.get(list.size() - 1);
-        } else if (index < 0) {
-            maybeResult = list.get(0);
-        } else maybeResult = list.get(index);
-
-        if (maybeResult != null) return maybeResult;
-        return replacement;
+    /**
+     * Copies first non-empty ItemStack from stacks, with new stack size.
+     *
+     * @param stacks list of candidates for copying
+     * @return a copy of ItemStack, or {@link ItemStack#EMPTY} if all the candidates are empty
+     * @throws IllegalArgumentException if {@code stacks} is empty
+     */
+    public static @NotNull ItemStack copyFirst(int newCount, @NotNull ItemStack... stacks) {
+        if (stacks.length == 0) {
+            throw new IllegalArgumentException("Empty ItemStack candidates");
+        }
+        for (ItemStack stack : stacks) {
+            if (!stack.isEmpty()) {
+                return stack.copyWithCount(newCount);
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     public static <M> M getItem(List<? extends M> list, int index, M replacement) {
@@ -307,7 +304,7 @@ public class GTUtil {
     }
 
     public static boolean isShiftDown() {
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             var id = Minecraft.getInstance().getWindow().getWindow();
             return InputConstants.isKeyDown(id, GLFW.GLFW_KEY_LEFT_SHIFT) ||
                     InputConstants.isKeyDown(id, GLFW.GLFW_KEY_LEFT_SHIFT);
@@ -316,7 +313,7 @@ public class GTUtil {
     }
 
     public static boolean isCtrlDown() {
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             var id = Minecraft.getInstance().getWindow().getWindow();
             return InputConstants.isKeyDown(id, GLFW.GLFW_KEY_LEFT_CONTROL) ||
                     InputConstants.isKeyDown(id, GLFW.GLFW_KEY_RIGHT_CONTROL);
@@ -325,7 +322,7 @@ public class GTUtil {
     }
 
     public static boolean isAltDown() {
-        if (LDLib.isClient()) {
+        if (GTCEu.isClientSide()) {
             var id = Minecraft.getInstance().getWindow().getWindow();
             return InputConstants.isKeyDown(id, GLFW.GLFW_KEY_LEFT_ALT) ||
                     InputConstants.isKeyDown(id, GLFW.GLFW_KEY_RIGHT_ALT);
@@ -343,8 +340,8 @@ public class GTUtil {
                 itemStack.getCount() / divisor != 0;
     }
 
-    public static int getItemBurnTime(ItemStack item) {
-        return item.getBurnTime(RecipeType.SMELTING);
+    public static int getItemBurnTime(Item item) {
+        return item.getDefaultInstance().getBurnTime(RecipeType.SMELTING);
     }
 
     public static int getPumpBiomeModifier(Holder<Biome> biome) {
@@ -354,21 +351,21 @@ public class GTUtil {
 
         if (biome.is(BiomeTags.IS_DEEP_OCEAN) || biome.is(BiomeTags.IS_OCEAN) || biome.is(BiomeTags.IS_BEACH) ||
                 biome.is(BiomeTags.IS_RIVER)) {
-            return FluidHelper.getBucket();
+            return FluidType.BUCKET_VOLUME;
         } else if (biome.is(Tags.Biomes.IS_SWAMP) || biome.is(Tags.Biomes.IS_WET)) {
-            return FluidHelper.getBucket() * 4 / 5;
+            return FluidType.BUCKET_VOLUME * 4 / 5;
         } else if (biome.is(BiomeTags.IS_JUNGLE)) {
-            return FluidHelper.getBucket() * 35 / 100;
+            return FluidType.BUCKET_VOLUME * 35 / 100;
         } else if (biome.is(Tags.Biomes.IS_SNOWY)) {
-            return FluidHelper.getBucket() * 3 / 10;
+            return FluidType.BUCKET_VOLUME * 3 / 10;
         } else if (biome.is(Tags.Biomes.IS_PLAINS) || biome.is(BiomeTags.IS_FOREST)) {
-            return FluidHelper.getBucket() / 4;
+            return FluidType.BUCKET_VOLUME / 4;
         } else if (biome.is(Tags.Biomes.IS_COLD)) {
-            return FluidHelper.getBucket() * 175 / 1000;
+            return FluidType.BUCKET_VOLUME * 175 / 1000;
         } else if (biome.is(Tags.Biomes.IS_SANDY)) {
-            return FluidHelper.getBucket() * 170 / 1000;
+            return FluidType.BUCKET_VOLUME * 170 / 1000;
         }
-        return FluidHelper.getBucket() / 10;
+        return FluidType.BUCKET_VOLUME / 10;
     }
 
     /**
@@ -414,14 +411,18 @@ public class GTUtil {
         return null;
     }
 
+    public static int getFluidColor(FluidStack fluid) {
+        return IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid);
+    }
+
     public static boolean canSeeSunClearly(Level world, BlockPos blockPos) {
         if (!world.canSeeSky(blockPos.above())) {
             return false;
         }
 
-        Biome biome = world.getBiome(blockPos.above()).value();
+        Holder<Biome> biome = world.getBiome(blockPos.above());
         if (world.isRaining()) {
-            if (biome.warmEnoughToRain(blockPos.above()) || biome.coldEnoughToSnow(blockPos.above())) {
+            if (biome.value().warmEnoughToRain(blockPos.above()) || biome.value().coldEnoughToSnow(blockPos.above())) {
                 return false;
             }
         }
@@ -431,8 +432,7 @@ public class GTUtil {
         }
 
         ResourceLocation javdVoidBiome = ResourceLocation.fromNamespaceAndPath(GTValues.MODID_JAVD, "void");
-        if (GTCEu.isJAVDLoaded() &&
-                world.registryAccess().registryOrThrow(Registries.BIOME).getKey(biome).equals(javdVoidBiome)) {
+        if (GTCEu.isModLoaded(GTValues.MODID_JAVD) && biome.is(javdVoidBiome)) {
             return !world.isDay();
         } else return world.isDay();
     }
@@ -473,9 +473,9 @@ public class GTUtil {
         if (!effects.isEmpty()) {
             list.add(Component.translatable("gtceu.tooltip.potion.header"));
         }
-        effects.forEach(pair -> {
-            var effect = pair.effect();
-            float probability = pair.effect().getDuration();
+        effects.forEach(eff -> {
+            var effect = eff.effect();
+            float probability = eff.probability();
             list.add(Component.translatable("gtceu.tooltip.potion.each",
                     Component.translatable(effect.getDescriptionId())
                             .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)),
@@ -486,5 +486,18 @@ public class GTUtil {
                     Component.literal(String.valueOf(100 * probability))
                             .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))));
         });
+    }
+
+    /**
+     * Returns the slot type based on the slot group and the index inside that group.
+     */
+    public static EquipmentSlot equipmentSlotByTypeAndIndex(EquipmentSlot.Type slotType, int slotIndex) {
+        for(EquipmentSlot equipmentslot : EquipmentSlot.values()) {
+            if (equipmentslot.getType() == slotType && equipmentslot.getIndex() == slotIndex) {
+                return equipmentslot;
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid slot '" + slotType + "': " + slotIndex);
     }
 }

@@ -12,11 +12,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-/**
- * @author KilaBash
- * @date 2023/3/13
- * @implNote ItemFilter
- */
 public interface ItemFilter extends Filter<ItemStack, ItemFilter> {
 
     Map<ItemLike, Function<ItemStack, ItemFilter>> FILTERS = new HashMap<>();
@@ -28,7 +23,7 @@ public interface ItemFilter extends Filter<ItemStack, ItemFilter> {
     /**
      * Retrieves the configured item count for the supplied item.
      *
-     * @return The amount configured for the supplied item stack.<br>
+     * @return The amount configured for the supplied item stack.<br/>
      *         If the stack is not matched by this filter, 0 is returned instead.
      */
     int testItemCount(ItemStack itemStack);
@@ -41,7 +36,7 @@ public interface ItemFilter extends Filter<ItemStack, ItemFilter> {
     }
 
     /**
-     * An empty item filter that allows all items.<br>
+     * An empty item filter that allows all items.<br/>
      * ONLY TO BE USED FOR ITEM MATCHING! All other functionality will throw an exception.
      */
     ItemFilter EMPTY = new ItemFilter() {

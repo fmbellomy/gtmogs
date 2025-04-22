@@ -55,10 +55,11 @@ public class OpticalNetWalker extends PipeNetWalker<OpticalPipeBlockEntity, Opti
         }
 
         if (((OpticalNetWalker) root).routePath == null) {
-            if (neighbourTile.getLevel().getCapability(GTCapability.CAPABILITY_DATA_ACCESS,
-                    neighbourTile.getBlockPos(), faceToNeighbour.getOpposite()) != null ||
-                    neighbourTile.getLevel().getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER,
-                            neighbourTile.getBlockPos(), faceToNeighbour.getOpposite()) != null) {
+            var dataAccess = pipeTile.getLevel().getCapability(GTCapability.CAPABILITY_DATA_ACCESS,
+                    pipePos.relative(faceToNeighbour), faceToNeighbour.getOpposite());
+            var computationProvider = pipeTile.getLevel().getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER,
+                    pipePos.relative(faceToNeighbour), faceToNeighbour.getOpposite());
+            if (dataAccess != null || computationProvider != null) {
                 ((OpticalNetWalker) root).routePath = new OpticalRoutePath(pipeTile, faceToNeighbour,
                         getWalkedBlocks());
                 stop();

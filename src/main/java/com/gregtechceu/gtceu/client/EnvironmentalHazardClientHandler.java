@@ -14,12 +14,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import it.unimi.dsi.fastutil.floats.FloatIntPair;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @OnlyIn(Dist.CLIENT)
 public class EnvironmentalHazardClientHandler {
@@ -39,8 +38,8 @@ public class EnvironmentalHazardClientHandler {
      * Map of source position to a triple of (trigger, material).
      */
     @Getter
-    private final Map<ChunkPos, EnvironmentalHazardSavedData.HazardZone> hazardZones = new HashMap<>();
-    private final Map<ChunkPos, FloatIntPair> chunkColorCache = new HashMap<>();
+    private final Map<ChunkPos, EnvironmentalHazardSavedData.HazardZone> hazardZones = new ConcurrentHashMap<>();
+    private final Map<ChunkPos, FloatIntPair> chunkColorCache = new ConcurrentHashMap<>();
 
     public void onClientTick() {
         if (!ConfigHolder.INSTANCE.gameplay.environmentalHazards) {

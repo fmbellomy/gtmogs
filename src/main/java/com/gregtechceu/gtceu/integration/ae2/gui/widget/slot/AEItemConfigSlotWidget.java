@@ -6,12 +6,14 @@ import com.gregtechceu.gtceu.integration.ae2.gui.widget.ConfigWidget;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAESlot;
 import com.gregtechceu.gtceu.integration.ae2.slot.IConfigurableSlot;
 
+import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
 import com.lowdragmc.lowdraglib.gui.util.TextFormattingUtil;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -24,11 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawStringFixedCorner;
 
-/**
- * @Author GlodBlock
- * @Description A configurable slot for {@link ItemStack}
- * @Date 2023/4/22-0:48
- */
 public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhostItemTarget {
 
     public AEItemConfigSlotWidget(int x, int y, ConfigWidget widget, int index) {
@@ -50,9 +47,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
         int stackX = position.x + 1;
         int stackY = position.y + 1;
         if (config != null) {
-            ItemStack stack = config.what() instanceof AEItemKey key ?
-                    new ItemStack(key.getItem(), (int) config.amount()) : ItemStack.EMPTY;
-            stack.setCount(1);
+            ItemStack stack = config.what() instanceof AEItemKey key ? new ItemStack(key.getItem()) : ItemStack.EMPTY;
             drawItemStack(graphics, stack, stackX, stackY, 0xFFFFFFFF, null);
 
             if (!parentWidget.isStocking()) {
@@ -61,9 +56,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             }
         }
         if (stock != null) {
-            ItemStack stack = stock.what() instanceof AEItemKey key ?
-                    new ItemStack(key.getItem(), (int) stock.amount()) : ItemStack.EMPTY;
-            stack.setCount(1);
+            ItemStack stack = stock.what() instanceof AEItemKey key ? new ItemStack(key.getItem()) : ItemStack.EMPTY;
             drawItemStack(graphics, stack, stackX, stackY + 18, 0xFFFFFFFF, null);
             String amountStr = TextFormattingUtil.formatLongToCompactString(stock.amount(), 4);
             drawStringFixedCorner(graphics, amountStr, stackX + 17, stackY + 18 + 17, 16777215, true, 0.5f);
@@ -101,7 +94,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
                 writeClientAction(REMOVE_ID, buf -> {});
 
                 if (!parentWidget.isStocking()) {
-                    this.parentWidget.disableAmount();
+                    this.parentWidget.disableAmountClient();
                 }
             } else if (button == 0) {
                 // Left click to set/select
@@ -112,7 +105,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
                 }
 
                 if (!parentWidget.isStocking()) {
-                    this.parentWidget.enableAmount(this.index);
+                    this.parentWidget.enableAmountClient(this.index);
                     this.select = true;
                 }
             }
@@ -149,7 +142,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             slot.setConfig(stack);
             this.parentWidget.enableAmount(this.index);
             if (!item.isEmpty()) {
-                writeUpdateInfo(UPDATE_ID, buf -> ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, item));
+                writeUpdateInfo(UPDATE_ID, buf -> ItemStack.STREAM_CODEC.encode(buf, item));
             }
         }
         if (id == AMOUNT_CHANGE_ID) {
@@ -161,12 +154,8 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
         }
         if (id == PICK_UP_ID) {
             if (slot.getStock() != null && this.gui.getModularUIContainer().getCarried() == ItemStack.EMPTY &&
-                    slot.getStock().what() instanceof AEItemKey key) {
-                ItemStack stack = new ItemStack(key.getItem(), Math.min((int) slot.getStock().amount(),
-                        key.getItem().getMaxStackSize(key.getItem().getDefaultInstance())));
-                if (key.getItem().components().isEmpty()) {
-                    stack.applyComponents(key.getItem().components());
-                }
+                    slot.getStock().what() instanceof AEItemKey) {
+                ItemStack stack = AEUtil.toItemStack(slot.getStock());
                 this.gui.getModularUIContainer().setCarried(stack);
                 GenericStack stack1 = ExportOnlyAESlot.copy(slot.getStock(),
                         Math.max(0, (slot.getStock().amount() - stack.getCount())));
@@ -185,7 +174,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
             slot.setConfig(null);
         }
         if (id == UPDATE_ID) {
-            ItemStack item = ItemStack.OPTIONAL_STREAM_CODEC.decode(buffer);
+            ItemStack item = ItemStack.STREAM_CODEC.decode(buffer);
             slot.setConfig(new GenericStack(AEItemKey.of(item), item.getCount()));
         }
         if (id == AMOUNT_CHANGE_ID) {
@@ -196,11 +185,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
         }
         if (id == PICK_UP_ID) {
             if (slot.getStock() != null && slot.getStock().what() instanceof AEItemKey key) {
-                ItemStack stack = new ItemStack(key.getItem(), Math.min((int) slot.getStock().amount(),
-                        key.getItem().getMaxStackSize(key.getItem().getDefaultInstance())));
-                if (key.getItem().components().isEmpty()) {
-                    stack.applyComponents(key.getItem().components());
-                }
+                ItemStack stack = AEUtil.toItemStack(slot.getStock());
                 this.gui.getModularUIContainer().setCarried(stack);
                 GenericStack stack1 = ExportOnlyAESlot.copy(slot.getStock(),
                         Math.max(0, (slot.getStock().amount() - stack.getCount())));
@@ -220,7 +205,7 @@ public class AEItemConfigSlotWidget extends AEConfigSlotWidget implements IGhost
     @OnlyIn(Dist.CLIENT)
     @Override
     public void acceptItem(ItemStack itemStack) {
-        writeClientAction(UPDATE_ID, buf -> ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, itemStack));
+        writeClientAction(UPDATE_ID, buf -> ItemStack.STREAM_CODEC.encode(buf, itemStack));
     }
 
     @OnlyIn(Dist.CLIENT)

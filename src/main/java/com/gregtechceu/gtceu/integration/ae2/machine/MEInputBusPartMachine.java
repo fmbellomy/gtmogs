@@ -3,13 +3,15 @@ package com.gregtechceu.gtceu.integration.ae2.machine;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
+import com.gregtechceu.gtceu.api.machine.feature.IHasCircuitSlot;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.AEItemConfigWidget;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEItemList;
 import com.gregtechceu.gtceu.integration.ae2.slot.ExportOnlyAEItemSlot;
+import com.gregtechceu.gtceu.utils.GTMath;
 
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -17,25 +19,20 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.Position;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.CustomData;
-
 import appeng.api.config.Actionable;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
+import net.minecraft.world.item.component.CustomData;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStickInteractable, IMachineLife {
+public class MEInputBusPartMachine extends MEBusPartMachine
+                                   implements IDataStickInteractable, IMachineLife, IHasCircuitSlot {
 
     protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(MEInputBusPartMachine.class,
             MEBusPartMachine.MANAGED_FIELD_HOLDER);
@@ -92,10 +89,10 @@ public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStic
                 long inserted = networkInv.insert(exceedItem.what(), exceedItem.amount(), Actionable.MODULATE,
                         this.actionSource);
                 if (inserted > 0) {
-                    aeSlot.extractItem(0, (int) inserted, false);
+                    aeSlot.extractItem(0, GTMath.saturatedCast(inserted), false);
                     continue;
                 } else {
-                    aeSlot.extractItem(0, (int) total, false);
+                    aeSlot.extractItem(0, GTMath.saturatedCast(total), false);
                 }
             }
             // Fill it
@@ -146,23 +143,23 @@ public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStic
     ////////////////////////////////
 
     @Override
-    public final boolean onDataStickLeftClick(Player player, ItemStack dataStick) {
+    public final InteractionResult onDataStickShiftUse(Player player, ItemStack dataStick) {
         if (!isRemote()) {
             CompoundTag tag = new CompoundTag();
             tag.put("MEInputBus", writeConfigToTag(player.registryAccess()));
             dataStick.set(GTDataComponents.DATA_COPY_TAG, CustomData.of(tag));
-            dataStick.set(DataComponents.ITEM_NAME,
+            dataStick.set(DataComponents.CUSTOM_NAME,
                     Component.translatable("gtceu.machine.me.item_import.data_stick.name"));
             player.sendSystemMessage(Component.translatable("gtceu.machine.me.import_copy_settings"));
         }
-        return true;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public final ItemInteractionResult onDataStickRightClick(Player player, ItemStack dataStick) {
+    public final InteractionResult onDataStickUse(Player player, ItemStack dataStick) {
         CustomData tag = dataStick.get(GTDataComponents.DATA_COPY_TAG);
         if (tag == null || !tag.contains("MEInputBus")) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
         if (!isRemote()) {
@@ -170,7 +167,7 @@ public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStic
             this.updateInventorySubscription();
             player.sendSystemMessage(Component.translatable("gtceu.machine.me.import_paste_settings"));
         }
-        return ItemInteractionResult.sidedSuccess(isRemote());
+        return InteractionResult.sidedSuccess(isRemote());
     }
 
     ////////////////////////////////
@@ -192,6 +189,7 @@ public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStic
         }
         tag.putByte("GhostCircuit",
                 (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.getStackInSlot(0)));
+        tag.putBoolean("DistinctBuses", isDistinct());
         return tag;
     }
 
@@ -210,6 +208,9 @@ public class MEInputBusPartMachine extends MEBusPartMachine implements IDataStic
         }
         if (tag.contains("GhostCircuit")) {
             circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
+        }
+        if (tag.contains("DistinctBuses")) {
+            setDistinct(tag.getBoolean("DistinctBuses"));
         }
     }
 }

@@ -1,44 +1,25 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
+import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.worldgen.GTOres;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryCodecs;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.RegistryOps;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.mojang.serialization.JsonOps;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class OreVeinUtil {
 
     private OreVeinUtil() {}
 
     public static boolean canPlaceOre(BlockState pState, Function<BlockPos, BlockState> pAdjacentStateAccessor,
-                                      RandomSource pRandom, GTOreDefinition entry,
+                                      RandomSource pRandom, OreVeinDefinition entry,
                                       OreConfiguration.TargetBlockState pTargetState,
                                       BlockPos pMatablePos) {
         if (!pTargetState.target.test(pState, pRandom))
@@ -50,7 +31,7 @@ public class OreVeinUtil {
     }
 
     public static boolean canPlaceOre(BlockState pState, Function<BlockPos, BlockState> pAdjacentStateAccessor,
-                                      RandomSource pRandom, GTOreDefinition entry,
+                                      RandomSource pRandom, OreVeinDefinition entry,
                                       BlockPos pMatablePos) {
         if (!entry.layer().getTarget().test(pState, pRandom))
             return false;
@@ -71,7 +52,7 @@ public class OreVeinUtil {
      * Note that depending on the config value for the random vein offset, its actual
      * center may be outside the supplied chunk.
      * 
-     * @return The origin of the vein to be generated.<br>
+     * @return The origin of the vein to be generated.<br/>
      *         {@code Optional.empty()} if no vein should exist for the specified chunk.
      */
     public static Optional<BlockPos> getVeinCenter(ChunkPos chunkPos, RandomSource random) {
@@ -93,46 +74,21 @@ public class OreVeinUtil {
     }
 
     /**
-     * @return The radius (in chunks) to search for adjacent veins.<br>
+     * @return The radius (in chunks) to search for adjacent veins.<br/>
      *         Depends on the largest registered vein size, as well as the configured random vein offset.
      */
     static int getMaxVeinSearchDistance() {
-        double halfVeinSize = GTOres.getLargestVeinSize() / 2.0;
+        double halfVeinSize = GTOreVeins.getLargestVeinSize() / 2.0;
         int randomOffset = ConfigHolder.INSTANCE.worldgen.oreVeins.oreVeinRandomOffset;
 
         return (int) Math.ceil((halfVeinSize + randomOffset) / 16.0);
     }
 
     /**
-     * @return The radius (in chunks) to search for adjacent indicators.<br>
+     * @return The radius (in chunks) to search for adjacent indicators.<br/>
      *         Depends on the largest registered indicator size, as well as the configured random vein offset.
      */
     static int getMaxIndicatorSearchDistance() {
-        return getMaxVeinSearchDistance() + (int) Math.ceil((double) GTOres.getLargestIndicatorOffset() / 16.0);
-    }
-
-    @Nullable
-    public static Supplier<HolderSet<Biome>> resolveBiomes(List<String> biomes) {
-        if (biomes.isEmpty())
-            return null;
-
-        RegistryOps<JsonElement> registryOps = RegistryOps.create(JsonOps.INSTANCE, GTRegistries.builtinRegistry());
-        JsonElement codecInput = resolveBiomeCodecInput(biomes);
-        return () -> RegistryCodecs.homogeneousList(Registries.BIOME)
-                .parse(registryOps, codecInput)
-                .getOrThrow();
-    }
-
-    private static JsonElement resolveBiomeCodecInput(List<String> biomes) {
-        if (biomes.size() == 1)
-            return new JsonPrimitive(biomes.get(0));
-
-        if (biomes.stream().anyMatch(filter -> filter.startsWith("#")))
-            throw new IllegalStateException(
-                    "Cannot resolve biomes: You may use either a single tag or multiple individual biomes.");
-
-        var jsonArray = new JsonArray();
-        biomes.forEach(jsonArray::add);
-        return jsonArray;
+        return getMaxVeinSearchDistance() + (int) Math.ceil((double) GTOreVeins.getLargestIndicatorOffset() / 16.0);
     }
 }

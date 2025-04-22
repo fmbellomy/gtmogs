@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.machine.feature.multiblock;
 
+import com.gregtechceu.gtceu.api.capability.IParallelHatch;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineFeature;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
@@ -10,8 +11,9 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,15 +21,10 @@ import net.minecraft.world.phys.BlockHitResult;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
-/**
- * @author KilaBash
- * @date 2023/3/3
- * @implNote IControllerComponent
- */
 public interface IMultiController extends IMachineFeature, IInteractedMachine {
 
     @Override
@@ -38,7 +35,7 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
     /**
      * Check MultiBlock Pattern. Just checking pattern without any other logic.
      * You can override it but it's unsafe for calling. because it will also be called in an async thread.
-     * <br>
+     * <br/>
      * you should always use {@link IMultiController#checkPatternWithLock()} and
      * {@link IMultiController#checkPatternWithTryLock()} instead.
      *
@@ -55,9 +52,11 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
     default boolean checkPatternWithLock() {
         var lock = getPatternLock();
         lock.lock();
-        var result = checkPattern();
-        lock.unlock();
-        return result;
+        try {
+            return checkPattern();
+        } finally {
+            lock.unlock();
+        }
     }
 
     /**
@@ -68,9 +67,11 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
     default boolean checkPatternWithTryLock() {
         var lock = getPatternLock();
         if (lock.tryLock()) {
-            var result = checkPattern();
-            lock.unlock();
-            return result;
+            try {
+                return checkPattern();
+            } finally {
+                lock.unlock();
+            }
         } else {
             return false;
         }
@@ -86,7 +87,7 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
 
     /**
      * Whether Multiblock Formed.
-     * <br>
+     * <br/>
      * NOTE: even machine is formed, it doesn't mean to workable!
      * Its parts maybe invalid due to chunk unload.
      */
@@ -108,22 +109,22 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
 
     /**
      * Called when structure is formed, have to be called after {@link #checkPattern()}. (server-side / fake scene only)
-     * <br>
+     * <br/>
      * Trigger points:
-     * <br>
+     * <br/>
      * 1 - Blocks in structure changed but still formed.
-     * <br>
+     * <br/>
      * 2 - Literally, structure formed.
      */
     void onStructureFormed();
 
     /**
      * Called when structure is invalid. (server-side / fake scene only)
-     * <br>
+     * <br/>
      * Trigger points:
-     * <br>
+     * <br/>
      * 1 - Blocks in structure changed.
-     * <br>
+     * <br/>
      * 2 - Before controller machine removed.
      */
     void onStructureInvalid();
@@ -138,6 +139,15 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
      * Get all parts
      */
     List<IMultiPart> getParts();
+
+    /**
+     * The instance of {@link IParallelHatch} attached to this Controller.
+     * <p>
+     * Note that this will return a singular instance, and will not account for multiple attached IParallelHatches
+     * 
+     * @return an {@link Optional} of the attached IParallelHatch, empty if one is not attached
+     */
+    Optional<IParallelHatch> getParallelHatch();
 
     /**
      * Called from part, when part is invalid due to chunk unload or broken.
@@ -157,7 +167,7 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
     }
 
     /**
-     * get parts' Appearance. same as IForgeBlock.getAppearance() / IFabricBlock.getAppearance()
+     * get parts' Appearance. same as IBlockExtension.getAppearance() / IFabricBlock.getAppearance()
      */
     @Nullable
     default BlockState getPartAppearance(IMultiPart part, Direction side, BlockState sourceState, BlockPos sourcePos) {
@@ -171,16 +181,20 @@ public interface IMultiController extends IMachineFeature, IInteractedMachine {
      * Show the preview of structure.
      */
     @Override
-    default ItemInteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player,
-                                        InteractionHand hand,
-                                        BlockHitResult hit) {
+    default InteractionResult onUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+                                    BlockHitResult hit) {
         if (!self().isFormed() && player.isShiftKeyDown() && player.getItemInHand(hand).isEmpty()) {
-            if (world.isClientSide()) {
-                MultiblockInWorldPreviewRenderer.showPreview(pos, self(),
-                        ConfigHolder.INSTANCE.client.inWorldPreviewDuration * 20);
+            if (level.isClientSide()) {
+                int duration = ConfigHolder.INSTANCE.client.inWorldPreviewDuration;
+                float tickRate = level.tickRateManager().tickrate();
+                MultiblockInWorldPreviewRenderer.showPreview(pos, self(), Mth.floor(duration * tickRate));
             }
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return IInteractedMachine.super.onUse(state, world, pos, player, hand, hit);
+        return IInteractedMachine.super.onUse(state, level, pos, player, hand, hit);
+    }
+
+    default boolean allowCircuitSlots() {
+        return true;
     }
 }

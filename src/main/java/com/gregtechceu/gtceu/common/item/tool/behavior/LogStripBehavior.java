@@ -3,11 +3,12 @@ package com.gregtechceu.gtceu.common.item.tool.behavior;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
+
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
-
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
@@ -22,12 +23,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 import com.google.common.collect.ImmutableSet;
-import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -37,13 +37,18 @@ public class LogStripBehavior implements IToolBehavior<LogStripBehavior> {
 
     public static final LogStripBehavior INSTANCE = create();
     public static final Codec<LogStripBehavior> CODEC = Codec.unit(INSTANCE);
-    public static final StreamCodec<RegistryFriendlyByteBuf, LogStripBehavior> STREAM_CODEC = StreamCodec
+    public static final StreamCodec<ByteBuf, LogStripBehavior> STREAM_CODEC = StreamCodec
             .unit(INSTANCE);
 
     protected LogStripBehavior() {/**/}
 
     protected static LogStripBehavior create() {
         return new LogStripBehavior();
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return action == ItemAbilities.AXE_STRIP;
     }
 
     @NotNull
@@ -54,49 +59,34 @@ public class LogStripBehavior implements IToolBehavior<LogStripBehavior> {
         BlockPos pos = context.getClickedPos();
         InteractionHand hand = context.getHand();
 
-        ItemStack stack = player.getItemInHand(hand);
+        ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
         Set<BlockPos> blocks;
         // only attempt to strip if the center block is strippable
-        if (isBlockStrippable(stack, level, player, pos, context)) {
-            if (aoeDefinition == AoESymmetrical.none()) {
-                blocks = ImmutableSet.of(pos);
-            } else {
-                HitResult rayTraceResult = ToolHelper.getPlayerDefaultRaytrace(player);
-
-                if (rayTraceResult == null)
-                    return InteractionResult.PASS;
-                if (rayTraceResult.getType() != HitResult.Type.BLOCK)
-                    return InteractionResult.PASS;
-                if (!(rayTraceResult instanceof BlockHitResult blockHitResult))
-                    return InteractionResult.PASS;
-                if (blockHitResult.getDirection() == null)
-                    return InteractionResult.PASS;
-
-                blocks = getStrippableBlocks(stack, aoeDefinition, level, player, rayTraceResult);
-                blocks.add(blockHitResult.getBlockPos());
-            }
-        } else
+        if (!isBlockStrippable(stack, level, player, pos, context)) {
             return InteractionResult.PASS;
+        }
+        if (aoeDefinition.isNone() || player == null) {
+            blocks = ImmutableSet.of(pos);
+        } else {
+            blocks = getStrippableBlocks(stack, aoeDefinition, level, player, context.getHitResult());
+            blocks.add(pos);
+        }
 
         boolean stripped = false;
         for (BlockPos blockPos : blocks) {
-            stripped |= level.setBlock(blockPos,
-                    getStripped(level.getBlockState(blockPos),
-                            new UseOnContext(player, hand, context.getHitResult().withPosition(blockPos))),
-                    Block.UPDATE_ALL);
-            if (!player.isCreative()) {
-                ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
-            }
+            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+                    context.getHitResult().withPosition(blockPos));
+            stripped |= level.setBlock(blockPos, getStripped(level.getBlockState(blockPos), newCtx),
+                    Block.UPDATE_ALL_IMMEDIATE);
+            ToolHelper.damageItem(stack, player);
             if (stack.isEmpty())
                 break;
         }
 
         if (stripped) {
-            level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.AXE_STRIP,
-                    SoundSource.PLAYERS, 1.0F, 1.0F);
-            player.swing(hand);
+            level.playSound(null, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.SUCCESS;
         }
 
@@ -112,7 +102,7 @@ public class LogStripBehavior implements IToolBehavior<LogStripBehavior> {
     protected boolean isBlockStrippable(ItemStack stack, Level level, Player player, BlockPos pos,
                                         UseOnContext context) {
         BlockState state = level.getBlockState(pos);
-        BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_STRIP, false);
+        BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_STRIP, true);
         return newState != null && newState != state;
     }
 

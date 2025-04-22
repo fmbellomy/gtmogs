@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.capability.IDataAccessHatch;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
@@ -12,21 +13,19 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.MultiblockPartMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.part.TieredPartMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.research.DataBankMachine;
-import com.gregtechceu.gtceu.common.recipe.ResearchCondition;
+import com.gregtechceu.gtceu.common.recipe.condition.ResearchCondition;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -41,10 +40,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class DataAccessHatchMachine extends TieredPartMachine
                                     implements IMachineLife, IDataAccessHatch, IDataInfoProvider {
 
@@ -71,15 +66,13 @@ public class DataAccessHatchMachine extends TieredPartMachine
             @Override
             public void onContentsChanged() {
                 super.onContentsChanged();
-                rebuildData(!getControllers().isEmpty() && getControllers().get(0) instanceof DataBankMachine);
+                rebuildData(isFormed() && getControllers().first() instanceof DataBankMachine);
             }
 
             @NotNull
             @Override
             public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-                var controller = DataAccessHatchMachine.this.getControllers().isEmpty() ? null :
-                        DataAccessHatchMachine.this.getControllers().get(0);
-                boolean isDataBank = controller instanceof DataBankMachine;
+                boolean isDataBank = isFormed() && getControllers().first() instanceof DataBankMachine;
                 if (ResearchManager.isStackDataItem(stack, isDataBank) &&
                         ResearchManager.hasResearchTag(stack)) {
                     return super.insertItem(slot, stack, simulate);

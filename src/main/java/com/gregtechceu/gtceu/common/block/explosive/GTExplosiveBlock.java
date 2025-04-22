@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.common.block.explosive;
 
 import com.gregtechceu.gtceu.common.entity.GTExplosiveEntity;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -10,7 +9,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -33,10 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @SuppressWarnings("deprecation")
 public abstract class GTExplosiveBlock extends Block {
 
@@ -96,7 +90,7 @@ public abstract class GTExplosiveBlock extends Block {
             this.explode(level, pos, player);
             level.removeBlock(pos, false);
             if (stack.getItem() == Items.FLINT_AND_STEEL) {
-                stack.hurtAndBreak(1, player, EquipmentSlot.MAINHAND);
+                stack.hurtAndBreak(1, player, LivingEntity.getSlotForHand(hand));
             } else if (!player.isCreative()) {
                 stack.shrink(1);
             }

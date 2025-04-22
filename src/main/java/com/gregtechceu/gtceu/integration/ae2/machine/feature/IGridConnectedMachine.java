@@ -4,15 +4,9 @@ import com.gregtechceu.gtceu.api.machine.feature.IMachineFeature;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.Direction;
-
 import appeng.api.networking.IGridNodeListener;
-import appeng.api.orientation.BlockOrientation;
-import appeng.api.orientation.RelativeSide;
 import appeng.api.util.AECableType;
 import appeng.me.helpers.IGridConnectedBlockEntity;
-
-import java.util.EnumSet;
-import java.util.Set;
 
 /**
  * A machine that can connect to ME network.
@@ -61,10 +55,5 @@ public interface IGridConnectedMachine extends IMachineFeature, IGridConnectedBl
     @Override
     default void onMainNodeStateChanged(IGridNodeListener.State reason) {
         this.updateMEStatus();
-    }
-
-    @Override
-    default Set<Direction> getGridConnectableSides(BlockOrientation orientation) {
-        return EnumSet.of(orientation.getSide(RelativeSide.FRONT));
     }
 }

@@ -18,8 +18,9 @@ import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMa
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
 import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
-import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.api.transfer.fluid.FluidHandlerList;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
+import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import com.gregtechceu.gtceu.utils.GTUtil;
@@ -30,7 +31,6 @@ import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.ImageWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.misc.FluidTransferList;
 import com.lowdragmc.lowdraglib.syncdata.IManaged;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -38,7 +38,6 @@ import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -57,14 +56,9 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.Supplier;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class HPCAMachine extends WorkableElectricMultiblockMachine
                          implements IOpticalComputationProvider, IControllable {
 
@@ -111,20 +105,22 @@ public class HPCAMachine extends WorkableElectricMultiblockMachine
                 this.maintenance = maintenanceMachine;
             }
             if (io == IO.NONE || io == IO.OUT) continue;
-            for (var handler : part.getRecipeHandlers()) {
-                // If IO not compatible
-                if (io != IO.BOTH && handler.getHandlerIO() != IO.BOTH && io != handler.getHandlerIO()) continue;
-                if (handler.getCapability() == EURecipeCapability.CAP &&
-                        handler instanceof IEnergyContainer container) {
-                    energyContainers.add(container);
-                } else if (handler.getCapability() == FluidRecipeCapability.CAP &&
-                        handler instanceof IFluidHandler fluidHandler) {
-                            coolantContainers.add(fluidHandler);
-                        }
+            var handlerLists = part.getRecipeHandlers();
+            for (var handlerList : handlerLists) {
+                if (!handlerList.isValid(io)) continue;
+
+                handlerList.getCapability(EURecipeCapability.CAP).stream()
+                        .filter(IEnergyContainer.class::isInstance)
+                        .map(IEnergyContainer.class::cast)
+                        .forEach(energyContainers::add);
+                handlerList.getCapability(FluidRecipeCapability.CAP).stream()
+                        .filter(IFluidHandler.class::isInstance)
+                        .map(IFluidHandler.class::cast)
+                        .forEach(coolantContainers::add);
             }
         }
         this.energyContainer = new EnergyContainerList(energyContainers);
-        this.coolantHandler = new FluidTransferList(coolantContainers);
+        this.coolantHandler = new FluidHandlerList(coolantContainers);
         this.hpcaHandler.onStructureForm(componentHatches);
 
         if (getLevel() instanceof ServerLevel serverLevel) {
@@ -270,7 +266,7 @@ public class HPCAMachine extends WorkableElectricMultiblockMachine
     public void addDisplayText(List<Component> textList) {
         MultiblockDisplayText.builder(textList, isFormed())
                 .setWorkingStatus(true, hpcaHandler.getAllocatedCWUt() > 0) // transform into two-state system for
-                // display
+                                                                            // display
                 .setWorkingStatusKeys(
                         "gtceu.multiblock.idling",
                         "gtceu.multiblock.idling",
@@ -494,7 +490,7 @@ public class HPCAMachine extends WorkableElectricMultiblockMachine
                 FluidStack coolantStack = GTTransferUtils.drainFluidAccountNotifiableList(coolantTank,
                         getCoolantStack(coolantToDrain), IFluidHandler.FluidAction.EXECUTE);
                 if (!coolantStack.isEmpty()) {
-                    long coolantDrained = coolantStack.getAmount();
+                    int coolantDrained = coolantStack.getAmount();
                     if (coolantDrained == coolantToDrain) {
                         // successfully stabilized to zero
                         return 0;

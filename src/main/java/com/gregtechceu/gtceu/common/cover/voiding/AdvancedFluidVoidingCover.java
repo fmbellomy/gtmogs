@@ -7,29 +7,23 @@ import com.gregtechceu.gtceu.api.cover.filter.SimpleFluidFilter;
 import com.gregtechceu.gtceu.api.gui.widget.EnumSelectorWidget;
 import com.gregtechceu.gtceu.api.gui.widget.IntInputWidget;
 import com.gregtechceu.gtceu.api.gui.widget.NumberInputWidget;
+import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.common.cover.data.BucketMode;
 import com.gregtechceu.gtceu.common.cover.data.VoidingMode;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class AdvancedFluidVoidingCover extends FluidVoidingCover {
 
     @Persisted
@@ -59,30 +53,30 @@ public class AdvancedFluidVoidingCover extends FluidVoidingCover {
 
     @Override
     protected void doVoidFluids() {
-        IFluidHandlerModifiable fluidTransfer = getOwnFluidTransfer();
-        if (fluidTransfer == null) {
+        IFluidHandlerModifiable fluidHandler = getOwnFluidHandler();
+        if (fluidHandler == null) {
             return;
         }
 
         switch (voidingMode) {
-            case VOID_ANY -> voidAny(fluidTransfer);
-            case VOID_OVERFLOW -> voidOverflow(fluidTransfer);
+            case VOID_ANY -> voidAny(fluidHandler);
+            case VOID_OVERFLOW -> voidOverflow(fluidHandler);
         }
     }
 
-    private void voidOverflow(IFluidHandlerModifiable fluidTransfer) {
-        final Map<FluidStack, Integer> fluidAmounts = enumerateDistinctFluids(fluidTransfer, TransferDirection.EXTRACT);
+    private void voidOverflow(IFluidHandlerModifiable fluidHandler) {
+        final Map<FluidStack, Integer> fluidAmounts = enumerateDistinctFluids(fluidHandler, TransferDirection.EXTRACT);
 
         for (FluidStack fluidStack : fluidAmounts.keySet()) {
             int presentAmount = fluidAmounts.get(fluidStack);
-            int targetAmount = getFilteredFluidAmount(fluidStack) * MILLIBUCKET_SIZE;
+            int targetAmount = getFilteredFluidAmount(fluidStack);
             if (targetAmount <= 0L || targetAmount > presentAmount)
                 continue;
 
             var toDrain = fluidStack.copy();
             toDrain.setAmount(presentAmount - targetAmount);
 
-            fluidTransfer.drain(toDrain, IFluidHandler.FluidAction.EXECUTE);
+            fluidHandler.drain(toDrain, IFluidHandler.FluidAction.EXECUTE);
         }
     }
 

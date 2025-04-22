@@ -23,6 +23,7 @@ public class CPacketKeysPressed implements CustomPacketPayload {
     public static final Type<CPacketKeysPressed> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, CPacketKeysPressed> CODEC = StreamCodec
             .ofMember(CPacketKeysPressed::encode, CPacketKeysPressed::decode);
+
     private Object updateKeys;
 
     public CPacketKeysPressed(List<KeyBind> updateKeys) {
@@ -54,23 +55,22 @@ public class CPacketKeysPressed implements CustomPacketPayload {
         return new CPacketKeysPressed(updateKeys);
     }
 
-    public static void execute(CPacketKeysPressed packet, IPayloadContext handler) {
-        if (handler.player() != null) {
+    public void execute(IPayloadContext context) {
+        if (context.player() instanceof ServerPlayer player) {
             KeyBind[] keybinds = KeyBind.VALUES;
             // noinspection unchecked
-            Pair<Boolean, Boolean>[] updateKeys = (Pair<Boolean, Boolean>[]) packet.updateKeys;
+            Pair<Boolean, Boolean>[] updateKeys = (Pair<Boolean, Boolean>[]) this.updateKeys;
             for (int i = 0; i < updateKeys.length; i++) {
                 Pair<Boolean, Boolean> pair = updateKeys[i];
                 if (pair != null) {
-                    keybinds[i].update(pair.getFirst(), pair.getSecond(), (ServerPlayer) handler.player());
+                    keybinds[i].update(pair.getFirst(), pair.getSecond(), player);
                 }
             }
         }
     }
 
-    @NotNull
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<CPacketKeysPressed> type() {
         return TYPE;
     }
 }

@@ -9,31 +9,46 @@ def mod_name = getConfig("mod_name")
 def mod_description = getConfig("mod_description")
 def mod_url = getConfig("mod_url")
 def mod_issue_tracker = getConfig("mod_issue_tracker")
-def loader_version = getConfig("loader_version")
 
-task printVersion {
+String suffix = System.getenv("VERSION_SUFFIX")
+String version_toml = "$version" + (suffix ? "-$suffix" : "")
+
+tasks.register('printVersion') {
     doLast {
         println mod_version
+    }
+}
+
+// Create run-folders for non-client configs to avoid pollution of dev envs
+tasks.matching { it.name.startsWith('prepare') }.configureEach {
+    doFirst {
+        mkdir('run')
+        mkdir('run/server')
+        mkdir('run/gametest')
+        mkdir('run/data')
     }
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
-    var forgeVers = forge.versions.neoForge.get().split("\\.")
+    var neoVersion = libs.versions.neoForge.get()
+    neoVersion = neoVersion.substring(0, neoVersion.lastIndexOf('.'))
+    var configurationVersion = forge.versions.configuration.get()
+    configurationVersion = configurationVersion.substring(0, configurationVersion.lastIndexOf('-'))
     var replaceProperties = [
-            version             : version,
+            version             : version_toml,
             mod_id              : mod_id,
             minecraft_version   : "[1.21, 1.21.1]",
-            loader_version      : loader_version,
-            forge_version       : forgeVers[0] + "." + forgeVers[1], // only specify major version of forge
-            configuration_version: "2.3.1",
-            kjs_version         : forge.versions.kubejs.get(),
+            loader_version      : libs.versions.loader.get(),
+            neo_version         : neoVersion,
+            configuration_version : configurationVersion,
+            kjs_version         : forge.versions.kubejs.get().split("\\.")[0], // only specify major version of kjs
             ldlib_version       : forge.versions.ldlib.get(),
             jei_version         : forge.versions.jei.get(),
             emi_version         : forge.versions.emi.get(),
             top_version         : forge.versions.theoneprobe.get(),
-            jade_version        : "15.1.8",
+            jade_version        : forge.versions.jade.get(),
             mod_license         : mod_license,
             mod_name            : mod_name,
             mod_description     : mod_description,

@@ -3,27 +3,28 @@ package com.gregtechceu.gtceu.common.item.behavior;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
-import com.gregtechceu.gtceu.api.capability.GTCapability;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IEnergyContainer;
 import com.gregtechceu.gtceu.api.capability.IWorkable;
+import com.gregtechceu.gtceu.api.capability.GTCapability;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidVeinSavedData;
+import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.feature.IMufflableMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
-import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidVeinSavedData;
 import com.gregtechceu.gtceu.common.blockentity.FluidPipeBlockEntity;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectBedrockFluid;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -32,6 +33,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -50,6 +52,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Getter;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -115,17 +118,15 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player,
-                                                  InteractionHand usedHand) {
-        ItemStack heldItem = player.getItemInHand(usedHand);
+    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player, InteractionHand usedHand) {
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide) {
-                setNextMode(heldItem);
-                var mode = getMode(heldItem);
+                setNextMode(item);
+                var mode = getMode(item);
                 player.sendSystemMessage(Component.translatable("behavior.portable_scanner.mode.caption",
                         Component.translatable(mode.getLangKey())));
             }
-            return InteractionResultHolder.success(heldItem);
+            return InteractionResultHolder.success(item);
         }
         return IInteractionItem.super.use(item, level, player, usedHand);
     }
@@ -197,12 +198,11 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
 
             // General machine information
             if (mode == DisplayMode.SHOW_ALL || mode == DisplayMode.SHOW_MACHINE_INFO) {
-                if (machineBlockEntity.getOwner() != null) {
-                    machineBlockEntity.getOwner().displayInfo(list);
+                if (machine.getOwner() != null) {
+                    machine.getOwner().displayInfo(list);
                 }
 
-                if (machine.getDefinition() instanceof MultiblockMachineDefinition multi &&
-                        multi.isAllowExtendedFacing()) {
+                if (machine.getDefinition().isAllowExtendedFacing()) {
                     list.add(Component.translatable("behavior.portable_scanner.divider"));
 
                     list.add(Component.translatable("behavior.portable_scanner.machine_front_facing",
@@ -233,8 +233,7 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
                                         .withStyle(ChatFormatting.GREEN),
                                 Component.translatable(FormattingUtil.formatNumbers(fluidHandler.getTankCapacity(i)))
                                         .withStyle(ChatFormatting.YELLOW),
-                                ((MutableComponent) fluidStack.getHoverName())
-                                        .withStyle(ChatFormatting.GOLD)));
+                                ((MutableComponent) fluidStack.getHoverName()).withStyle(ChatFormatting.GOLD)));
                     }
 
                     if (allTanksEmpty) {
@@ -384,19 +383,26 @@ public class PortableScannerBehavior implements IInteractionItem, IAddInformatio
             if (level instanceof ServerLevel serverLevel) {
                 list.add(Component.translatable("behavior.portable_scanner.divider"));
                 var veinData = BedrockFluidVeinSavedData.getOrCreate(serverLevel);
-                Fluid fluid = veinData.getFluidInChunk(pos.getX() >> 4, pos.getZ() >> 4);
+                int chunkX = pos.getX() >> 4;
+                int chunkZ = pos.getZ() >> 4;
+                Fluid fluid = veinData.getFluidInChunk(chunkX, chunkZ);
 
                 if (fluid != null) {
                     FluidStack stack = new FluidStack(fluid,
-                            veinData.getOperationsRemaining(pos.getX() >> 4, pos.getZ() >> 4));
+                            veinData.getOperationsRemaining(chunkX, chunkZ));
                     double fluidPercent = stack.getAmount() * 100.0 / BedrockFluidVeinSavedData.MAXIMUM_VEIN_OPERATIONS;
+
+                    var fluidInfo = ProspectorMode.FluidInfo
+                            .fromVeinWorldEntry(veinData.getFluidVeinWorldEntry(chunkX, chunkZ));
+                    var packet = new SPacketProspectBedrockFluid(level.dimension(), pos, fluidInfo);
+                    PacketDistributor.sendToPlayer((ServerPlayer) player, packet);
 
                     if (player.isCreative()) {
                         list.add(Component.translatable("behavior.portable_scanner.bedrock_fluid.amount",
                                 ((MutableComponent) stack.getHoverName())
                                         .withStyle(ChatFormatting.GOLD),
                                 Component.translatable(String.valueOf(
-                                        veinData.getFluidYield(pos.getX() >> 4, pos.getZ() >> 4)))
+                                        veinData.getFluidYield(chunkX, chunkZ)))
                                         .withStyle(ChatFormatting.GOLD),
                                 Component.translatable(String.valueOf(fluidPercent))
                                         .withStyle(ChatFormatting.YELLOW)));

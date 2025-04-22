@@ -2,13 +2,20 @@ package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.api.item.IGTTool;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.EnchantmentTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RepairItemRecipe;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 
+import com.llamalad7.mixinextras.sugar.Local;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -27,7 +34,7 @@ public abstract class RepairItemRecipeMixin extends CustomRecipe {
      * @param container the input inventory
      */
     @Override
-    public NonNullList<ItemStack> getRemainingItems(CraftingInput container) {
+    public @NotNull NonNullList<ItemStack> getRemainingItems(@NotNull CraftingInput container) {
         var result = super.getRemainingItems(container);
         for (ItemStack stack : result) {
             if (stack.getItem() instanceof IGTTool) {
@@ -56,37 +63,32 @@ public abstract class RepairItemRecipeMixin extends CustomRecipe {
         }
     }
 
-    /*
-     * FIXME enchantment copying
-     * 
-     * @Inject(
-     * method =
-     * "assemble(Lnet/minecraft/world/inventory/CraftingContainer;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
-     * at = @At(value = "RETURN", ordinal = 1), cancellable = true
-     * )
-     * public void gtceu$assemble(CraftingContainer container, HolderLookup.Provider registryAccess,
-     * CallbackInfoReturnable<ItemStack> cir,
-     * 
-     * @Local(ordinal = 1) ItemStack itemstack3,
-     * 
-     * @Local(ordinal = 2) LocalRef<ItemStack> itemstack2,
-     * 
-     * @Local(ordinal = 3) int i1,
-     * 
-     * @Local(ordinal = 0) ItemEnchantments first,
-     * 
-     * @Local(ordinal = 1) ItemEnchantments second) {
-     * if (itemstack3.getItem() instanceof IGTTool tool) {
-     * itemstack2.set(tool.get());
-     * itemstack2.get().setDamageValue(i1);
-     * 
-     * // apply curse enchantments properly
-     * if (!first.isEmpty()) {
-     * first.forEach((enchantment, level) -> itemstack2.get().enchant(enchantment, level));
-     * }
-     * 
-     * cir.setReturnValue(itemstack2.get());
-     * }
-     * }
-     */
+
+
+    @Inject(
+            method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
+            at = @At(value = "RETURN", ordinal = 1),
+            cancellable = true)
+    public void gtceu$assemble(CraftingInput input, HolderLookup.Provider registries,
+                               CallbackInfoReturnable<ItemStack> cir,
+                               @Local(ordinal = 0) ItemStack itemstack,
+                               @Local(ordinal = 3) int calculatedDamage) {
+        if (itemstack.getItem() instanceof IGTTool tool) {
+            ItemStack ret = cir.getReturnValue();
+            ItemEnchantments doneEnchants = EnchantmentHelper.getEnchantmentsForCrafting(ret);
+            ret = tool.get();
+            // re-apply the enchantments to the new item
+            EnchantmentHelper.updateEnchantments(
+                    ret,
+                    itemEnchants -> registries.lookupOrThrow(Registries.ENCHANTMENT)
+                            .listElements()
+                            .filter(enchant -> enchant.is(EnchantmentTags.CURSE))
+                            .forEach(enchant -> {
+                                itemEnchants.upgrade(enchant, doneEnchants.getLevel(enchant));
+                            }));
+            ret.setDamageValue(calculatedDamage);
+
+            cir.setReturnValue(ret);
+        }
+    }
 }

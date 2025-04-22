@@ -1,11 +1,17 @@
 package com.gregtechceu.gtceu.data.recipe.misc;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
-
+import java.util.HashSet;
+import java.util.Set;
 import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
@@ -13,6 +19,28 @@ import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 public class FuelRecipes {
 
     public static void init(RecipeOutput provider) {
+        // TODO this all needs to be cleaned up, but this will make it somewhat work for now
+        // do these first because for some reason vanilla fuels are not set up yet at this phase?
+        Set<Item> addedItems = new HashSet<>();
+        for (var fuelEntry : FurnaceBlockEntity.getFuel().entrySet()) {
+            addedItems.add(fuelEntry.getKey());
+            var resLoc = BuiltInRegistries.ITEM.getKey(fuelEntry.getKey());
+            STEAM_BOILER_RECIPES.recipeBuilder(GTCEu.id(resLoc.getNamespace() + "_" + resLoc.getPath()))
+                    .inputItems(fuelEntry.getKey())
+                    .duration(fuelEntry.getValue() * 12) // remove the * 12 if SteamBoilerMachine:240 is uncommented
+                    .save(provider);
+        }
+        for (Item item : BuiltInRegistries.ITEM) {
+            var burnTime = GTUtil.getItemBurnTime(item);
+            if (burnTime > 0 && !addedItems.contains(item)) {
+                var resLoc = BuiltInRegistries.ITEM.getKey(item);
+                STEAM_BOILER_RECIPES.recipeBuilder(GTCEu.id(resLoc.getNamespace() + "_" + resLoc.getPath()))
+                        .inputItems(item)
+                        .duration(burnTime * 12)
+                        .save(provider);
+            }
+        }
+
         STEAM_BOILER_RECIPES.recipeBuilder("lava")
                 .inputFluids(new FluidStack(Fluids.LAVA, 100))
                 .duration(600 * 12)
@@ -40,7 +68,7 @@ public class FuelRecipes {
                 .save(provider);
 
         LARGE_BOILER_RECIPES.recipeBuilder("heavy_oil")
-                .inputFluids(OilHeavy.getFluid(32))
+                .inputFluids(HeavyOil.getFluid(32))
                 .duration(10)
                 .save(provider);
 
@@ -139,7 +167,7 @@ public class FuelRecipes {
                 .save(provider);
 
         COMBUSTION_GENERATOR_FUELS.recipeBuilder("light_oil")
-                .inputFluids(OilLight.getFluid(32))
+                .inputFluids(LightOil.getFluid(32))
                 .duration(5)
                 .EUt(-V[LV])
                 .save(provider);
@@ -289,10 +317,24 @@ public class FuelRecipes {
                 .EUt(-V[EV])
                 .save(provider);
 
+        PLASMA_GENERATOR_FUELS.recipeBuilder("argon")
+                .inputFluids(Argon.getFluid(FluidStorageKeys.PLASMA, 1))
+                .outputFluids(Argon.getFluid(1))
+                .duration(96)
+                .EUt(-V[EV])
+                .save(provider);
+
         PLASMA_GENERATOR_FUELS.recipeBuilder("iron")
                 .inputFluids(Iron.getFluid(FluidStorageKeys.PLASMA, 1))
                 .outputFluids(Iron.getFluid(1))
-                .duration(96)
+                .duration(112)
+                .EUt(-V[EV])
+                .save(provider);
+
+        PLASMA_GENERATOR_FUELS.recipeBuilder("tin")
+                .inputFluids(Tin.getFluid(FluidStorageKeys.PLASMA, 1))
+                .outputFluids(Tin.getFluid(1))
+                .duration(128)
                 .EUt(-V[EV])
                 .save(provider);
 
@@ -300,6 +342,13 @@ public class FuelRecipes {
                 .inputFluids(Nickel.getFluid(FluidStorageKeys.PLASMA, 1))
                 .outputFluids(Nickel.getFluid(1))
                 .duration(192)
+                .EUt(-V[EV])
+                .save(provider);
+
+        PLASMA_GENERATOR_FUELS.recipeBuilder("americium")
+                .inputFluids(Americium.getFluid(FluidStorageKeys.PLASMA, 1))
+                .outputFluids(Americium.getFluid(1))
+                .duration(320)
                 .EUt(-V[EV])
                 .save(provider);
     }

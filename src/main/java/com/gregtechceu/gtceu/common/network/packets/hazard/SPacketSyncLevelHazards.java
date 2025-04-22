@@ -12,13 +12,12 @@ import net.minecraft.world.level.ChunkPos;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@NoArgsConstructor
 @AllArgsConstructor
 public class SPacketSyncLevelHazards implements CustomPacketPayload {
 
@@ -46,12 +45,12 @@ public class SPacketSyncLevelHazards implements CustomPacketPayload {
         return new SPacketSyncLevelHazards(map);
     }
 
-    public static void execute(SPacketSyncLevelHazards packet, IPayloadContext handler) {
-        EnvironmentalHazardClientHandler.INSTANCE.updateHazardMap(packet.map);
+    public void execute(IPayloadContext handler) {
+        EnvironmentalHazardClientHandler.INSTANCE.updateHazardMap(this.map);
     }
 
     @Override
-    public Type<? extends CustomPacketPayload> type() {
+    public @NotNull Type<SPacketSyncLevelHazards> type() {
         return TYPE;
     }
 }

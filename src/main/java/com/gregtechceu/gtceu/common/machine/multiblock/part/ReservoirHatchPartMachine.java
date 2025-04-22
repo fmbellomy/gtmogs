@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.material.Fluids;
@@ -14,10 +13,6 @@ import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.Collections;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ReservoirHatchPartMachine extends FluidHatchPartMachine {
 
     protected InfiniteWaterTank waterTank;
@@ -102,12 +97,5 @@ public class ReservoirHatchPartMachine extends FluidHatchPartMachine {
 
         @Override
         public void deserializeNBT(HolderLookup.Provider provider, CompoundTag nbt) {}
-
-        @Override
-        public CustomFluidTank copy() {
-            var storage = new InfiniteWaterTank(capacity);
-            storage.setFluid(fluid.copy());
-            return storage;
-        }
     }
 }

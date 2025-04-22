@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.client.renderer.machine;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.client.renderer.block.CTMModelRenderer;
+import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 import com.lowdragmc.lowdraglib.client.model.ModelFactory;
@@ -51,10 +51,10 @@ public class OverlayEnergyIORenderer {
 
     public void renderOverlay(List<BakedQuad> quads, Direction modelFacing, ModelState modelState, int tintIndex) {
         quads.add(FaceQuad.bakeFace(
-                CTMModelRenderer.SLIGHTLY_OVER_BLOCK, modelFacing,
+                StaticFaceBakery.SLIGHTLY_OVER_BLOCK, modelFacing,
                 ModelFactory.getBlockSprite(tintedPart), modelState, tintIndex, 0, true, true));
         quads.add(FaceQuad.bakeFace(
-                CTMModelRenderer.SLIGHTLY_OVER_BLOCK, modelFacing,
+                StaticFaceBakery.SLIGHTLY_OVER_BLOCK, modelFacing,
                 ModelFactory.getBlockSprite(ioPart), modelState, -1, 0, true, true));
     }
 }

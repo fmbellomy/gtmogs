@@ -1,11 +1,14 @@
 package com.gregtechceu.gtceu.api.cover.filter;
 
+import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
+import com.gregtechceu.gtceu.api.machine.MachineCoverContainer;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
 
-import com.lowdragmc.lowdraglib.LDLib;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.IEnhancedManaged;
@@ -14,19 +17,14 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class FilterHandler<T, F extends Filter<T, F>> implements IEnhancedManaged {
 
     private final IEnhancedManaged container;
@@ -114,7 +112,13 @@ public abstract class FilterHandler<T, F extends Filter<T, F>> implements IEnhan
 
     private CustomItemStackHandler getFilterSlot() {
         if (this.filterSlot == null) {
-            this.filterSlot = new CustomItemStackHandler(this.filterItem);
+            this.filterSlot = new CustomItemStackHandler(this.filterItem) {
+
+                @Override
+                public int getSlotLimit(int slot) {
+                    return 1;
+                }
+            };
 
             this.filterSlot.setFilter(this::canInsertFilterItem);
         }
@@ -125,7 +129,7 @@ public abstract class FilterHandler<T, F extends Filter<T, F>> implements IEnhan
     private void updateFilter() {
         var filterContainer = getFilterSlot();
 
-        if (LDLib.isRemote()) {
+        if (GTCEu.isClientThread()) {
             if (!filterContainer.getStackInSlot(0).isEmpty() && !this.filterItem.isEmpty()) {
                 return;
             }
@@ -145,7 +149,14 @@ public abstract class FilterHandler<T, F extends Filter<T, F>> implements IEnhan
         if (!this.filterItem.isEmpty()) {
             this.filter = loadFilter(this.filterItem);
             filter.setOnUpdated(this.onFilterUpdated);
-
+            if (filter instanceof SmartItemFilter smart &&
+                    container instanceof CoverBehavior cover &&
+                    cover.coverHolder instanceof MachineCoverContainer mcc) {
+                var machine = MetaMachine.getMachine(mcc.getLevel(), mcc.getPos());
+                if (machine != null) {
+                    smart.setModeFromMachine(machine.getDefinition().getName());
+                }
+            }
             this.onFilterLoaded.accept(this.filter);
         }
         updateFilterGroupUI();

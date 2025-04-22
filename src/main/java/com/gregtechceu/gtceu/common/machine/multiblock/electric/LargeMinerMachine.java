@@ -7,35 +7,35 @@ import com.gregtechceu.gtceu.api.capability.IMiner;
 import com.gregtechceu.gtceu.api.capability.recipe.EURecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.feature.IDataInfoProvider;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
-import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
+import com.gregtechceu.gtceu.api.transfer.fluid.FluidHandlerList;
+import com.gregtechceu.gtceu.data.block.GTBlocks;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.item.behavior.PortableScannerBehavior;
 import com.gregtechceu.gtceu.common.machine.trait.miner.LargeMinerLogic;
-import com.gregtechceu.gtceu.data.block.GTBlocks;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.util.ClickData;
 import com.lowdragmc.lowdraglib.gui.widget.ComponentPanelWidget;
-import com.lowdragmc.lowdraglib.misc.FluidTransferList;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -44,18 +44,14 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 import static com.gregtechceu.gtceu.data.material.GTMaterials.DrillingFluid;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class LargeMinerMachine extends WorkableElectricMultiblockMachine
                                implements IMiner, IControllable, IDataInfoProvider {
 
@@ -67,7 +63,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
     @Nullable
     protected EnergyContainerList energyContainer;
     @Nullable
-    protected FluidTransferList inputFluidInventory;
+    protected FluidHandlerList inputFluidInventory;
     private final int drillingFluidConsumePerTick;
 
     public LargeMinerMachine(IMachineBlockEntity holder, int tier, int speed, int maximumChunkDiameter, int fortune,
@@ -107,7 +103,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
         return GTMaterials.Steel;
     }
 
-    public static Block getCasingState(int tier) {
+    public static net.minecraft.world.level.block.Block getCasingState(int tier) {
         return GTBlocks.MATERIALS_TO_CASINGS.get(getMaterial(tier)).get();
     }
 
@@ -121,7 +117,15 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
     @Override
     public void onStructureFormed() {
         super.onStructureFormed();
+        Direction opposite = this.getUpwardsFacing().getOpposite();
+        getRecipeLogic().setDir(opposite == Direction.NORTH ? Direction.UP : Direction.DOWN);
         initializeAbilities();
+    }
+
+    @Override
+    public boolean checkPattern() {
+        return super.checkPattern() &&
+                (this.getUpwardsFacing() == Direction.NORTH || this.getUpwardsFacing() == Direction.SOUTH);
     }
 
     private void initializeAbilities() {
@@ -131,21 +135,22 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
         for (IMultiPart part : getParts()) {
             IO io = ioMap.getOrDefault(part.self().getPos().asLong(), IO.BOTH);
             if (io == IO.NONE) continue;
-            for (var handler : part.getRecipeHandlers()) {
-                // If IO not compatible
-                if (io != IO.BOTH && handler.getHandlerIO() != IO.BOTH && io != handler.getHandlerIO()) continue;
-                var handlerIO = io == IO.BOTH ? handler.getHandlerIO() : io;
-                if (handlerIO == IO.IN && handler.getCapability() == EURecipeCapability.CAP &&
-                        handler instanceof IEnergyContainer container) {
-                    energyContainers.add(container);
-                } else if (handlerIO == IO.IN && handler.getCapability() == FluidRecipeCapability.CAP &&
-                        handler instanceof IFluidHandler fluidTransfer) {
-                            fluidTanks.add(fluidTransfer);
-                        }
+
+            var handlerLists = part.getRecipeHandlers();
+            for (var handlerList : handlerLists) {
+                if (!handlerList.isValid(io)) continue;
+                handlerList.getCapability(EURecipeCapability.CAP).stream()
+                        .filter(IEnergyContainer.class::isInstance)
+                        .map(IEnergyContainer.class::cast)
+                        .forEach(energyContainers::add);
+                handlerList.getCapability(FluidRecipeCapability.CAP).stream()
+                        .filter(IFluidHandler.class::isInstance)
+                        .map(IFluidHandler.class::cast)
+                        .forEach(fluidTanks::add);
             }
         }
         this.energyContainer = new EnergyContainerList(energyContainers);
-        this.inputFluidInventory = new FluidTransferList(fluidTanks);
+        this.inputFluidInventory = new FluidHandlerList(fluidTanks);
 
         getRecipeLogic().setVoltageTier(GTUtil.getTierByVoltage(this.energyContainer.getInputVoltage()));
         getRecipeLogic().setOverclockAmount(
@@ -177,11 +182,11 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
         }
 
         // drain fluid
-        if (inputFluidInventory != null && inputFluidInventory.transfers.length > 0) {
+        if (inputFluidInventory != null && inputFluidInventory.handlers.length > 0) {
             FluidStack drillingFluid = DrillingFluid
                     .getFluid(this.drillingFluidConsumePerTick * getRecipeLogic().getOverclockAmount());
             FluidStack fluidStack = inputFluidInventory.getFluidInTank(0);
-            if (!fluidStack.isEmpty() && FluidStack.isSameFluidSameComponents(fluidStack, DrillingFluid.getFluid(1)) &&
+            if (fluidStack != FluidStack.EMPTY && fluidStack.is(DrillingFluid.getFluid()) &&
                     fluidStack.getAmount() >= drillingFluid.getAmount()) {
                 if (!simulate) {
                     GTTransferUtils.drainFluidAccountNotifiableList(inputFluidInventory, drillingFluid,
@@ -250,7 +255,7 @@ public class LargeMinerMachine extends WorkableElectricMultiblockMachine
     // ******* Interaction *******//
     //////////////////////////////////////
     @Override
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, Direction facing,
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction facing,
                                                     BlockHitResult hitResult) {
         if (isRemote() || !this.isFormed())
             return ItemInteractionResult.SUCCESS;

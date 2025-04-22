@@ -6,17 +6,18 @@ import com.gregtechceu.gtceu.api.gui.factory.CoverUIFactory;
 import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
+import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
 import com.lowdragmc.lowdraglib.syncdata.IEnhancedManaged;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,20 +31,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import lombok.Getter;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * Represents cover instance attached on the specific side of meta tile entity
  * Cover filters out interaction and logic of meta tile entity
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLight {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CoverBehavior.class);
@@ -94,12 +93,15 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
      *
      * @return true if cover can be attached, false otherwise
      */
+    @MustBeInvokedByOverriders
     public boolean canAttach() {
-        return true;
+        var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
+        return machine == null || !machine.hasFrontFacing() || coverHolder.getFrontFacing() != attachedSide ||
+                machine instanceof IMultiController;
     }
 
     /**
-     * Will be called on server side after the cover attachment to the meta tile entity
+     * Will be called on server side after the cover attachment to the machine
      * Cover can change it's internal state here and return initial data as nbt.
      *
      * @param itemStack the item cover was attached from
@@ -136,6 +138,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     public void onNeighborChanged(Block block, BlockPos fromPos, boolean isMoving) {}
 
     public void setRedstoneSignalOutput(int redstoneSignalOutput) {
+        if (this.redstoneSignalOutput == redstoneSignalOutput) return;
         this.redstoneSignalOutput = redstoneSignalOutput;
         coverHolder.notifyBlockUpdate();
         coverHolder.markDirty();
@@ -148,18 +151,18 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     //////////////////////////////////////
     // ******* Interaction *******//
     //////////////////////////////////////
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
         if (this instanceof IUICover) {
             if (playerIn instanceof ServerPlayer serverPlayer) {
                 CoverUIFactory.INSTANCE.openUI(this, serverPlayer);
             }
             playerIn.swing(hand);
-            return ItemInteractionResult.SUCCESS;
+            return ItemInteractionResult.CONSUME;
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
@@ -189,23 +192,23 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     public boolean shouldRenderGrid(Player player, BlockPos pos, BlockState state, ItemStack held,
                                     Set<GTToolType> toolTypes) {
         return toolTypes.contains(GTToolType.CROWBAR) ||
-                (toolTypes.contains(GTToolType.SCREWDRIVER) && this instanceof IUICover);
+                ((toolTypes.isEmpty() || toolTypes.contains(GTToolType.SCREWDRIVER)) && this instanceof IUICover);
     }
 
     @Override
-    public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    Direction side) {
+    public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
+                                              ItemStack held, Direction side) {
         if (toolTypes.contains(GTToolType.CROWBAR)) {
             return GuiTextures.TOOL_REMOVE_COVER;
         }
-        if (toolTypes.contains(GTToolType.SCREWDRIVER) && this instanceof IUICover) {
+        if ((toolTypes.isEmpty() || toolTypes.contains(GTToolType.SCREWDRIVER)) && this instanceof IUICover) {
             return GuiTextures.TOOL_COVER_SETTINGS;
         }
         return null;
     }
 
     /**
-     * get Appearance. same as IForgeBlock.getAppearance() / IFabricBlock.getAppearance()
+     * get Appearance. same as IBlockExtension.getAppearance() / IFabricBlock.getAppearance()
      */
     @Nullable
     public BlockState getAppearance(BlockState sourceState, BlockPos sourcePos) {
@@ -217,12 +220,12 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     //////////////////////////////////////
 
     @Nullable
-    public IItemHandlerModifiable getItemTransferCap(IItemHandlerModifiable defaultValue) {
+    public IItemHandlerModifiable getItemHandlerCap(IItemHandlerModifiable defaultValue) {
         return defaultValue;
     }
 
     @Nullable
-    public IFluidHandlerModifiable getFluidTransferCap(IFluidHandlerModifiable defaultValue) {
+    public IFluidHandlerModifiable getFluidHandlerCap(IFluidHandlerModifiable defaultValue) {
         return defaultValue;
     }
 }

@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.item.tool.behavior;
 
 import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -19,6 +18,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -91,6 +92,19 @@ public interface IToolBehavior<T extends IToolBehavior<T>> {
     }
 
     /**
+     * Queries if an item can perform the given action.
+     * See {@link ItemAbilities} for a description of each stock action
+     * and {@link com.gregtechceu.gtceu.data.item.GTItemAbilities} for GTCEu's ones
+     *
+     * @param stack  The stack being used
+     * @param action The ability being queried
+     * @return True if the stack can perform the action
+     */
+    default boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        return false;
+    }
+
+    /**
      * Called when a Block is right-clicked with this Item
      *
      * @param context The UseOnContext used to determine actions.
@@ -127,13 +141,5 @@ public interface IToolBehavior<T extends IToolBehavior<T>> {
     default void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                 @NotNull TooltipFlag flag) {}
 
-    /**
-     * Add the necessary NBT information to the tool
-     * 
-     * @param stack the tool
-     * @param tag   the nbt tag to add to
-     */
-    default void addBehaviorComponent(@NotNull ItemStack stack, @NotNull ToolBehaviors tag) {}
-
-    public ToolBehaviorType<T> getType();
+    ToolBehaviorType<T> getType();
 }

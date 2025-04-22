@@ -1,15 +1,13 @@
 package com.gregtechceu.gtceu.api.cover.filter;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
+import com.gregtechceu.gtceu.api.gui.widget.PhantomSlotWidget;
 import com.gregtechceu.gtceu.api.gui.widget.ToggleButtonWidget;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 
-import com.lowdragmc.lowdraglib.gui.widget.PhantomSlotWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.side.item.ItemTransferHelper;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.ItemStack;
 
 import com.mojang.serialization.Codec;
@@ -20,22 +18,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/13
- * @implNote ItemFilterHandler
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleItemFilter implements ItemFilter {
 
     public static final Codec<SimpleItemFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("is_blacklist").forGetter(val -> val.isBlackList),
             Codec.BOOL.fieldOf("ignore_components").forGetter(val -> val.ignoreNbt),
-            ItemStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList()))
-            .apply(instance, SimpleItemFilter::new));
+            ItemStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList())
+    ).apply(instance, SimpleItemFilter::new));
 
     @Getter
     protected boolean isBlackList;
@@ -55,7 +44,7 @@ public class SimpleItemFilter implements ItemFilter {
         maxStackSize = 1;
     }
 
-    protected SimpleItemFilter(boolean isBlackList, boolean ignoreNbt, List<ItemStack> matches) {
+    public SimpleItemFilter(boolean isBlackList, boolean ignoreNbt, List<ItemStack> matches) {
         this.isBlackList = isBlackList;
         this.ignoreNbt = ignoreNbt;
         this.matches = matches.toArray(ItemStack[]::new);
@@ -73,6 +62,11 @@ public class SimpleItemFilter implements ItemFilter {
             this.itemWriter.accept(filter);
             onUpdated.accept(filter);
         };
+    }
+
+    @Override
+    public boolean isBlank() {
+        return !isBlackList && !ignoreNbt && Arrays.stream(matches).allMatch(ItemStack::isEmpty);
     }
 
     public void setBlackList(boolean blackList) {
@@ -116,9 +110,9 @@ public class SimpleItemFilter implements ItemFilter {
                 group.addWidget(slot);
             }
         }
-        group.addWidget(new ToggleButtonWidget(18 * 3 + 2, 9, 18, 18,
+        group.addWidget(new ToggleButtonWidget(18 * 3 + 5, 0, 20, 20,
                 GuiTextures.BUTTON_BLACKLIST, this::isBlackList, this::setBlackList));
-        group.addWidget(new ToggleButtonWidget(18 * 3 + 2, (18) + 9, 18, 18,
+        group.addWidget(new ToggleButtonWidget(18 * 3 + 5, 20, 20, 20,
                 GuiTextures.BUTTON_FILTER_NBT, this::isIgnoreNbt, this::setIgnoreNbt));
         return group;
     }
@@ -145,7 +139,7 @@ public class SimpleItemFilter implements ItemFilter {
         for (var candidate : matches) {
             if (ignoreNbt && ItemStack.isSameItemSameComponents(candidate, itemStack)) {
                 totalCount += candidate.getCount();
-            } else if (ItemTransferHelper.canItemStacksStack(candidate, itemStack)) {
+            } else if (ItemStack.isSameItemSameComponents(candidate, itemStack)) {
                 totalCount += candidate.getCount();
             }
         }

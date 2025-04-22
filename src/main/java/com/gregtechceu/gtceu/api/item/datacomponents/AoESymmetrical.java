@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
+import lombok.*;
+import lombok.experimental.Accessors;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
@@ -8,48 +10,31 @@ import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-public class AoESymmetrical {
+public record AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column, int row, int layer) {
 
     public static final Codec<AoESymmetrical> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_column").forGetter(AoESymmetrical::getMaxColumn),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_row").forGetter(AoESymmetrical::getMaxRow),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_layer").forGetter(AoESymmetrical::getMaxLayer),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("column").forGetter(AoESymmetrical::getColumn),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("row").forGetter(AoESymmetrical::getRow),
-            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("layer").forGetter(AoESymmetrical::getLayer))
-            .apply(instance, AoESymmetrical::new));
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_column").forGetter(AoESymmetrical::maxColumn),
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_row").forGetter(AoESymmetrical::maxRow),
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("max_layer").forGetter(AoESymmetrical::maxLayer),
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("column").forGetter(AoESymmetrical::column),
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("row").forGetter(AoESymmetrical::row),
+            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("layer").forGetter(AoESymmetrical::layer)
+    ).apply(instance, AoESymmetrical::new));
     public static final StreamCodec<ByteBuf, AoESymmetrical> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getMaxColumn,
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getMaxRow,
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getMaxLayer,
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getColumn,
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getRow,
-            ByteBufCodecs.VAR_INT, AoESymmetrical::getLayer,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::maxColumn,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::maxRow,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::maxLayer,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::column,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::row,
+            ByteBufCodecs.VAR_INT, AoESymmetrical::layer,
             AoESymmetrical::new);
 
-    @Getter
-    public final int maxColumn, maxRow, maxLayer;
-    @Getter
-    public final int column, row, layer;
-
-    private AoESymmetrical() {
-        this.maxColumn = 0;
-        this.maxRow = 0;
-        this.maxLayer = 0;
-        this.column = 0;
-        this.row = 0;
-        this.layer = 0;
-    }
+    private static final AoESymmetrical NONE = new AoESymmetrical(0, 0, 0, 0, 0, 0);
 
     public boolean isNone() {
         return this == NONE || (this.maxColumn == 0 && this.maxRow == 0 && this.maxLayer == 0);
     }
-
-    private static final AoESymmetrical NONE = new AoESymmetrical();
 
     public static AoESymmetrical none() {
         return NONE;
@@ -111,8 +96,12 @@ public class AoESymmetrical {
         return aoe;
     }
 
+    public Mutable toMutable() {
+        return new Mutable(maxColumn, maxRow, maxLayer, column, row, layer);
+    }
+
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (!(o instanceof AoESymmetrical that))
@@ -131,5 +120,62 @@ public class AoESymmetrical {
         result = 31 * result + row;
         result = 31 * result + layer;
         return result;
+    }
+
+    @Accessors(fluent = true, chain = true)
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class Mutable {
+        @Getter
+        @Setter
+        public int maxColumn, maxRow, maxLayer;
+        @Getter
+        @Setter
+        public int column, row, layer;
+
+        public Mutable increaseColumn() {
+            if (column < maxColumn) {
+                column++;
+            }
+            return this;
+        }
+
+        public Mutable increaseRow() {
+            if (row < maxRow) {
+                row++;
+            }
+            return this;
+        }
+
+        public Mutable increaseLayer() {
+            if (layer < maxLayer) {
+                layer++;
+            }
+            return this;
+        }
+
+        public Mutable decreaseColumn() {
+            if (column > 0) {
+                column++;
+            }
+            return this;
+        }
+
+        public Mutable decreaseRow() {
+            if (row > 0) {
+                row++;
+            }
+            return this;
+        }
+
+        public Mutable decreaseLayer() {
+            if (layer > 0) {
+                layer++;
+            }
+            return this;
+        }
+
+        public AoESymmetrical toImmutable() {
+            return new AoESymmetrical(maxColumn, maxRow, maxLayer, column, row, layer);
+        }
     }
 }

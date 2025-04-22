@@ -6,13 +6,14 @@ import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.machine.feature.IEnvironmentalHazardEmitter;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
-import com.gregtechceu.gtceu.api.recipe.logic.OCParams;
-import com.gregtechceu.gtceu.api.recipe.logic.OCResult;
+import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
+import com.gregtechceu.gtceu.api.recipe.modifier.ModifierFunction;
+import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
+import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
-import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.utils.Position;
@@ -27,22 +28,11 @@ import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.function.BiFunction;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/17
- * @implNote SimpleGeneratorMachine
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class SimpleGeneratorMachine extends WorkableTieredMachine
                                     implements IFancyUIMachine, IEnvironmentalHazardEmitter {
 
@@ -93,25 +83,36 @@ public class SimpleGeneratorMachine extends WorkableTieredMachine
     // ****** RECIPE LOGIC *******//
     //////////////////////////////////////
 
-    @Nullable
-    public static GTRecipe recipeModifier(MetaMachine machine, @NotNull GTRecipe recipe, @NotNull OCParams params,
-                                          @NotNull OCResult result) {
-        if (machine instanceof SimpleGeneratorMachine generator) {
-            var EUt = RecipeHelper.getOutputEUt(recipe);
-            if (EUt > 0) {
-                var maxParallel = (int) (Math.min(generator.getOverclockVoltage(),
-                        GTValues.V[generator.getOverclockTier()]) / EUt);
-                var paraRecipe = GTRecipeModifiers.fastParallel(generator, recipe, maxParallel, false);
-                result.init(-RecipeHelper.getOutputEUt(paraRecipe.getFirst()), paraRecipe.getFirst().duration,
-                        paraRecipe.getSecond(), params.getOcAmount());
-                return paraRecipe.getFirst();
-            }
+    /**
+     * Recipe Modifier for <b>Simple Generator Machines</b> - can be used as a valid {@link RecipeModifier}
+     * <p>
+     * Recipe is fast parallelized up to {@code desiredEUt / recipeEUt} times.
+     * </p>
+     * 
+     * @param machine a {@link SimpleGeneratorMachine}
+     * @param recipe  recipe
+     * @return A {@link ModifierFunction} for the given Simple Generator
+     */
+    public static ModifierFunction recipeModifier(@NotNull MetaMachine machine, @NotNull GTRecipe recipe) {
+        if (!(machine instanceof SimpleGeneratorMachine generator)) {
+            return RecipeModifier.nullWrongType(SimpleGeneratorMachine.class, machine);
         }
-        return null;
+        long EUt = RecipeHelper.getOutputEUt(recipe);
+        if (EUt <= 0) return ModifierFunction.NULL;
+
+        int maxParallel = (int) (generator.getOverclockVoltage() / EUt);
+        int parallels = ParallelLogic.getParallelAmountFast(generator, recipe, maxParallel);
+
+        return ModifierFunction.builder()
+                .inputModifier(ContentModifier.multiplier(parallels))
+                .outputModifier(ContentModifier.multiplier(parallels))
+                .eutMultiplier(parallels)
+                .parallels(parallels)
+                .build();
     }
 
     @Override
-    public boolean dampingWhenWaiting() {
+    public boolean regressWhenWaiting() {
         return false;
     }
 
@@ -130,6 +131,7 @@ public class SimpleGeneratorMachine extends WorkableTieredMachine
     // *********** GUI ***********//
     //////////////////////////////////////
 
+    @SuppressWarnings("UnstableApiUsage")
     public static BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> EDITABLE_UI_CREATOR = Util
             .memoize((path, recipeType) -> new EditableMachineUI("generator", path, () -> {
                 WidgetGroup template = recipeType.getRecipeUI().createEditableUITemplate(false, false).createDefault();

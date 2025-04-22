@@ -1,8 +1,5 @@
 {
   "values": [
-    {
-      "id": "#gtceu:needs_neutronium_tool",
-      "required": false
-    }
+    "gtceu:diamond_lens"
   ]
 }

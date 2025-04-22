@@ -7,39 +7,42 @@ import com.gregtechceu.gtceu.api.cover.IUICover;
 import com.gregtechceu.gtceu.api.cover.filter.ItemFilter;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.ToggleButtonWidget;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.common.cover.ConveyorCover;
 
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.IItemHandler;
 
-import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Set;
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ItemVoidingCover extends ConveyorCover implements IUICover, IControllable {
-
-    @Persisted
-    @Getter
-    protected boolean isEnabled = false;
 
     public ItemVoidingCover(CoverDefinition definition, ICoverable coverHolder, Direction attachedSide) {
         super(definition, coverHolder, attachedSide, 0);
+        setWorkingEnabled(false);
     }
 
     @Override
     protected boolean isSubscriptionActive() {
-        return isWorkingEnabled() && isEnabled();
+        return isWorkingEnabled();
     }
 
     //////////////////////////////////////////////
@@ -56,33 +59,23 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
     }
 
     protected void doVoidItems() {
-        IItemHandler itemTransfer = getOwnItemTransfer();
-        if (itemTransfer == null) {
+        IItemHandler handler = getOwnItemHandler();
+        if (handler == null) {
             return;
         }
-        voidAny(itemTransfer);
+        voidAny(handler);
     }
 
-    void voidAny(IItemHandler itemTransfer) {
+    void voidAny(IItemHandler handler) {
         ItemFilter filter = filterHandler.getFilter();
 
-        for (int slot = 0; slot < itemTransfer.getSlots(); slot++) {
-            ItemStack sourceStack = itemTransfer.extractItem(slot, Integer.MAX_VALUE, true);
+        for (int slot = 0; slot < handler.getSlots(); slot++) {
+            ItemStack sourceStack = handler.extractItem(slot, Integer.MAX_VALUE, true);
             if (sourceStack.isEmpty() || !filter.test(sourceStack)) {
                 continue;
             }
-            itemTransfer.extractItem(slot, Integer.MAX_VALUE, false);
+            handler.extractItem(slot, Integer.MAX_VALUE, false);
         }
-    }
-
-    public void setWorkingEnabled(boolean workingEnabled) {
-        isWorkingEnabled = workingEnabled;
-        subscriptionHandler.updateSubscription();
-    }
-
-    public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
-        subscriptionHandler.updateSubscription();
     }
 
     //////////////////////////////////////
@@ -95,7 +88,7 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
         group.addWidget(new LabelWidget(10, 5, getUITitle()));
 
         group.addWidget(new ToggleButtonWidget(10, 20, 20, 20,
-                GuiTextures.BUTTON_POWER, this::isEnabled, this::setEnabled));
+                GuiTextures.BUTTON_POWER, this::isWorkingEnabled, this::setWorkingEnabled));
 
         // group.addWidget(filterHandler.createFilterSlotUI(36, 21));
         group.addWidget(filterHandler.createFilterSlotUI(148, 91));
@@ -111,12 +104,36 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
         return "cover.item.voiding.title";
     }
 
-    protected void buildAdditionalUI(WidgetGroup group) {
-        // Do nothing in the base implementation. This is intended to be overridden by subclasses.
+    @Override
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+        if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (!isRemote()) {
+            setWorkingEnabled(!isWorkingEnabled);
+            playerIn.sendSystemMessage(Component.translatable(isWorkingEnabled() ?
+                    "cover.voiding.message.enabled" : "cover.voiding.message.disabled"));
+        }
+        playerIn.swing(hand);
+        return ItemInteractionResult.CONSUME;
     }
 
-    protected void configureFilter() {
-        // Do nothing in the base implementation. This is intended to be overridden by subclasses.
+    // TODO: Decide grid behavior
+    @Override
+    public boolean shouldRenderGrid(Player player, BlockPos pos, BlockState state, ItemStack held,
+                                    Set<GTToolType> toolTypes) {
+        return super.shouldRenderGrid(player, pos, state, held, toolTypes);
+    }
+
+    @Override
+    public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
+                                              ItemStack held, Direction side) {
+        var superTips = super.sideTips(player, pos, state, toolTypes, held, side);
+        if (superTips != null) return superTips;
+        if (toolTypes.contains(GTToolType.SOFT_MALLET)) {
+            return isWorkingEnabled() ? GuiTextures.TOOL_START : GuiTextures.TOOL_PAUSE;
+        }
+        return null;
     }
 
     //////////////////////////////////////

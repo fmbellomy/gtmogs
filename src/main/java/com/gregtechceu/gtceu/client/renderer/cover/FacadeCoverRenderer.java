@@ -23,28 +23,23 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import org.jetbrains.annotations.NotNull;
+import org.joml.AxisAngle4d;
 import org.joml.Quaternionf;
-
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author KilaBash
- * @date 2023/2/24
- * @implNote FacadeRenderer
- *           It can only be used for item.
- *           call it in other renderer to render a facade cover.
- */
 public class FacadeCoverRenderer implements ICoverRenderer {
 
-    public final static FacadeCoverRenderer INSTANCE = new FacadeCoverRenderer();
+    public static final FacadeCoverRenderer INSTANCE = new FacadeCoverRenderer();
 
     protected FacadeCoverRenderer() {}
 
@@ -59,7 +54,7 @@ public class FacadeCoverRenderer implements ICoverRenderer {
     public void renderItem(ItemStack stack, ItemDisplayContext transformType, boolean leftHand, PoseStack matrixStack,
                            MultiBufferSource buffer, int combinedLight, int combinedOverlay, BakedModel model) {
         var mc = Minecraft.getInstance();
-        var blockState = FacadeItemBehaviour.getFacadeState(stack);
+        BlockState blockState = FacadeItemBehaviour.getFacadeState(stack);
         if (mc.level != null) {
             model = mc.getBlockRenderer().getBlockModel(blockState);
             if (!model.isCustomRenderer()) {
@@ -70,7 +65,7 @@ public class FacadeCoverRenderer implements ICoverRenderer {
                         transformType == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
                     matrixStack.translate(0.5, 0.5, 0.5);
 
-                    matrixStack.mulPose(new Quaternionf().rotateAxis(90, 0, 1, 0));
+                    matrixStack.mulPose(new Quaternionf(new AxisAngle4d().set(90, 0, 1, 0)));
                     matrixStack.translate(-0.5, -0.5, -0.5);
                 }
                 var pose = matrixStack.last();
@@ -91,8 +86,8 @@ public class FacadeCoverRenderer implements ICoverRenderer {
                 }
 
                 for (BakedQuad bakedQuad : quads) {
-                    buffer.getBuffer(RenderType.cutout()).putBulkData(pose, bakedQuad, 1.0f, 1.0f, 1.0f, 1.0f,
-                            combinedLight, combinedOverlay, false);
+                    buffer.getBuffer(RenderType.cutout()).putBulkData(pose, bakedQuad,
+                            1, 1, 1, 1, combinedLight, combinedOverlay);
                 }
 
                 matrixStack.popPose();
@@ -103,16 +98,15 @@ public class FacadeCoverRenderer implements ICoverRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderCover(List<BakedQuad> quads, Direction side, RandomSource rand,
-                            @NotNull CoverBehavior coverBehavior, Direction modelFacing, ModelState modelState) {
+                            @NotNull CoverBehavior coverBehavior, Direction modelFacing, BlockPos pos,
+                            BlockAndTintGetter level, ModelState modelState) {
         if (coverBehavior instanceof FacadeCover facadeCover) {
             var state = facadeCover.getFacadeState();
             if (state.getRenderShape() == RenderShape.MODEL) {
                 BlockRenderDispatcher brd = Minecraft.getInstance().getBlockRenderer();
                 BakedModel model = brd.getBlockModel(state);
-                var level = new FacadeBlockAndTintGetter(coverBehavior.coverHolder.getLevel(),
-                        coverBehavior.coverHolder.getPos(), state, null);
                 if (side == coverBehavior.attachedSide) {
-                    quads.addAll(ModelUtil.getBakedModelQuads(model, level, BlockPos.ZERO, state, side, rand));
+                    quads.addAll(ModelUtil.getBakedModelQuads(model, level, pos, state, side, rand));
                 } else if (side == null && coverBehavior.coverHolder.shouldRenderBackSide()) {
                     var normal = coverBehavior.attachedSide.getNormal();
                     var cube = new AABB(
@@ -122,7 +116,7 @@ public class FacadeCoverRenderer implements ICoverRenderer {
                             normal.getX() == 0 ? 1 : normal.getX() > 0 ? 1 : 0,
                             normal.getY() == 0 ? 1 : normal.getY() > 0 ? 1 : 0,
                             normal.getZ() == 0 ? 1 : normal.getZ() > 0 ? 1 : 0);
-                    for (BakedQuad quad : ModelUtil.getBakedModelQuads(model, level, BlockPos.ZERO, state,
+                    for (BakedQuad quad : ModelUtil.getBakedModelQuads(model, level, pos, state,
                             coverBehavior.attachedSide, rand)) {
                         quads.add(FaceQuad.builder(coverBehavior.attachedSide.getOpposite(), quad.getSprite())
                                 .cube(cube)

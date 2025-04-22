@@ -2,22 +2,17 @@ package com.gregtechceu.gtceu.common.block;
 
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
-
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class RubberLogBlock extends RotatedPillarBlock {
 
     public static final BooleanProperty NATURAL = BooleanProperty.create("natural");

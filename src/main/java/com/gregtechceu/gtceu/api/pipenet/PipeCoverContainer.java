@@ -6,11 +6,11 @@ import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.common.blockentity.FluidPipeBlockEntity;
 import com.gregtechceu.gtceu.common.blockentity.ItemPipeBlockEntity;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
 import com.lowdragmc.lowdraglib.syncdata.IEnhancedManaged;
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
@@ -30,12 +30,6 @@ import net.neoforged.neoforge.items.wrapper.EmptyItemHandler;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
-
-/**
- * @author KilaBash
- * @date 2023/2/18
- * @implNote PipeCoverContainer
- */
 
 public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
 
@@ -155,17 +149,17 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
     }
 
     @Override
-    public IItemHandlerModifiable getItemTransferCap(@Nullable Direction side, boolean useCoverCapability) {
+    public IItemHandlerModifiable getItemHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
         if (pipeTile instanceof ItemPipeBlockEntity itemPipe) {
             return getLevel() instanceof ServerLevel ? itemPipe.getHandler(side, useCoverCapability) :
-                    new EmptyItemHandler();
+                    (IItemHandlerModifiable) EmptyItemHandler.INSTANCE;
         } else {
             return null;
         }
     }
 
     @Override
-    public IFluidHandlerModifiable getFluidTransferCap(@Nullable Direction side, boolean useCoverCapability) {
+    public IFluidHandlerModifiable getFluidHandlerCap(@Nullable Direction side, boolean useCoverCapability) {
         if (pipeTile instanceof FluidPipeBlockEntity fluidPipe) {
             return fluidPipe.getTankList(side);
         } else {
@@ -186,6 +180,7 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
     }
 
     public void setCoverAtSide(@Nullable CoverBehavior coverBehavior, Direction side) {
+        var previousCover = getCoverAtSide(side);
         switch (side) {
             case UP -> up = coverBehavior;
             case SOUTH -> south = coverBehavior;
@@ -196,6 +191,11 @@ public class PipeCoverContainer implements ICoverable, IEnhancedManaged {
         }
         if (coverBehavior != null) {
             coverBehavior.getSyncStorage().markAllDirty();
+            if (coverBehavior.canPipePassThrough()) {
+                pipeTile.setConnection(side, true, false);
+            }
+        } else if (previousCover != null && previousCover.canPipePassThrough()) {
+            pipeTile.setConnection(side, false, false);
         }
     }
 

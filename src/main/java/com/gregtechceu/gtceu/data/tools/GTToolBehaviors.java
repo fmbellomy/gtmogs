@@ -16,6 +16,9 @@ public class GTToolBehaviors {
 
     private GTToolBehaviors() {}
 
+    public static final ToolBehaviorType<AOEConfigUIBehavior> AOE_CONFIG_UI = GTRegistries.TOOL_BEHAVIORS.register(
+            GTCEu.id("aoe_config_ui"),
+            new ToolBehaviorType<>(AOEConfigUIBehavior.CODEC, AOEConfigUIBehavior.STREAM_CODEC));
     public static final ToolBehaviorType<BlockRotatingBehavior> BLOCK_ROTATING = GTRegistries.TOOL_BEHAVIORS.register(
             GTCEu.id("rotate_block"),
             new ToolBehaviorType<>(BlockRotatingBehavior.CODEC, BlockRotatingBehavior.STREAM_CODEC));
@@ -54,7 +57,7 @@ public class GTToolBehaviors {
                     new ToolBehaviorType<>(ToolModeSwitchBehavior.CODEC, ToolModeSwitchBehavior.STREAM_CODEC));
 
     public static void init() {
-        ModLoader.postEvent(new GTCEuAPI.RegisterEvent(GTRegistries.TOOL_BEHAVIORS));
+        GTCEuAPI.postRegisterEvent(GTRegistries.TOOL_BEHAVIORS);
         GTRegistries.TOOL_BEHAVIORS.freeze();
     }
 }

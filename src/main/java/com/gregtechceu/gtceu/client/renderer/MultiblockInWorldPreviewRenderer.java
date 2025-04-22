@@ -1,16 +1,16 @@
 package com.gregtechceu.gtceu.client.renderer;
 
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.RotationState;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockShapeInfo;
 
-import com.lowdragmc.lowdraglib.Platform;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.lowdragmc.lowdraglib.client.scene.WorldSceneRenderer;
 import com.lowdragmc.lowdraglib.utils.BlockInfo;
 import com.lowdragmc.lowdraglib.utils.TrackedDummyWorld;
@@ -39,7 +39,6 @@ import com.mojang.blaze3d.vertex.*;
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
-
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -196,14 +195,15 @@ public class MultiblockInWorldPreviewRenderer {
 
                     BlockPos realPos = pos.offset(offset);
 
-                    if (column[z].getBlockEntity(realPos,
-                            Platform.getFrozenRegistry()) instanceof IMachineBlockEntity holder &&
+                    // spotless:off
+                    if (column[z].getBlockEntity(realPos, GTRegistries.builtinRegistry()) instanceof IMachineBlockEntity holder &&
                             holder.getMetaMachine() instanceof IMultiController cont) {
                         holder.getSelf().setLevel(LEVEL);
                         controllerBase = cont;
                     } else {
                         blockMap.put(realPos, BlockInfo.fromBlockState(blockState));
                     }
+                    // spotless:on
                 }
             }
         }
@@ -387,8 +387,8 @@ public class MultiblockInWorldPreviewRenderer {
                 if (Thread.interrupted())
                     return;
                 var layer = RenderType.chunkBufferLayers().get(i);
-                var buffer = new BufferBuilder(new ByteBufferBuilder(layer.bufferSize()), VertexFormat.Mode.QUADS,
-                        DefaultVertexFormat.BLOCK);
+                var buffer = new BufferBuilder(new ByteBufferBuilder(layer.bufferSize()),
+                        VertexFormat.Mode.QUADS, DefaultVertexFormat.BLOCK);
                 renderBlocks(level, poseStack, dispatcher, layer, new WorldSceneRenderer.VertexConsumerWrapper(buffer),
                         renderedBlocks);
                 var builder = buffer.buildOrThrow();

@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.modifier;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.ExtraCodecs;
@@ -17,15 +16,6 @@ import com.mojang.serialization.MapCodec;
 
 import java.util.stream.Stream;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/20
- * @implNote GTOrePlacementModifier
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class FrequencyModifier extends PlacementModifier {
 
     public static final PlacementModifierType<FrequencyModifier> FREQUENCY_MODIFIER = GTRegistries

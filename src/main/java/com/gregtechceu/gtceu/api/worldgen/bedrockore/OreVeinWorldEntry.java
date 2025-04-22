@@ -3,29 +3,29 @@ package com.gregtechceu.gtceu.api.worldgen.bedrockore;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
+import lombok.Setter;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author Screret
- * @date 2023/12/20
- * @implNote OreVeinWorldEntry
- */
 public class OreVeinWorldEntry {
 
     @Nullable
     @Getter
-    private BedrockOreDefinition definition;
+    @Setter
+    private Holder<BedrockOreDefinition> definition;
     @Getter
     private int oreYield;
     @Getter
     private int operationsRemaining;
 
-    public OreVeinWorldEntry(@Nullable BedrockOreDefinition vein, int oreYield, int operationsRemaining) {
+    public OreVeinWorldEntry(@Nullable Holder<BedrockOreDefinition> vein, int oreYield, int operationsRemaining) {
         this.definition = vein;
         this.oreYield = oreYield;
         this.operationsRemaining = operationsRemaining;
@@ -47,23 +47,23 @@ public class OreVeinWorldEntry {
         var tag = new CompoundTag();
         tag.putInt("oreYield", oreYield);
         tag.putInt("operationsRemaining", operationsRemaining);
-        if (definition != null && GTRegistries.BEDROCK_ORE_DEFINITIONS.getKey(definition) != null) {
-            tag.putString("vein", GTRegistries.BEDROCK_ORE_DEFINITIONS.getKey(definition).toString());
+        if (definition != null && definition.unwrapKey().isPresent()) {
+            tag.putString("vein", definition.unwrapKey().get().location().toString());
         }
         return tag;
     }
 
     @NotNull
-    public static OreVeinWorldEntry readFromNBT(@NotNull CompoundTag tag) {
+    public static OreVeinWorldEntry readFromNBT(@NotNull CompoundTag tag, HolderLookup.Provider provider) {
         OreVeinWorldEntry info = new OreVeinWorldEntry();
         info.oreYield = tag.getInt("oreYield");
         info.operationsRemaining = tag.getInt("operationsRemaining");
 
         if (tag.contains("vein")) {
             ResourceLocation id = ResourceLocation.parse(tag.getString("vein"));
-            if (GTRegistries.BEDROCK_ORE_DEFINITIONS.containKey(id)) {
-                info.definition = GTRegistries.BEDROCK_ORE_DEFINITIONS.get(id);
-            }
+            var maybeDef = provider.lookup(GTRegistries.BEDROCK_ORE_REGISTRY).get()
+                    .get(ResourceKey.create(GTRegistries.BEDROCK_ORE_REGISTRY, id));
+            maybeDef.ifPresent(info::setDefinition);
         }
         return info;
     }

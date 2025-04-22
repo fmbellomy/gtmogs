@@ -1,9 +1,9 @@
 package com.gregtechceu.gtceu.api.gui.widget;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.lowdragmc.lowdraglib.LDLib;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
@@ -27,7 +27,7 @@ import java.util.function.Supplier;
  * A widget containing an integer input field, as well as adjacent buttons for increasing or decreasing the value.
  *
  * <p>
- * The buttons' change amount can be altered with Ctrl, Shift, or both.<br>
+ * The buttons' change amount can be altered with Ctrl, Shift, or both.<br/>
  * The input is limited by a minimum and maximum value.
  * </p>
  */
@@ -133,7 +133,7 @@ public abstract class NumberInputWidget<T extends Number> extends WidgetGroup {
     private IGuiTexture getButtonTexture(String prefix, int buttonWidth) {
         var texture = new TextTexture(prefix + "1");
 
-        if (!LDLib.isRemote()) {
+        if (!GTCEu.isClientThread()) {
             return texture;
         }
 

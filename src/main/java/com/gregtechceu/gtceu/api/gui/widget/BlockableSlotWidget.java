@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.gui.widget;
 
-import com.lowdragmc.lowdraglib.gui.widget.SlotWidget;
 import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 

@@ -1,19 +1,13 @@
 package com.gregtechceu.gtceu.api.machine.trait;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.capability.GTCapability;
-import com.gregtechceu.gtceu.api.capability.IOpticalComputationHatch;
-import com.gregtechceu.gtceu.api.capability.IOpticalComputationProvider;
-import com.gregtechceu.gtceu.api.capability.IOpticalComputationReceiver;
-import com.gregtechceu.gtceu.api.capability.recipe.CWURecipeCapability;
-import com.gregtechceu.gtceu.api.capability.recipe.IO;
-import com.gregtechceu.gtceu.api.capability.recipe.IRecipeCapabilityHolder;
-import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
+import com.gregtechceu.gtceu.api.capability.*;
+import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.common.blockentity.OpticalPipeBlockEntity;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
@@ -23,7 +17,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -63,7 +56,7 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
                 if (machine instanceof IOpticalComputationProvider provider) {
                     return provider.requestCWUt(cwut, simulate, seen);
                 } else if (machine instanceof IMultiPart part) {
-                    if (part.getControllers().isEmpty()) {
+                    if (!part.isFormed()) {
                         return 0;
                     }
                     for (IMultiController controller : part.getControllers()) {
@@ -104,7 +97,7 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
                 if (machine instanceof IOpticalComputationProvider provider) {
                     return provider.getMaxCWUt(seen);
                 } else if (machine instanceof IMultiPart part) {
-                    if (part.getControllers().isEmpty()) {
+                    if (!part.isFormed()) {
                         return 0;
                     }
                     for (IMultiController controller : part.getControllers()) {
@@ -147,7 +140,7 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
                 if (machine instanceof IOpticalComputationProvider provider) {
                     return provider.canBridge(seen);
                 } else if (machine instanceof IMultiPart part) {
-                    if (part.getControllers().isEmpty()) {
+                    if (!part.isFormed()) {
                         return false;
                     }
                     for (IMultiController controller : part.getControllers()) {
@@ -183,12 +176,11 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
 
     @Override
     public List<Integer> handleRecipeInner(IO io, GTRecipe recipe, List<Integer> left,
-                                           @Nullable String slotName,
                                            boolean simulate) {
         IOpticalComputationProvider provider = getOpticalNetProvider();
         if (provider == null) return left;
 
-        int sum = left.stream().reduce(0, Integer::sum);
+        int sum = left.stream().mapToInt(Integer::intValue).sum();
         if (io == IO.IN) {
             int availableCWUt = requestCWUt(Integer.MAX_VALUE, true);
             if (availableCWUt >= sum) {
@@ -224,7 +216,7 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
     }
 
     @Override
-    public List<Object> getContents() {
+    public @NotNull List<Object> getContents() {
         return List.of(lastOutputCwu);
     }
 
@@ -249,19 +241,17 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
         } else if (machine instanceof IOpticalComputationProvider provider) {
             return provider;
         } else if (machine instanceof IRecipeCapabilityHolder recipeCapabilityHolder) {
-            if (recipeCapabilityHolder.getCapabilitiesProxy().contains(IO.IN, CWURecipeCapability.CAP) &&
-                    !recipeCapabilityHolder.getCapabilitiesProxy().get(IO.IN, CWURecipeCapability.CAP).isEmpty()) {
-                var provider = (IOpticalComputationProvider) recipeCapabilityHolder.getCapabilitiesProxy()
-                        .get(IO.IN, CWURecipeCapability.CAP).get(0);
+            var cwuCap = recipeCapabilityHolder.getCapabilitiesFlat(IO.IN, CWURecipeCapability.CAP);
+            if (!cwuCap.isEmpty()) {
+                var provider = (IOpticalComputationProvider) cwuCap.get(0);
                 if (provider != this) {
                     return provider;
                 }
             }
         }
         for (Direction direction : GTUtil.DIRECTIONS) {
-            IOpticalComputationProvider provider = machine.getLevel().getCapability(
-                    GTCapability.CAPABILITY_COMPUTATION_PROVIDER, machine.getPos().relative(direction),
-                    direction.getOpposite());
+            IOpticalComputationProvider provider = GTCapabilityHelper.getOpticalComputationProvider(
+                    machine.getLevel(), machine.getPos().relative(direction), direction.getOpposite());
             if (provider != null && provider != this) {
                 return provider;
             }
@@ -274,8 +264,8 @@ public class NotifiableComputationContainer extends NotifiableRecipeHandlerTrait
         for (Direction direction : GTUtil.DIRECTIONS) {
             BlockEntity blockEntity = machine.getLevel().getBlockEntity(machine.getPos().relative(direction));
             if (blockEntity instanceof OpticalPipeBlockEntity) {
-                return machine.getLevel().getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER,
-                        machine.getPos().relative(direction), direction.getOpposite());
+                machine.getLevel().getCapability(GTCapability.CAPABILITY_COMPUTATION_PROVIDER,
+                        blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, direction.getOpposite());
             }
         }
         return null;

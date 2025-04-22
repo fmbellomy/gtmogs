@@ -4,8 +4,8 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.ItemPipeProperties;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.pipenet.IMaterialPipeType;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.pipenet.IMaterialPipeType;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 
 import net.minecraft.resources.ResourceLocation;
@@ -16,13 +16,13 @@ public enum ItemPipeType implements IMaterialPipeType<ItemPipeProperties> {
 
     SMALL("small", 0.375f, TagPrefix.pipeSmallItem, 0.5f, 1.5f),
     NORMAL("normal", 0.5f, TagPrefix.pipeNormalItem, 1f, 1f),
-    LARGE("large", 0.75f, TagPrefix.pipeLargeItem, 2f, 0.75f),
-    HUGE("huge", 0.875f, TagPrefix.pipeHugeItem, 4f, 0.5f),
+    LARGE("large", 0.625f, TagPrefix.pipeLargeItem, 2f, 0.75f),
+    HUGE("huge", 0.75f, TagPrefix.pipeHugeItem, 4f, 0.5f),
 
     RESTRICTIVE_SMALL("small_restrictive", 0.375f, TagPrefix.pipeSmallRestrictive, 0.5f, 150f),
     RESTRICTIVE_NORMAL("normal_restrictive", 0.5f, TagPrefix.pipeNormalRestrictive, 1f, 100f),
-    RESTRICTIVE_LARGE("large_restrictive", 0.75f, TagPrefix.pipeLargeRestrictive, 2f, 75f),
-    RESTRICTIVE_HUGE("huge_restrictive", 0.875f, TagPrefix.pipeHugeRestrictive, 4f, 50f);
+    RESTRICTIVE_LARGE("large_restrictive", 0.625f, TagPrefix.pipeLargeRestrictive, 2f, 75f),
+    RESTRICTIVE_HUGE("huge_restrictive", 0.75f, TagPrefix.pipeHugeRestrictive, 4f, 50f);
 
     public static final ResourceLocation TYPE_ID = GTCEu.id("item");
     public static final ItemPipeType[] VALUES = values();

@@ -3,7 +3,7 @@ package com.gregtechceu.gtceu.api.item.tool;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Tier;
@@ -12,11 +12,6 @@ import net.minecraft.world.level.block.Block;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * @author KilaBash
- * @date 2023/2/23
- * @implNote MaterialTier
- */
 public class MaterialToolTier implements Tier {
 
     public final Material material;
@@ -47,7 +42,7 @@ public class MaterialToolTier implements Tier {
     }
 
     @Override
-    public TagKey<Block> getIncorrectBlocksForDrops() {
+    public @NotNull TagKey<Block> getIncorrectBlocksForDrops() {
         return CustomTags.INCORRECT_TOOL_TIERS[property.getHarvestLevel()];
     }
 

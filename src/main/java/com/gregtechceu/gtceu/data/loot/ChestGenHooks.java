@@ -6,11 +6,14 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.core.mixins.LootPoolAccessor;
 import com.gregtechceu.gtceu.utils.ItemStackHashStrategy;
 
-import net.minecraft.core.component.DataComponentPatch;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.GsonHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -20,16 +23,19 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.LootItemConditionalFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunction;
 import net.minecraft.world.level.storage.loot.functions.LootItemFunctionType;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.crafting.CraftingHelper;
 import net.neoforged.neoforge.event.LootTableLoadEvent;
+import net.neoforged.bus.api.SubscribeEvent;
 
 import com.google.common.base.Preconditions;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
@@ -42,8 +48,8 @@ import java.util.function.Consumer;
 
 public final class ChestGenHooks {
 
-    private static final Map<ResourceKey<LootTable>, List<GTLootEntryItem>> lootEntryItems = new Object2ObjectOpenHashMap<>();
-    private static final Map<ResourceKey<LootTable>, NumberProvider> rollValues = new Object2ObjectOpenHashMap<>();
+    private static final Map<ResourceLocation, List<GTLootEntryItem>> lootEntryItems = new Object2ObjectOpenHashMap<>();
+    private static final Map<ResourceLocation, NumberProvider> rollValues = new Object2ObjectOpenHashMap<>();
 
     private static final List<LootItemCondition> NO_CONDITIONS = List.of();
 
@@ -51,6 +57,7 @@ public final class ChestGenHooks {
 
     public static void init() {
         NeoForge.EVENT_BUS.register(ChestGenHooks.class);
+        RandomWeightLootFunction.init();
     }
 
     @SubscribeEvent
@@ -90,11 +97,11 @@ public final class ChestGenHooks {
         String modid = Objects.requireNonNull(BuiltInRegistries.ITEM.getKey(stack.getItem())).getNamespace();
         String entryName = createEntryName(stack, modid, weight, lootFunction);
         GTLootEntryItem itemEntry = new GTLootEntryItem(stack, weight, lootFunction, entryName);
-        lootEntryItems.computeIfAbsent(lootTable, $ -> new ArrayList<>()).add(itemEntry);
+        lootEntryItems.computeIfAbsent(lootTable.location(), $ -> new ArrayList<>()).add(itemEntry);
     }
 
-    public static void addRolls(ResourceKey<LootTable> tableLocation, int minAdd, int maxAdd) {
-        rollValues.put(tableLocation, UniformGenerator.between(minAdd, maxAdd));
+    public static void addRolls(ResourceKey<LootTable> lootTable, int minAdd, int maxAdd) {
+        rollValues.put(lootTable.location(), UniformGenerator.between(minAdd, maxAdd));
     }
 
     private static final ItemStackHashStrategy HASH_STRATEGY = ItemStackHashStrategy.comparingAllButCount();
@@ -118,7 +125,7 @@ public final class ChestGenHooks {
             this.entryName = entryName;
         }
 
-        public void createItemStack(Consumer<ItemStack> stackConsumer, LootContext lootContext) {
+        public void createItemStack(Consumer<ItemStack> stackConsumer, @NotNull LootContext lootContext) {
             stackConsumer.accept(this.stack.copy());
         }
 
@@ -154,22 +161,21 @@ public final class ChestGenHooks {
             this.maxAmount = maxAmount;
         }
 
-        public static void init() {
-            // Do nothing here. This just ensures that TYPE is being set immediately when called.
-        }
+        public static void init() {}
 
         @Override
-        public LootItemFunctionType<RandomWeightLootFunction> getType() {
+        public @NotNull LootItemFunctionType<RandomWeightLootFunction> getType() {
             return TYPE;
         }
 
         @Override
-        protected ItemStack run(ItemStack itemStack, LootContext context) {
+        protected @NotNull ItemStack run(@NotNull ItemStack itemStack, @NotNull LootContext context) {
             if (stack.getDamageValue() != 0) {
                 itemStack.setDamageValue(stack.getDamageValue());
             }
-            DataComponentPatch patch = stack.getComponentsPatch();
-            itemStack.applyComponents(patch);
+            if (!stack.isComponentsPatchEmpty()) {
+                itemStack.applyComponents(stack.getComponentsPatch());
+            }
 
             if (minAmount == maxAmount) {
                 itemStack.setCount(minAmount);

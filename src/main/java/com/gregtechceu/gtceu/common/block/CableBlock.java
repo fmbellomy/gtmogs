@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.block;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.MaterialBlock;
 import com.gregtechceu.gtceu.api.block.MaterialPipeBlock;
@@ -9,18 +10,18 @@ import com.gregtechceu.gtceu.api.capability.IToolable;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.WireProperties;
-import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.common.blockentity.CableBlockEntity;
-import com.gregtechceu.gtceu.common.pipelike.cable.Insulation;
-import com.gregtechceu.gtceu.common.pipelike.cable.LevelEnergyNet;
-import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
 import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
+import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
+import com.gregtechceu.gtceu.common.pipelike.cable.Insulation;
+import com.gregtechceu.gtceu.common.pipelike.cable.LevelEnergyNet;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -33,24 +34,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/3/1
- * @implNote CableBlock
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class CableBlock extends MaterialPipeBlock<Insulation, WireProperties, LevelEnergyNet> {
 
     public CableBlock(Properties properties, Insulation insulation, Material material) {
@@ -114,10 +104,9 @@ public class CableBlock extends MaterialPipeBlock<Insulation, WireProperties, Le
     }
 
     @Override
-    public boolean canPipeConnectToBlock(IPipeNode<Insulation, WireProperties> selfTile, Direction side,
-                                         @Nullable BlockEntity tile) {
-        return tile != null && tile.getLevel().getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER,
-                tile.getBlockPos(), tile.getBlockState(), tile, side.getOpposite()) != null;
+    public boolean canPipeConnectToBlock(IPipeNode<Insulation, WireProperties> selfTile,
+                                         Direction side, Level level, BlockPos pos) {
+        return level.getCapability(GTCapability.CAPABILITY_ENERGY_CONTAINER, pos, side.getOpposite()) != null;
     }
 
     @Override
@@ -133,17 +122,24 @@ public class CableBlock extends MaterialPipeBlock<Insulation, WireProperties, Le
         int tier = GTUtil.getTierByVoltage(wireProperties.getVoltage());
         if (wireProperties.isSuperconductor())
             tooltip.add(Component.translatable("gtceu.cable.superconductor", GTValues.VN[tier]));
-        tooltip.add(Component.translatable("gtceu.cable.voltage", wireProperties.getVoltage(), GTValues.VNF[tier]));
-        tooltip.add(Component.translatable("gtceu.cable.amperage", wireProperties.getAmperage()));
-        tooltip.add(Component.translatable("gtceu.cable.loss_per_block", wireProperties.getLossPerBlock()));
+        tooltip.add(Component.translatable("gtceu.cable.voltage",
+                FormattingUtil.formatNumbers(wireProperties.getVoltage()), GTValues.VNF[tier]));
+        tooltip.add(Component.translatable("gtceu.cable.amperage",
+                FormattingUtil.formatNumbers(wireProperties.getAmperage())));
+        tooltip.add(Component.translatable("gtceu.cable.loss_per_block",
+                FormattingUtil.formatNumbers(wireProperties.getLossPerBlock())));
     }
 
     @Override
     public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
         // dont apply damage if there is a frame box
         var pipeNode = getPipeTile(level, pos);
-        if (pipeNode.getFrameMaterial() != null) {
-            BlockState frameState = GTBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
+        if (pipeNode == null) {
+            GTCEu.LOGGER.error("Pipe was null");
+            return;
+        }
+        if (!pipeNode.getFrameMaterial().isNull()) {
+            BlockState frameState = GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
                     .getDefaultState();
             ((MaterialBlock) frameState.getBlock()).entityInside(frameState, level, pos, entity);
             return;
@@ -153,7 +149,8 @@ public class CableBlock extends MaterialPipeBlock<Insulation, WireProperties, Le
         Insulation insulation = getPipeTile(level, pos).getPipeType();
         if (insulation.insulationLevel == -1 && entity instanceof LivingEntity entityLiving) {
             CableBlockEntity cable = (CableBlockEntity) getPipeTile(level, pos);
-            if (cable != null && cable.getFrameMaterial() == null && cable.getNodeData().getLossPerBlock() > 0) {
+            if (cable != null && cable.getFrameMaterial().isNull() &&
+                    cable.getNodeData().getLossPerBlock() > 0) {
                 long voltage = cable.getCurrentMaxVoltage();
                 double amperage = cable.getAverageAmperage();
                 if (voltage > 0L && amperage > 0L) {
@@ -161,7 +158,7 @@ public class CableBlock extends MaterialPipeBlock<Insulation, WireProperties, Le
                     entityLiving.hurt(GTDamageTypes.ELECTRIC.source(level), damageAmount);
                     if (entityLiving instanceof ServerPlayer) {
                         // TODO advancments
-                        // AdvancementTriggers.ELECTROCUTION_DEATH.trigger((EntityPlayerMP) entityLiving);
+                        // AdvancementTriggers.ELECTROCUTION_DEATH.trigger((ServerPlayer) entityLiving);
                     }
                 }
             }

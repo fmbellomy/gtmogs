@@ -2,8 +2,8 @@ package com.gregtechceu.gtceu.api.item.armor;
 
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.*;
+import com.gregtechceu.gtceu.data.item.GTItems;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.Holder;
 import net.minecraft.core.NonNullList;
@@ -25,6 +25,7 @@ import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import com.google.common.base.Preconditions;
 import lombok.Getter;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,10 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class ArmorComponentItem extends ArmorItem implements IComponentItem {
 
     @Getter
@@ -95,11 +92,6 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
     }
 
     @Override
-    public int getMaxDamage(ItemStack stack) {
-        return super.getMaxDamage(stack);
-    }
-
-    @Override
     public boolean isValidRepairItem(ItemStack stack, ItemStack repairCandidate) {
         return false;
     }
@@ -118,10 +110,12 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
         return armorLogic.getArmorDisplay(player, armor, slot);
     }
 
-    public void damageArmor(LivingEntity entity, @NotNull ItemStack stack, DamageSource source, int damage) {
-        armorLogic.damageArmor(entity, stack, source, damage);
+    public void damageArmor(LivingEntity entity, @NotNull ItemStack stack, DamageSource source, int damage,
+                            EquipmentSlot slot) {
+        armorLogic.damageArmor(entity, stack, source, damage, slot);
     }
 
+    @SuppressWarnings("removal") // eh, it works for now.
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new IClientItemExtensions() {
@@ -195,6 +189,16 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
             }
         }
         return super.getBarColor(stack);
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ItemAbility action) {
+        for (IItemComponent component : components) {
+            if (component instanceof IAbilityItem abilityItem && abilityItem.canPerformAction(stack, action)) {
+                return true;
+            }
+        }
+        return super.canPerformAction(stack, action);
     }
 
     @Override
@@ -304,5 +308,10 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
             }
         }
         return super.hasCraftingRemainingItem(stack);
+    }
+
+    @Override
+    public boolean canWalkOnPowderedSnow(ItemStack stack, LivingEntity wearer) {
+        return stack.is(GTItems.NANO_BOOTS.asItem()) || stack.is(GTItems.QUANTUM_BOOTS.asItem());
     }
 }

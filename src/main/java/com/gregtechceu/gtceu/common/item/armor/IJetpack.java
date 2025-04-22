@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.common.item.armor;
 
 import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTArmor;
-import com.gregtechceu.gtceu.data.tag.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import net.minecraft.core.particles.ParticleOptions;
@@ -51,8 +51,7 @@ public interface IJetpack {
         return 0.0D;
     }
 
-    @Nullable
-    default ParticleOptions getParticle() {
+    default @Nullable ParticleOptions getParticle() {
         return ParticleTypes.LARGE_SMOKE;
     }
 
@@ -158,7 +157,7 @@ public interface IJetpack {
     }
 
     static void performEHover(ItemStack stack, Player player) {
-        stack.update(GTDataComponents.ARMOR_DATA, new GTArmor(), armor -> armor
+        stack.update(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY, armor -> armor
                 .setEnabled(true)
                 .setHover(true));
         player.displayClientMessage(Component.translatable("metaarmor.jetpack.emergency_hover_mode"), true);

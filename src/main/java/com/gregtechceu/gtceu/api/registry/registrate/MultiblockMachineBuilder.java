@@ -1,11 +1,13 @@
 package com.gregtechceu.gtceu.api.registry.registrate;
 
-import com.gregtechceu.gtceu.api.RotationState;
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
@@ -14,15 +16,14 @@ import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.multiblock.BlockPattern;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockShapeInfo;
-import com.gregtechceu.gtceu.api.recipe.GTRecipe;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
-import com.gregtechceu.gtceu.data.compass.GTCompassSections;
-import com.gregtechceu.gtceu.utils.SupplierMemoizer;
+import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
+import com.tterrag.registrate.AbstractRegistrate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -37,30 +38,20 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-import com.tterrag.registrate.Registrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.function.*;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-/**
- * @author KilaBash
- * @date 2023/2/18
- * @implNote MachineBuilder
- */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 @Accessors(chain = true, fluent = true)
 public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDefinition> {
 
@@ -69,38 +60,29 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     @Setter
     private Function<MultiblockMachineDefinition, BlockPattern> pattern;
     private final List<Function<MultiblockMachineDefinition, List<MultiblockShapeInfo>>> shapeInfos = new ArrayList<>();
-    /** Whether this multi can be rotated or face upwards. */
-    @Setter
-    private boolean allowExtendedFacing = true;
-    /** Set this to false only if your multiblock is set up such that it could have a wall-shared controller. */
+    /**
+     * Set this to false only if your multiblock is set up such that it could have a wall-shared controller.
+     */
     @Setter
     private boolean allowFlip = true;
     private final List<Supplier<ItemStack[]>> recoveryItems = new ArrayList<>();
     @Setter
     private Comparator<IMultiPart> partSorter = (a, b) -> 0;
     @Setter
+    @Nullable
     private TriFunction<IMultiController, IMultiPart, Direction, BlockState> partAppearance;
     @Getter
     @Setter
     private BiConsumer<IMultiController, List<Component>> additionalDisplay = (m, l) -> {};
 
-    protected MultiblockMachineBuilder(Registrate registrate, String name,
-                                       Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
-                                       BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
-                                       BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                                       TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
+    public MultiblockMachineBuilder(AbstractRegistrate<?> registrate, String name,
+                                    Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
+                                    BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
+                                    BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
+                                    TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
         super(registrate, name, MultiblockMachineDefinition::createDefinition, metaMachine::apply, blockFactory,
                 itemFactory, blockEntityFactory);
-        this.compassSections(GTCompassSections.MULTIBLOCK);
-    }
-
-    public static MultiblockMachineBuilder createMulti(Registrate registrate, String name,
-                                                       Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine,
-                                                       BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
-                                                       BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                                                       TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        return new MultiblockMachineBuilder(registrate, name, metaMachine, blockFactory, itemFactory,
-                blockEntityFactory);
+        allowExtendedFacing(true);
     }
 
     public MultiblockMachineBuilder shapeInfo(Function<MultiblockMachineDefinition, MultiblockShapeInfo> shape) {
@@ -122,6 +104,16 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     public MultiblockMachineBuilder recoveryStacks(Supplier<ItemStack[]> stacks) {
         this.recoveryItems.add(stacks);
         return this;
+    }
+
+    @Override
+    public MultiblockMachineBuilder definition(Function<ResourceLocation, MultiblockMachineDefinition> definition) {
+        return (MultiblockMachineBuilder) super.definition(definition);
+    }
+
+    @Override
+    public MultiblockMachineBuilder machine(Function<IMachineBlockEntity, MetaMachine> machine) {
+        return (MultiblockMachineBuilder) super.machine(machine);
     }
 
     @Override
@@ -161,12 +153,12 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder blockBuilder(Consumer<BlockBuilder<? extends Block, ?>> blockBuilder) {
+    public MultiblockMachineBuilder blockBuilder(@Nullable Consumer<BlockBuilder<? extends Block, ?>> blockBuilder) {
         return (MultiblockMachineBuilder) super.blockBuilder(blockBuilder);
     }
 
     @Override
-    public MultiblockMachineBuilder itemBuilder(Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder) {
+    public MultiblockMachineBuilder itemBuilder(@Nullable Consumer<ItemBuilder<? extends MetaMachineItem, ?>> itemBuilder) {
         return (MultiblockMachineBuilder) super.itemBuilder(itemBuilder);
     }
 
@@ -247,12 +239,12 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder tooltipBuilder(BiConsumer<ItemStack, List<Component>> tooltipBuilder) {
+    public MultiblockMachineBuilder tooltipBuilder(@Nullable BiConsumer<ItemStack, List<Component>> tooltipBuilder) {
         return (MultiblockMachineBuilder) super.tooltipBuilder(tooltipBuilder);
     }
 
     @Override
-    public MultiblockMachineBuilder appearance(Supplier<BlockState> state) {
+    public MultiblockMachineBuilder appearance(@Nullable Supplier<BlockState> state) {
         return (MultiblockMachineBuilder) super.appearance(state);
     }
 
@@ -262,7 +254,7 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
-    public MultiblockMachineBuilder langValue(String langValue) {
+    public MultiblockMachineBuilder langValue(@Nullable String langValue) {
         return (MultiblockMachineBuilder) super.langValue(langValue);
     }
 
@@ -279,6 +271,18 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     @Override
     public MultiblockMachineBuilder tooltips(Component... components) {
         return (MultiblockMachineBuilder) super.tooltips(components);
+    }
+
+    @Override
+    public MultiblockMachineBuilder conditionalTooltip(Component component, Supplier<Boolean> condition) {
+        return conditionalTooltip(component, condition.get());
+    }
+
+    @Override
+    public MultiblockMachineBuilder conditionalTooltip(Component component, boolean condition) {
+        if (condition)
+            tooltips(component);
+        return this;
     }
 
     @Override
@@ -341,38 +345,13 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
+    public MultiblockMachineBuilder regressWhenWaiting(boolean regressWhenWaiting) {
+        return (MultiblockMachineBuilder) super.regressWhenWaiting(regressWhenWaiting);
+    }
+
+    @Override
     public MultiblockMachineBuilder editableUI(@Nullable EditableMachineUI editableUI) {
         return (MultiblockMachineBuilder) super.editableUI(editableUI);
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassSections(CompassSection... sections) {
-        return (MultiblockMachineBuilder) super.compassSections(sections);
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassNodeSelf() {
-        return (MultiblockMachineBuilder) super.compassNodeSelf();
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassNode(String compassNode) {
-        return (MultiblockMachineBuilder) super.compassNode(compassNode);
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassPreNodes(CompassSection section, String... compassNodes) {
-        return (MultiblockMachineBuilder) super.compassPreNodes(section, compassNodes);
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassPreNodes(ResourceLocation... compassNodes) {
-        return (MultiblockMachineBuilder) super.compassPreNodes(compassNodes);
-    }
-
-    @Override
-    public MultiblockMachineBuilder compassPreNodes(CompassNode... compassNodes) {
-        return (MultiblockMachineBuilder) super.compassPreNodes(compassNodes);
     }
 
     @Override
@@ -381,16 +360,24 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     }
 
     @Override
+    public MultiblockMachineBuilder allowExtendedFacing(boolean allowExtendedFacing) {
+        return (MultiblockMachineBuilder) super.allowExtendedFacing(allowExtendedFacing);
+    }
+
+    @Override
+    @HideFromJS
     public MultiblockMachineDefinition register() {
-        var definition = (MultiblockMachineDefinition) super.register();
+        var definition = super.register();
         definition.setGenerator(generator);
+        //noinspection ConstantValue it can be null by mistake.
         if (pattern == null) {
-            throw new IllegalStateException("missing pattern while creating multiblock " + name);
+            GTCEu.LOGGER.error(
+                    "missing pattern while creating multiblock {}, something's likely gone very wrong! Check the full log.",
+                    name);
         }
-        definition.setPatternFactory(SupplierMemoizer.memoize(() -> pattern.apply(definition)));
+        definition.setPatternFactory(GTMemoizer.memoize(() -> pattern.apply(definition)));
         definition.setShapes(() -> shapeInfos.stream().map(factory -> factory.apply(definition))
                 .flatMap(Collection::stream).toList());
-        definition.setAllowExtendedFacing(allowExtendedFacing);
         definition.setAllowFlip(allowFlip);
         if (!recoveryItems.isEmpty()) {
             definition.setRecoveryItems(

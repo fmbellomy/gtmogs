@@ -5,8 +5,6 @@ import com.gregtechceu.gtceu.api.fluid.FluidState;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttribute;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
 
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
-
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import lombok.Getter;
@@ -17,7 +15,7 @@ import org.jetbrains.annotations.UnmodifiableView;
 import java.util.Collection;
 import java.util.Objects;
 
-public class FluidPipeProperties implements IMaterialProperty<FluidPipeProperties>, IPropertyFluidFilter {
+public class FluidPipeProperties implements IMaterialProperty, IPropertyFluidFilter {
 
     /**
      * The maximum number of channels any fluid pipe can have
@@ -101,10 +99,6 @@ public class FluidPipeProperties implements IMaterialProperty<FluidPipePropertie
                 ", plasmaProof=" + plasmaProof +
                 ", channels=" + channels +
                 '}';
-    }
-
-    public long getPlatformThroughput() {
-        return getThroughput() * FluidHelper.getBucket() / 1000;
     }
 
     @Override

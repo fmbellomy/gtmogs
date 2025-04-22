@@ -7,19 +7,15 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author KilaBash
- * @date 2023/3/27
- * @implNote IAppearanceBlock
- */
 public interface IAppearance {
 
     /**
-     * get Appearance. same as IForgeBlock.getAppearance() / IFabricBlock.getAppearance()
+     * @see net.neoforged.neoforge.common.extensions.IBlockExtension#getAppearance(BlockState, BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
+     *      IBlockExtension#getAppearance
      */
     @Nullable
     default BlockState getBlockAppearance(BlockState state, BlockAndTintGetter level, BlockPos pos, Direction side,
-                                          BlockState sourceState, BlockPos sourcePos) {
+                                          @Nullable BlockState sourceState, @Nullable BlockPos sourcePos) {
         return state;
     }
 }

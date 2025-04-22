@@ -29,27 +29,32 @@ public interface IGTToolDefinition {
 
     boolean isToolEffective(BlockState state);
 
+    /**
+     * Durability Spec
+     */
+    int getDamagePerAction(ItemStack stack);
+
     int getDamagePerCraftingAction(ItemStack stack);
 
-    boolean isSuitableForBlockBreak();
+    boolean isSuitableForBlockBreak(ItemStack stack);
 
-    boolean isSuitableForAttacking();
+    boolean isSuitableForAttacking(ItemStack stack);
 
-    boolean isSuitableForCrafting();
+    boolean isSuitableForCrafting(ItemStack stack);
 
     default int getToolDamagePerBlockBreak(ItemStack stack) {
-        int action = getTool().damagePerBlock();
-        return isSuitableForBlockBreak() ? action : action * 2;
+        int action = getDamagePerAction(stack);
+        return isSuitableForBlockBreak(stack) ? action : action * 2;
     }
 
     default int getToolDamagePerAttack(ItemStack stack) {
-        int action = getTool().damagePerBlock();
-        return isSuitableForAttacking() ? action : action * 2;
+        int action = getDamagePerAction(stack);
+        return isSuitableForAttacking(stack) ? action : action * 2;
     }
 
     default int getToolDamagePerCraft(ItemStack stack) {
         int action = getDamagePerCraftingAction(stack);
-        return isSuitableForCrafting() ? action : action * 2;
+        return isSuitableForCrafting(stack) ? action : action * 2;
     }
 
     /**
@@ -79,6 +84,10 @@ public interface IGTToolDefinition {
         return 1.0F;
     }
 
+    default float getAttackSpeed() {
+        return 0.0F;
+    }
+
     default AoESymmetrical getAoEDefinition() {
         return AoESymmetrical.none();
     }
@@ -86,11 +95,11 @@ public interface IGTToolDefinition {
     /**
      * Enchantments
      */
-    default boolean isEnchantable() {
+    default boolean isEnchantable(ItemStack stack) {
         return true;
     }
 
-    TagKey<Item>[] getValidEnchantmentTags();
+    List<TagKey<Item>> getValidEnchantmentTags();
 
     Object2IntMap<ResourceKey<Enchantment>> getDefaultEnchantments();
 

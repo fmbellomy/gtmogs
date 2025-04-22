@@ -16,13 +16,15 @@ import net.minecraft.world.item.ItemStack;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+
 @NoArgsConstructor
 public class HudGuiOverlay implements LayeredDraw.Layer {
 
     @Override
     public void render(GuiGraphics guiGraphics, DeltaTracker tracker) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.isWindowActive() && mc.level != null && !mc.gui.getDebugOverlay().showDebugScreen() &&
+        if (mc.isWindowActive() && mc.level != null &&
+                !mc.gui.getDebugOverlay().showDebugScreen() &&
                 !mc.options.hideGui) {
             renderHUDMetaArmor(mc.player.getItemBySlot(EquipmentSlot.HEAD), guiGraphics);
             renderHUDMetaArmor(mc.player.getItemBySlot(EquipmentSlot.CHEST), guiGraphics);

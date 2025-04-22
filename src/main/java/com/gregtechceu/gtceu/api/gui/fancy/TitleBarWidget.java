@@ -13,14 +13,9 @@ import com.lowdragmc.lowdraglib.utils.Position;
 import com.lowdragmc.lowdraglib.utils.Size;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.MethodsReturnNonnullByDefault;
 
 import java.util.function.Consumer;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
 public class TitleBarWidget extends WidgetGroup {
 
     private static final int BORDER_SIZE = 3;
@@ -38,7 +33,7 @@ public class TitleBarWidget extends WidgetGroup {
     /**
      * The button group is rendered behind the main section and contains the back and menu buttons.
      * <p>
-     * For easier texture reuse, the background is applied to the group itself, instead of the individual buttons.<br>
+     * For easier texture reuse, the background is applied to the group itself, instead of the individual buttons.<br/>
      * The button group therefore needs to be rendered behind the main section.
      */
     private final WidgetGroup buttonGroup;

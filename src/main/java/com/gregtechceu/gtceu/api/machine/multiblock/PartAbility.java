@@ -1,8 +1,9 @@
 package com.gregtechceu.gtceu.api.machine.multiblock;
 
+import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
+
 import net.minecraft.world.level.block.Block;
 
-import com.google.common.base.Suppliers;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
@@ -36,8 +37,6 @@ public class PartAbility {
     public static final PartAbility OUTPUT_ENERGY = new PartAbility("output_energy");
     public static final PartAbility SUBSTATION_INPUT_ENERGY = new PartAbility("substation_input_energy");
     public static final PartAbility SUBSTATION_OUTPUT_ENERGY = new PartAbility("substation_output_energy");
-    public static final PartAbility INPUT_KINETIC = new PartAbility("input_kinetic");
-    public static final PartAbility OUTPUT_KINETIC = new PartAbility("output_kinetic");
     public static final PartAbility ROTOR_HOLDER = new PartAbility("rotor_holder");
     public static final PartAbility PUMP_FLUID_HATCH = new PartAbility("pump_fluid_hatch");
     public static final PartAbility STEAM = new PartAbility("steam");
@@ -66,7 +65,7 @@ public class PartAbility {
      */
     private final Int2ObjectMap<Set<Block>> registry = new Int2ObjectOpenHashMap<>();
 
-    private Supplier<Collection<Block>> allBlocks = Suppliers
+    private final Supplier<Collection<Block>> allBlocks = GTMemoizer
             .memoize(() -> registry.values().stream().flatMap(Collection::stream).toList());
 
     @Getter

@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.material.material.properties;
 
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.MaterialToolTier;
-import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.resources.ResourceKey;
@@ -18,7 +18,7 @@ import java.util.Arrays;
 
 import static com.gregtechceu.gtceu.api.item.tool.GTToolType.*;
 
-public class ToolProperty implements IMaterialProperty<ToolProperty> {
+public class ToolProperty implements IMaterialProperty {
 
     /**
      * Harvest speed of tools made from this Material.

@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.client.renderer.item;
 
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.data.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.models.model.DelegatedModel;
@@ -10,11 +10,6 @@ import net.minecraft.world.item.Item;
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * @author KilaBash
- * @date 2023/2/16
- * @implNote TagPrefixItemRenderer
- */
 public class ToolItemRenderer {
 
     private static final Set<ToolItemRenderer> MODELS = new HashSet<>();

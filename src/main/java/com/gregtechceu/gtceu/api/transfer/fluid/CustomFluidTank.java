@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.transfer.fluid;
 
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
 import com.lowdragmc.lowdraglib.syncdata.IContentChangeAware;
 
 import net.minecraft.core.HolderLookup;
@@ -39,16 +38,14 @@ public class CustomFluidTank extends FluidTank
         onContentsChanged.run();
     }
 
-    public CustomFluidTank copy() {
-        FluidStack copiedStack = this.fluid.copy();
-        CustomFluidTank copied = new CustomFluidTank(this.capacity, this.validator);
-        copied.setFluid(copiedStack);
-        return copied;
+    @Override
+    public void setFluidInTank(int tank, FluidStack stack) {
+        setFluid(stack);
     }
 
     @Override
-    public void setFluidInTank(int tank, FluidStack stack) {
-        this.setFluid(stack);
+    public void setFluid(FluidStack stack) {
+        super.setFluid(stack);
         this.onContentsChanged();
     }
 

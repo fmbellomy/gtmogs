@@ -1,9 +1,11 @@
 package com.gregtechceu.gtceu.common.item.behavior;
 
+import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IMaterialPartItem;
 import com.gregtechceu.gtceu.api.item.component.ISubItemHandler;
-import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -14,28 +16,26 @@ import net.minecraft.world.item.TooltipFlag;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.turbineBlade;
 
-/**
- * @author KilaBash
- * @date 2023/7/10
- * @implNote TurbineRotorBehaviour
- */
 public class TurbineRotorBehaviour implements IMaterialPartItem, ISubItemHandler {
 
     @Override
     public void fillItemCategory(Item item, CreativeModeTab category, NonNullList<ItemStack> items) {
-        turbineBlade.executeHandler(null, PropertyKey.INGOT, (tagPrefix, material, property, provider) -> {
+        for (Material material : GTCEuAPI.materialManager) {
+            if (!material.shouldGenerateRecipesFor(turbineBlade) || !material.hasProperty(PropertyKey.INGOT)) {
+                continue;
+            }
+
             var rotorStack = new ItemStack(item);
             var behavior = TurbineRotorBehaviour.getBehaviour(rotorStack);
             if (behavior != null) {
                 behavior.setPartMaterial(rotorStack, material);
                 items.add(rotorStack);
             }
-        });
+        }
     }
 
     public int getRotorPower(ItemStack stack) {
@@ -74,7 +74,7 @@ public class TurbineRotorBehaviour implements IMaterialPartItem, ISubItemHandler
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @org.jetbrains.annotations.Nullable Item.TooltipContext context,
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context,
                                 List<Component> tooltipComponents, TooltipFlag isAdvanced) {
         IMaterialPartItem.super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
         tooltipComponents

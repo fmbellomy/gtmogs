@@ -1,10 +1,11 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.GTOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 
+import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -16,6 +17,7 @@ import com.mojang.serialization.MapCodec;
 import java.util.List;
 import java.util.Map;
 
+@NoArgsConstructor
 public class NoopVeinGenerator extends VeinGenerator {
 
     public static final NoopVeinGenerator INSTANCE = new NoopVeinGenerator();
@@ -27,7 +29,7 @@ public class NoopVeinGenerator extends VeinGenerator {
     }
 
     @Override
-    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, GTOreDefinition entry,
+    public Map<BlockPos, OreBlockPlacer> generate(WorldGenLevel level, RandomSource random, OreVeinDefinition entry,
                                                   BlockPos origin) {
         return Map.of();
     }

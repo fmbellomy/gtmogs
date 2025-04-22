@@ -1,10 +1,7 @@
 package com.gregtechceu.gtceu.api.gui.widget;
 
+import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.utils.GTUtil;
-
-import com.lowdragmc.lowdraglib.gui.widget.PhantomFluidWidget;
-import com.lowdragmc.lowdraglib.side.fluid.FluidHelper;
-import com.lowdragmc.lowdraglib.side.fluid.IFluidHandlerModifiable;
 
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.neoforged.api.distmarker.Dist;
@@ -20,7 +17,6 @@ import java.util.function.Supplier;
 public class ScrollablePhantomFluidWidget extends PhantomFluidWidget {
 
     private static final int SCROLL_ACTION_ID = 0x0001_0001;
-    private static final int MILLIBUCKETS = FluidHelper.getBucket() / 1000;
 
     public ScrollablePhantomFluidWidget(@Nullable IFluidHandlerModifiable fluidTank, int tank, int x, int y, int width,
                                         int height, Supplier<FluidStack> phantomFluidGetter,
@@ -34,7 +30,7 @@ public class ScrollablePhantomFluidWidget extends PhantomFluidWidget {
         if (!isMouseOverElement(mouseX, mouseY))
             return false;
 
-        int delta = getModifiedChangeAmount((scrollY > 0) ? 1 : -1) * MILLIBUCKETS;
+        int delta = getModifiedChangeAmount((scrollY > 0) ? 1 : -1);
         writeClientAction(SCROLL_ACTION_ID, buf -> buf.writeVarInt(delta));
 
         return true;
@@ -69,6 +65,9 @@ public class ScrollablePhantomFluidWidget extends PhantomFluidWidget {
             return;
 
         FluidStack fluid = fluidTank.getFluidInTank(tank);
+        if (fluid.isEmpty())
+            return;
+
         if (fluid.isEmpty())
             return;
 
