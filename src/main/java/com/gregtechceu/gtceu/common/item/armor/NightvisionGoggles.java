@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +33,7 @@ public class NightvisionGoggles extends ArmorLogicSuite {
     }
 
     @Override
-    public void onArmorTick(Level world, @NotNull Player player, @NotNull ItemStack stack) {
+    public void onArmorTick(Level level, @NotNull Player player, @NotNull ItemStack stack) {
         IElectricItem item = GTCapabilityHelper.getElectricItem(stack);
         if (item == null) {
             return;
@@ -41,7 +42,7 @@ public class NightvisionGoggles extends ArmorLogicSuite {
         byte toggleTimer = data.toggleTimer();
         int nightVisionTimer = data.nightVisionTimer();
         if (!player.getItemBySlot(EquipmentSlot.HEAD).is(stack.getItem())) {
-            disableNightVision(world, player, false);
+            disableNightVision(level, player, false);
         }
         if (type == ArmorItem.Type.HELMET) {
             boolean nightVision = data.nightVision();
@@ -59,10 +60,11 @@ public class NightvisionGoggles extends ArmorLogicSuite {
 
             if (nightVision) {
                 player.removeEffect(MobEffects.BLINDNESS);
-                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET) {
-                    nightVisionTimer = ArmorUtils.NIGHTVISION_DURATION;
+                float tickRate = level.tickRateManager().tickrate();
+                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET * tickRate) {
+                    nightVisionTimer = Mth.floor(ArmorUtils.NIGHTVISION_DURATION * tickRate);
                     player.addEffect(
-                            new MobEffectInstance(MobEffects.NIGHT_VISION, ArmorUtils.NIGHTVISION_DURATION, 0, true,
+                            new MobEffectInstance(MobEffects.NIGHT_VISION, nightVisionTimer, 0, true,
                                     false));
                     item.discharge((energyPerUse), this.tier, true, false, false);
                 }

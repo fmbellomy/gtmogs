@@ -82,6 +82,8 @@ import com.gregtechceu.gtceu.integration.kjs.helpers.MachineConstructors;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MachineModifiers;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MaterialStackWrapper;
 import com.gregtechceu.gtceu.integration.kjs.recipe.GTRecipeSchema;
+import com.gregtechceu.gtceu.integration.kjs.recipe.GTShapedRecipeSchema;
+import com.gregtechceu.gtceu.integration.kjs.recipe.WrappingRecipeSchemaType;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.CapabilityMapComponent;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.GTRecipeComponents;
 
@@ -90,8 +92,10 @@ import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NBTWrapper;
+import dev.latvian.mods.kubejs.recipe.KubeJSRecipeSerializers;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentTypeRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaRegistry;
+import dev.latvian.mods.kubejs.recipe.schema.minecraft.ShapedKubeRecipe;
 import dev.latvian.mods.kubejs.registry.BuilderTypeRegistry;
 import dev.latvian.mods.kubejs.registry.ServerRegistryRegistry;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
@@ -180,6 +184,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         for (var entry : GTRegistries.RECIPE_TYPES.entries()) {
             event.register(entry.getKey(), GTRecipeSchema.SCHEMA);
         }
+        event.namespace(GTCEu.MOD_ID).register("shaped", GTShapedRecipeSchema.SCHEMA);
     }
 
     @Override
@@ -311,16 +316,8 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
             if (o instanceof CharSequence chars) return TagPrefix.get(chars.toString());
             return null;
         });
-        registry.register(MaterialEntry.class, o -> {
-            if (o instanceof MaterialEntry entry) return entry;
-            if (o instanceof CharSequence chars) {
-                var values = chars.toString().split(":", 2);
-                if (values.length >= 2) {
-                    return new MaterialEntry(TagPrefix.get(values[0]), GTMaterials.get(values[1]));
-                }
-            }
-            return null;
-        });
+        registry.register(MaterialEntry.class, MaterialEntry::of);
+
         registry.register(RecipeCapability.class, o -> {
             if (o instanceof RecipeCapability<?> capability) return capability;
             if (o instanceof ResourceLocation id) return GTRegistries.RECIPE_CAPABILITIES.get(id);

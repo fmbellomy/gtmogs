@@ -91,6 +91,11 @@ public class SlotWidget extends com.lowdragmc.lowdraglib.gui.widget.SlotWidget {
     }
 
     @Override
+    public void updateSlot(Slot slot) {
+        super.updateSlot(slot);
+    }
+
+    @Override
     public SlotWidget setHandlerSlot(IItemHandlerModifiable itemHandler, int slotIndex) {
         super.setHandlerSlot(itemHandler, slotIndex);
         return this;

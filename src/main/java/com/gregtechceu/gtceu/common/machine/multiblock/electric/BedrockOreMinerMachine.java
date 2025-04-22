@@ -12,6 +12,7 @@ import com.gregtechceu.gtceu.api.machine.feature.ITieredMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
+import com.gregtechceu.gtceu.common.machine.trait.FluidDrillLogic;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -25,6 +26,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import lombok.Getter;
+import net.minecraft.util.Mth;
 
 import java.util.List;
 import java.util.Map;
@@ -83,9 +85,10 @@ public class BedrockOreMinerMachine extends WorkableElectricMultiblockMachine im
                 }
 
                 // Ore amount
-                Component amountInfo = Component.literal(FormattingUtil.formatNumbers(
-                        getRecipeLogic().getOreToProduce() * 20L / BedrockOreMinerLogic.MAX_PROGRESS) +
-                        "/s").withStyle(ChatFormatting.BLUE);
+                float produced = getRecipeLogic().getOreToProduce() * getLevel().tickRateManager().tickrate();
+                produced = Mth.floor(produced / FluidDrillLogic.MAX_PROGRESS);
+                Component amountInfo = Component.literal(FormattingUtil.formatNumbers(produced) + "/s")
+                        .withStyle(ChatFormatting.BLUE);
                 textList.add(Component.translatable("gtceu.multiblock.ore_rig.ore_amount", amountInfo)
                         .withStyle(ChatFormatting.GRAY));
             } else {

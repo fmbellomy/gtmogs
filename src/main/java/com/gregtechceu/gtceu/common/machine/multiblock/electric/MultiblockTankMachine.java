@@ -52,9 +52,9 @@ public class MultiblockTankMachine extends MultiblockControllerMachine implement
     }
 
     @Override
-    public InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
+    public InteractionResult onUse(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
                                    BlockHitResult hit) {
-        var superResult = super.onUse(state, world, pos, player, hand, hit);
+        var superResult = super.onUse(state, level, pos, player, hand, hit);
 
         if (superResult != InteractionResult.PASS) return superResult;
         if (!isFormed()) return InteractionResult.FAIL;

@@ -64,11 +64,15 @@ import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.IShearable;
 import net.neoforged.neoforge.event.EventHooks;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
+import it.unimi.dsi.fastutil.chars.Char2ReferenceMap;
+import it.unimi.dsi.fastutil.chars.Char2ReferenceOpenHashMap;
+import it.unimi.dsi.fastutil.chars.CharSet;
+import it.unimi.dsi.fastutil.chars.CharSets;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnmodifiableView;
+
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -76,33 +80,27 @@ import java.util.function.Supplier;
 public class ToolHelper {
 
     // Crafting Symbols
-    private static final BiMap<Character, GTToolType> symbols = HashBiMap.create();
+    private static final Char2ReferenceMap<GTToolType> symbols = new Char2ReferenceOpenHashMap<>();
 
     private ToolHelper() {/**/}
 
     /**
-     * @return finds the registered crafting symbol with the tool
-     */
-    public static Character getSymbolFromTool(GTToolType tool) {
-        return symbols.inverse().get(tool);
-    }
-
-    /**
      * @return finds the registered tool with the crafting symbol
      */
-    public static GTToolType getToolFromSymbol(Character symbol) {
+    public static GTToolType getToolFromSymbol(char symbol) {
         return symbols.get(symbol);
     }
 
-    public static Set<Character> getToolSymbols() {
-        return symbols.keySet();
+    @UnmodifiableView
+    public static CharSet getToolSymbols() {
+        return CharSets.unmodifiable(symbols.keySet());
     }
 
     /**
      * Registers the tool against a crafting symbol, this is used in
      * {@link com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper}
      */
-    public static void registerToolSymbol(Character symbol, GTToolType tool) {
+    public static void registerToolSymbol(char symbol, GTToolType tool) {
         symbols.put(symbol, tool);
     }
 
@@ -181,7 +179,7 @@ public class ToolHelper {
         }
     }
 
-    public static void playToolSound(GTToolType toolType, ServerPlayer player) {
+    public static void playToolSound(@Nullable GTToolType toolType, ServerPlayer player) {
         if (toolType != null && toolType.soundEntry != null) {
             toolType.soundEntry.playOnServer(player.level(), player.blockPosition());
         }

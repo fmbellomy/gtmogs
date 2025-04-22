@@ -44,7 +44,7 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
     }
 
     @Override
-    public void onArmorTick(Level world, Player player, @NotNull ItemStack stack) {
+    public void onArmorTick(Level level, Player player, @NotNull ItemStack stack) {
         IElectricItem cont = GTCapabilityHelper.getElectricItem(stack);
         if (cont == null) {
             return;
@@ -79,7 +79,7 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
 
             if (messageKey != null) {
                 toggleTimer = 5;
-                if (!world.isClientSide) player.displayClientMessage(Component.translatable(messageKey), true);
+                if (!level.isClientSide) player.displayClientMessage(Component.translatable(messageKey), true);
             }
         }
 
@@ -91,7 +91,7 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
         performFlying(player, jetpackEnabled, hoverMode, stack);
 
         // Charging mechanics
-        if (canShare && !world.isClientSide) {
+        if (canShare && !level.isClientSide) {
             // Check for new things to charge every 5 seconds
             if (timer % 100 == 0)
                 inventoryIndexMap = ArmorUtils.getChargeableItem(player, cont.getTier());

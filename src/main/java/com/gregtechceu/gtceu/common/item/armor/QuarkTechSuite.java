@@ -16,6 +16,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
@@ -70,7 +71,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
     }
 
     @Override
-    public void onArmorTick(Level world, Player player, ItemStack stack) {
+    public void onArmorTick(Level level, Player player, ItemStack stack) {
         IElectricItem item = GTCapabilityHelper.getElectricItem(stack);
         if (item == null)
             return;
@@ -83,7 +84,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
         if (!player.getItemBySlot(EquipmentSlot.CHEST).is(GTItems.QUANTUM_CHESTPLATE.get()) &&
                 !player.getItemBySlot(EquipmentSlot.CHEST).is(GTItems.QUANTUM_CHESTPLATE_ADVANCED.get())) {
-            if (!world.isClientSide) ((IFireImmuneEntity) player).gtceu$setFireImmune(false);
+            if (!level.isClientSide) ((IFireImmuneEntity) player).gtceu$setFireImmune(false);
         }
 
         boolean ret = false;
@@ -107,10 +108,11 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
 
             if (nightVision) {
                 player.removeEffect(MobEffects.BLINDNESS);
-                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET) {
-                    nightVisionTimer = ArmorUtils.NIGHTVISION_DURATION;
+                float tickRate = level.tickRateManager().tickrate();
+                if (nightVisionTimer <= ArmorUtils.NIGHT_VISION_RESET * tickRate) {
+                    nightVisionTimer = Mth.floor(ArmorUtils.NIGHTVISION_DURATION * tickRate);
                     player.addEffect(
-                            new MobEffectInstance(MobEffects.NIGHT_VISION, ArmorUtils.NIGHTVISION_DURATION, 0, true,
+                            new MobEffectInstance(MobEffects.NIGHT_VISION, nightVisionTimer, 0, true,
                                     false));
                     item.discharge((4), this.tier, true, false, false);
                 }
@@ -169,7 +171,7 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
                         .translatable("metaarmor.nms.boosted_jump." + (boostedJump ? "enabled" : "disabled")), true);
             }
             if (boostedJump) {
-                if (!world.isClientSide) {
+                if (!level.isClientSide) {
                     boolean onGround = data.onGround();
                     if (onGround && !player.onGround() && jumping) {
                         item.discharge(energyPerUse / 100, item.getTier(), true, false, false);

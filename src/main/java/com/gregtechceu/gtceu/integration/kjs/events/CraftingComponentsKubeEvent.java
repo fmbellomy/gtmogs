@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.component.CraftingComponent;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import dev.latvian.mods.kubejs.event.KubeStartupEvent;
 import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
 import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.util.ID;
@@ -17,10 +18,6 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import dev.latvian.mods.kubejs.event.KubeStartupEvent;
-import dev.latvian.mods.kubejs.item.ItemStackJS;
-import dev.latvian.mods.kubejs.util.ConsoleJS;
-import dev.latvian.mods.kubejs.util.UtilsJS;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,12 +28,7 @@ import java.util.Map;
 public class CraftingComponentsKubeEvent implements KubeStartupEvent {
 
     private ComponentWrapper create(String id, Object fallback) {
-        Object obj = parseObject(cx, fallback);
-        if (obj == null) {
-            ConsoleJS.STARTUP.errorf("Couldn't parse crafting component %s", id);
-            return null;
-        }
-        return ComponentWrapper.of(id, obj);
+        return ComponentWrapper.of(id, fallback);
     }
 
     public ComponentWrapper createItem(String id, ItemStack stack) {
@@ -52,10 +44,8 @@ public class CraftingComponentsKubeEvent implements KubeStartupEvent {
     }
 
     // Set singular
-    private void set(Context cx, CraftingComponent craftingComponent, int tier, Object value) {
-        Object obj = parseObject(cx, value);
-        if (obj == null) return;
-        craftingComponent.add(tier, obj);
+    private void set(CraftingComponent craftingComponent, int tier, Object value) {
+        craftingComponent.add(tier, value);
     }
 
     public void setItem(CraftingComponent craftingComponent, int tier, ItemStack item) {
@@ -66,7 +56,8 @@ public class CraftingComponentsKubeEvent implements KubeStartupEvent {
         set(craftingComponent, tier, tag);
     }
 
-    public void setMaterialEntry(CraftingComponent craftingComponent, int tier, MaterialEntry matEntry) {
+    public void setMaterialEntry(CraftingComponent craftingComponent, int tier,
+                                 MaterialEntry matEntry) {
         set(craftingComponent, tier, matEntry);
     }
 
@@ -111,7 +102,7 @@ public class CraftingComponentsKubeEvent implements KubeStartupEvent {
         for (var val : map.entrySet()) {
             int tier = parseTier(val.getKey());
             if (tier == -1) return;
-            MaterialEntry entry = val.getValue();
+            MaterialEntry entry = MaterialEntry.of(val.getValue());
             if (entry == null) {
                 ConsoleJS.STARTUP.error("Invalid MaterialEntry passed to setMaterialEntries");
                 return;

@@ -2,7 +2,6 @@
 ldlib = "1.0.35.a"
 registrate = "MC1.21-1.3.0+67"
 configuration = "3.1.0-neoforge"
-mixinExtras = "0.2.0"
 
 jei = "19.21.0.247"
 rei = "16.0.799"

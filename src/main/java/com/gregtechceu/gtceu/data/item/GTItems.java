@@ -2121,12 +2121,20 @@ public class GTItems {
 
     public static ItemEntry<ComponentItem> ITEM_MAGNET_LV = REGISTRATE.item("lv_item_magnet", ComponentItem::new)
             .lang("LV Item Magnet")
-            .properties(p -> p.stacksTo(1))
+            .properties(p -> p.stacksTo(1)
+                    .component(GTDataComponents.MAGNET,
+                            new ItemMagnetBehavior.MagnetComponent(true, ItemMagnetBehavior.Filter.SIMPLE))
+                    .component(GTDataComponents.SIMPLE_ITEM_FILTER,
+                            new SimpleItemFilter(true, true, Collections.emptyList())))
             .onRegister(attach(ElectricStats.createElectricItem(100_000L, GTValues.LV), new ItemMagnetBehavior(8)))
             .register();
     public static ItemEntry<ComponentItem> ITEM_MAGNET_HV = REGISTRATE.item("hv_item_magnet", ComponentItem::new)
             .lang("HV Item Magnet")
-            .properties(p -> p.stacksTo(1))
+            .properties(p -> p.stacksTo(1)
+                    .component(GTDataComponents.MAGNET,
+                            new ItemMagnetBehavior.MagnetComponent(true, ItemMagnetBehavior.Filter.SIMPLE))
+                    .component(GTDataComponents.SIMPLE_ITEM_FILTER,
+                            new SimpleItemFilter(true, true, Collections.emptyList())))
             .onRegister(attach(ElectricStats.createElectricItem(1_600_000L, GTValues.HV), new ItemMagnetBehavior(32)))
             .register();
 
@@ -2523,7 +2531,7 @@ public class GTItems {
                 Supplier<ItemLike> supplier = GTMemoizer.memoize(() -> item);
                 MaterialEntry entry = new MaterialEntry(tagPrefix, mat);
                 GTMaterialItems.toUnify.put(entry, supplier);
-                ItemMaterialData.registerMaterialInfoItem(entry, supplier);
+                ItemMaterialData.registerMaterialEntry(supplier, entry);
             });
             return builder;
         };

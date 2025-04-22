@@ -813,6 +813,7 @@ public interface GTRecipeSchema {
     RecipeKey<TickDuration> DURATION = TimeComponent.TICKS.key("duration", ComponentRole.OTHER).optional(new TickDuration(100));
     RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data", ComponentRole.OTHER).optional(new CompoundTag());
     RecipeKey<List<RecipeCondition<?>>> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asList().key("recipeConditions", ComponentRole.OTHER).optional(new ArrayList<>());
+    RecipeKey<ResourceLocation> CATEGORY = GTRecipeComponents.RESOURCE_LOCATION.key("category", ComponentRole.OTHER).defaultOptional();
 
     RecipeKey<CapabilityMap> ALL_INPUTS = CapabilityMapComponent.INSTANCE.key("inputs", ComponentRole.INPUT).optional(new CapabilityMap());
     RecipeKey<CapabilityMap> ALL_TICK_INPUTS = CapabilityMapComponent.INSTANCE.key("tickInputs", ComponentRole.INPUT).optional(new CapabilityMap());
@@ -829,8 +830,8 @@ public interface GTRecipeSchema {
     RecipeKey<Map<RecipeCapability<?>, ChanceLogic>> TICK_OUTPUT_CHANCE_LOGICS = GTRecipeComponents.CHANCE_LOGIC_MAP
             .key("tickOutputChanceLogics", ComponentRole.OTHER).defaultOptional();
 
-    RecipeSchema SCHEMA = new RecipeSchema(DURATION, DATA, CONDITIONS, ALL_INPUTS,
-            ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
+    RecipeSchema SCHEMA = new RecipeSchema(DURATION, DATA, CONDITIONS,
+            ALL_INPUTS, ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
             INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS)
             .factory(new KubeRecipeFactory(GTCEu.id("recipe"), GTKubeRecipe.class, GTKubeRecipe::new))
             .constructor(new IDRecipeConstructor());

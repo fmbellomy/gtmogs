@@ -196,6 +196,28 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
         return this;
     }
 
+    // for kjs
+    public FluidStack getFluid() {
+        if (isClientSideWidget || isRemote()) {
+            return lastFluidInTank == null ? FluidStack.EMPTY : lastFluidInTank;
+        }
+        return fluidTank != null ? fluidTank.getFluidInTank(tank) : FluidStack.EMPTY;
+    }
+
+    public TankWidget setFluid(FluidStack fluidStack) {
+        return setFluid(fluidStack, true);
+    }
+
+    public TankWidget setFluid(FluidStack fluidStack, boolean notify) {
+        if (fluidTank instanceof IFluidHandlerModifiable modifiable) {
+            modifiable.setFluidInTank(tank, fluidStack);
+            if (notify) {
+                detectAndSendChanges();
+            }
+        }
+        return this;
+    }
+
     @Override
     public TankWidget setClientSideWidget() {
         super.setClientSideWidget();
