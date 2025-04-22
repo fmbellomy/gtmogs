@@ -208,41 +208,13 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
         }, this.self());
         event.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             if (blockEntity instanceof IMachineBlockEntity machineBe) {
-                MetaMachine machine = machineBe.getMetaMachine();
-                if (machine instanceof LDItemEndpointMachine fluidEndpointMachine) {
-                    if (machine.getLevel().isClientSide)
-                        return null;
-                    ILDEndpoint endpoint = fluidEndpointMachine.getLink();
-                    if (endpoint == null)
-                        return null;
-                    Direction outputFacing = fluidEndpointMachine.getOutputFacing();
-                    IItemHandler transfer = machine.getLevel().getCapability(Capabilities.ItemHandler.BLOCK,
-                            endpoint.getPos().relative(outputFacing), outputFacing.getOpposite());
-                    if (transfer != null) {
-                        new LDItemEndpointMachine.ItemHandlerWrapper(transfer);
-                    }
-                }
-                return machine.getItemHandlerCap(side, true);
+                return machineBe.getMetaMachine().getItemHandlerCap(side, true);
             }
             return null;
         }, this.self());
         event.registerBlock(Capabilities.FluidHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
             if (blockEntity instanceof IMachineBlockEntity machineBe) {
-                MetaMachine machine = machineBe.getMetaMachine();
-                if (machine instanceof LDFluidEndpointMachine fluidEndpointMachine) {
-                    if (machine.getLevel().isClientSide)
-                        return null;
-                    ILDEndpoint endpoint = fluidEndpointMachine.getLink();
-                    if (endpoint == null)
-                        return null;
-                    Direction outputFacing = fluidEndpointMachine.getOutputFacing();
-                    IFluidHandler transfer = machine.getLevel().getCapability(Capabilities.FluidHandler.BLOCK,
-                            endpoint.getPos().relative(outputFacing), outputFacing.getOpposite());
-                    if (transfer != null) {
-                        return new LDFluidEndpointMachine.FluidHandlerWrapper(transfer);
-                    }
-                }
-                return machine.getFluidHandlerCap(side, true);
+                return machineBe.getMetaMachine().getFluidHandlerCap(side, true);
             }
             return null;
         }, this.self());
@@ -314,7 +286,7 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
         }
     }
 
-    static <T> List<T> getCapabilitiesFromTraits(List<MachineTrait> traits, Direction accessSide,
+    static <T> List<T> getCapabilitiesFromTraits(List<MachineTrait> traits, @Nullable Direction accessSide,
                                                  Class<T> capability) {
         if (traits.isEmpty()) return Collections.emptyList();
         List<T> list = new ArrayList<>();

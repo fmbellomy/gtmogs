@@ -30,13 +30,13 @@ public class PostRegistryListener extends SimplePreparableReloadListener<Void> {
     protected void apply(Void object, ResourceManager resourceManager, ProfilerFiller profiler) {
         var registry = GTRegistries.builtinRegistry().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
 
-        buildVeinGenerator(registry);
+        buildVeinGenerators(registry);
         GTOreVeins.updateLargestVeinSize(registry);
         ServerCache.instance.oreVeinDefinitionsChanged(registry);
         WorldGeneratorUtils.invalidateOreVeinCache();
     }
 
-    public static void buildVeinGenerator(Registry<OreVeinDefinition> registry) {
+    public static void buildVeinGenerators(Registry<OreVeinDefinition> registry) {
         var iterator = registry.asHolderIdMap().iterator();
         Set<Holder<OreVeinDefinition>> toRemove = new HashSet<>();
         while (iterator.hasNext()) {
