@@ -149,7 +149,7 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
                 .map(ResearchCondition.class::cast).orElse(null);
         if (researchCondition != null) {
             for (ResearchData.ResearchEntry entry : researchCondition.data) {
-                type.addDataStickEntry(entry.getResearchId(), recipe);
+                type.addDataStickEntry(entry.researchId(), recipe);
             }
         }
         return recipe;

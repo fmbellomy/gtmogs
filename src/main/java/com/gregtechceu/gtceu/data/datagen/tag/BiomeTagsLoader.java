@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/tag/BiomeTagsLoader.java
-package com.gregtechceu.gtceu.data.tag;
-========
 package com.gregtechceu.gtceu.data.datagen.tag;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/datagen/tag/BiomeTagsLoader.java
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
@@ -11,10 +7,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.BiomeTagsProvider;
 import net.minecraft.tags.BiomeTags;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/tag/BiomeTagsLoader.java
-import net.minecraft.world.level.biome.Biomes;
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/datagen/tag/BiomeTagsLoader.java
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 

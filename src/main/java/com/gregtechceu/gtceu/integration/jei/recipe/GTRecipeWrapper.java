@@ -10,9 +10,9 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 
 public class GTRecipeWrapper extends ModularWrapper<Widget> {
 
-    public final RecipeHolder<GTRecipe> recipe;
+    public final GTRecipe recipe;
 
-    public GTRecipeWrapper(RecipeHolder<GTRecipe> recipe) {
+    public GTRecipeWrapper(GTRecipe recipe) {
         super(new GTRecipeWidget(recipe));
         this.recipe = recipe;
     }

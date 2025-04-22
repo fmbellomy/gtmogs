@@ -1323,7 +1323,7 @@ public class GTRecipeBuilder {
                 .map(ResearchCondition.class::cast).orElse(null);
         if (condition != null) {
             for (ResearchData.ResearchEntry entry : condition.data) {
-                this.recipeType.addDataStickEntry(entry.getResearchId(), build());
+                this.recipeType.addDataStickEntry(entry.researchId(), build());
             }
         }
 

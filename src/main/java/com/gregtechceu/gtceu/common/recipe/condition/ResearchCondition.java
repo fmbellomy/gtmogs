@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.recipe.ResearchData;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeConditions;
 
+import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -49,7 +50,7 @@ public class ResearchCondition extends RecipeCondition<ResearchCondition> {
     @Override
     public JsonObject serialize() {
         JsonObject value = super.serialize();
-        value.add("research", this.data.toJson());
+        value.add("research", ResearchData.CODEC.encodeStart(JsonOps.INSTANCE, this.data).getOrThrow());
         return value;
     }
 

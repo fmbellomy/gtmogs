@@ -48,7 +48,7 @@ public class ClientInit {
     }
 
     @SubscribeEvent
-    public void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
+    public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
         for (Item item : BuiltInRegistries.ITEM) {
             if (item instanceof IComponentItem) {
                 event.register(item, GTComponentItemDecorator.INSTANCE);

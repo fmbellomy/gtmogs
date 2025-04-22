@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/api/RotationState.java
-package com.gregtechceu.gtceu.api;
-========
 package com.gregtechceu.gtceu.api.machine;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/api/machine/RotationState.java
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;

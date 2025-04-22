@@ -495,8 +495,8 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                         if (condition != null) {
                             List<ItemStack> dataItems = new ArrayList<>();
                             for (ResearchData.ResearchEntry entry : condition.data) {
-                                ItemStack dataStick = entry.getDataItem().copy();
-                                ResearchManager.writeResearchToComponent(dataStick, entry.getResearchId(), recipeType);
+                                ItemStack dataStick = entry.dataItem().copy();
+                                ResearchManager.writeResearchToComponent(dataStick, entry.researchId(), recipeType);
                                 dataItems.add(dataStick);
                             }
                             CycleItemStackHandler handler = new CycleItemStackHandler(List.of(dataItems));

@@ -1,8 +1,4 @@
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/tag/EntityTypeTagLoader.java
-package com.gregtechceu.gtceu.data.tag;
-========
 package com.gregtechceu.gtceu.data.datagen.tag;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/datagen/tag/EntityTypeTagLoader.java
 
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 

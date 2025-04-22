@@ -19,6 +19,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -42,7 +44,7 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
     public static void onBlockEntityRegister(BlockEntityType<BlockEntity> type) {}
 
     @Override
-    public @NotNull MultiManagedStorage getRootStorage() {
+    public MultiManagedStorage getRootStorage() {
         return managedStorage;
     }
 
@@ -103,7 +105,7 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
     }
 
     @Override
-    public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
+    public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
                                     ItemStack held, Direction side) {
         return metaMachine.sideTips(player, pos, state, toolTypes, held, side);
     }

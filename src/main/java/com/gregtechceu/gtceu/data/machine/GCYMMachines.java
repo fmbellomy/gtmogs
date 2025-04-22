@@ -3,35 +3,18 @@ package com.gregtechceu.gtceu.data.machine;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-import com.gregtechceu.gtceu.api.RotationState;
-========
 import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.CoilWorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
 import com.gregtechceu.gtceu.api.multiblock.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockShapeInfo;
 import com.gregtechceu.gtceu.api.multiblock.Predicates;
 import com.gregtechceu.gtceu.api.multiblock.TraceabilityPredicate;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-import com.gregtechceu.gtceu.api.recipe.OverclockingLogic;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.common.machine.multiblock.part.ParallelHatchPartMachine;
-import com.gregtechceu.gtceu.data.compass.GTCompassSections;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
-import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-========
 import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeChemicalBathRenderer;
 import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeMixerRenderer;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -42,7 +25,6 @@ import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeChemic
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeMixerMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ParallelHatchPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.ChatFormatting;
@@ -59,8 +41,6 @@ import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.machine.multiblock.PartAbility.*;
 import static com.gregtechceu.gtceu.api.multiblock.Predicates.*;
 import static com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection.*;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-========
 import static com.gregtechceu.gtceu.data.block.GCYMBlocks.*;
 import static com.gregtechceu.gtceu.data.recipe.GCYMRecipeTypes.ALLOY_BLAST_RECIPES;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
@@ -68,14 +48,7 @@ import static com.gregtechceu.gtceu.data.machine.GTMachines.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.NaquadahAlloy;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 import static com.gregtechceu.gtceu.data.machine.GTMachineUtils.registerTieredMachines;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
-import static com.gregtechceu.gtceu.data.block.GCyMBlocks.*;
-import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
-import static com.gregtechceu.gtceu.data.machine.GTMachines.*;
-import static com.gregtechceu.gtceu.data.material.GTMaterials.NaquadahAlloy;
-import static com.gregtechceu.gtceu.data.recipe.GCyMRecipeTypes.ALLOY_BLAST_RECIPES;
-import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
 /**
  * @author Rundas
@@ -111,11 +84,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(MACERATOR_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_SECURE_MACERATION)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXXXX", "XXXXX")
@@ -132,11 +101,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/secure_maceration_casing"),
                     GTCEu.id("block/multiblock/gcym/large_maceration_tower"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_CHEMICAL_BATH = REGISTRATE
@@ -151,11 +115,7 @@ public class GCYMMachines {
                     GTCEu.id("block/multiblock/gcym/large_chemical_bath")))
             .hasTESR(true)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_WATERTIGHT)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXXXX")
@@ -172,13 +132,6 @@ public class GCYMMachines {
                     .where(' ', Predicates.air())
                     .where('T', Predicates.blocks(CASING_TITANIUM_PIPE.get()))
                     .build())
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
-                    GTCEu.id("block/multiblock/gcym/large_chemical_bath"))
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_CENTRIFUGE = REGISTRATE
@@ -190,11 +143,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(CENTRIFUGE_RECIPES, THERMAL_CENTRIFUGE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_VIBRATION_SAFE)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#XXX#", "XXXXX", "#XXX#")
@@ -212,11 +161,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/vibration_safe_casing"),
                     GTCEu.id("block/multiblock/gcym/large_centrifuge"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_MIXER = REGISTRATE
@@ -231,11 +175,7 @@ public class GCYMMachines {
                     GTCEu.id("block/multiblock/gcym/large_mixer")))
             .hasTESR(true)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_REACTION_SAFE)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#XXX#", "#XXX#", "#XXX#", "#XXX#", "#XXX#", "##F##")
@@ -253,13 +193,6 @@ public class GCYMMachines {
                     .where('A', Predicates.air())
                     .where('#', Predicates.any())
                     .build())
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .workableCasingRenderer(GTCEu.id("block/casings/gcym/reaction_safe_mixing_casing"),
-                    GTCEu.id("block/multiblock/gcym/large_mixer"))
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_ELECTROLYZER = REGISTRATE
@@ -271,11 +204,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(ELECTROLYZER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_NONCONDUCTING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXXXX")
@@ -290,11 +219,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/nonconducting_casing"),
                     GTCEu.id("block/multiblock/gcym/large_electrolyzer"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_ELECTROMAGNET = REGISTRATE
@@ -307,11 +231,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(ELECTROMAGNETIC_SEPARATOR_RECIPES, POLARIZER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_NONCONDUCTING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXXXX")
@@ -326,11 +246,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/nonconducting_casing"),
                     GTCEu.id("block/multiblock/gcym/large_electrolyzer"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_PACKER = REGISTRATE
@@ -338,15 +253,11 @@ public class GCYMMachines {
             .langValue("Large Packaging Machine")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-                    PACKER_RECIPES.getName()))
+                    Component.translatable("gtceu.packer")))
             .rotationState(RotationState.ALL)
             .recipeType(GTRecipeTypes.PACKER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_TUNGSTENSTEEL_ROBUST)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXX", "XXX", "XXX")
@@ -363,11 +274,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"),
                     GTCEu.id("block/multiblock/gcym/large_packer"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[HV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_ASSEMBLER = REGISTRATE
@@ -376,14 +282,6 @@ public class GCYMMachines {
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.multiblock.exact_hatch_1.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    ASSEMBLER_RECIPES.getName()))
-            .tooltips(GTMachines.defaultEnvironmentRequirement())
-            .rotationState(RotationState.ALL)
-            .recipeType(ASSEMBLER_RECIPES)
-            .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     Component.translatable("gtceu.assembler")))
             .conditionalTooltip(GTMachineUtils.defaultEnvironmentRequirement(),
                     ConfigHolder.INSTANCE.gameplay.environmentalHazards)
@@ -391,7 +289,6 @@ public class GCYMMachines {
             .recipeType(ASSEMBLER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_LARGE_SCALE_ASSEMBLING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXXXXXX", "XXXXXXXXX", "XXXXXXXXX")
@@ -409,27 +306,14 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/large_scale_assembling_casing"),
                     GTCEu.id("block/multiblock/gcym/large_assembler"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_CIRCUIT_ASSEMBLER = REGISTRATE
             .multiblock("large_circuit_assembler", WorkableElectricMultiblockMachine::new)
             .langValue("Large Circuit Assembling Facility")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
-            .tooltips(Component.translatable("gtceu.multiblock.exact_hatch_1.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
                     CIRCUIT_ASSEMBLER_RECIPES.getName()))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .tooltips(GTMachines.defaultEnvironmentRequirement())
-            .rotationState(RotationState.ALL)
-            .recipeType(CIRCUIT_ASSEMBLER_RECIPES)
-            .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
             .tooltips(Component.translatable("gtceu.multiblock.exact_hatch_1.tooltip"))
             .conditionalTooltip(GTMachineUtils.defaultEnvironmentRequirement(),
                     ConfigHolder.INSTANCE.gameplay.environmentalHazards)
@@ -437,7 +321,6 @@ public class GCYMMachines {
             .recipeType(CIRCUIT_ASSEMBLER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_LARGE_SCALE_ASSEMBLING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXXXX", "XXXXXXX", "XXXXXXX")
@@ -459,11 +342,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/large_scale_assembling_casing"),
                     GTCEu.id("block/multiblock/gcym/large_circuit_assembler"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_ARC_SMELTER = REGISTRATE
@@ -475,11 +353,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(ARC_FURNACE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_HIGH_TEMPERATURE_SMELTING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#XXX#", "#XXX#", "#XXX#", "#XXX#")
@@ -498,11 +372,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/high_temperature_smelting_casing"),
                     GTCEu.id("block/multiblock/gcym/large_arc_smelter"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_ENGRAVING_LASER = REGISTRATE
@@ -511,20 +380,12 @@ public class GCYMMachines {
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",
                     LASER_ENGRAVER_RECIPES.getName()))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .tooltips(GTMachines.defaultEnvironmentRequirement())
-            .rotationState(RotationState.ALL)
-            .recipeType(LASER_ENGRAVER_RECIPES)
-            .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
             .conditionalTooltip(GTMachineUtils.defaultEnvironmentRequirement(),
                     ConfigHolder.INSTANCE.gameplay.environmentalHazards)
             .rotationState(RotationState.ALL)
             .recipeType(LASER_ENGRAVER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.DEFAULT_ENVIRONMENT_REQUIREMENT, GTRecipeModifiers.PARALLEL_HATCH,
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_LASER_SAFE_ENGRAVING)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXGXX", "XXGXX", "XXXXX")
@@ -543,11 +404,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/laser_safe_engraving_casing"),
                     GTCEu.id("block/multiblock/gcym/large_engraving_laser"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_SIFTING_FUNNEL = REGISTRATE
@@ -559,11 +415,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(SIFTER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_VIBRATION_SAFE)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#X#X#", "#X#X#", "#XXX#", "XXXXX", "#XXX#")
@@ -581,11 +433,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/vibration_safe_casing"),
                     GTCEu.id("block/multiblock/gcym/large_sifting_funnel"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition BLAST_ALLOY_SMELTER = REGISTRATE
@@ -654,11 +501,6 @@ public class GCYMMachines {
                                     .setStyle(Style.EMPTY.withColor(ChatFormatting.RED))));
                 }
             })
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_AUTOCLAVE = REGISTRATE
@@ -670,11 +512,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(AUTOCLAVE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_WATERTIGHT)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXX", "XXX", "XXX")
@@ -691,11 +529,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
                     GTCEu.id("block/multiblock/gcym/large_autoclave"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_MATERIAL_PRESS = REGISTRATE
@@ -708,11 +541,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(BENDER_RECIPES, COMPRESSOR_RECIPES, FORGE_HAMMER_RECIPES, FORMING_PRESS_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_STRESS_PROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXXXX", "XXXXXXX", "XXXXXXX")
@@ -728,11 +557,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/stress_proof_casing"),
                     GTCEu.id("block/multiblock/gcym/large_material_press"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_BREWER = REGISTRATE
@@ -745,11 +569,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(BREWING_RECIPES, FERMENTING_RECIPES, FLUID_HEATER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_CORROSION_PROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#XXX#", "#XXX#", "#XXX#", "#XXX#", "#####")
@@ -769,11 +589,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/corrosion_proof_casing"),
                     GTCEu.id("block/multiblock/gcym/large_brewer"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_CUTTER = REGISTRATE
@@ -785,11 +600,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(CUTTER_RECIPES, LATHE_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_SHOCK_PROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXXXX", "XXXXXXX", "XXXXXXX", "##XXXXX")
@@ -807,11 +618,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/shock_proof_cutting_casing"),
                     GTCEu.id("block/multiblock/gcym/large_cutter"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_DISTILLERY = REGISTRATE
@@ -823,11 +629,7 @@ public class GCYMMachines {
             .rotationState(RotationState.NON_Y_AXIS)
             .recipeTypes(DISTILLATION_RECIPES, DISTILLERY_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_WATERTIGHT)
             .pattern(definition -> {
                 TraceabilityPredicate casingPredicate = blocks(CASING_WATERTIGHT.get()).setMinGlobalLimited(40);
@@ -907,11 +709,6 @@ public class GCYMMachines {
             .partSorter(Comparator.comparingInt(a -> a.self().getPos().getY()))
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
                     GTCEu.id("block/multiblock/gcym/large_distillery"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_EXTRACTOR = REGISTRATE
@@ -923,11 +720,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeTypes(EXTRACTOR_RECIPES, CANNER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_WATERTIGHT)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXXXX")
@@ -942,11 +735,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
                     GTCEu.id("block/multiblock/gcym/large_extractor"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_EXTRUDER = REGISTRATE
@@ -958,11 +746,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(EXTRUDER_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_STRESS_PROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("##XXX", "##XXX", "##XXX")
@@ -981,11 +765,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/stress_proof_casing"),
                     GTCEu.id("block/multiblock/gcym/large_extruder"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_SOLIDIFIER = REGISTRATE
@@ -997,11 +776,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(FLUID_SOLIDFICATION_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_WATERTIGHT)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("#XXX#", "#XXX#", "#XXX#", "#XXX#")
@@ -1019,11 +794,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/watertight_casing"),
                     GTCEu.id("block/multiblock/gcym/large_solidifier"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition LARGE_WIREMILL = REGISTRATE
@@ -1035,11 +805,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(WIREMILL_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_STRESS_PROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXX", "XXXXX", "XXX##")
@@ -1054,11 +820,6 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/stress_proof_casing"),
                     GTCEu.id("block/multiblock/gcym/large_wiremill"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[IV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition ROTARY_HEARTH_FURNACE = REGISTRATE
@@ -1224,11 +985,7 @@ public class GCYMMachines {
                 return shapeInfo;
             })
             .workableCasingRenderer(GTCEu.id("block/casings/gcym/high_temperature_smelting_casing"),
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTCEu.id("block/multiblock/gcym/mega_blast_furnace"))
-========
                     GTCEu.id("block/multiblock/gcym/rotary_hearth_furnace"))
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .additionalDisplay((controller, components) -> {
                 if (controller instanceof CoilWorkableElectricMultiblockMachine coilMachine && controller.isFormed()) {
                     components.add(Component.translatable("gtceu.multiblock.blast_furnace.max_temperature",
@@ -1241,11 +998,6 @@ public class GCYMMachines {
                                     .setStyle(Style.EMPTY.withColor(ChatFormatting.RED))));
                 }
             })
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[LuV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 
     public final static MultiblockMachineDefinition MEGA_VACUUM_FREEZER = REGISTRATE
@@ -1257,11 +1009,7 @@ public class GCYMMachines {
             .rotationState(RotationState.ALL)
             .recipeType(VACUUM_RECIPES)
             .recipeModifiers(GTRecipeModifiers.PARALLEL_HATCH,
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-                    GTRecipeModifiers.ELECTRIC_OVERCLOCK.apply(OverclockingLogic.NON_PERFECT_OVERCLOCK_SUBTICK))
-========
                     GTRecipeModifiers.OC_NON_PERFECT_SUBTICK)
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .appearanceBlock(CASING_ALUMINIUM_FROSTPROOF)
             .pattern(definition -> FactoryBlockPattern.start()
                     .aisle("XXXXXXX#KKK", "XXXXXXX#KVK", "XXXXXXX#KVK", "XXXXXXX#KVK", "XXXXXXX#KKK", "XXXXXXX####",
@@ -1289,10 +1037,5 @@ public class GCYMMachines {
                     .build())
             .workableCasingRenderer(GTCEu.id("block/casings/solid/machine_casing_frost_proof"),
                     GTCEu.id("block/multiblock/gcym/mega_vacuum_freezer"))
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/machine/GCyMMachines.java
-            .compassSections(GTCompassSections.TIER[LuV])
-            .compassNodeSelf()
-========
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/machine/GCYMMachines.java
             .register();
 }

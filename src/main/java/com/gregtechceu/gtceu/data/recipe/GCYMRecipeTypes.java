@@ -7,10 +7,7 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
-<<<<<<<< HEAD:src/main/java/com/gregtechceu/gtceu/data/recipe/GCyMRecipeTypes.java
-========
 import com.gregtechceu.gtceu.integration.xei.handlers.item.CycleItemStackHandler;
->>>>>>>> sc/remake-1.21.1-branch:src/main/java/com/gregtechceu/gtceu/data/recipe/GCYMRecipeTypes.java
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
