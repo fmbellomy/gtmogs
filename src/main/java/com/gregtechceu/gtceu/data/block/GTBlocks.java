@@ -238,7 +238,7 @@ public class GTBlocks {
             GTCEu.id("block/casings/solid/machine_casing_inert_ptfe"));
     public static final BlockEntry<Block> CASING_HSSE_STURDY = createCasingBlock("sturdy_machine_casing",
             GTCEu.id("block/casings/solid/machine_casing_sturdy_hsse"));
-    public static final BlockEntry<Block> CASING_PALLADIUM_SUBSTATION = createCasingBlock("palladium_substation",
+    public static final BlockEntry<Block> CASING_PALLADIUM_SUBSTATION = createCasingBlock("palladium_substation_casing",
             GTCEu.id("block/casings/solid/machine_casing_palladium_substation"));
     public static final BlockEntry<Block> CASING_TEMPERED_GLASS = createGlassCasingBlock("tempered_glass",
             GTCEu.id("block/casings/transparent/tempered_glass"), () -> RenderType::translucent);
@@ -1209,15 +1209,15 @@ public class GTBlocks {
                     table.createSingleItemTable(Items.CHARCOAL, UniformGenerator.between(1.0F, 3.0F))))
             .lang("Brittle Charcoal")
             .tag(BlockTags.MINEABLE_WITH_SHOVEL)
-            .blockstate(GTModels.cubeAllModel("brittle_charcoal", GTCEu.id("block/misc/brittle_charcoal")))
+            .defaultBlockstate()
             .item((b, p) -> new BlockItem(b, p) {
 
                 @Override
-                public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltipComponents,
-                                            TooltipFlag isAdvanced) {
-                    super.appendHoverText(stack, context, tooltipComponents, isAdvanced);
-                    tooltipComponents.add(1, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.0"));
-                    tooltipComponents.add(2, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.1"));
+                public void appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
+                                            @NotNull List<Component> tooltip, @NotNull TooltipFlag isAdvanced) {
+                    super.appendHoverText(stack, context, tooltip, isAdvanced);
+                    tooltip.add(1, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.0"));
+                    tooltip.add(2, Component.translatable("tile.gtceu.brittle_charcoal.tooltip.1"));
                 }
             })
             .build()

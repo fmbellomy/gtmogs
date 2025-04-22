@@ -77,6 +77,11 @@ public class GTDataFixers {
         Schema schemaV2 = builder.addSchema(2, SAME_NAMESPACED);
         builder.addFixer(ItemRenameFix.create(schemaV2, "Tungstensteel rename fix",
                 createRenamer(Pattern.compile("gtceu:tungstensteel"), "gtceu:tungsten_steel")));
+
+        builder.addFixer(ItemRenameFix.create(schemaV2, "Palladium Substation Casing item rename fix",
+                createRenamer("gtceu:palladium_substation", "gtceu:palladium_substation_casing")));
+        builder.addFixer(BlockRenameFix.create(schemaV2, "Palladium Substation Casing block rename fix",
+                createRenamer("gtceu:palladium_substation", "gtceu:palladium_substation_casing")));
     }
 
     private static UnaryOperator<String> createRenamer(String oldName, String newName) {
