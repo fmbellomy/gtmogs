@@ -7,15 +7,15 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
+import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 
-import dev.latvian.mods.kubejs.client.LangKubeEvent;
 import net.minecraft.resources.ResourceLocation;
 
 import com.google.common.base.Preconditions;
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -77,7 +77,8 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
                 "example: `builder.machine((holder, tier) => new SimpleTieredMachine(holder, tier, t => t * 3200)`");
         Preconditions.checkNotNull(definition, "You must set a definition function! " +
                 "See GTMachines for examples");
-        @Nullable MachineDefinition @NotNull [] definitions = new MachineDefinition[TIER_COUNT];
+        @Nullable
+        MachineDefinition @NotNull [] definitions = new MachineDefinition[TIER_COUNT];
         for (final int tier : tiers) {
             String tierName = GTValues.VN[tier].toLowerCase(Locale.ROOT);
             final Int2IntFunction tankFunction = tankScalingFunction != null ?

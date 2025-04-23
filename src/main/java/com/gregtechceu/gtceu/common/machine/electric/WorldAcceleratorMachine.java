@@ -11,9 +11,9 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
+import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
-import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
@@ -41,6 +41,7 @@ import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -229,7 +230,8 @@ public class WorldAcceleratorMachine extends TieredEnergyMachine implements ICon
         return super.sideTips(player, pos, state, toolTypes, held, side);
     }
 
-    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                      Direction gridSide,
                                                       BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -248,7 +250,8 @@ public class WorldAcceleratorMachine extends TieredEnergyMachine implements ICon
 
     @Override
     protected @NotNull ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand,
-                                                                ItemStack held, Direction gridSide, BlockHitResult hitResult) {
+                                                                ItemStack held, Direction gridSide,
+                                                                BlockHitResult hitResult) {
         if (!isRemote()) {
             isRandomTickMode = !isRandomTickMode;
             playerIn.sendSystemMessage(Component.translatable(isRandomTickMode ?

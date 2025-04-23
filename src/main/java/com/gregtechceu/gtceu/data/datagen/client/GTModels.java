@@ -6,15 +6,14 @@ import com.gregtechceu.gtceu.api.block.ActiveBlock;
 import com.gregtechceu.gtceu.api.block.ICoilType;
 import com.gregtechceu.gtceu.api.block.IFilterType;
 import com.gregtechceu.gtceu.api.block.IFusionCasingType;
-import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
-import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.fluid.GTFluid;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorage;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKey;
 import com.gregtechceu.gtceu.api.machine.multiblock.IBatteryData;
+import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.common.block.*;
-import com.gregtechceu.gtceu.core.MixinHelpers;
 import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
+import com.gregtechceu.gtceu.core.MixinHelpers;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;

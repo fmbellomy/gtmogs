@@ -22,7 +22,6 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -30,12 +29,12 @@ import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
 import net.neoforged.neoforge.fluids.crafting.DataComponentFluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Pair;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -125,17 +124,18 @@ public class PotionFluidHelper {
             noEffects = false;
             MutableComponent mutablecomponent = Component.translatable(mobeffectinstance.getDescriptionId());
             Holder<MobEffect> holder = mobeffectinstance.getEffect();
-            holder.value().createModifiers(mobeffectinstance.getAmplifier(), (p_331556_, p_330860_) -> list.add(new Pair<>(p_331556_, p_330860_)));
+            holder.value().createModifiers(mobeffectinstance.getAmplifier(),
+                    (p_331556_, p_330860_) -> list.add(new Pair<>(p_331556_, p_330860_)));
             if (mobeffectinstance.getAmplifier() > 0) {
                 mutablecomponent = Component.translatable(
-                        "potion.withAmplifier", mutablecomponent, Component.translatable("potion.potency." + mobeffectinstance.getAmplifier())
-                );
+                        "potion.withAmplifier", mutablecomponent,
+                        Component.translatable("potion.potency." + mobeffectinstance.getAmplifier()));
             }
 
             if (!mobeffectinstance.endsWithin(20)) {
                 mutablecomponent = Component.translatable(
-                        "potion.withDuration", mutablecomponent, MobEffectUtil.formatDuration(mobeffectinstance, 1.0f, context.tickRate())
-                );
+                        "potion.withDuration", mutablecomponent,
+                        MobEffectUtil.formatDuration(mobeffectinstance, 1.0f, context.tickRate()));
             }
 
             tooltipAdder.accept(mutablecomponent.withStyle(holder.value().getCategory().getTooltipFormatting()));

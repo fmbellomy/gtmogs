@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.integration.map.ftbchunks;
 
-import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
+import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.integration.map.GenericMapRenderer;
 import com.gregtechceu.gtceu.integration.map.ftbchunks.veins.fluid.FluidVeinIcon;
 import com.gregtechceu.gtceu.integration.map.ftbchunks.veins.ore.OreVeinIcon;
@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.integration.map.ftbchunks.veins.ore.OreVeinIcon;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import dev.ftb.mods.ftblibrary.ui.Widget;

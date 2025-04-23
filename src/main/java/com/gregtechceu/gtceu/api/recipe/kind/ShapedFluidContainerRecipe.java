@@ -3,9 +3,6 @@ package com.gregtechceu.gtceu.api.recipe.kind;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidContainerIngredient;
 import com.gregtechceu.gtceu.core.mixins.ShapedRecipeAccessor;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +10,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 // TODO shapeless fluid container recipes
 public class ShapedFluidContainerRecipe extends ShapedRecipe {
@@ -104,14 +104,14 @@ public class ShapedFluidContainerRecipe extends ShapedRecipe {
 
         public static final MapCodec<ShapedFluidContainerRecipe> CODEC = RecordCodecBuilder
                 .mapCodec(instance -> instance.group(
-                                Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
-                                CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC)
-                                        .forGetter(ShapedRecipe::category),
-                                ShapedRecipePattern.MAP_CODEC.forGetter(i -> i.pattern),
-                                ItemStack.STRICT_CODEC.fieldOf("result")
-                                        .forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
-                                Codec.BOOL.optionalFieldOf("show_notification", true)
-                                        .forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification()))
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC)
+                                .forGetter(ShapedRecipe::category),
+                        ShapedRecipePattern.MAP_CODEC.forGetter(i -> i.pattern),
+                        ItemStack.STRICT_CODEC.fieldOf("result")
+                                .forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
+                        Codec.BOOL.optionalFieldOf("show_notification", true)
+                                .forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification()))
                         .apply(instance, ShapedFluidContainerRecipe::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, ShapedFluidContainerRecipe> STREAM_CODEC = StreamCodec
                 .of(

@@ -5,14 +5,14 @@ import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreIndicatorPlacer;
 
-import com.mojang.serialization.MapCodec;
-import lombok.NoArgsConstructor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.state.BlockState;
 
 import com.mojang.datafixers.util.Either;
+import com.mojang.serialization.MapCodec;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;

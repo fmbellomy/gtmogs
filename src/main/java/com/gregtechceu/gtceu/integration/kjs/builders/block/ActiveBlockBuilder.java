@@ -3,19 +3,21 @@ package com.gregtechceu.gtceu.integration.kjs.builders.block;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.block.ActiveBlock;
 
-import dev.latvian.mods.kubejs.block.BlockRenderType;
-import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
-import dev.latvian.mods.kubejs.util.ID;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+
 import dev.latvian.mods.kubejs.block.BlockBuilder;
+import dev.latvian.mods.kubejs.block.BlockRenderType;
 import dev.latvian.mods.kubejs.client.VariantBlockStateGenerator;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
+import dev.latvian.mods.kubejs.util.ID;
 
 import java.util.function.UnaryOperator;
 
 import static dev.latvian.mods.kubejs.generator.KubeAssetGenerator.*;
 
 public class ActiveBlockBuilder extends BlockBuilder {
+
     // spotless:off
     public static final UnaryOperator<String> ACTIVE = s -> s + "_active";
     public static final UnaryOperator<String> BLOOM = s -> s + "_bloom";

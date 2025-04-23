@@ -6,8 +6,8 @@ import com.gregtechceu.gtceu.api.item.component.ISubItemHandler;
 import com.gregtechceu.gtceu.api.item.datacomponents.FacadeWrapper;
 import com.gregtechceu.gtceu.client.renderer.cover.FacadeCoverRenderer;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
 import net.minecraft.core.NonNullList;
@@ -18,11 +18,12 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionId, ICustomRenderer {

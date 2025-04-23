@@ -684,7 +684,8 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
 
         private static <T> Object _getJEIFluidClickable(IPlatformFluidHelper<T> helper,
                                                         FluidStack fluidStack, Position pos, Size size) {
-            T ingredient = helper.create(fluidStack.getFluidHolder(), fluidStack.getAmount(), fluidStack.getComponentsPatch());
+            T ingredient = helper.create(fluidStack.getFluidHolder(), fluidStack.getAmount(),
+                    fluidStack.getComponentsPatch());
             return JEIPlugin.jeiHelpers.getIngredientManager().createTypedIngredient(ingredient)
                     .map(typedIngredient -> new ClickableIngredient<>(typedIngredient, pos.x, pos.y, size.width,
                             size.height))
@@ -695,7 +696,8 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
     public static final class REICallWrapper {
 
         public static dev.architectury.fluid.FluidStack toREIStack(FluidStack stack) {
-            return dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentsPatch());
+            return dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(),
+                    stack.getComponentsPatch());
         }
 
         private static EntryIngredient toREIIngredient(Stream<FluidStack> stream) {

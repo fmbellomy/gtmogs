@@ -5,8 +5,8 @@ import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
@@ -40,7 +40,8 @@ public class ShutterCover extends CoverBehavior implements IControllable {
     }
 
     @Override
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                    BlockHitResult hitResult) {
         return ItemInteractionResult.FAIL;
     }
 
@@ -50,7 +51,8 @@ public class ShutterCover extends CoverBehavior implements IControllable {
     }
 
     @Override
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                   BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }

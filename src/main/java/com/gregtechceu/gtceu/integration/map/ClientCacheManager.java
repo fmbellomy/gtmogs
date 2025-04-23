@@ -13,11 +13,11 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.neoforged.fml.loading.FMLPaths;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectMap;
 import lombok.Getter;
-import net.neoforged.fml.loading.FMLPaths;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -53,7 +53,7 @@ public class ClientCacheManager {
         if (shouldInit) {
             final Player player = Minecraft.getInstance().player;
             worldFolder = new File(clientCacheDir, player.getUUID() +
-                            File.separator + sanitizeFilename(worldId));
+                    File.separator + sanitizeFilename(worldId));
             worldFolder.mkdirs();
             // to ensure any cache data that might somehow be lying around gets dealt with
             clearCaches();

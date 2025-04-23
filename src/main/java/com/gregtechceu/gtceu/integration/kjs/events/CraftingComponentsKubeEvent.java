@@ -3,21 +3,21 @@ package com.gregtechceu.gtceu.integration.kjs.events;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.component.CraftingComponent;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import dev.latvian.mods.kubejs.event.KubeStartupEvent;
-import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
-import dev.latvian.mods.kubejs.script.ConsoleJS;
-import dev.latvian.mods.kubejs.util.ID;
-import dev.latvian.mods.rhino.Context;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import dev.latvian.mods.kubejs.event.KubeStartupEvent;
+import dev.latvian.mods.kubejs.plugin.builtin.wrapper.ItemWrapper;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
+import dev.latvian.mods.kubejs.util.ID;
+import dev.latvian.mods.rhino.Context;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 

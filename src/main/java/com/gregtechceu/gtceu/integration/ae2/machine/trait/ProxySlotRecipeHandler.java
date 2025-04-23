@@ -12,12 +12,12 @@ import com.gregtechceu.gtceu.integration.ae2.machine.trait.InternalSlotRecipeHan
 
 import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 
-import net.minecraft.world.item.crafting.Ingredient;
-
-import lombok.Getter;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -118,7 +118,8 @@ public final class ProxySlotRecipeHandler {
         }
 
         @Override
-        public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left, boolean simulate) {
+        public List<SizedIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedIngredient> left,
+                                                       boolean simulate) {
             if (proxy == null) return left;
             return proxy.handleRecipeInner(io, recipe, left, simulate);
         }
@@ -174,7 +175,7 @@ public final class ProxySlotRecipeHandler {
 
         @Override
         public List<SizedFluidIngredient> handleRecipeInner(IO io, GTRecipe recipe, List<SizedFluidIngredient> left,
-                                                       boolean simulate) {
+                                                            boolean simulate) {
             if (proxy == null) return left;
             return proxy.handleRecipeInner(io, recipe, left, simulate);
         }

@@ -13,8 +13,6 @@ import com.gregtechceu.gtceu.common.cover.voiding.AdvancedItemVoidingCover;
 import com.gregtechceu.gtceu.common.cover.voiding.FluidVoidingCover;
 import com.gregtechceu.gtceu.common.cover.voiding.ItemVoidingCover;
 
-import net.neoforged.fml.ModLoader;
-
 import it.unimi.dsi.fastutil.ints.Int2ObjectFunction;
 
 import java.util.Arrays;

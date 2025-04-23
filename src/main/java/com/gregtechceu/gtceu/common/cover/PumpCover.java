@@ -43,6 +43,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -216,7 +217,8 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
         }
 
         if (timer % 20 == 0) {
-            this.mBLeftToTransferLastSecond = Mth.floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
+            this.mBLeftToTransferLastSecond = Mth
+                    .floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
         }
 
         subscriptionHandler.updateSubscription();

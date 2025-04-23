@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -10,8 +9,6 @@ import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.mojang.serialization.MapCodec;
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -29,11 +26,14 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -49,10 +49,9 @@ import java.util.stream.Stream;
 public class DikeVeinGenerator extends VeinGenerator {
 
     public static final MapCodec<DikeVeinGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    Codec.list(DikeBlockDefinition.CODEC).fieldOf("blocks").forGetter(it -> it.blocks),
-                    Codec.INT.fieldOf("min_y").forGetter(it -> it.minYLevel),
-                    Codec.INT.fieldOf("max_y").forGetter(it -> it.maxYLevel)
-    ).apply(instance, DikeVeinGenerator::new));
+            Codec.list(DikeBlockDefinition.CODEC).fieldOf("blocks").forGetter(it -> it.blocks),
+            Codec.INT.fieldOf("min_y").forGetter(it -> it.minYLevel),
+            Codec.INT.fieldOf("max_y").forGetter(it -> it.maxYLevel)).apply(instance, DikeVeinGenerator::new));
 
     public List<DikeBlockDefinition> blocks;
     @Setter
@@ -116,8 +115,8 @@ public class DikeVeinGenerator extends VeinGenerator {
     }
 
     private void placeBlock(
-            BulkSectionAccess level, LevelChunkSection section, long randomSeed, BlockPos pos,
-            OreVeinDefinition entry) {
+                            BulkSectionAccess level, LevelChunkSection section, long randomSeed, BlockPos pos,
+                            OreVeinDefinition entry) {
         var rand = new XoroshiroRandomSource(randomSeed);
         List<? extends Map.Entry<Integer, DikeBlockDefinition>> entries = blocks.stream()
                 .map(b -> Map.entry(b.weight, b)).toList();
@@ -202,7 +201,5 @@ public class DikeVeinGenerator extends VeinGenerator {
         public DikeBlockDefinition(List<TargetBlockState> block, int weight, int minY, int maxY) {
             this(Either.left(block), weight, minY, maxY);
         }
-
     }
-
 }

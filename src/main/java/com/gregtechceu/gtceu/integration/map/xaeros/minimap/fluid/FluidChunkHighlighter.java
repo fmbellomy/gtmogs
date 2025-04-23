@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.integration.map.xaeros.minimap.fluid;
 
+import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.integration.map.GroupingMapRenderer;
 import com.gregtechceu.gtceu.integration.map.xaeros.XaerosRenderer;
 
@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-import org.jetbrains.annotations.Nullable;
+
 import xaero.common.minimap.highlight.ChunkHighlighter;
 import xaero.common.minimap.info.render.compile.InfoDisplayCompiler;
 

@@ -20,7 +20,6 @@ import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
-
 /**
  * A widget for selecting a value from an enum or a subset of its values.
  */

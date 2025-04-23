@@ -12,25 +12,25 @@ import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.api.registry.registrate.forge.GTClientFluidTypeExtensions;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import com.tterrag.registrate.AbstractRegistrate;
-import com.tterrag.registrate.providers.ProviderType;
-import com.tterrag.registrate.util.OneTimeEventReceiver;
-import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluid;
-
-import com.google.common.base.Preconditions;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.Tolerate;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.SoundActions;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+
+import com.google.common.base.Preconditions;
+import com.tterrag.registrate.AbstractRegistrate;
+import com.tterrag.registrate.providers.ProviderType;
+import com.tterrag.registrate.util.OneTimeEventReceiver;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.experimental.Tolerate;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -267,7 +267,7 @@ public class FluidBuilder {
             throw new IllegalStateException("Could not determine fluid name");
         }
 
-        //noinspection ConstantValue: in case of mistakes
+        // noinspection ConstantValue: in case of mistakes
         if (state == null) {
             if (key.getDefaultFluidState() != null) {
                 state = key.getDefaultFluidState();
@@ -283,10 +283,10 @@ public class FluidBuilder {
         determineViscosity(material);
 
         final String langKey = this.translation != null ? this.translation : key.getTranslationKeyFor(material);
-        //noinspection DataFlowIssue
+        // noinspection DataFlowIssue
         var builder = registrate.fluid(this.name, this.still, this.flowing,
-                        (p, $1, $2) -> makeFluidType(registrate, p, material, key, langKey),
-                        (p) -> new GTFluid.Flowing(this.state, this.burnTime, p))
+                (p, $1, $2) -> makeFluidType(registrate, p, material, key, langKey),
+                (p) -> new GTFluid.Flowing(this.state, this.burnTime, p))
                 .source((p) -> new GTFluid.Source(this.state, this.burnTime, p))
                 .setData(ProviderType.LANG, NonNullBiConsumer.noop());
         if (this.hasFluidBlock) {
@@ -326,7 +326,8 @@ public class FluidBuilder {
         }
 
         if (hasCustomFlowing) {
-            flowing = ResourceLocation.fromNamespaceAndPath(material.getModid(), "block/fluids/fluid." + name + "_flow");
+            flowing = ResourceLocation.fromNamespaceAndPath(material.getModid(),
+                    "block/fluids/fluid." + name + "_flow");
         } else {
             // FIXME this is actually wrong, flowing fluids should have 32x32 textures (double the size of still ones).
             flowing = still;

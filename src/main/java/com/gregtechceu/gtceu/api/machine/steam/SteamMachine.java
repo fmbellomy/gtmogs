@@ -9,9 +9,7 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-
 import lombok.Getter;
-
 
 public abstract class SteamMachine extends MetaMachine implements ITieredMachine {
 

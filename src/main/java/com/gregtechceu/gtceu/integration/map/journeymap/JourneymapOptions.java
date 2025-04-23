@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.integration.map.journeymap;
 
 import com.gregtechceu.gtceu.GTCEu;
+
 import journeymap.api.v2.client.IClientAPI;
 import journeymap.api.v2.client.option.BooleanOption;
 import journeymap.api.v2.client.option.OptionCategory;

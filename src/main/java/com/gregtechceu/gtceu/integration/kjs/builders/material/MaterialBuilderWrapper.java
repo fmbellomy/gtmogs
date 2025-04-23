@@ -11,10 +11,12 @@ import com.gregtechceu.gtceu.api.material.material.properties.*;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MaterialStackWrapper;
+
+import net.minecraft.resources.ResourceLocation;
+
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.typings.Info;
 import dev.latvian.mods.kubejs.typings.Param;
-import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -33,11 +35,11 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
     /*
      * Material Types
      */
-    
+
     @Info("""
             Add a `FluidProperty` to this Material.<br/>
             Will be created as a `FluidStorageKeys#LIQUID`, without a Fluid Block.
-           
+
             @throws IllegalArgumentException If a `FluidProperty` has already been added to this Material.
             """)
     public MaterialBuilderWrapper fluid() {
@@ -45,7 +47,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a `FluidProperty` to this Material.<br/>
             Will be created with the specified state a with standard `FluidBuilder` defaults.
@@ -57,7 +58,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a `FluidProperty` to this Material.<br/>
             <p>
@@ -68,10 +68,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a liquid for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper liquid() {
@@ -79,10 +78,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a liquid for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper liquid(@NotNull FluidBuilder builder) {
@@ -95,10 +93,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a plasma for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper plasma() {
@@ -106,10 +103,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a plasma for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper plasma(@NotNull FluidBuilder builder) {
@@ -122,10 +118,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a gas for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper gas() {
@@ -133,10 +128,9 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a gas for this material.
-           
+
             @see #fluid(FluidStorageKey, FluidState)
             """)
     public MaterialBuilderWrapper gas(@NotNull FluidBuilder builder) {
@@ -149,7 +143,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add a `DustProperty` to this Material.<br/>
             Will be created with a Harvest Level of 2 and no Burn Time (Furnace Fuel).
@@ -159,7 +152,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add a `DustProperty` to this Material.<br/>
             Will be created with no Burn Time (Furnace Fuel).
@@ -167,21 +159,20 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """)
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper dust(int harvestLevel) {
         internal.dust(harvestLevel);
         return this;
     }
 
-    
     @Info(value = """
             Add a `DustProperty` to this Material.
-           
+
             @param harvestLevel The Harvest Level of this block for Mining.<br/>
                                 If this Material also has a `ToolProperty`, this value will
                                 also be used to determine the tool's Mining Level.
@@ -191,23 +182,22 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """),
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """),
                   @Param(name = "burnTime",
                          value = """
-                                The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
-                                If this Material already had a Burn Time defined, it will be overridden.
-                                """)
+                                 The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
+                                 If this Material already had a Burn Time defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper dust(int harvestLevel, int burnTime) {
         internal.dust(harvestLevel, burnTime);
         return this;
     }
 
-    
     @Info("""
             Add a `WoodProperty` to this Material.<br/>
             Useful for marking a Material as Wood for various additional behaviors.<br/>
@@ -218,7 +208,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add a `WoodProperty` to this Material.<br/>
             Useful for marking a Material as Wood for various additional behaviors.<br/>
@@ -227,18 +216,17 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """)
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper wood(int harvestLevel) {
         internal.wood(harvestLevel);
         return this;
     }
 
-    
     @Info(value = """
             Add a `WoodProperty` to this Material.<br/>
             Useful for marking a Material as Wood for various additional behaviors.<br/>
@@ -246,23 +234,22 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """),
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """),
                   @Param(name = "burnTime",
                          value = """
-                                The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
-                                If this Material already had a Burn Time defined, it will be overridden.
-                                """)
+                                 The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
+                                 If this Material already had a Burn Time defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper wood(int harvestLevel, int burnTime) {
         internal.wood(harvestLevel, burnTime);
         return this;
     }
 
-    
     @Info("""
             Add an `IngotProperty` to this Material.<br/>
             Will be created with a Harvest Level of 2 and no Burn Time (Furnace Fuel).<br/>
@@ -273,7 +260,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add an `IngotProperty` to this Material.<br/>
             Will be created with no Burn Time (Furnace Fuel).<br/>
@@ -282,18 +268,17 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """)
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper ingot(int harvestLevel) {
         internal.ingot(harvestLevel);
         return this;
     }
 
-    
     @Info(value = """
             Add an `IngotProperty` to this Material.<br/>
             Will automatically add a `DustProperty` to this Material if it does not already have one.
@@ -301,23 +286,22 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """),
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """),
                   @Param(name = "burnTime",
                          value = """
-                                The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
-                                If this Material already had a Burn Time defined, it will be overridden.
-                                """)
+                                 The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
+                                 If this Material already had a Burn Time defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper ingot(int harvestLevel, int burnTime) {
         internal.ingot(harvestLevel, burnTime);
         return this;
     }
 
-    
     @Info("""
             Add a `GemProperty` to this Material.<br/>
             Will be created with a Harvest Level of 2 and no Burn Time (Furnace Fuel).<br/>
@@ -328,7 +312,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add a `GemProperty` to this Material.<br/>
             Will be created with no Burn Time (Furnace Fuel).<br/>
@@ -337,22 +320,21 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """)
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper gem(int harvestLevel) {
         internal.gem(harvestLevel);
         return this;
     }
 
-    
     @Info(value = """
             Add a `GemProperty` to this Material.<br/>
             Will automatically add a `DustProperty` to this Material if it does not already have one.
-           
+
             @param harvestLevel The Harvest Level of this block for Mining.<br/>
                                 If this Material also has a `ToolProperty`, this value will
                                 also be used to determine the tool's Mining level.<br/>
@@ -363,23 +345,22 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """),
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """),
                   @Param(name = "burnTime",
                          value = """
-                                The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
-                                If this Material already had a Burn Time defined, it will be overridden.
-                                """)
+                                 The Burn Time (in ticks) of this Material as a Furnace Fuel.<br/>
+                                 If this Material already had a Burn Time defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper gem(int harvestLevel, int burnTime) {
         internal.gem(harvestLevel, burnTime);
         return this;
     }
 
-    
     @Info("""
             Add a `PolymerProperty` to this Material.<br/>
             Will be created with a Harvest Level of 2 and no Burn Time (Furnace Fuel).<br/>
@@ -390,7 +371,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add a `PolymerProperty` to this Material.<br/>
             Will automatically add a `DustProperty` to this Material if it does not already have one.
@@ -399,11 +379,11 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
           params = {
                   @Param(name = "harvestLevel",
                          value = """
-                    The Harvest Level of this block for Mining.<br/>
-                    If this Material also has a `ToolProperty`, this value will
-                    also be used to determine the tool's Mining level.<br/>
-                    If this Material already had a Harvest Level defined, it will be overridden.
-                    """)
+                                 The Harvest Level of this block for Mining.<br/>
+                                 If this Material also has a `ToolProperty`, this value will
+                                 also be used to determine the tool's Mining level.<br/>
+                                 If this Material already had a Harvest Level defined, it will be overridden.
+                                 """)
           })
     public MaterialBuilderWrapper polymer(int harvestLevel) {
         internal.polymer(harvestLevel);
@@ -415,12 +395,11 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Set the Color of this Material.<br/>
             Defaults to 0xFFFFFF unless `MaterialBuilderWrapper#colorAverage()` was called, where
             it will be a weighted average of the components of the Material.
-           
+
             @param color The RGB-formatted Color.
             """)
     public MaterialBuilderWrapper color(int color) {
@@ -428,12 +407,11 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Set the Color of this Material.<br/>
             Defaults to 0xFFFFFF unless `MaterialBuilderWrapper#colorAverage()` was called, where
             it will be a weighted average of the components of the Material.
-           
+
             @param color         The RGB-formatted Color.
             @param hasFluidColor Whether the fluid should be colored or not.
             """)
@@ -442,12 +420,11 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Set the secondary color of this Material.<br/>
             Defaults to 0xFFFFFF unless `MaterialBuilderWrapper#colorAverage()` was called, where
             it will be a weighted average of the components of the Material.
-           
+
             @param color The RGB-formatted Color.
             """)
     public MaterialBuilderWrapper secondaryColor(int color) {
@@ -460,7 +437,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Set the `MaterialIconSet` of this Material.<br/>
             Defaults vary depending on if the Material has a:<br/>
@@ -471,7 +447,7 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
             Default will be determined by first-found Property in this order, unless specified.
             """,
           params = {
-            @Param(name = "iconSet", value = "The `MaterialIconSet` of this Material.")
+                  @Param(name = "iconSet", value = "The `MaterialIconSet` of this Material.")
           })
     public MaterialBuilderWrapper iconSet(MaterialIconSet iconSet) {
         internal.iconSet(iconSet);
@@ -483,7 +459,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Add `MaterialFlags` to this Material.<br/>
             Dependent Flags (for example, `MaterialFlags#GENERATE_LONG_ROD` requiring
@@ -494,15 +469,16 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info(value = """
             Add `MaterialFlags` to this Material.<br/>
             Dependent Flags (for example, `MaterialFlags#GENERATE_LONG_ROD` requiring
             `MaterialFlags#GENERATE_ROD`) will be automatically applied.
             """,
           params = {
-            @Param(name = "f1", value = "A `Collection` of `MaterialFlag`. Provided this way for easy Flag presets to be applied."),
-            @Param(name = "f2", value = "An Array of `MaterialFlag`. If no `Collection` is required, use `MaterialBuilderWrapper#flags(MaterialFlag...)`.")
+                  @Param(name = "f1",
+                         value = "A `Collection` of `MaterialFlag`. Provided this way for easy Flag presets to be applied."),
+                  @Param(name = "f2",
+                         value = "An Array of `MaterialFlag`. If no `Collection` is required, use `MaterialBuilderWrapper#flags(MaterialFlag...)`.")
           })
     // rename for kjs conflicts
     public MaterialBuilderWrapper appendFlags(Collection<MaterialFlag> f1, MaterialFlag... f2) {
@@ -510,7 +486,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Added `TagPrefix` to be ignored by this Material.<br/>
             """)
@@ -529,7 +504,6 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
         return this;
     }
 
-    
     @Info("""
             Replaced the old toolStats methods which took many parameters.
             Use `ToolProperty.Builder` instead to create a Tool Property.
@@ -582,19 +556,19 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
     }
 
     public MaterialBuilderWrapper hazard(HazardProperty.HazardTrigger trigger, MedicalCondition condition,
-                                   float progressionMultiplier) {
+                                         float progressionMultiplier) {
         internal.hazard(trigger, condition, progressionMultiplier);
         return this;
     }
 
     public MaterialBuilderWrapper hazard(HazardProperty.HazardTrigger trigger, MedicalCondition condition,
-                                   float progressionMultiplier, boolean applyToDerivatives) {
+                                         float progressionMultiplier, boolean applyToDerivatives) {
         internal.hazard(trigger, condition, progressionMultiplier, applyToDerivatives);
         return this;
     }
 
     public MaterialBuilderWrapper hazard(HazardProperty.HazardTrigger trigger, MedicalCondition condition,
-                                   boolean applyToDerivatives) {
+                                         boolean applyToDerivatives) {
         internal.hazard(trigger, condition, applyToDerivatives);
         return this;
     }
@@ -675,7 +649,7 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
     }
 
     public MaterialBuilderWrapper cableProperties(long voltage, int amperage, int loss, boolean isSuperCon,
-                                            int criticalTemperature) {
+                                                  int criticalTemperature) {
         internal.cableProperties(voltage, amperage, loss, isSuperCon, criticalTemperature);
         return this;
     }
@@ -686,7 +660,7 @@ public class MaterialBuilderWrapper extends BuilderBase<Material> {
     }
 
     public MaterialBuilderWrapper fluidPipeProperties(int maxTemp, int throughput, boolean gasProof, boolean acidProof,
-                                                boolean cryoProof, boolean plasmaProof) {
+                                                      boolean cryoProof, boolean plasmaProof) {
         internal.fluidPipeProperties(maxTemp, throughput, gasProof, acidProof, cryoProof, plasmaProof);
         return this;
     }

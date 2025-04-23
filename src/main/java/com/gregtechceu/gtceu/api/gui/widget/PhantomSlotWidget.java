@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-
 @LDLRegister(name = "gtm_phantom_item_slot", group = "widget.gtm_container", priority = 50)
 public class PhantomSlotWidget extends SlotWidget implements IGhostIngredientTarget, IConfigurableWidget {
 

@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.integration.jei.subtype;
 
-import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.fluids.FluidStack;
 
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -37,5 +37,4 @@ public class PotionFluidSubtypeInterpreter implements ISubtypeInterpreter<FluidS
         String potionEffectId = contents.potion().map(Holder::getRegisteredName).orElse("none");
         return itemDescriptionId + ".effect_id." + potionEffectId;
     }
-
 }

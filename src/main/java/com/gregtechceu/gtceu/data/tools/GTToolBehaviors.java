@@ -6,8 +6,6 @@ import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.item.tool.behavior.*;
 
-import net.neoforged.fml.ModLoader;
-
 public class GTToolBehaviors {
 
     static {

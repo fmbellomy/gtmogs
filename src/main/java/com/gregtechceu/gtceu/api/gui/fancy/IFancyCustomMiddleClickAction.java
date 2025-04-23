@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.gui.fancy;
 
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
 import java.util.function.BiConsumer;

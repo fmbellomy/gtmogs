@@ -5,7 +5,6 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import org.jetbrains.annotations.NotNull;
 
-
 public abstract class ItemHandlerDelegate implements IItemHandlerModifiable {
 
     public IItemHandlerModifiable delegate;

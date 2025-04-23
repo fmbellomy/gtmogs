@@ -14,13 +14,13 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import lombok.Getter;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -121,7 +121,8 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
             if (io == IO.OUT && !allowSameFluids) {
                 CustomFluidTank existing = null;
                 for (var storage : storages) {
-                    if (!storage.getFluid().isEmpty() && FluidStack.isSameFluidSameComponents(storage.getFluid(), fluids[0])) {
+                    if (!storage.getFluid().isEmpty() &&
+                            FluidStack.isSameFluidSameComponents(storage.getFluid(), fluids[0])) {
                         existing = storage;
                         break;
                     }

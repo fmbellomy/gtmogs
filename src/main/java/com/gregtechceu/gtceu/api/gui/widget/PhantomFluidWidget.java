@@ -36,12 +36,12 @@ import lombok.Getter;
 import lombok.Setter;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 @LDLRegister(name = "gtm_phantom_fluid_slot", group = "widget.gtm_container", priority = 50)
@@ -107,7 +107,8 @@ public class PhantomFluidWidget extends TankWidget implements IGhostIngredientTa
     @OnlyIn(Dist.CLIENT)
     public List<Target> getPhantomTargets(Object ingredient) {
         if (GTCEu.Mods.isREILoaded() && ingredient instanceof dev.architectury.fluid.FluidStack fluidStack) {
-            ingredient = new FluidStack(fluidStack.getFluid().builtInRegistryHolder(), (int) fluidStack.getAmount(), fluidStack.getPatch());
+            ingredient = new FluidStack(fluidStack.getFluid().builtInRegistryHolder(), (int) fluidStack.getAmount(),
+                    fluidStack.getPatch());
         } else if (GTCEu.Mods.isEMILoaded() && ingredient instanceof EmiStack emiStack) {
             var key = emiStack.getKey();
             if (key instanceof Fluid f) {

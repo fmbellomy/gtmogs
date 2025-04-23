@@ -20,7 +20,7 @@ public class ServerCacheSavedData extends SavedData {
     public static ServerCacheSavedData init(ServerLevel world, final DimensionCache backingCache) {
         ServerCacheSavedData instance = world.getDataStorage()
                 .computeIfAbsent(new Factory<>(() -> new ServerCacheSavedData(backingCache),
-                                (tag, registries) -> new ServerCacheSavedData(backingCache, tag, registries)),
+                        (tag, registries) -> new ServerCacheSavedData(backingCache, tag, registries)),
                         DATA_NAME);
 
         instance.backingCache = backingCache;

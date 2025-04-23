@@ -1,17 +1,17 @@
 package com.gregtechceu.gtceu.integration.rei;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.data.fluid.GTFluids;
-import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluid;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
+import com.gregtechceu.gtceu.data.fluid.GTFluids;
 import com.gregtechceu.gtceu.data.item.GTItems;
+import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 import com.gregtechceu.gtceu.integration.rei.circuit.GTProgrammedCircuitCategory;
 import com.gregtechceu.gtceu.integration.rei.multipage.MultiblockInfoDisplayCategory;
@@ -23,9 +23,9 @@ import com.gregtechceu.gtceu.integration.rei.recipe.GTRecipeREICategory;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.fluids.FluidStack;
+
 import me.shedaniel.rei.api.client.plugins.REIClientPlugin;
 import me.shedaniel.rei.api.client.registry.category.CategoryRegistry;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;
@@ -123,7 +123,8 @@ public class GTREIPlugin implements REIClientPlugin {
         BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack stack = PotionFluidHelper.getFluidFromPotion(potion, PotionFluidHelper.BOTTLE_AMOUNT);
             stacks.add(EntryStacks
-                    .of(dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentsPatch())));
+                    .of(dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(),
+                            stack.getComponentsPatch())));
         });
         registry.group(GTCEu.id("potion_fluids"), Component.translatable("gtceu.rei.group.potion_fluids"), stacks);
     }
@@ -146,7 +147,8 @@ public class GTREIPlugin implements REIClientPlugin {
         BuiltInRegistries.POTION.holders().forEach(potion -> {
             FluidStack stack = PotionFluidHelper.getFluidFromPotion(potion, PotionFluidHelper.BOTTLE_AMOUNT);
             registry.addEntry(EntryStacks.of(
-                    dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(), stack.getComponentsPatch())));
+                    dev.architectury.fluid.FluidStack.create(stack.getFluid(), stack.getAmount(),
+                            stack.getComponentsPatch())));
         });
     }
 

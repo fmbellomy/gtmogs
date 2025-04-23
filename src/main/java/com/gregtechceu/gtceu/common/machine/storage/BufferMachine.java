@@ -36,6 +36,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Set;
 
 public class BufferMachine extends TieredMachine implements IMachineLife, IAutoOutputBoth, IFancyUIMachine {

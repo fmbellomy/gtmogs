@@ -4,6 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class WorldIDSaveData extends SavedData {
     public static void init(ServerLevel level) {
         instance = level.getDataStorage()
                 .computeIfAbsent(new SavedData.Factory<>(() -> new WorldIDSaveData(level),
-                                (tag, provider) -> new WorldIDSaveData(tag)),
+                        (tag, provider) -> new WorldIDSaveData(tag)),
                         DATA_NAME);
     }
 

@@ -21,8 +21,8 @@ import com.gregtechceu.gtceu.api.machine.trait.MachineTrait;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTMath;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
@@ -55,12 +55,12 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -175,7 +175,8 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     @Override
     public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {
         super.applyImplicitComponents(componentInput);
-        LargeItemContent storage = componentInput.getOrDefault(GTDataComponents.LARGE_ITEM_CONTENT, LargeItemContent.EMPTY);
+        LargeItemContent storage = componentInput.getOrDefault(GTDataComponents.LARGE_ITEM_CONTENT,
+                LargeItemContent.EMPTY);
         stored = storage.stored();
         storedAmount = storage.amount();
     }
@@ -307,7 +308,8 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
                 var drained = cache.extractItem(0, player.isShiftKeyDown() ? stored.getMaxStackSize() : 1, false);
                 if (!drained.isEmpty()) {
                     if (!player.addItem(drained)) {
-                        net.minecraft.world.level.block.Block.popResourceFromFace(world, getPos(), getFrontFacing(), drained);
+                        net.minecraft.world.level.block.Block.popResourceFromFace(world, getPos(), getFrontFacing(),
+                                drained);
                     }
                 }
             }
@@ -316,7 +318,8 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     }
 
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                  Direction gridSide,
                                                   BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
             return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
@@ -338,7 +341,8 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     }
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                       Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (!isRemote()) {
             if (gridSide == getOutputFacingItems()) {
@@ -400,7 +404,8 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
                                     var extracted = cache.extractItem(0,
                                             (int) Math.min(storedAmount, stored.getMaxStackSize()), false);
                                     if (!group.getGui().entityPlayer.addItem(extracted)) {
-                                        net.minecraft.world.level.block.Block.popResource(group.getGui().entityPlayer.level(),
+                                        net.minecraft.world.level.block.Block.popResource(
+                                                group.getGui().entityPlayer.level(),
                                                 group.getGui().entityPlayer.getOnPos(), extracted);
                                     }
                                 }

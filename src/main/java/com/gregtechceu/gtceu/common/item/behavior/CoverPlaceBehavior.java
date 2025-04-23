@@ -6,8 +6,8 @@ import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.IItemComponent;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.Item;
@@ -58,8 +58,8 @@ public record CoverPlaceBehavior(CoverDefinition coverDefinition) implements IIn
             }
         } else if (itemStack.canPerformAction(GTItemAbilities.INTERACT_WITH_COVER) ||
                 itemStack.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
-            return hasCoverSupplier == null || hasCoverSupplier.getAsBoolean();
-        }
+                    return hasCoverSupplier == null || hasCoverSupplier.getAsBoolean();
+                }
         return false;
     }
 }

@@ -2,15 +2,14 @@ package com.gregtechceu.gtceu.common.particle;
 
 import com.gregtechceu.gtceu.data.particle.GTParticleTypes;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.codec.StreamCodec;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public record HazardParticleOptions(int color, float scale) implements ParticleOptions {
 

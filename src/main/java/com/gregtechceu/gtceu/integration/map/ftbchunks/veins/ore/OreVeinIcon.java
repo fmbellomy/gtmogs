@@ -32,6 +32,7 @@ import dev.ftb.mods.ftblibrary.ui.input.Key;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.util.TooltipList;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 
 public class OreVeinIcon implements MapIcon {

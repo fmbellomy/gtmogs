@@ -11,6 +11,7 @@ import com.lowdragmc.lowdraglib.emi.IGui2Renderable;
 
 import net.minecraft.Util;
 import net.minecraft.network.chat.Component;
+
 import dev.emi.emi.api.EmiRegistry;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.recipe.VanillaEmiRecipeCategories;

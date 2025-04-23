@@ -1,13 +1,11 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
-
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
-import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
-import com.mojang.serialization.Codec;
-import io.netty.buffer.ByteBuf;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -19,9 +17,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-
-import lombok.Getter;
 import net.neoforged.neoforge.common.ItemAbility;
+
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -106,5 +106,4 @@ public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehav
             return id;
         }
     }
-
 }

@@ -2,11 +2,12 @@ package com.gregtechceu.gtceu.data.datagen;
 
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.data.datagen.datamap.DataMapsHandler;
-import com.gregtechceu.gtceu.data.datagen.tag.*;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
+import com.gregtechceu.gtceu.data.datagen.tag.*;
+
+import net.minecraft.data.DataProvider;
 
 import com.tterrag.registrate.providers.ProviderType;
-import net.minecraft.data.DataProvider;
 
 public class GTRegistrateDatagen {
 

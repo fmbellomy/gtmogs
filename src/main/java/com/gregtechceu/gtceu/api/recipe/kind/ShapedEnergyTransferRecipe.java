@@ -4,12 +4,9 @@ import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.SimpleEnergyContent;
 import com.gregtechceu.gtceu.core.mixins.ShapedRecipeAccessor;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.codec.StreamCodecUtils;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,6 +15,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
 
 /**
@@ -89,18 +89,18 @@ public class ShapedEnergyTransferRecipe extends ShapedRecipe {
 
         public static final MapCodec<ShapedEnergyTransferRecipe> CODEC = RecordCodecBuilder
                 .mapCodec(instance -> instance.group(
-                                Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
-                                CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC)
-                                        .forGetter(ShapedRecipe::category),
-                                ShapedRecipePattern.MAP_CODEC.forGetter(val -> val.pattern),
-                                Ingredient.CODEC.fieldOf("chargeIngredient")
-                                        .forGetter(ShapedEnergyTransferRecipe::getChargeIngredient),
-                                Codec.BOOL.fieldOf("overrideCharge").forGetter(ShapedEnergyTransferRecipe::isOverrideCharge),
-                                Codec.BOOL.fieldOf("transferMaxCharge")
-                                        .forGetter(ShapedEnergyTransferRecipe::isTransferMaxCharge),
-                                ItemStack.CODEC.fieldOf("result").forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
-                                Codec.BOOL.optionalFieldOf("show_notification", true)
-                                        .forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification()))
+                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC)
+                                .forGetter(ShapedRecipe::category),
+                        ShapedRecipePattern.MAP_CODEC.forGetter(val -> val.pattern),
+                        Ingredient.CODEC.fieldOf("chargeIngredient")
+                                .forGetter(ShapedEnergyTransferRecipe::getChargeIngredient),
+                        Codec.BOOL.fieldOf("overrideCharge").forGetter(ShapedEnergyTransferRecipe::isOverrideCharge),
+                        Codec.BOOL.fieldOf("transferMaxCharge")
+                                .forGetter(ShapedEnergyTransferRecipe::isTransferMaxCharge),
+                        ItemStack.CODEC.fieldOf("result").forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
+                        Codec.BOOL.optionalFieldOf("show_notification", true)
+                                .forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification()))
                         .apply(instance, ShapedEnergyTransferRecipe::new));
         public static final StreamCodec<RegistryFriendlyByteBuf, ShapedEnergyTransferRecipe> STREAM_CODEC = StreamCodecUtils
                 .composite(

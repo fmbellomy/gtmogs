@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.client.util;
 
 import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -15,12 +15,13 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+
 import java.util.*;
 import java.util.function.Function;
 
@@ -137,7 +138,8 @@ public class RenderUtil {
         }
 
         var fluidContent = contents.stream()
-                .filter(content -> content.content instanceof SizedFluidIngredient ingredient && !ingredient.ingredient().hasNoFluids())
+                .filter(content -> content.content instanceof SizedFluidIngredient ingredient &&
+                        !ingredient.ingredient().hasNoFluids())
                 .findAny();
         if (fluidContent.isEmpty()) {
             return null;

@@ -1,11 +1,12 @@
 package com.gregtechceu.gtceu.core;
 
-import it.unimi.dsi.fastutil.objects.ObjectList;
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 
 import java.util.Map;
 
@@ -34,5 +35,4 @@ public interface IMappedRegistryAccess<T> {
     default Map<ResourceKey<T>, RegistrationInfo> gtceu$getRegistrationInfos() {
         throw new AssertionError();
     }
-
 }

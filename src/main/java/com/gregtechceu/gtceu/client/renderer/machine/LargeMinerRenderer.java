@@ -16,8 +16,8 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,8 +35,10 @@ public class LargeMinerRenderer extends WorkableCasingMachineRenderer {
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
                               Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand,
-                              @Nullable Direction modelFacing, ModelState modelState, @NotNull ModelData data, RenderType renderType) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
+                              @Nullable Direction modelFacing, ModelState modelState, @NotNull ModelData data,
+                              RenderType renderType) {
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data,
+                renderType);
         if (machine instanceof IMultiController controller && controller.isFormed() && side == Direction.DOWN &&
                 modelFacing != null) {
             quads.add(FaceQuad.bakeFace(BEHIND_BLOCK, modelFacing,

@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.worldgen.bedrockore;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.integration.kjs.builders.worldgen.BedrockOreBuilder;
 
 import net.minecraft.core.Holder;
@@ -15,6 +15,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
@@ -27,6 +28,7 @@ import java.util.*;
 
 @Accessors(fluent = true, chain = true)
 public class BedrockOreDefinition {
+
     // spotless:off
     public static final MapCodec<Pair<Material, Integer>> MATERIAL = Codec
             .mapPair(GTRegistries.MATERIALS.byNameCodec().fieldOf("material"), Codec.INT.fieldOf("chance"));
@@ -138,5 +140,4 @@ public class BedrockOreDefinition {
     public static BedrockOreBuilder builder(ResourceLocation name) {
         return new BedrockOreBuilder(name);
     }
-
 }

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe.components;
 
 import com.gregtechceu.gtceu.GTCEu;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
@@ -15,10 +16,12 @@ import java.util.Map;
 public record JavaMapRecipeComponent<K, V>(RecipeComponent<K> key, RecipeComponent<V> value)
         implements RecipeComponent<Map<K, V>> {
 
-    public static final RecipeComponentType<Map<?, ?>> TYPE = RecipeComponentType.dynamic(GTCEu.id("java_map"), (RecipeComponentCodecFactory<JavaMapRecipeComponent<?, ?>>) ctx -> RecordCodecBuilder.mapCodec(instance -> instance.group(
-            ctx.codec().fieldOf("key").forGetter(JavaMapRecipeComponent::key),
-            ctx.codec().fieldOf("value").forGetter(JavaMapRecipeComponent::value)
-    ).apply(instance, JavaMapRecipeComponent::new)));
+    public static final RecipeComponentType<Map<?, ?>> TYPE = RecipeComponentType.dynamic(GTCEu.id("java_map"),
+            (RecipeComponentCodecFactory<JavaMapRecipeComponent<?, ?>>) ctx -> RecordCodecBuilder
+                    .mapCodec(instance -> instance.group(
+                            ctx.codec().fieldOf("key").forGetter(JavaMapRecipeComponent::key),
+                            ctx.codec().fieldOf("value").forGetter(JavaMapRecipeComponent::value))
+                            .apply(instance, JavaMapRecipeComponent::new)));
 
     @Override
     public RecipeComponentType<?> type() {

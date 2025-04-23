@@ -55,6 +55,7 @@ public class CustomItemStackHandler extends ItemStackHandler
     /**
      * Don't use unless necessary.<br/>
      * (A good use case is loading/saving this container's items from/to a {@link ItemContainerContents} component)
+     * 
      * @return the internal list of items in this handler
      */
     @ApiStatus.Internal

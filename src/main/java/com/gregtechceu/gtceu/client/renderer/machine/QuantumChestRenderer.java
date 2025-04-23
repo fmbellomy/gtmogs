@@ -4,18 +4,17 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.common.machine.storage.CreativeChestMachine;
 import com.gregtechceu.gtceu.common.machine.storage.QuantumChestMachine;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TransformTexture;
 
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -33,13 +32,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Quaternionf;
+
 import java.util.List;
 
 import static com.gregtechceu.gtceu.utils.GTMatrixUtils.*;
@@ -59,7 +60,8 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderBaseModel(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                                ModelState modelState, @Nullable Direction side, @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+                                ModelState modelState, @Nullable Direction side, @NotNull RandomSource rand,
+                                @NotNull ModelData data, RenderType renderType) {
         quads.addAll(getRotatedModel(modelState).getQuads(definition.defaultBlockState(), side, rand));
     }
 
@@ -83,7 +85,8 @@ public class QuantumChestRenderer extends TieredHullMachineRenderer {
             var storage = stack.get(GTDataComponents.LARGE_ITEM_CONTENT);
             ItemStack itemStack = storage.stored();
             long storedAmount = storage.amount();
-            float tick = Minecraft.getInstance().level.getGameTime() + Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
+            float tick = Minecraft.getInstance().level.getGameTime() +
+                    Minecraft.getInstance().getTimer().getGameTimeDeltaTicks();
             // Don't need to handle locked items here since they don't get saved to the item
             renderChest(poseStack, buffer, Direction.NORTH, itemStack, storedAmount, tick,
                     ItemStack.EMPTY, stack.is(CREATIVE_CHEST_ITEM));

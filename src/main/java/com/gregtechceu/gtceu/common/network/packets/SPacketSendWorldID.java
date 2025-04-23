@@ -4,17 +4,14 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 
-import com.lowdragmc.lowdraglib.networking.IHandlerContext;
-import com.lowdragmc.lowdraglib.networking.IPacket;
-
-import lombok.AllArgsConstructor;
 import net.minecraft.network.FriendlyByteBuf;
-
-import lombok.NoArgsConstructor;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 @NoArgsConstructor
@@ -45,5 +42,4 @@ public class SPacketSendWorldID implements CustomPacketPayload {
     public @NotNull Type<SPacketSendWorldID> type() {
         return TYPE;
     }
-
 }

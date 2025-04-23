@@ -6,8 +6,6 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTRecipeWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.jei.ModularWrapper;
 
-import net.minecraft.world.item.crafting.RecipeHolder;
-
 public class GTRecipeWrapper extends ModularWrapper<Widget> {
 
     public final GTRecipe recipe;

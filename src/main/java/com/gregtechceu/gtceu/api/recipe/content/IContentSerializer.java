@@ -1,12 +1,12 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;

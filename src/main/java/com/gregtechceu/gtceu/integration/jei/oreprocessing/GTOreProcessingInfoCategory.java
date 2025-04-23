@@ -10,9 +10,9 @@ import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
-import lombok.Getter;
 import net.minecraft.network.chat.Component;
 
+import lombok.Getter;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.helpers.IJeiHelpers;

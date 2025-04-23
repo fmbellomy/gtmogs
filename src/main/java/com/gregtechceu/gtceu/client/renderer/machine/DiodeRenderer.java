@@ -12,8 +12,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -30,9 +30,11 @@ public class DiodeRenderer extends TieredHullMachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand, Direction modelFacing,
+                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand,
+                              Direction modelFacing,
                               ModelState modelState, @NotNull ModelData data, RenderType renderType) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data,
+                renderType);
         OverlayEnergyIORenderer energyIn = ENERGY_IN_1A;
         OverlayEnergyIORenderer energyOut = ENERGY_OUT_1A;
         var amps = 1;

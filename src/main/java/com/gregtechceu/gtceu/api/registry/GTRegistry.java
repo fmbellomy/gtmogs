@@ -1,10 +1,8 @@
 package com.gregtechceu.gtceu.api.registry;
 
-import com.google.common.collect.Maps;
 import com.gregtechceu.gtceu.GTCEu;
-
 import com.gregtechceu.gtceu.core.mixins.ResourceKeyAccessor;
-import com.mojang.serialization.Lifecycle;
+
 import net.minecraft.core.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.VarInt;
@@ -14,6 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 
+import com.google.common.collect.Maps;
+import com.mojang.serialization.Lifecycle;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -33,7 +33,8 @@ public class GTRegistry<T> extends MappedRegistry<T> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @ApiStatus.Internal
-    public GTRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle registryLifecycle, boolean hasIntrusiveHolders) {
+    public GTRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle registryLifecycle,
+                      boolean hasIntrusiveHolders) {
         super(key, registryLifecycle, hasIntrusiveHolders);
         if (!key.location().equals(GTRegistries.ROOT_GT_REGISTRY_NAME)) {
             GTRegistries.ROOT.register((ResourceKey) key, this, RegistrationInfo.BUILT_IN);
@@ -154,6 +155,7 @@ public class GTRegistry<T> extends MappedRegistry<T> {
 
     public StreamCodec<RegistryFriendlyByteBuf, T> streamCodec() {
         return new StreamCodec<>() {
+
             public T decode(RegistryFriendlyByteBuf buffer) {
                 return GTRegistry.this.byIdOrThrow(VarInt.read(buffer));
             }

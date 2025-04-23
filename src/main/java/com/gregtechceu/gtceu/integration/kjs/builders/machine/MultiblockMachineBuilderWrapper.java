@@ -22,13 +22,9 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.api.registry.registrate.MultiblockMachineBuilder;
+
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
-import com.tterrag.registrate.builders.BlockBuilder;
-import com.tterrag.registrate.builders.ItemBuilder;
-import com.tterrag.registrate.util.nullness.NonNullConsumer;
-import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
+
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +37,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
+import com.tterrag.registrate.builders.BlockBuilder;
+import com.tterrag.registrate.builders.ItemBuilder;
+import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -219,12 +222,14 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing, ResourceLocation overlayModel) {
+    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing,
+                                                                  ResourceLocation overlayModel) {
         internal.workableCasingRenderer(baseCasing, overlayModel);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing, ResourceLocation overlayModel,
+    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing,
+                                                                  ResourceLocation overlayModel,
                                                                   boolean tint) {
         internal.workableCasingRenderer(baseCasing, overlayModel, tint);
         return this;
@@ -266,7 +271,8 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableSteamHullRenderer(boolean isHighPressure, ResourceLocation workableModel) {
+    public MultiblockMachineBuilderWrapper workableSteamHullRenderer(boolean isHighPressure,
+                                                                     ResourceLocation workableModel) {
         internal.workableSteamHullRenderer(isHighPressure, workableModel);
         return this;
     }
@@ -301,7 +307,8 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper recipeModifier(RecipeModifier recipeModifier, boolean alwaysTryModifyRecipe) {
+    public MultiblockMachineBuilderWrapper recipeModifier(RecipeModifier recipeModifier,
+                                                          boolean alwaysTryModifyRecipe) {
         internal.recipeModifier(recipeModifier, alwaysTryModifyRecipe);
         return this;
     }
@@ -311,7 +318,8 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper recipeModifiers(boolean alwaysTryModifyRecipe, RecipeModifier... recipeModifiers) {
+    public MultiblockMachineBuilderWrapper recipeModifiers(boolean alwaysTryModifyRecipe,
+                                                           RecipeModifier... recipeModifiers) {
         internal.recipeModifiers(alwaysTryModifyRecipe, recipeModifiers);
         return this;
     }
@@ -372,7 +380,8 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
     }
 
     public static MultiblockMachineBuilderWrapper createKJSMulti(ResourceLocation id) {
-        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()), id.getPath(),
+        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()),
+                id.getPath(),
                 WorkableElectricMultiblockMachine::new,
                 MetaMachineBlock::new,
                 MetaMachineItem::new,
@@ -381,13 +390,13 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
     }
 
     public static MultiblockMachineBuilderWrapper createKJSMulti(ResourceLocation id,
-                                                              KJSTieredMachineBuilder.CreationFunction<? extends MultiblockControllerMachine> machine) {
-        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()), id.getPath(),
+                                                                 KJSTieredMachineBuilder.CreationFunction<? extends MultiblockControllerMachine> machine) {
+        var baseBuilder = new MultiblockMachineBuilder(GTRegistrate.createIgnoringListenerErrors(id.getNamespace()),
+                id.getPath(),
                 machine::create,
                 MetaMachineBlock::new,
                 MetaMachineItem::new,
                 MetaMachineBlockEntity::createBlockEntity);
         return new MultiblockMachineBuilderWrapper(id, baseBuilder);
     }
-
 }

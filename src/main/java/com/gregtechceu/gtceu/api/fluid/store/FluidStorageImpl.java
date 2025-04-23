@@ -87,7 +87,7 @@ public class FluidStorageImpl implements FluidStorage {
                         GTCEu.LOGGER.error("{} already has an associated fluid for material {}", material, material);
                     }
                 });
-        //noinspection DataFlowIssue
+        // noinspection DataFlowIssue
         toRegister = null;
         registered = true;
     }

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.data.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
 import com.gregtechceu.gtceu.api.material.material.MarkerMaterial;
@@ -10,7 +11,6 @@ import com.gregtechceu.gtceu.api.material.material.stack.ItemMaterialInfo;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 import com.gregtechceu.gtceu.common.recipe.builder.*;
 
 import net.minecraft.core.registries.Registries;
@@ -21,11 +21,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 
-import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import it.unimi.dsi.fastutil.chars.*;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
-import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaRecipeHelper {
@@ -290,8 +289,7 @@ public class VanillaRecipeHelper {
                             builder.define(sign, tag);
                         } else builder.define(sign, ChemicalHelper.get(tagPrefix, material));
                     }
-                    default -> {
-                    }
+                    default -> {}
                 }
             }
         }
@@ -381,8 +379,7 @@ public class VanillaRecipeHelper {
                             builder.define(sign, tag);
                         } else builder.define(sign, ChemicalHelper.get(tagPrefix, material));
                     }
-                    default -> {
-                    }
+                    default -> {}
                 }
             }
         }
@@ -453,8 +450,7 @@ public class VanillaRecipeHelper {
                             builder.define(sign, tag);
                         } else builder.define(sign, ChemicalHelper.get(tagPrefix, material));
                     }
-                    default -> {
-                    }
+                    default -> {}
                 }
             }
         }
@@ -524,8 +520,7 @@ public class VanillaRecipeHelper {
                     } else builder.requires(ChemicalHelper.get(tagPrefix, material));
                 }
                 case Character c -> builder.requires(ToolHelper.getToolFromSymbol(c).itemTags.getFirst());
-                default -> {
-                }
+                default -> {}
             }
         }
         builder.save(provider);

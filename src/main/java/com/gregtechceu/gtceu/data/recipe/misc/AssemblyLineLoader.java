@@ -9,9 +9,9 @@ import static com.gregtechceu.gtceu.api.GTValues.*;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
 import static com.gregtechceu.gtceu.data.item.GTItems.*;
+import static com.gregtechceu.gtceu.data.machine.GTMultiMachines.FUSION_REACTOR;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.ASSEMBLY_LINE_RECIPES;
-import static com.gregtechceu.gtceu.data.machine.GTMultiMachines.FUSION_REACTOR;
 
 public class AssemblyLineLoader {
 

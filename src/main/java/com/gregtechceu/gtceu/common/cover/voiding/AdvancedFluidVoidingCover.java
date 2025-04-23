@@ -22,6 +22,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 public class AdvancedFluidVoidingCover extends FluidVoidingCover {

@@ -3,16 +3,16 @@ package com.gregtechceu.gtceu.api.item.datacomponents;
 import com.gregtechceu.gtceu.api.item.armor.ArmorUtils;
 import com.gregtechceu.gtceu.utils.codec.StreamCodecUtils;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public record GTArmor(
                       boolean enabled,
@@ -27,6 +27,7 @@ public record GTArmor(
                       byte runningTimer,
                       byte boostedJumpTimer,
                       byte consumerTicks) {
+
     // spotless:off
     public static final Codec<GTArmor> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.orElse(false).fieldOf("enabled").forGetter(GTArmor::enabled),
@@ -131,6 +132,7 @@ public record GTArmor(
     @Accessors(chain = true, fluent = true)
     @AllArgsConstructor
     public static class Mutable {
+
         @Getter
         @Setter
         private boolean enabled;

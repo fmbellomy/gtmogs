@@ -2,11 +2,10 @@ package com.gregtechceu.gtceu.api.worldgen.bedrockore;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import com.gregtechceu.gtceu.data.inject.GTEnumProxies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.saveddata.SavedData;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -112,7 +112,8 @@ public class BedrockOreVeinSavedData extends SavedData {
                     if (veinWeight > 0 &&
                             (oreDefinition.dimensionFilter().isEmpty() ||
                                     oreDefinition.dimensionFilter().stream().anyMatch(
-                                    dim -> WorldGeneratorUtils.isSameDimension(dim, serverLevel.dimension())))) {
+                                            dim -> WorldGeneratorUtils.isSameDimension(dim,
+                                                    serverLevel.dimension())))) {
                         weight -= veinWeight;
                         if (weight < 0) {
                             definition = holder;

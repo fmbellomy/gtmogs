@@ -1,7 +1,7 @@
 package com.gregtechceu.gtceu.api.worldgen.bedrockfluid;
 
-import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
@@ -28,6 +28,7 @@ import java.util.*;
 import java.util.function.Supplier;
 
 public class BedrockFluidDefinition {
+
     // spotless:off
     public static final MapCodec<Pair<Integer, Integer>> YIELD = Codec.mapPair(Codec.INT.fieldOf("min"),
             Codec.INT.fieldOf("max"));
@@ -70,9 +71,9 @@ public class BedrockFluidDefinition {
     public Set<ResourceKey<Level>> dimensionFilter; // filtering of dimensions
 
     private BedrockFluidDefinition(int weight, Pair<Integer, Integer> yield,
-                                  int depletionAmount, int depletionChance, int depletedYield,
-                                  Fluid storedFluid, List<BiomeWeightModifier> originalModifiers,
-                                  List<ResourceKey<Level>> dimensionFilter) {
+                                   int depletionAmount, int depletionChance, int depletedYield,
+                                   Fluid storedFluid, List<BiomeWeightModifier> originalModifiers,
+                                   List<ResourceKey<Level>> dimensionFilter) {
         this(weight, yield.getFirst(), yield.getSecond(), depletionAmount, depletionChance, depletedYield,
                 () -> storedFluid, originalModifiers, new HashSet<>(dimensionFilter));
     }
@@ -89,22 +90,23 @@ public class BedrockFluidDefinition {
         this.depletedYield = depletedYield;
         this.storedFluid = storedFluid;
         this.originalModifiers = originalModifiers;
-        /* FIXME datagen broke
-        this.biomeWeightModifier = new BiomeWeightModifier(
-                HolderSet.direct(originalModifiers.stream().flatMap(mod -> mod.biomes.stream()).toList()),
-                originalModifiers.stream().mapToInt(mod -> mod.addedWeight).sum()) {
-
-            @Override
-            public Integer apply(Holder<Biome> biome) {
-                int mod = 0;
-                for (var modifier : originalModifiers) {
-                    if (modifier.biomes.contains(biome)) {
-                        mod += modifier.apply(biome);
-                    }
-                }
-                return mod;
-            }
-        };
+        /*
+         * FIXME datagen broke
+         * this.biomeWeightModifier = new BiomeWeightModifier(
+         * HolderSet.direct(originalModifiers.stream().flatMap(mod -> mod.biomes.stream()).toList()),
+         * originalModifiers.stream().mapToInt(mod -> mod.addedWeight).sum()) {
+         * 
+         * @Override
+         * public Integer apply(Holder<Biome> biome) {
+         * int mod = 0;
+         * for (var modifier : originalModifiers) {
+         * if (modifier.biomes.contains(biome)) {
+         * mod += modifier.apply(biome);
+         * }
+         * }
+         * return mod;
+         * }
+         * };
          */
         this.dimensionFilter = dimensionFilter;
     }

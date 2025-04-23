@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.utils.RedstoneUtil;
 
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.items.IItemHandler;
+
 import org.jetbrains.annotations.Nullable;
 
 public class ItemDetectorCover extends DetectorCover {

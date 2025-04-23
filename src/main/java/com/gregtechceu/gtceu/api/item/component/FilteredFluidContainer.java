@@ -11,8 +11,8 @@ import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
-
 import net.neoforged.neoforge.fluids.FluidUtil;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.utils.TagExprFilter;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import it.unimi.dsi.fastutil.objects.Object2BooleanOpenHashMap;
 

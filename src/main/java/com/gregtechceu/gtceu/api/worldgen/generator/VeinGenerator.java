@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -18,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
+import com.mojang.serialization.MapCodec;
 import dev.latvian.mods.rhino.util.HideFromJS;
 
 import java.util.*;
@@ -37,6 +37,7 @@ public abstract class VeinGenerator {
             Function.identity());
 
     public VeinGenerator() {}
+
     /**
      * @return List of [block|material, chance]
      */

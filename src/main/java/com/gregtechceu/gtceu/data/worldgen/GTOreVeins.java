@@ -1,12 +1,11 @@
 package com.gregtechceu.gtceu.data.worldgen;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.*;
 import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -24,6 +23,8 @@ import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
+
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import lombok.Getter;
 
 import java.util.*;
@@ -123,7 +124,6 @@ public class GTOreVeins {
                 .max()
                 .orElse(0);
     }
-
 
     public static ResourceKey<OreVeinDefinition> create(ResourceLocation id) {
         var key = ResourceKey.create(GTRegistries.ORE_VEIN_REGISTRY, id);
@@ -415,7 +415,6 @@ public class GTOreVeins {
                 .surfaceIndicatorGenerator(indicator -> indicator
                         .surfaceRock(Topaz)
                         .placement(SurfaceIndicatorGenerator.IndicatorPlacement.BELOW)));
-
 
         // STONE
         RuleTest[] stoneRules = new RuleTest[] { new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES) };

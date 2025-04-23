@@ -1,9 +1,10 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
+import net.minecraft.network.RegistryFriendlyByteBuf;
+
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Lifecycle;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
 import java.math.BigInteger;
 

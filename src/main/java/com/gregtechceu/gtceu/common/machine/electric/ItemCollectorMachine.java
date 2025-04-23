@@ -20,10 +20,10 @@ import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IMachineLife;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
-import com.gregtechceu.gtceu.data.item.GTItemAbilities;
-import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
+import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
@@ -57,10 +57,10 @@ import net.minecraft.world.phys.Vec3;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiFunction;
-
 
 /**
  * @author h3tr
@@ -522,7 +522,8 @@ public class ItemCollectorMachine extends TieredEnergyMachine
     // ******* Interactions ********//
     /// ///////////////////////////////////
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                  Direction gridSide,
                                                   BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
             return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
@@ -550,7 +551,8 @@ public class ItemCollectorMachine extends TieredEnergyMachine
     }
 
     @Override
-    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                      Direction gridSide,
                                                       BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;

@@ -51,6 +51,7 @@ public class CoilBlock extends ActiveBlock {
     }
 
     public enum CoilType implements StringRepresentable, ICoilType {
+
         // spotless:off
         CUPRONICKEL("cupronickel", 1800, 1, 1, GTMaterials.Cupronickel, GTCEu.id("block/casings/coils/machine_coil_cupronickel")),
         KANTHAL("kanthal", 2700, 2, 1, GTMaterials.Kanthal, GTCEu.id("block/casings/coils/machine_coil_kanthal")),

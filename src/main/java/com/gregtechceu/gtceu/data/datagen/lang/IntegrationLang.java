@@ -5,9 +5,10 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.data.worldgen.GTBedrockFluids;
 import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 
-import com.tterrag.registrate.providers.RegistrateLangProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+
+import com.tterrag.registrate.providers.RegistrateLangProvider;
 
 public class IntegrationLang {
 

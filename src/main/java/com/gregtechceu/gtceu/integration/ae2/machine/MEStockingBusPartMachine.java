@@ -37,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.function.Predicate;
 
 public class MEStockingBusPartMachine extends MEInputBusPartMachine implements IMEStockingPart {
@@ -220,7 +221,8 @@ public class MEStockingBusPartMachine extends MEInputBusPartMachine implements I
     }
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                       Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (!isRemote()) {
             setAutoPull(!autoPull);

@@ -52,6 +52,7 @@ public class TagUtil {
     public static TagKey<Block> createBlockTag(String path, boolean vanilla) {
         return createTag(Registries.BLOCK, path, vanilla);
     }
+
     /**
      * Creates a block tag under the {@code gtceu} namespace
      *

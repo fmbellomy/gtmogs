@@ -1,18 +1,18 @@
 package com.gregtechceu.gtceu.common.network.packets.prospecting;
 
-import com.google.common.collect.Table;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.integration.map.cache.client.GTClientCache;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import com.google.common.collect.Table;
 import org.jetbrains.annotations.NotNull;
 
 public class SPacketProspectBedrockFluid extends SPacketProspect<ProspectorMode.FluidInfo> {
@@ -50,5 +50,4 @@ public class SPacketProspectBedrockFluid extends SPacketProspect<ProspectorMode.
     public @NotNull Type<SPacketProspectBedrockFluid> type() {
         return TYPE;
     }
-
 }

@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.integration.ae2.slot;
 
 import com.gregtechceu.gtceu.integration.ae2.utils.AEUtil;
-import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;

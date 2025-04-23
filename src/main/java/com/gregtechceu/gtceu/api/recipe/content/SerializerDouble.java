@@ -1,11 +1,8 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import net.minecraft.network.FriendlyByteBuf;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
-import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+
+import com.mojang.serialization.Codec;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class SerializerDouble implements IContentSerializer<Double> {

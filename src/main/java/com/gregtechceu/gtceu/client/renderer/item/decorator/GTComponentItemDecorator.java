@@ -1,12 +1,12 @@
 package com.gregtechceu.gtceu.client.renderer.item.decorator;
 
 import com.gregtechceu.gtceu.api.item.IComponentItem;
-import com.gregtechceu.gtceu.api.item.component.IItemDecoratorComponent;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.IItemDecorator;
+
 import org.jetbrains.annotations.NotNull;
 
 public final class GTComponentItemDecorator implements IItemDecorator {

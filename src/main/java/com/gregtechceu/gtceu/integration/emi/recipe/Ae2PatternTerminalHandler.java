@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.integration.emi.recipe;
 
-import appeng.integration.modules.itemlists.EncodingHelper;
 import com.gregtechceu.gtceu.integration.emi.multipage.MultiblockInfoEmiRecipe;
 
 import net.minecraft.client.Minecraft;
@@ -13,6 +12,7 @@ import net.minecraft.world.level.material.Fluid;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.GenericStack;
+import appeng.integration.modules.itemlists.EncodingHelper;
 import appeng.menu.me.items.PatternEncodingTermMenu;
 import dev.emi.emi.api.recipe.EmiPlayerInventory;
 import dev.emi.emi.api.recipe.EmiRecipe;

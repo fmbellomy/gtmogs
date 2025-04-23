@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import net.minecraft.core.Direction;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
-
 public class GTEnergyWrapper implements IEnergyContainer {
 
     /**

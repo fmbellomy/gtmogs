@@ -59,5 +59,4 @@ public class SizedIngredientExtensions {
         }
         return copied.toVanilla();
     }
-
 }

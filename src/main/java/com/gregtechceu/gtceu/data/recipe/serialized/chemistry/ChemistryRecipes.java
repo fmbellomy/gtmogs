@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.data.recipe.serialized.chemistry;
 import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 

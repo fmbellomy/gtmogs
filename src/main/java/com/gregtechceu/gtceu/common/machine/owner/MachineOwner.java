@@ -7,8 +7,8 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.common.UsernameCache;
 import net.neoforged.fml.ModLoader;
+import net.neoforged.neoforge.common.UsernameCache;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -16,6 +16,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+
 import java.util.*;
 import java.util.function.Function;
 

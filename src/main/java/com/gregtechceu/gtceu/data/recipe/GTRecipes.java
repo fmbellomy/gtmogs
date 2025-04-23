@@ -17,10 +17,9 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.level.block.ComposterBlock;
+import net.neoforged.neoforge.common.conditions.ICondition;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,6 +41,7 @@ public class GTRecipes {
      */
     public static void recipeAddition(RecipeOutput originalConsumer) {
         RecipeOutput consumer = new RecipeOutput() {
+
             @Override
             public Advancement.@NotNull Builder advancement() {
                 return originalConsumer.advancement();
@@ -49,11 +49,10 @@ public class GTRecipes {
 
             @Override
             public void accept(@NotNull ResourceLocation id, @NotNull Recipe<?> recipe,
-                               @Nullable AdvancementHolder advancement, ICondition @NotNull ... conditions) {
+                               @Nullable AdvancementHolder advancement, ICondition @NotNull... conditions) {
                 if (!RECIPE_FILTERS.contains(id)) {
                     originalConsumer.accept(id, recipe, advancement, conditions);
                 }
-
             }
         };
 

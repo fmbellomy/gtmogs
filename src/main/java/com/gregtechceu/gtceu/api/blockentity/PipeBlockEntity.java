@@ -6,13 +6,13 @@ import com.gregtechceu.gtceu.api.block.MaterialPipeBlock;
 import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.capability.IToolable;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.pipenet.*;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
@@ -54,7 +54,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-
 
 public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeType<NodeDataType>, NodeDataType>
                                      extends BlockEntity implements IPipeNode<PipeType, NodeDataType>, IEnhancedManaged,
@@ -384,13 +383,16 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
                 return Pair.of(null, coverBehavior.onScrewdriverClick(playerIn, hand, held, hitResult));
             }
         }
-        if (toolTypes.contains(GTToolType.SCREWDRIVER) || held.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
+        if (toolTypes.contains(GTToolType.SCREWDRIVER) ||
+                held.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SCREWDRIVER, coverBehavior.onScrewdriverClick(playerIn, hand, held, hitResult));
+                return Pair.of(GTToolType.SCREWDRIVER,
+                        coverBehavior.onScrewdriverClick(playerIn, hand, held, hitResult));
             }
         } else if (toolTypes.contains(GTToolType.SOFT_MALLET) || held.canPerformAction(GTItemAbilities.MALLET_PAUSE)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SOFT_MALLET, coverBehavior.onSoftMalletClick(playerIn, hand, held, hitResult));
+                return Pair.of(GTToolType.SOFT_MALLET,
+                        coverBehavior.onSoftMalletClick(playerIn, hand, held, hitResult));
             }
         } else if (toolTypes.contains(getPipeTuneTool()) || hasCorrectAction(held)) {
             if (playerIn.isShiftKeyDown() && this.canHaveBlockedFaces()) {
@@ -402,23 +404,24 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
             }
             playerIn.swing(hand);
             return Pair.of(getPipeTuneTool(), ItemInteractionResult.CONSUME);
-        } else if (toolTypes.contains(GTToolType.CROWBAR) || held.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
-            if (coverBehavior != null) {
-                if (!isRemote()) {
-                    getCoverContainer().removeCover(gridSide, playerIn);
-                    playerIn.swing(hand);
-                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
-                }
-            } else {
-                if (!frameMaterial.isNull()) {
-                    Block.popResource(getLevel(), getPipePos(),
-                            GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, frameMaterial).asStack());
-                    frameMaterial = GTMaterials.NULL;
-                    playerIn.swing(hand);
-                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
+        } else
+            if (toolTypes.contains(GTToolType.CROWBAR) || held.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
+                if (coverBehavior != null) {
+                    if (!isRemote()) {
+                        getCoverContainer().removeCover(gridSide, playerIn);
+                        playerIn.swing(hand);
+                        return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
+                    }
+                } else {
+                    if (!frameMaterial.isNull()) {
+                        Block.popResource(getLevel(), getPipePos(),
+                                GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, frameMaterial).asStack());
+                        frameMaterial = GTMaterials.NULL;
+                        playerIn.swing(hand);
+                        return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
+                    }
                 }
             }
-        }
 
         return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
     }

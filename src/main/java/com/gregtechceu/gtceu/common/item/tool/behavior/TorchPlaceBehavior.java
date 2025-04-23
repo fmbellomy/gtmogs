@@ -1,16 +1,12 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
+import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.api.tag.TagUtil;
-import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import lombok.AllArgsConstructor;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -24,6 +20,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -65,7 +65,6 @@ public class TorchPlaceBehavior implements IToolBehavior<TorchPlaceBehavior> {
         if (!stack.getOrDefault(GTDataComponents.ACTIVE, false)) {
             return InteractionResult.PASS;
         }
-
 
         ItemStack slotStack;
         if (this.cacheSlotKey) {

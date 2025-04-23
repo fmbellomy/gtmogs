@@ -4,34 +4,33 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
+import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.datacomponents.GTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
-import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
+import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
-import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
-import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
 import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
 
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -69,6 +68,7 @@ import it.unimi.dsi.fastutil.chars.Char2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import it.unimi.dsi.fastutil.chars.CharSets;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
@@ -431,7 +431,8 @@ public class ToolHelper {
         }
     }
 
-    public static boolean removeBlock(Level level, ServerPlayer player, BlockPos pos, BlockState state, boolean canDropLoot) {
+    public static boolean removeBlock(Level level, ServerPlayer player, BlockPos pos, BlockState state,
+                                      boolean canDropLoot) {
         boolean removed = state.onDestroyedByPlayer(level, pos, player, canDropLoot, level.getFluidState(pos));
         if (removed) {
             state.getBlock().destroy(level, pos, state);
@@ -522,7 +523,8 @@ public class ToolHelper {
     }
 
     // encompasses all vanilla special case tool checks for harvesting
-    public static boolean isToolEffective(ItemStack stack, BlockState state, Set<GTToolType> toolClasses, int harvestLevel) {
+    public static boolean isToolEffective(ItemStack stack, BlockState state, Set<GTToolType> toolClasses,
+                                          int harvestLevel) {
         Tool tool = stack.get(DataComponents.TOOL);
         return tool != null && tool.isCorrectForDrops(state);
     }
@@ -639,8 +641,7 @@ public class ToolHelper {
                 level.registryAccess(),
                 GTEnchantmentProviders.SILK_TOUCH,
                 level.getCurrentDifficultyAt(origin),
-                level.getRandom()
-        );
+                level.getRandom());
 
         return state.getDrops(new LootParams.Builder(level).withParameter(LootContextParams.BLOCK_STATE, state)
                 .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(origin))

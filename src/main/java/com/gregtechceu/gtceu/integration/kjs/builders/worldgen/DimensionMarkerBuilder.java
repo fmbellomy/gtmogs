@@ -2,11 +2,13 @@ package com.gregtechceu.gtceu.integration.kjs.builders.worldgen;
 
 import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
 import com.gregtechceu.gtceu.integration.kjs.Validator;
+
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;

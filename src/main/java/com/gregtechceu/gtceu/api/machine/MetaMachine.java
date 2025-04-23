@@ -29,8 +29,8 @@ import com.gregtechceu.gtceu.common.cover.FluidFilterCover;
 import com.gregtechceu.gtceu.common.cover.ItemFilterCover;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.common.machine.owner.PlayerOwner;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.syncdata.IEnhancedManaged;
@@ -74,6 +74,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Predicate;
 
@@ -211,11 +212,9 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         }
     }
 
-    public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {
-    }
+    public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {}
 
-    public void collectImplicitComponents(DataComponentMap.Builder components) {
-    }
+    public void collectImplicitComponents(DataComponentMap.Builder components) {}
 
     //////////////////////////////////////
     // ***** Tickable Manager ****//
@@ -326,14 +325,19 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 return Pair.of(null, coverBehavior.onScrewdriverClick(playerIn, hand, itemStack, hitResult));
             }
         }
-        if (toolType.contains(GTToolType.SCREWDRIVER) && itemStack.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
+        if (toolType.contains(GTToolType.SCREWDRIVER) &&
+                itemStack.canPerformAction(GTItemAbilities.SCREWDRIVER_CONFIGURE)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SCREWDRIVER, coverBehavior.onScrewdriverClick(playerIn, hand, itemStack, hitResult));
-            } else return Pair.of(GTToolType.SCREWDRIVER, onScrewdriverClick(playerIn, hand, itemStack, gridSide, hitResult));
+                return Pair.of(GTToolType.SCREWDRIVER,
+                        coverBehavior.onScrewdriverClick(playerIn, hand, itemStack, hitResult));
+            } else return Pair.of(GTToolType.SCREWDRIVER,
+                    onScrewdriverClick(playerIn, hand, itemStack, gridSide, hitResult));
         } else if (toolType.contains(GTToolType.SOFT_MALLET)) {
             if (coverBehavior != null) {
-                return Pair.of(GTToolType.SOFT_MALLET, coverBehavior.onSoftMalletClick(playerIn, hand, itemStack, hitResult));
-            } else return Pair.of(GTToolType.SOFT_MALLET, onSoftMalletClick(playerIn, hand, itemStack, gridSide, hitResult));
+                return Pair.of(GTToolType.SOFT_MALLET,
+                        coverBehavior.onSoftMalletClick(playerIn, hand, itemStack, hitResult));
+            } else return Pair.of(GTToolType.SOFT_MALLET,
+                    onSoftMalletClick(playerIn, hand, itemStack, gridSide, hitResult));
         } else if (toolType.contains(GTToolType.WRENCH)) {
             return Pair.of(GTToolType.WRENCH, onWrenchClick(playerIn, hand, itemStack, gridSide, hitResult));
         } else if (toolType.contains(GTToolType.CROWBAR)) {

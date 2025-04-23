@@ -8,6 +8,7 @@ import net.minecraft.core.Direction;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+
 import org.jetbrains.annotations.Nullable;
 
 public class FluidDetectorCover extends DetectorCover {

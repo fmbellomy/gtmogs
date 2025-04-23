@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

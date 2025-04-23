@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.data.blockentity;
 
 import com.gregtechceu.gtceu.common.blockentity.*;
-
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 

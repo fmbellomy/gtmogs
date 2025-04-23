@@ -5,27 +5,26 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
-import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.api.machine.RotationState;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifierList;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.renderer.GTRendererProvider;
 import com.gregtechceu.gtceu.client.renderer.machine.*;
-import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import com.tterrag.registrate.AbstractRegistrate;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -41,6 +40,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.providers.ProviderType;
@@ -162,11 +162,11 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     private String langValue = null;
 
     public MachineBuilder(AbstractRegistrate<?> registrate, String name,
-                             Function<ResourceLocation, DEFINITION> definition,
-                             Function<IMachineBlockEntity, MetaMachine> machine,
-                             BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
-                             BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
-                             TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
+                          Function<ResourceLocation, DEFINITION> definition,
+                          Function<IMachineBlockEntity, MetaMachine> machine,
+                          BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
+                          BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
+                          TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
         this.registrate = registrate;
         this.name = name;
         this.machine = machine;
@@ -360,7 +360,8 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
         definition.setRegressWhenWaiting(this.regressWhenWaiting);
 
         if (renderer == null) {
-            renderer = () -> new MachineRenderer(ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/machine/" + name));
+            renderer = () -> new MachineRenderer(
+                    ResourceLocation.fromNamespaceAndPath(registrate.getModid(), "block/machine/" + name));
         }
         if (recipeTypes != null) {
             for (GTRecipeType type : recipeTypes) {
@@ -391,8 +392,9 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     static class BlockBuilderWrapper {
 
         @SuppressWarnings("removal")
-        public static <D extends MachineDefinition> BlockBuilder<Block, MachineBuilder<D>> makeBlockBuilder(MachineBuilder<D> builder,
-                                                                                                            D definition) {
+        public static <
+                D extends MachineDefinition> BlockBuilder<Block, MachineBuilder<D>> makeBlockBuilder(MachineBuilder<D> builder,
+                                                                                                     D definition) {
             return builder.registrate.block(builder, builder.name, properties -> {
                 RotationState.set(builder.rotationState);
                 MachineDefinition.setBuilt(definition);
@@ -413,9 +415,12 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
 
     static class ItemBuilderWrapper {
 
-        public static <D extends MachineDefinition> ItemBuilder<MetaMachineItem, MachineBuilder<D>> makeItemBuilder(MachineBuilder<D> builder,
-                                                                                                                    BlockEntry<Block> block) {
-            return builder.registrate.item(builder, builder.name, properties -> builder.itemFactory.apply((IMachineBlock) block.get(), properties))
+        public static <
+                D extends MachineDefinition> ItemBuilder<MetaMachineItem, MachineBuilder<D>> makeItemBuilder(MachineBuilder<D> builder,
+                                                                                                             BlockEntry<Block> block) {
+            return builder.registrate
+                    .item(builder, builder.name,
+                            properties -> builder.itemFactory.apply((IMachineBlock) block.get(), properties))
                     .setData(ProviderType.LANG, NonNullBiConsumer.noop()) // do not gen any lang keys
                     .model(NonNullBiConsumer.noop())
                     .color(() -> () -> builder.itemColor::apply)

@@ -9,13 +9,14 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagEntry;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.Tags;
+
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
 public class BlockTagLoader {
 
     public static void init(RegistrateTagsProvider<Block> provider) {
         provider.addTag(CustomTags.ENDSTONE_ORE_REPLACEABLES)
-                        .addTag(Tags.Blocks.END_STONES);
+                .addTag(Tags.Blocks.END_STONES);
 
         provider.addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
         provider.addTag(CustomTags.NEEDS_DURANIUM_TOOL);

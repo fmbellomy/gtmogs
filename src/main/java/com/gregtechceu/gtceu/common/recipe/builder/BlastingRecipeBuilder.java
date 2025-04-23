@@ -10,10 +10,10 @@ import net.minecraft.world.item.crafting.BlastingRecipe;
 import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -86,4 +86,3 @@ public class BlastingRecipeBuilder {
         consumer.accept(recipeId.withPrefix("blasting/"), create(), null);
     }
 }
-

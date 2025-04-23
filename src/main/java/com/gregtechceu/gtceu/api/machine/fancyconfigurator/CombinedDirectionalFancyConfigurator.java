@@ -20,6 +20,7 @@ import com.lowdragmc.lowdraglib.utils.Size;
 import net.minecraft.network.chat.Component;
 
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

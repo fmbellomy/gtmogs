@@ -6,7 +6,6 @@ import lombok.Setter;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-
 public abstract class FluidHandlerDelegate implements IFluidHandlerModifiable {
 
     @Setter

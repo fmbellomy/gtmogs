@@ -5,8 +5,8 @@ import com.gregtechceu.gtceu.api.capability.ICoverable;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
@@ -74,7 +74,8 @@ public abstract class DetectorCover extends CoverBehavior implements IControllab
     }
 
     @Override
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                    BlockHitResult hitResult) {
         ItemInteractionResult superResult = super.onScrewdriverClick(playerIn, hand, held, hitResult);
         if (superResult.consumesAction()) {
             return superResult;

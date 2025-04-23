@@ -18,17 +18,17 @@ import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import lombok.experimental.ExtensionMethod;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import appeng.api.config.Actionable;
 import appeng.api.stacks.AEFluidKey;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.List;
-
 
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMachineLife {

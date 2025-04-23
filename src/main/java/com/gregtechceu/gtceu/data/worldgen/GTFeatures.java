@@ -23,9 +23,11 @@ public class GTFeatures {
     public static final DeferredRegister<Feature<?>> FEATURE_REGISTER = DeferredRegister.create(Registries.FEATURE,
             GTCEu.MOD_ID);
 
-    public static final DeferredHolder<Feature<?>, StoneBlobFeature> STONE_BLOB = FEATURE_REGISTER.register("stone_blob",
+    public static final DeferredHolder<Feature<?>, StoneBlobFeature> STONE_BLOB = FEATURE_REGISTER.register(
+            "stone_blob",
             StoneBlobFeature::new);
-    public static final DeferredHolder<Feature<?>, FluidSproutFeature> FLUID_SPROUT = FEATURE_REGISTER.register("fluid_sprout",
+    public static final DeferredHolder<Feature<?>, FluidSproutFeature> FLUID_SPROUT = FEATURE_REGISTER.register(
+            "fluid_sprout",
             FluidSproutFeature::new);
 
     public static void init() {

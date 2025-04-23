@@ -15,10 +15,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-
-import lombok.AllArgsConstructor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+
+import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
@@ -98,5 +98,4 @@ public class SCPacketShareProspection implements CustomPacketPayload {
     public @NotNull Type<SCPacketShareProspection> type() {
         return TYPE;
     }
-
 }

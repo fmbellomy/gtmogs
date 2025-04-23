@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.integration.map.journeymap;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
-import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.map.GenericMapRenderer;
 import com.gregtechceu.gtceu.integration.map.WaypointManager;
@@ -13,14 +13,6 @@ import com.gregtechceu.gtceu.integration.map.layer.builtin.FluidRenderLayer;
 import com.gregtechceu.gtceu.integration.map.layer.builtin.OreRenderLayer;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 
-import journeymap.api.v2.client.IClientAPI;
-import journeymap.api.v2.client.display.*;
-import journeymap.api.v2.client.fullscreen.ModPopupMenu;
-import journeymap.api.v2.client.model.MapImage;
-import journeymap.api.v2.client.model.MapPolygon;
-import journeymap.api.v2.client.model.ShapeProperties;
-import journeymap.api.v2.client.util.PolygonHelper;
-import journeymap.api.v2.client.util.UIState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -31,15 +23,24 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+
 import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import journeymap.api.v2.client.IClientAPI;
+import journeymap.api.v2.client.display.*;
+import journeymap.api.v2.client.fullscreen.ModPopupMenu;
+import journeymap.api.v2.client.model.MapImage;
+import journeymap.api.v2.client.model.MapPolygon;
+import journeymap.api.v2.client.model.ShapeProperties;
+import journeymap.api.v2.client.util.PolygonHelper;
+import journeymap.api.v2.client.util.UIState;
 import lombok.Getter;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 
 /**
  * A map renderer for Journeymap, uses Journeymap's own tooltip rendering to fit existing theming better

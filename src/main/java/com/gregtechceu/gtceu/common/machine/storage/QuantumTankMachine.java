@@ -58,11 +58,11 @@ import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
-import com.mojang.blaze3d.MethodsReturnNonnullByDefault;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -177,7 +177,8 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
     @Override
     public void applyImplicitComponents(MetaMachineBlockEntity.ExDataComponentInput componentInput) {
         super.applyImplicitComponents(componentInput);
-        LargeFluidContent storage = componentInput.getOrDefault(GTDataComponents.LARGE_FLUID_CONTENT, LargeFluidContent.EMPTY);
+        LargeFluidContent storage = componentInput.getOrDefault(GTDataComponents.LARGE_FLUID_CONTENT,
+                LargeFluidContent.EMPTY);
         stored = storage.stored();
         storedAmount = storage.amount();
     }
@@ -282,7 +283,8 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
     }
 
     @Override
-    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                  Direction gridSide,
                                                   BlockHitResult hitResult) {
         if (!playerIn.isShiftKeyDown() && !isRemote()) {
             var tool = playerIn.getItemInHand(hand);
@@ -301,7 +303,8 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
     }
 
     @Override
-    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, Direction gridSide,
+    protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                       Direction gridSide,
                                                        BlockHitResult hitResult) {
         if (!isRemote()) {
             if (gridSide == getOutputFacingFluids()) {
@@ -402,7 +405,8 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
 
     protected class FluidCache extends MachineTrait implements IFluidHandler {
 
-        private final Predicate<FluidStack> filter = f -> !isLocked() || FluidStack.isSameFluidSameComponents(f, getLockedFluid());
+        private final Predicate<FluidStack> filter = f -> !isLocked() ||
+                FluidStack.isSameFluidSameComponents(f, getLockedFluid());
 
         public FluidCache(MetaMachine holder) {
             super(holder);

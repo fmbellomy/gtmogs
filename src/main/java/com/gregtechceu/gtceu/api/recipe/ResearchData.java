@@ -63,8 +63,8 @@ public final class ResearchData implements Iterable<ResearchData.ResearchEntry> 
 
         public static final Codec<ResearchEntry> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.STRING.fieldOf("research_id").forGetter(val -> val.researchId),
-                ItemStack.CODEC.fieldOf("data_item").forGetter(val -> val.dataItem)
-        ).apply(instance, ResearchEntry::new));
+                ItemStack.CODEC.fieldOf("data_item").forGetter(val -> val.dataItem))
+                .apply(instance, ResearchEntry::new));
 
         public static ResearchEntry fromNetwork(RegistryFriendlyByteBuf buf) {
             String researchId = buf.readUtf();

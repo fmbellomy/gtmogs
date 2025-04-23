@@ -35,10 +35,12 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+
 import com.google.common.annotations.VisibleForTesting;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMaps;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
 import java.math.BigInteger;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -252,15 +254,13 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
                 if (averageInLastSec > averageOutLastSec) {
                     BigInteger timeToFillSeconds = energyCapacity.subtract(energyStored)
                             .divide(BigInteger.valueOf(Mth.floor(
-                                    (averageInLastSec - averageOutLastSec) * getLevel().tickRateManager().tickrate()
-                            )));
+                                    (averageInLastSec - averageOutLastSec) * getLevel().tickRateManager().tickrate())));
                     textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill",
                             getTimeToFillDrainText(timeToFillSeconds).setStyle(STYLE_GREEN)));
                 } else if (averageInLastSec < averageOutLastSec) {
                     BigInteger timeToDrainSeconds = energyStored
                             .divide(BigInteger.valueOf(Mth.floor(
-                                    (averageOutLastSec - averageInLastSec) * getLevel().tickRateManager().tickrate()
-                            )));
+                                    (averageOutLastSec - averageInLastSec) * getLevel().tickRateManager().tickrate())));
                     textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                             getTimeToFillDrainText(timeToDrainSeconds).setStyle(STYLE_RED)));
                 }

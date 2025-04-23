@@ -1,11 +1,7 @@
 package com.gregtechceu.gtceu.common.recipe.builder;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.gregtechceu.gtceu.api.recipe.kind.ShapedEnergyTransferRecipe;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -16,8 +12,12 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
-
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

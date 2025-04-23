@@ -1,10 +1,12 @@
 package com.gregtechceu.gtceu.integration.kjs.events;
 
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import dev.latvian.mods.kubejs.event.KubeEvent;
-import dev.latvian.mods.kubejs.typings.Info;
+
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
+
+import dev.latvian.mods.kubejs.event.KubeEvent;
+import dev.latvian.mods.kubejs.typings.Info;
 
 import java.util.function.Consumer;
 

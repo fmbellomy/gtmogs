@@ -19,6 +19,7 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
 import net.minecraft.core.Direction;
+
 import lombok.Getter;
 import lombok.Setter;
 

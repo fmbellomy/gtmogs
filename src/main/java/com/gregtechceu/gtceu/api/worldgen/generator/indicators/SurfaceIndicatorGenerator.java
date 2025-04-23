@@ -8,8 +8,6 @@ import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreIndicatorPlacer;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 
-import com.mojang.serialization.MapCodec;
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.SectionPos;
@@ -29,11 +27,14 @@ import net.minecraft.world.level.levelgen.Heightmap;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -45,13 +46,14 @@ import java.util.stream.Stream;
 @NoArgsConstructor
 public class SurfaceIndicatorGenerator extends IndicatorGenerator {
 
-    public static final MapCodec<SurfaceIndicatorGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.either(BlockState.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("block")
-                    .forGetter(ext -> ext.block),
-            IntProvider.codec(1, 32).fieldOf("radius").forGetter(ext -> ext.radius),
-            FloatProvider.codec(0.0f, 2.0f).fieldOf("density").forGetter(ext -> ext.density),
-            IndicatorPlacement.CODEC.fieldOf("placement").forGetter(ext -> ext.placement)
-    ).apply(instance, SurfaceIndicatorGenerator::new));
+    public static final MapCodec<SurfaceIndicatorGenerator> CODEC = RecordCodecBuilder.mapCodec(instance -> instance
+            .group(
+                    Codec.either(BlockState.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("block")
+                            .forGetter(ext -> ext.block),
+                    IntProvider.codec(1, 32).fieldOf("radius").forGetter(ext -> ext.radius),
+                    FloatProvider.codec(0.0f, 2.0f).fieldOf("density").forGetter(ext -> ext.density),
+                    IndicatorPlacement.CODEC.fieldOf("placement").forGetter(ext -> ext.placement))
+            .apply(instance, SurfaceIndicatorGenerator::new));
 
     private Either<BlockState, Material> block = Either.left(Blocks.AIR.defaultBlockState());
     private IntProvider radius = ConstantInt.of(5);

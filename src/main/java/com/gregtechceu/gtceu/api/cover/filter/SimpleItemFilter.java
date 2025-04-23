@@ -23,8 +23,8 @@ public class SimpleItemFilter implements ItemFilter {
     public static final Codec<SimpleItemFilter> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.BOOL.fieldOf("is_blacklist").forGetter(val -> val.isBlackList),
             Codec.BOOL.fieldOf("ignore_components").forGetter(val -> val.ignoreNbt),
-            ItemStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList())
-    ).apply(instance, SimpleItemFilter::new));
+            ItemStack.OPTIONAL_CODEC.listOf().fieldOf("matches").forGetter(val -> Arrays.stream(val.matches).toList()))
+            .apply(instance, SimpleItemFilter::new));
 
     @Getter
     protected boolean isBlackList;

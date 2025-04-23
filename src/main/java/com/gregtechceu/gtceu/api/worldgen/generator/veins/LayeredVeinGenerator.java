@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -25,6 +24,7 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.MapCodec;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 @SuppressWarnings("UnusedReturnValue")
 @NoArgsConstructor
 public class LayeredVeinGenerator extends VeinGenerator {
+
     // spotless:off
     public static final MapCodec<LayeredVeinGenerator> CODEC = GTLayerPattern.CODEC.listOf().fieldOf("layer_patterns")
             .xmap(LayeredVeinGenerator::new, LayeredVeinGenerator::getLayerPatterns);
@@ -222,5 +223,4 @@ public class LayeredVeinGenerator extends VeinGenerator {
     public MapCodec<? extends VeinGenerator> codec() {
         return CODEC;
     }
-
 }

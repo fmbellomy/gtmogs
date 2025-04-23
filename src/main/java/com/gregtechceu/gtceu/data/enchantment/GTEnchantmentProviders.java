@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.data.enchantment;
 
 import com.gregtechceu.gtceu.GTCEu;
+
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;

@@ -1,10 +1,9 @@
 package com.gregtechceu.gtceu.api.worldgen.bedrockfluid;
 
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 
-import com.gregtechceu.gtceu.data.inject.GTEnumProxies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -19,6 +18,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.saveddata.SavedData;
 
 import org.jetbrains.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.Objects;
 

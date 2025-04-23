@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.client.renderer.cover;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
-import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 import com.gregtechceu.gtceu.common.cover.PumpCover;
 
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;

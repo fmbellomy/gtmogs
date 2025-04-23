@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.data.recipe.misc;
 
 import com.gregtechceu.gtceu.api.machine.multiblock.CleanroomType;
-import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.data.recipes.RecipeOutput;
@@ -13,9 +13,9 @@ import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.block.GTBlocks.*;
 import static com.gregtechceu.gtceu.data.item.GTItems.*;
 import static com.gregtechceu.gtceu.data.machine.GTMachines.*;
+import static com.gregtechceu.gtceu.data.machine.GTResearchMachines.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
-import static com.gregtechceu.gtceu.data.machine.GTResearchMachines.*;
 
 public class ComputerRecipes {
 

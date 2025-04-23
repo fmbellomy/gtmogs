@@ -6,12 +6,13 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.FluidPipeProperties;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.misc.forge.ThermalFluidHandlerItemStack;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 
-import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.capability.templates.FluidHandlerItemStack;
+
 import org.jetbrains.annotations.NotNull;
 
 public class DrumMachineItem extends MetaMachineItem {

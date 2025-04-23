@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class TagExprFilter {
         }
 
         private static class BinExpr extends MatchExpr {
+
             @Nullable
             MatchExpr left, right;
             Token op;
@@ -185,7 +187,7 @@ public class TagExprFilter {
             BinExpr result = null;
             while (match(TokenType.And) || match(TokenType.Or) || match(TokenType.Xor)) {
                 if (result == null) {
-                    //noinspection DataFlowIssue can't.
+                    // noinspection DataFlowIssue can't.
                     result = new BinExpr(prev, lhs, unary());
                 } else {
                     result = new BinExpr(prev, result, unary());
@@ -202,7 +204,7 @@ public class TagExprFilter {
         @Nullable
         private MatchExpr unary() {
             if (match(TokenType.Not)) {
-                //noinspection DataFlowIssue it gets set in match()
+                // noinspection DataFlowIssue it gets set in match()
                 return new UnaryExpr(prev, id());
             }
 
@@ -219,7 +221,7 @@ public class TagExprFilter {
             }
 
             if (match(TokenType.String)) {
-                //noinspection DataFlowIssue it gets set in match()
+                // noinspection DataFlowIssue it gets set in match()
                 return new StringExpr(prev.lexeme);
             }
 

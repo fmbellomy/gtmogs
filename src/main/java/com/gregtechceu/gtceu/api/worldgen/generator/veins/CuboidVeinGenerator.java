@@ -7,8 +7,6 @@ import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
-import com.mojang.serialization.MapCodec;
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -25,11 +23,14 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTes
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +48,7 @@ public class CuboidVeinGenerator extends VeinGenerator {
             ClassicVeinGenerator.Layer.CODEC.fieldOf("bottom").forGetter(val -> val.bottom),
             ClassicVeinGenerator.Layer.CODEC.fieldOf("spread").forGetter(val -> val.spread),
             Codec.INT.fieldOf("min_y").forGetter(val -> val.minY),
-            Codec.INT.fieldOf("max_y").forGetter(val -> val.maxY)
-    ).apply(instance, CuboidVeinGenerator::new));
+            Codec.INT.fieldOf("max_y").forGetter(val -> val.maxY)).apply(instance, CuboidVeinGenerator::new));
 
     private ClassicVeinGenerator.Layer top;
     private ClassicVeinGenerator.Layer middle;

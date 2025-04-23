@@ -4,12 +4,14 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistry;
 import com.gregtechceu.gtceu.core.mixins.neoforge.BaseMappedRegistryAccessor;
 import com.gregtechceu.gtceu.core.mixins.neoforge.RegistryBuilderAccessor;
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.serialization.Lifecycle;
+
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.neoforged.neoforge.registries.RegistryBuilder;
+
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.serialization.Lifecycle;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
@@ -17,7 +19,9 @@ import org.spongepowered.asm.mixin.injection.At;
 public class RegistryDataMixin<T> {
 
     @SuppressWarnings({ "UnstableApiUsage", "unchecked" })
-    @ModifyExpressionValue(method = "create", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/registries/RegistryBuilder;create()Lnet/minecraft/core/Registry;"))
+    @ModifyExpressionValue(method = "create",
+                           at = @At(value = "INVOKE",
+                                    target = "Lnet/neoforged/neoforge/registries/RegistryBuilder;create()Lnet/minecraft/core/Registry;"))
     private Registry<T> gtceu$ReplaceRegistryType(Registry<T> original, @Local RegistryBuilder<T> builder) {
         if (builder instanceof RegistryBuilderAccessor<?> accessor &&
                 original.key().location().getNamespace().equals(GTCEu.MOD_ID)) {

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.recipe.lookup.ingredient.item;
 
 import com.gregtechceu.gtceu.api.recipe.lookup.AbstractMapIngredient;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
@@ -57,7 +58,8 @@ public class MapItemStackPartialComponentIngredient extends MapItemStackIngredie
 
     @Override
     public String toString() {
-        return "MapItemStackPartialComponentIngredient{" + "item=" + BuiltInRegistries.ITEM.getKey(stack.getItem()) + "}";
+        return "MapItemStackPartialComponentIngredient{" + "item=" + BuiltInRegistries.ITEM.getKey(stack.getItem()) +
+                "}";
     }
 
     @Override

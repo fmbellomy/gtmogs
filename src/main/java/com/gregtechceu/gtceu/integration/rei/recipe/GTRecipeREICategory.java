@@ -22,6 +22,7 @@ import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.util.EntryStacks;
 import me.shedaniel.rei.plugin.common.BuiltinPlugin;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.function.Function;
 
 public class GTRecipeREICategory extends ModularUIDisplayCategory<GTRecipeDisplay> {

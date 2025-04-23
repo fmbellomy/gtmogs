@@ -1,11 +1,10 @@
 package com.gregtechceu.gtceu.data.worldgen;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -14,6 +13,8 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biomes;
 import net.neoforged.neoforge.common.Tags;
+
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 
 import java.util.Set;
 import java.util.function.Consumer;
@@ -39,8 +40,8 @@ public class GTBedrockFluids {
     //////////////////////////////////////
 
     public static final ResourceKey<BedrockFluidDefinition> LAVA = create(GTCEu.id("lava_deposit"));
-    public static final ResourceKey<BedrockFluidDefinition> NETHER_NATURAL_GAS = create(GTCEu.id("nether_natural_gas_deposit"));
-
+    public static final ResourceKey<BedrockFluidDefinition> NETHER_NATURAL_GAS = create(
+            GTCEu.id("nether_natural_gas_deposit"));
 
     public static ResourceKey<BedrockFluidDefinition> create(ResourceLocation id) {
         var key = ResourceKey.create(GTRegistries.BEDROCK_FLUID_REGISTRY, id);
@@ -76,7 +77,7 @@ public class GTBedrockFluids {
                 .biomes(10, Tags.Biomes.IS_SANDY)
                 .dimensions(overworld())
                 .build());
-        register(context, LIGHT_OIL,  builder -> builder
+        register(context, LIGHT_OIL, builder -> builder
                 .fluid(GTMaterials.LightOil::getFluid)
                 .weight(25)
                 .yield(175, 300)
@@ -84,7 +85,7 @@ public class GTBedrockFluids {
                 .depletionChance(100)
                 .depletedYield(25)
                 .dimensions(overworld()));
-        register(context, NATURAL_GAS,  builder -> builder
+        register(context, NATURAL_GAS, builder -> builder
                 .fluid(GTMaterials.NaturalGas::getFluid)
                 .weight(15)
                 .yield(100, 175)
@@ -92,7 +93,7 @@ public class GTBedrockFluids {
                 .depletionChance(100)
                 .depletedYield(20)
                 .dimensions(overworld()));
-        register(context, OIL,  builder -> builder
+        register(context, OIL, builder -> builder
                 .fluid(GTMaterials.Oil::getFluid)
                 .weight(20)
                 .yield(175, 300)
@@ -102,7 +103,7 @@ public class GTBedrockFluids {
                 .biomes(5, BiomeTags.IS_OCEAN)
                 .biomes(5, Tags.Biomes.IS_SANDY)
                 .dimensions(overworld()));
-        register(context, RAW_OIL,  builder -> builder
+        register(context, RAW_OIL, builder -> builder
                 .fluid(GTMaterials.RawOil::getFluid)
                 .weight(20)
                 .yield(200, 300)
@@ -110,7 +111,7 @@ public class GTBedrockFluids {
                 .depletionChance(100)
                 .depletedYield(25)
                 .dimensions(overworld()));
-        register(context, SALT_WATER,  builder -> builder
+        register(context, SALT_WATER, builder -> builder
                 .fluid(GTMaterials.SaltWater::getFluid)
                 .weight(0)
                 .yield(50, 100)
@@ -121,7 +122,7 @@ public class GTBedrockFluids {
                 .biomes(200, Biomes.DEEP_OCEAN, Biomes.DEEP_COLD_OCEAN, Biomes.DEEP_FROZEN_OCEAN)
                 .biomes(150, BiomeTags.IS_OCEAN));
 
-        register(context, LAVA,  builder -> builder
+        register(context, LAVA, builder -> builder
                 .fluid(GTMaterials.Lava::getFluid)
                 .weight(65)
                 .yield(125, 250)

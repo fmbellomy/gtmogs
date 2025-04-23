@@ -2,13 +2,13 @@ package com.gregtechceu.gtceu.data.fluid;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluid;
-import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
+import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.world.level.material.Fluid;

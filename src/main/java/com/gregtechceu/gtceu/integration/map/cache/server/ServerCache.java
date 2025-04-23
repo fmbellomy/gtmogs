@@ -97,7 +97,8 @@ public class ServerCache extends WorldCache {
         PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
     }
 
-    public void prospectByDepositName(ResourceKey<Level> dim, ResourceKey<OreVeinDefinition> veinId, BlockPos origin, ServerPlayer player,
+    public void prospectByDepositName(ResourceKey<Level> dim, ResourceKey<OreVeinDefinition> veinId, BlockPos origin,
+                                      ServerPlayer player,
                                       int radius) {
         if (radius < 0) return;
         List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, origin, radius);

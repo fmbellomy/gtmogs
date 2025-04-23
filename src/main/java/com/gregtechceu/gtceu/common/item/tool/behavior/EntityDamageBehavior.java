@@ -1,16 +1,9 @@
 package com.gregtechceu.gtceu.common.item.tool.behavior;
 
-import com.google.common.base.Strings;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
-
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
-import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
-import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,6 +19,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
+import com.google.common.base.Strings;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
+import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatMap;
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -36,6 +36,7 @@ import java.util.*;
  */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior> {
+
     // spotless:off
     public static final Codec<EntityDamageBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.lenientOptionalFieldOf("mob_type")
@@ -101,7 +102,7 @@ public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior>
     @Override
     public void addInformation(@NotNull ItemStack stack, Item.TooltipContext context, @NotNull List<Component> tooltip,
                                @NotNull TooltipFlag flag) {
-        //noinspection OptionalIsPresent
+        // noinspection OptionalIsPresent
         if (mobType.isPresent()) {
             tooltip.add(Component.translatable("item.gtceu.tool.behavior.damage_boost",
                     Component.translatable("item.gtceu.tool.behavior.damage_boost_" + mobType.get())));

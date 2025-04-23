@@ -20,7 +20,7 @@ public interface IInteractedMachine extends IMachineFeature {
      * Right-Click
      */
     default InteractionResult onUse(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
-                                        BlockHitResult hit) {
+                                    BlockHitResult hit) {
         return InteractionResult.PASS;
     }
 
@@ -30,8 +30,9 @@ public interface IInteractedMachine extends IMachineFeature {
      * <br/>
      * Right-Click
      */
-    default ItemInteractionResult onUseWithItem(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand,
-                                        BlockHitResult hit) {
+    default ItemInteractionResult onUseWithItem(ItemStack stack, BlockState state, Level world, BlockPos pos,
+                                                Player player, InteractionHand hand,
+                                                BlockHitResult hit) {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 

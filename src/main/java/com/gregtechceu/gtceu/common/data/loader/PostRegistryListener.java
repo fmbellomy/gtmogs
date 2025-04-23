@@ -7,12 +7,14 @@ import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
 import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
+
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.neoforged.neoforge.resource.ContextAwareReloadListener;
+
 import org.jetbrains.annotations.NotNullByDefault;
 
 import java.util.HashSet;
@@ -61,5 +63,4 @@ public class PostRegistryListener extends ContextAwareReloadListener implements 
                                           Executor backgroundExecutor, Executor gameExecutor) {
         return stage.wait(null).thenRunAsync(this::apply);
     }
-
 }

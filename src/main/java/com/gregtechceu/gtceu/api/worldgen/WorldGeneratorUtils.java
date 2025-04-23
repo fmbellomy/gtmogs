@@ -1,11 +1,10 @@
 package com.gregtechceu.gtceu.api.worldgen;
 
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -19,7 +18,9 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
+
 import com.google.common.collect.HashBiMap;
+import com.mojang.serialization.MapCodec;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -70,7 +71,8 @@ public class WorldGeneratorUtils {
                             (entry.value().biomes().size() == 0 || entry.value().biomes().contains(biome)))
                     .map(vein -> new AbstractMap.SimpleEntry<>(
                             vein.value().weight() +
-                                    (vein.value().biomeWeightModifier() == null ? 0 : vein.value().biomeWeightModifier().apply(biome)),
+                                    (vein.value().biomeWeightModifier() == null ? 0 :
+                                            vein.value().biomeWeightModifier().apply(biome)),
                             vein))
                     .filter(entry -> entry.getKey() > 0)
                     .collect(Collectors.toList());

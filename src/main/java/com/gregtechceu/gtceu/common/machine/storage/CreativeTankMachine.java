@@ -8,8 +8,8 @@ import com.gregtechceu.gtceu.api.item.datacomponents.CreativeMachineInfo;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceBorderTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
@@ -193,7 +193,8 @@ public class CreativeTankMachine extends QuantumTankMachine {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (!stored.isEmpty() && FluidStack.isSameFluidSameComponents(stored, resource)) return resource.getAmount();
+            if (!stored.isEmpty() && FluidStack.isSameFluidSameComponents(stored, resource))
+                return resource.getAmount();
             return 0;
         }
 
@@ -205,7 +206,8 @@ public class CreativeTankMachine extends QuantumTankMachine {
 
         @Override
         public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-            if (!stored.isEmpty() && FluidStack.isSameFluidSameComponents(stored, resource)) return resource.copyWithAmount(mBPerCycle);
+            if (!stored.isEmpty() && FluidStack.isSameFluidSameComponents(stored, resource))
+                return resource.copyWithAmount(mBPerCycle);
             return FluidStack.EMPTY;
         }
 

@@ -1,11 +1,11 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import dev.latvian.mods.kubejs.recipe.schema.RecipeNamespace;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaType;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.Optional;
 

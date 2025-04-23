@@ -1,15 +1,10 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
-
+import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.Getter;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
@@ -18,6 +13,9 @@ import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 
+import com.mojang.serialization.MapCodec;
+import lombok.AccessLevel;
+import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;

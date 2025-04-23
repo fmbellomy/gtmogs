@@ -13,9 +13,10 @@ import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
+
+import com.mojang.serialization.Codec;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
 
 import java.util.List;
@@ -33,7 +34,8 @@ public class SmartItemFilter implements ItemFilter {
     }
 
     public static SmartItemFilter loadFilter(ItemStack itemStack) {
-        SmartFilteringMode mode = itemStack.getOrDefault(GTDataComponents.SMART_ITEM_FILTER, SmartFilteringMode.ELECTROLYZER);
+        SmartFilteringMode mode = itemStack.getOrDefault(GTDataComponents.SMART_ITEM_FILTER,
+                SmartFilteringMode.ELECTROLYZER);
         SmartItemFilter handler = new SmartItemFilter(mode);
         handler.itemWriter = filter -> itemStack.set(GTDataComponents.SMART_ITEM_FILTER, filter.filterMode);
         return handler;
@@ -95,6 +97,7 @@ public class SmartItemFilter implements ItemFilter {
     }
 
     public enum SmartFilteringMode implements EnumSelectorWidget.SelectableEnum, StringRepresentable {
+
         ELECTROLYZER("electrolyzer", GTRecipeTypes.ELECTROLYZER_RECIPES),
         CENTRIFUGE("centrifuge", GTRecipeTypes.CENTRIFUGE_RECIPES),
         SIFTER("sifter", GTRecipeTypes.SIFTER_RECIPES);

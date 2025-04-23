@@ -88,7 +88,6 @@ public final class MaterialRegistry extends GTRegistry<Material> implements IMat
         return fallbackMaterials.get(GTCEu.MOD_ID);
     }
 
-
     @NotNull
     @Override
     public Phase getPhase() {

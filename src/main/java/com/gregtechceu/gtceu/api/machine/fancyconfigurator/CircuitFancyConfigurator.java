@@ -23,6 +23,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.items.ItemStackHandler;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -59,7 +60,8 @@ public class CircuitFancyConfigurator implements IFancyConfigurator, IFancyCusto
     }
 
     @Override
-    public boolean mouseWheelMove(BiConsumer<Integer, Consumer<RegistryFriendlyByteBuf>> writeClientAction, double mouseX,
+    public boolean mouseWheelMove(BiConsumer<Integer, Consumer<RegistryFriendlyByteBuf>> writeClientAction,
+                                  double mouseX,
                                   double mouseY, double wheelDelta) {
         if (wheelDelta == 0) return false;
         if (!ConfigHolder.INSTANCE.machines.ghostCircuit && circuitSlot.getStackInSlot(0).isEmpty()) return false;

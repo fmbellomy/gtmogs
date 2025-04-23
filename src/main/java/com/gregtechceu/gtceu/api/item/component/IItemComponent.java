@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.item.component;
 
 import com.gregtechceu.gtceu.api.item.IComponentItem;
+
 import net.minecraft.world.item.Item;
 
 /**

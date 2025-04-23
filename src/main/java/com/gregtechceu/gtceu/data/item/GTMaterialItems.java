@@ -1,18 +1,18 @@
 package com.gregtechceu.gtceu.data.item;
 
 import com.gregtechceu.gtceu.api.GTCEuAPI;
+import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
+import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IGTToolDefinition;
 import com.gregtechceu.gtceu.api.item.tool.MaterialToolTier;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.item.IGTTool;
-import com.gregtechceu.gtceu.api.item.TagPrefixItem;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
@@ -26,6 +26,8 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
@@ -33,7 +35,6 @@ import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
-import net.minecraft.world.level.block.Block;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,9 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.MATERIAL_ITEM;
 import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.TOOL;
-import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
 public class GTMaterialItems {
 
@@ -62,11 +63,12 @@ public class GTMaterialItems {
 
     // Reference Tables
     public static Table<TagPrefix, Material, ItemEntry<TagPrefixItem>> MATERIAL_ITEMS;
-    public final static Table<Material, GTToolType, ItemProviderEntry<Item, ? extends IGTTool>> TOOL_ITEMS = ArrayTable.create(
-            GTCEuAPI.materialManager.stream()
-                    .filter(mat -> mat.hasProperty(PropertyKey.TOOL))
-                    .toList(),
-            GTToolType.getTypes().values().stream().toList());
+    public final static Table<Material, GTToolType, ItemProviderEntry<Item, ? extends IGTTool>> TOOL_ITEMS = ArrayTable
+            .create(
+                    GTCEuAPI.materialManager.stream()
+                            .filter(mat -> mat.hasProperty(PropertyKey.TOOL))
+                            .toList(),
+                    GTToolType.getTypes().values().stream().toList());
 
     // Material Items
     public static void generateMaterialItems() {

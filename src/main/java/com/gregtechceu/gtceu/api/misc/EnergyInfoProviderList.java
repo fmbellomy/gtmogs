@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.api.misc;
 
 import com.gregtechceu.gtceu.api.capability.IEnergyInfoProvider;
 
-
 import java.math.BigInteger;
 import java.util.List;
 

@@ -94,7 +94,7 @@ public class EntityDamageUtil {
                 var usedItem = mutable.getValue();
                 // check for empty in order to force damage to be applied if armor breaks
                 if (!usedItem.itemStack().isEmpty()) {
-                    //noinspection DataFlowIssue
+                    // noinspection DataFlowIssue
                     usedItem.itemStack().hurtAndBreak(1, entity, usedItem.inSlot());
                     return;
                 }

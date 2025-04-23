@@ -13,7 +13,8 @@ import dev.latvian.mods.rhino.Context;
 import dev.latvian.mods.rhino.type.TypeInfo;
 import org.apache.commons.lang3.mutable.MutableObject;
 
-public record ContentJS<T>(RecipeComponentType<?> type, RecipeComponentType<T> baseComponent, RecipeCapability<?> capability)
+public record ContentJS<T>(RecipeComponentType<?> type, RecipeComponentType<T> baseComponent,
+                           RecipeCapability<?> capability)
         implements RecipeComponent<Content> {
 
     public static <T> ContentJS<T> create(RecipeComponentType<T> baseComponent, RecipeCapability<?> capability) {
@@ -41,7 +42,7 @@ public record ContentJS<T>(RecipeComponentType<?> type, RecipeComponentType<T> b
     public Content replace(Context cx, KubeRecipe recipe, Content original, ReplacementMatchInfo match, Object with) {
         return new Content(
                 baseComponent.instance().replace(cx, recipe,
-                        baseComponent.instance().wrap(cx, recipe, original.content),match, with),
+                        baseComponent.instance().wrap(cx, recipe, original.content), match, with),
                 original.chance, original.maxChance, original.tierChanceBoost);
     }
 

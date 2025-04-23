@@ -1,18 +1,14 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
 import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.mojang.serialization.JsonOps;
-import lombok.experimental.ExtensionMethod;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.resources.RegistryOps;
-import net.neoforged.neoforge.fluids.FluidStack;
 
-import com.google.gson.JsonElement;
-import com.mojang.serialization.Codec;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import com.mojang.serialization.Codec;
+import lombok.experimental.ExtensionMethod;
 
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class SerializerFluidIngredient implements IContentSerializer<SizedFluidIngredient> {

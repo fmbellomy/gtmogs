@@ -1,11 +1,7 @@
 package com.gregtechceu.gtceu.common.recipe.builder;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.gregtechceu.gtceu.api.recipe.kind.StrictShapedRecipe;
 
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -18,8 +14,12 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.minecraft.world.level.ItemLike;
-
 import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

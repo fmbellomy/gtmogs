@@ -33,7 +33,8 @@ public class TagType {
      */
     public static TagType withDefaultFormatter(String tagPath, boolean isVanilla) {
         TagType type = new TagType(tagPath);
-        type.formatter = Util.memoize((prefix, mat) -> TagUtil.createItemTag(type.tagPath.formatted(mat.getName()), isVanilla));
+        type.formatter = Util
+                .memoize((prefix, mat) -> TagUtil.createItemTag(type.tagPath.formatted(mat.getName()), isVanilla));
         return type;
     }
 
@@ -44,7 +45,8 @@ public class TagType {
      */
     public static TagType withPrefixFormatter(String tagPath) {
         TagType type = new TagType(tagPath);
-        type.formatter = Util.memoize((prefix, mat) -> TagUtil.createItemTag(type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name), mat.getName())));
+        type.formatter = Util.memoize((prefix, mat) -> TagUtil.createItemTag(
+                type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name), mat.getName())));
         return type;
     }
 
@@ -54,7 +56,8 @@ public class TagType {
      */
     public static TagType withPrefixOnlyFormatter(String tagPath) {
         TagType type = new TagType(tagPath);
-        type.formatter = Util.memoize((prefix, mat) -> TagUtil.createItemTag(type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name))));
+        type.formatter = Util.memoize((prefix, mat) -> TagUtil
+                .createItemTag(type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name))));
         type.isParentTag = true;
         return type;
     }

@@ -2,17 +2,17 @@ package com.gregtechceu.gtceu.client;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.fluid.FluidConstants;
+import com.gregtechceu.gtceu.api.fluid.FluidState;
+import com.gregtechceu.gtceu.api.fluid.GTFluid;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.fluid.FluidConstants;
-import com.gregtechceu.gtceu.api.fluid.FluidState;
-import com.gregtechceu.gtceu.api.fluid.GTFluid;
-import com.gregtechceu.gtceu.data.fluid.GTFluids;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.common.fluid.potion.PotionFluidHelper;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
+import com.gregtechceu.gtceu.data.fluid.GTFluids;
+import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import net.minecraft.ChatFormatting;
@@ -27,6 +27,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -36,7 +37,8 @@ public class TooltipsHandler {
     private static final String ITEM_PREFIX = "item." + GTCEu.MOD_ID;
     private static final String BLOCK_PREFIX = "block." + GTCEu.MOD_ID;
 
-    public static void appendTooltips(ItemStack stack, TooltipFlag flag, List<Component> tooltips, Item.TooltipContext context) {
+    public static void appendTooltips(ItemStack stack, TooltipFlag flag, List<Component> tooltips,
+                                      Item.TooltipContext context) {
         // Formula
         var materialEntry = ChemicalHelper.getMaterialEntry(stack.getItem());
         if (!materialEntry.isEmpty()) {
@@ -75,7 +77,8 @@ public class TooltipsHandler {
         GTUtil.appendHazardTooltips(material, tooltips);
     }
 
-    public static void appendFluidTooltips(FluidStack fluidStack, Consumer<Component> tooltips, TooltipFlag flag, Item.TooltipContext context) {
+    public static void appendFluidTooltips(FluidStack fluidStack, Consumer<Component> tooltips, TooltipFlag flag,
+                                           Item.TooltipContext context) {
         Fluid fluid = fluidStack.getFluid();
         int amount = fluidStack.getAmount();
         FluidType fluidType = fluid.getFluidType();

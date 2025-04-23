@@ -1,10 +1,8 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
 import com.gregtechceu.gtceu.api.tag.TagUtil;
-
 import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -17,18 +15,18 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.templates.VoidFluidHandler;
-
-import lombok.Getter;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import com.mojang.serialization.MapCodec;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-import javax.annotation.Nonnull;
-
 public class FluidContainerIngredient implements ICustomIngredient {
+
     // spotless:off
     public static final MapCodec<FluidContainerIngredient> CODEC = SizedFluidIngredient.NESTED_CODEC.fieldOf("fluid")
             .xmap(FluidContainerIngredient::new, FluidContainerIngredient::getFluid);

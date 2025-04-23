@@ -12,10 +12,10 @@ import com.gregtechceu.gtceu.api.gui.editor.IEditableUI;
 import com.gregtechceu.gtceu.api.gui.widget.DualProgressWidget;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.integration.emi.recipe.GTRecipeEMICategory;
 import com.gregtechceu.gtceu.integration.jei.recipe.GTRecipeJEICategory;
@@ -51,6 +51,7 @@ import lombok.Setter;
 import me.shedaniel.rei.api.client.view.ViewSearchBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -110,8 +111,9 @@ public class GTRecipeTypeUI {
             } else {
                 try {
                     var resource = resourceManager
-                            .getResourceOrThrow(ResourceLocation.fromNamespaceAndPath(recipeType.registryName.getNamespace(),
-                                    "ui/recipe_type/%s.rtui".formatted(recipeType.registryName.getPath())));
+                            .getResourceOrThrow(
+                                    ResourceLocation.fromNamespaceAndPath(recipeType.registryName.getNamespace(),
+                                            "ui/recipe_type/%s.rtui".formatted(recipeType.registryName.getPath())));
                     try (InputStream inputStream = resource.open()) {
                         try (DataInputStream dataInputStream = new DataInputStream(inputStream)) {
                             this.customUICache = NbtIo.read(dataInputStream, NbtAccounter.unlimitedHeap());
@@ -325,7 +327,7 @@ public class GTRecipeTypeUI {
             int capCount = entry.getValue();
             for (int slotIndex = 0; slotIndex < capCount; slotIndex++) {
                 var slot = cap.createWidget();
-                //noinspection DataFlowIssue
+                // noinspection DataFlowIssue
                 slot.setSelfPosition(new Position((index % 3) * 18 + 4, (index / 3) * 18 + 4));
                 slot.setBackground(
                         getOverlaysForSlot(isOutputs, cap, slotIndex == capCount - 1, isSteam, isHighPressure));

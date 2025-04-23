@@ -9,8 +9,8 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,9 +26,11 @@ public class SimpleGeneratorMachineRenderer extends WorkableTieredHullMachineRen
 
     @Override
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand, Direction modelFacing,
+                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand,
+                              Direction modelFacing,
                               ModelState modelState, @NotNull ModelData data, RenderType renderType) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data,
+                renderType);
         if (side == frontFacing && modelFacing != null) {
             ENERGY_OUT_1A.renderOverlay(quads, modelFacing, modelState, 2);
         }

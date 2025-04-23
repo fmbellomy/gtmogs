@@ -65,7 +65,8 @@ public final class AddonFinder {
                     IGTAddon instance = constructor.newInstance();
                     instances.put(modId, instance);
                 } catch (ReflectiveOperationException e) {
-                    LOGGER.error("GT addon class {} for addon {} must have a public constructor with no arguments, found {}",
+                    LOGGER.error(
+                            "GT addon class {} for addon {} must have a public constructor with no arguments, found {}",
                             className, modId, Arrays.toString(asmInstanceClass.getConstructors()));
                 }
             } catch (ClassCastException e) {

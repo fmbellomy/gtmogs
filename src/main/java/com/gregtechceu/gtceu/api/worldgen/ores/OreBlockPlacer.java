@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.ores;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 
-
 /**
  * Responsible for actually placing a vein's block.
  * 

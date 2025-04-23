@@ -6,8 +6,6 @@ import com.gregtechceu.gtceu.api.gui.widget.EnumSelectorWidget;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
-
-
 public enum FilterMode implements EnumSelectorWidget.SelectableEnum {
 
     FILTER_INSERT("filter_insert"),

@@ -2,10 +2,10 @@ package com.gregtechceu.gtceu.integration.kjs.builders.machine;
 
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 
-import dev.latvian.mods.kubejs.client.LangKubeEvent;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
 import net.minecraft.resources.ResourceLocation;
 
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;

@@ -24,8 +24,8 @@ public class DimensionFilter extends PlacementFilter {
 
     public static final MapCodec<DimensionFilter> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.DIMENSION_TYPE).fieldOf("dimension_id")
-                    .forGetter(filter -> filter.dimensionId)
-    ).apply(instance, DimensionFilter::new));
+                    .forGetter(filter -> filter.dimensionId))
+            .apply(instance, DimensionFilter::new));
 
     public HolderSet<DimensionType> dimensionId;
 

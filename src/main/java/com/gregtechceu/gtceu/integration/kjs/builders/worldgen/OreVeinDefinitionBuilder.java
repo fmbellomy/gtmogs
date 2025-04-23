@@ -6,11 +6,7 @@ import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
-import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.Tolerate;
+
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +17,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+
+import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.experimental.Tolerate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -56,7 +58,6 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     private VeinGenerator veinGenerator;
     @Setter
     private List<IndicatorGenerator> indicatorGenerators;
-
 
     public OreVeinDefinitionBuilder(ResourceLocation id) {
         super(id);
@@ -172,7 +173,7 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     @Nullable
     public VeinGenerator veinGenerator(ResourceLocation id) {
         if (veinGenerator == null) {
-            //noinspection DataFlowIssue
+            // noinspection DataFlowIssue
             veinGenerator = WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.containsKey(id) ?
                     WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.get(id).get() : null;
         }
@@ -215,5 +216,4 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
                 biomes, biomeWeightModifier, veinGenerator, indicatorGenerators,
                 GTRegistries.builtinRegistry().lookupOrThrow(Registries.BIOME));
     }
-
 }

@@ -14,8 +14,8 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,9 @@ import java.util.List;
 public interface ICoverRenderer extends IRenderer {
 
     /**
-     * Use {@link #renderCover(List, Direction, RandomSource, CoverBehavior, Direction, BlockPos, BlockAndTintGetter, ModelState)} instead
+     * Use
+     * {@link #renderCover(List, Direction, RandomSource, CoverBehavior, Direction, BlockPos, BlockAndTintGetter, ModelState)}
+     * instead
      */
     @Override
     @Deprecated

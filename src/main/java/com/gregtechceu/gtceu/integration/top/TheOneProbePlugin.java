@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.integration.top;
 
 import com.gregtechceu.gtceu.integration.top.element.FluidStackElement;
-import com.gregtechceu.gtceu.integration.top.element.FluidStyle;
 import com.gregtechceu.gtceu.integration.top.element.ProgressElement;
 import com.gregtechceu.gtceu.integration.top.provider.*;
 

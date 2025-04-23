@@ -7,14 +7,13 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTProgrammedCircuitWidget;
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 import com.lowdragmc.lowdraglib.jei.ModularWrapper;
 
-import lombok.Getter;
 import net.minecraft.network.chat.Component;
 
+import lombok.Getter;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.RecipeType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class GTProgrammedCircuitCategory extends ModularUIRecipeCategory<GTProgrammedCircuitWidget> {
 

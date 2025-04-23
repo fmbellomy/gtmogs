@@ -42,9 +42,9 @@ public abstract class FluidEmiStackMixin extends EmiStack {
     private void gtceu$addFluidTooltip(CallbackInfoReturnable<List<ClientTooltipComponent>> cir,
                                        @Local(ordinal = 0) List<ClientTooltipComponent> list) {
         TooltipsHandler.appendFluidTooltips(new FluidStack(
-                        this.fluid.builtInRegistryHolder(),
-                        Math.max(GTMath.saturatedCast(this.getAmount()), 1),
-                        this.getComponentChanges()),
+                this.fluid.builtInRegistryHolder(),
+                Math.max(GTMath.saturatedCast(this.getAmount()), 1),
+                this.getComponentChanges()),
                 text -> list.add(EmiTooltipComponents.of(text)),
                 TooltipFlag.NORMAL,
                 Item.TooltipContext.of(Minecraft.getInstance().level));

@@ -8,8 +8,6 @@ import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
 
-import com.mojang.serialization.MapCodec;
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.ExtraCodecs;
@@ -23,12 +21,15 @@ import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
+
 import com.google.common.base.Preconditions;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
@@ -50,8 +51,8 @@ public class ClassicVeinGenerator extends VeinGenerator {
             Layer.CODEC.fieldOf("secondary").forGetter(val -> val.secondary),
             Layer.CODEC.fieldOf("between").forGetter(val -> val.between),
             Layer.CODEC.fieldOf("sporadic").forGetter(val -> val.sporadic),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius)
-    ).apply(instance, ClassicVeinGenerator::new));
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("y_radius", 3).forGetter(val -> val.yRadius))
+            .apply(instance, ClassicVeinGenerator::new));
 
     private Layer primary;
     private Layer secondary;
@@ -239,6 +240,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
     @AllArgsConstructor
     public static class Layer {
+
         // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("targets").forGetter(layer -> layer.target),

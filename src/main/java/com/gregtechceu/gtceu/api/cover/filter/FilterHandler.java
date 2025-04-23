@@ -22,8 +22,8 @@ import net.minecraft.world.item.ItemStack;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import java.util.function.Consumer;
 
+import java.util.function.Consumer;
 
 public abstract class FilterHandler<T, F extends Filter<T, F>> implements IEnhancedManaged {
 

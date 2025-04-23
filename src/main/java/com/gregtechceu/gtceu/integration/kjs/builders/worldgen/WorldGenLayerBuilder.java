@@ -4,11 +4,11 @@ import com.gregtechceu.gtceu.api.worldgen.IWorldGenLayer;
 import com.gregtechceu.gtceu.api.worldgen.SimpleWorldGenLayer;
 
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import dev.latvian.mods.kubejs.level.ruletest.AnyMatchRuleTest;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.experimental.Accessors;
-import net.minecraft.world.level.Level;
 
 import java.util.Collections;
 import java.util.List;

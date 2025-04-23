@@ -8,8 +8,8 @@ import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputFluid;
 import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputItem;
 import com.gregtechceu.gtceu.api.machine.feature.IMufflableMachine;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
@@ -27,6 +27,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public class MetaMachineConfigCopyBehaviour implements IInteractionItem, IAddInformation {
@@ -87,7 +88,8 @@ public class MetaMachineConfigCopyBehaviour implements IInteractionItem, IAddInf
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player, InteractionHand usedHand) {
+    public InteractionResultHolder<ItemStack> use(ItemStack item, Level level, Player player,
+                                                  InteractionHand usedHand) {
         if (player.isShiftKeyDown()) {
             item.remove(GTDataComponents.DATA_COPY_POS);
             item.remove(GTDataComponents.DATA_COPY_TAG);

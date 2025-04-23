@@ -21,5 +21,4 @@ public @interface GTAddon {
      * This is required to be the same as the one in your {@link net.neoforged.fml.common.Mod @Mod} annotation.
      */
     String value();
-
 }

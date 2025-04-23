@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
-import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.worldgen.GTOreVeins;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;

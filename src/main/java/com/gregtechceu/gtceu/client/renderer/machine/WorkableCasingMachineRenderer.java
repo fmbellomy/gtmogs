@@ -17,8 +17,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,9 +45,11 @@ public class WorkableCasingMachineRenderer extends MachineRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public void renderMachine(List<BakedQuad> quads, MachineDefinition definition, @Nullable MetaMachine machine,
-                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand, Direction modelFacing,
+                              Direction frontFacing, @Nullable Direction side, @NotNull RandomSource rand,
+                              Direction modelFacing,
                               ModelState modelState, @NotNull ModelData data, RenderType renderType) {
-        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data, renderType);
+        super.renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, modelState, data,
+                renderType);
         if (machine instanceof IWorkable workable) {
             overlayModel.bakeQuads(side, modelState, workable.isActive(), workable.isWorkingEnabled())
                     .forEach(quad -> quads.add(Quad.from(quad, reBakeOverlayQuadsOffset()).rebake()));

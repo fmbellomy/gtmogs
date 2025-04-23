@@ -16,20 +16,17 @@ import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.item.component.IItemLifeCycle;
 import com.gregtechceu.gtceu.api.item.component.IItemUIFactory;
+import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.item.GTItems;
 
-import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
-
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
+
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -49,16 +46,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
-import net.neoforged.bus.api.SubscribeEvent;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.tterrag.registrate.util.entry.ItemEntry;
+import io.netty.buffer.ByteBuf;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.NotNull;
 import oshi.util.tuples.Triplet;
 import top.theillusivec4.curios.api.CuriosApi;
+
 import java.util.*;
 
 public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAddInformation, IItemUIFactory {
@@ -311,8 +312,10 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
         public ItemStack getFilter(ItemStack magnet) {
             var mockStack = new ItemStack(item.asItem());
             switch (this) {
-                case SIMPLE -> mockStack.set(GTDataComponents.SIMPLE_ITEM_FILTER, magnet.get(GTDataComponents.SIMPLE_ITEM_FILTER));
-                case TAG -> mockStack.set(GTDataComponents.TAG_FILTER_EXPRESSION, magnet.get(GTDataComponents.TAG_FILTER_EXPRESSION));
+                case SIMPLE -> mockStack.set(GTDataComponents.SIMPLE_ITEM_FILTER,
+                        magnet.get(GTDataComponents.SIMPLE_ITEM_FILTER));
+                case TAG -> mockStack.set(GTDataComponents.TAG_FILTER_EXPRESSION,
+                        magnet.get(GTDataComponents.TAG_FILTER_EXPRESSION));
             }
             return mockStack;
         }
@@ -358,15 +361,15 @@ public class ItemMagnetBehavior implements IInteractionItem, IItemLifeCycle, IAd
     }
 
     public record MagnetComponent(boolean active, Filter filterType) {
+
         public static final Codec<MagnetComponent> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.BOOL.orElse(false).fieldOf("active").forGetter(MagnetComponent::active),
-                Filter.CODEC.fieldOf("filter_type").forGetter(MagnetComponent::filterType)
-        ).apply(instance, MagnetComponent::new));
+                Filter.CODEC.fieldOf("filter_type").forGetter(MagnetComponent::filterType))
+                .apply(instance, MagnetComponent::new));
         public static final StreamCodec<ByteBuf, MagnetComponent> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.BOOL, MagnetComponent::active,
                 ByteBufCodecs.VAR_INT, c -> c.filterType().ordinal(),
-                (active, ordinal) -> new MagnetComponent(active, Filter.get(ordinal))
-        );
+                (active, ordinal) -> new MagnetComponent(active, Filter.get(ordinal)));
 
         public static final MagnetComponent EMPTY = new MagnetComponent(false, Filter.SIMPLE);
     }

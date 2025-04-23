@@ -104,7 +104,8 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
                     tnt.onCaughtFire(state, context.getLevel(), pos, null, player);
                     context.getLevel().setBlock(pos, Blocks.AIR.defaultBlockState(),
                             Block.UPDATE_ALL_IMMEDIATE);
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS,
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE,
+                            SoundSource.PLAYERS,
                             1.0F,
                             GTValues.RNG.nextFloat() * 0.4F + 0.8F);
                     return InteractionResult.SUCCESS;
@@ -113,7 +114,8 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
                     explosive.explode(context.getLevel(), pos, player);
                     context.getLevel().setBlock(pos, Blocks.AIR.defaultBlockState(),
                             Block.UPDATE_ALL_IMMEDIATE);
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS,
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE,
+                            SoundSource.PLAYERS,
                             1.0F,
                             GTValues.RNG.nextFloat() * 0.4F + 0.8F);
                     return InteractionResult.SUCCESS;
@@ -148,11 +150,13 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
                     } else return InteractionResult.PASS;
                 }
                 case SoulSandBlock soulSandBlock when block != Blocks.SOUL_FIRE && consumeFuel(player, itemStack) -> {
-                    context.getLevel().setBlock(offset, Blocks.SOUL_FIRE.defaultBlockState(), Block.UPDATE_ALL_IMMEDIATE);
+                    context.getLevel().setBlock(offset, Blocks.SOUL_FIRE.defaultBlockState(),
+                            Block.UPDATE_ALL_IMMEDIATE);
                     if (!context.getLevel().isClientSide) {
                         CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer) player, offset, itemStack);
                     }
-                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE, SoundSource.PLAYERS,
+                    player.level().playSound(null, player.getOnPos(), SoundEvents.FLINTANDSTEEL_USE,
+                            SoundSource.PLAYERS,
                             1.0F,
                             GTValues.RNG.nextFloat() * 0.4F + 0.8F);
                     return InteractionResult.PASS;

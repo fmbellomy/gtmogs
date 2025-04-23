@@ -24,6 +24,7 @@ import com.lowdragmc.lowdraglib.gui.widget.*;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 

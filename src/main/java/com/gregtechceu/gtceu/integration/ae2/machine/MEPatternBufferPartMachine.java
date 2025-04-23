@@ -18,9 +18,9 @@ import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
 import com.gregtechceu.gtceu.data.machine.GTAEMachines;
-import com.gregtechceu.gtceu.common.item.behavior.IntCircuitBehaviour;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.AETextInputButtonWidget;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEPatternViewSlotWidget;
 import com.gregtechceu.gtceu.integration.ae2.machine.trait.InternalSlotRecipeHandler;
@@ -38,9 +38,6 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
-import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -56,6 +53,8 @@ import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
 import appeng.api.crafting.IPatternDetails;
 import appeng.api.crafting.PatternDetailsHelper;
 import appeng.api.implementations.blockentities.PatternContainerGroup;
@@ -71,17 +70,19 @@ import appeng.helpers.patternprovider.PatternContainer;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import it.unimi.dsi.fastutil.objects.*;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.Getter;
 import lombok.Setter;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
 
 @ExtensionMethod(SizedIngredientExtensions.class)
 public class MEPatternBufferPartMachine extends MEBusPartMachine
@@ -616,7 +617,8 @@ public class MEPatternBufferPartMachine extends MEBusPartMachine
             return left.isEmpty() ? null : left;
         }
 
-        public @Nullable List<SizedFluidIngredient> handleFluidInternal(List<SizedFluidIngredient> left, boolean simulate) {
+        public @Nullable List<SizedFluidIngredient> handleFluidInternal(List<SizedFluidIngredient> left,
+                                                                        boolean simulate) {
             boolean changed = false;
             for (var it = left.listIterator(); it.hasNext();) {
                 var ingredient = it.next();

@@ -1,13 +1,9 @@
 package com.gregtechceu.gtceu.api.capability.recipe;
 
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
-import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.item.*;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.ResearchData;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
@@ -15,9 +11,13 @@ import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import com.gregtechceu.gtceu.api.recipe.content.SerializerIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntCircuitIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
+import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.lookup.*;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.item.*;
 import com.gregtechceu.gtceu.api.recipe.modifier.ParallelLogic;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.common.recipe.condition.ResearchCondition;
 import com.gregtechceu.gtceu.common.valueprovider.AddedFloat;
 import com.gregtechceu.gtceu.common.valueprovider.CastedFloat;
@@ -35,7 +35,6 @@ import com.gregtechceu.gtceu.utils.*;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.jei.IngredientIO;
 
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentPredicate;
@@ -53,6 +52,7 @@ import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.*;
+import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnknownNullability;
@@ -98,14 +98,14 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
 
             // all kinds of special cases
             switch (custom) {
-                case DataComponentIngredient component when component.isStrict() ->
-                        ingredients.addAll(MapItemStackStrictComponentIngredient.from(component));
-                case DataComponentIngredient component when !component.isStrict() ->
-                        ingredients.addAll(MapItemStackPartialComponentIngredient.from(component));
+                case DataComponentIngredient component when component.isStrict() -> ingredients
+                        .addAll(MapItemStackStrictComponentIngredient.from(component));
+                case DataComponentIngredient component when !component.isStrict() -> ingredients
+                        .addAll(MapItemStackPartialComponentIngredient.from(component));
                 case IntCircuitIngredient circuit -> ingredients
                         .addAll(MapItemStackStrictComponentIngredient.from(circuit.convertToData()));
-                case IntersectionIngredient intersection ->
-                        ingredients.add(new MapItemIntersectionIngredient(intersection));
+                case IntersectionIngredient intersection -> ingredients
+                        .add(new MapItemIntersectionIngredient(intersection));
                 case CompoundIngredient compound -> {
                     for (Ingredient inner : compound.children()) {
                         ingredients.addAll(convertToMapIngredient(inner));
@@ -161,14 +161,16 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                 // formatter:off
                 ingredients
                         .add(new MapItemStackStrictComponentIngredient(stack,
-                                (DataComponentIngredient) DataComponentIngredient.of(true, stack).getCustomIngredient()));
+                                (DataComponentIngredient) DataComponentIngredient.of(true, stack)
+                                        .getCustomIngredient()));
                 DataComponentPredicate.Builder builder = DataComponentPredicate.builder();
                 for (var entry : stack.getComponentsPatch().entrySet()) {
                     if (entry.getValue().isEmpty()) continue;
                     builder.expect((DataComponentType) entry.getKey(), entry.getValue().get());
                 }
                 ingredients.add(new MapItemStackPartialComponentIngredient(stack,
-                        (DataComponentIngredient) DataComponentIngredient.of(false, builder.build(), stack.getItem()).getCustomIngredient()));
+                        (DataComponentIngredient) DataComponentIngredient.of(false, builder.build(), stack.getItem())
+                                .getCustomIngredient()));
                 // formatter:on
             }
             TagPrefix prefix = ChemicalHelper.getPrefix(stack.getItem());
@@ -208,10 +210,10 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                     list.addFirst(ingredient);
                 } else if (ingredient.ingredient().getCustomIngredient() instanceof IntProviderIngredient intProvider &&
                         intProvider.getInner().getCustomIngredient() instanceof IntCircuitIngredient) {
-                    list.addFirst(ingredient);
-                } else {
-                    list.add(ingredient);
-                }
+                            list.addFirst(ingredient);
+                        } else {
+                            list.add(ingredient);
+                        }
                 // formatter:on
             } else if (item instanceof ItemStack stack) {
                 boolean isEqual = false;
@@ -302,7 +304,8 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
         for (Content content : recipe.getInputContents(ItemRecipeCapability.CAP)) {
             SizedIngredient recipeIngredient = ItemRecipeCapability.CAP.of(content.content);
             int ingredientCount;
-            if (recipeIngredient.ingredient().getCustomIngredient() instanceof IntProviderIngredient intProviderIngredient) {
+            if (recipeIngredient.ingredient()
+                    .getCustomIngredient() instanceof IntProviderIngredient intProviderIngredient) {
                 ingredientCount = intProviderIngredient.getSampledCount(GTValues.RNG);
             } else {
                 ingredientCount = recipeIngredient.count();
@@ -609,6 +612,5 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
          * @return Limited multiplier
          */
         int limitParallel(GTRecipe recipe, int multiplier);
-
     }
 }

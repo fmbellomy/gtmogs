@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.jei.ModularWrapper;
+
 import net.minecraft.core.Holder;
 
 public class GTBedrockOreInfoWrapper extends ModularWrapper<GTOreVeinWidget> {

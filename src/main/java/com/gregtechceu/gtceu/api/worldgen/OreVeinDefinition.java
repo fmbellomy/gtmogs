@@ -1,13 +1,11 @@
 package com.gregtechceu.gtceu.api.worldgen;
 
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
-import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
@@ -35,16 +33,15 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 import lombok.experimental.Tolerate;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @SuppressWarnings("UnusedReturnValue")
 @Accessors(chain = true, fluent = true)
 public class OreVeinDefinition {
+
     // spotless:off
     public static final Codec<OreVeinDefinition> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
             IntProvider.NON_NEGATIVE_CODEC.fieldOf("cluster_size").forGetter(OreVeinDefinition::clusterSize),
@@ -114,7 +111,8 @@ public class OreVeinDefinition {
                              @Nullable BiomeWeightModifier biomeWeightModifier, @Nullable VeinGenerator veinGenerator,
                              @Nullable List<IndicatorGenerator> indicatorGenerators) {
         this(clusterSize, density, weight,
-                layer, new HashSet<>(dimensionFilter), heightRange,discardChanceOnAirExposure, biomes, biomeWeightModifier,
+                layer, new HashSet<>(dimensionFilter), heightRange, discardChanceOnAirExposure, biomes,
+                biomeWeightModifier,
                 veinGenerator, indicatorGenerators, null);
     }
 
@@ -271,7 +269,7 @@ public class OreVeinDefinition {
     @Nullable
     public VeinGenerator veinGenerator(ResourceLocation id) {
         if (veinGenerator == null) {
-            //noinspection DataFlowIssue
+            // noinspection DataFlowIssue
             veinGenerator = WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.containsKey(id) ?
                     WorldGeneratorUtils.VEIN_GENERATOR_FUNCTIONS.get(id).get() : null;
         }

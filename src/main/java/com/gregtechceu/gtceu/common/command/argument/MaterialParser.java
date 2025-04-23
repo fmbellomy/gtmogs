@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.common.command.argument;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.network.chat.Component;
@@ -37,7 +37,7 @@ public class MaterialParser {
     }
 
     public static Material parseForMaterial(HolderLookup<Material> registry, StringReader reader)
-            throws CommandSyntaxException {
+                                                                                                  throws CommandSyntaxException {
         int i = reader.getCursor();
 
         try {
@@ -67,9 +67,9 @@ public class MaterialParser {
         int i = this.reader.getCursor();
         ResourceLocation id = ResourceLocation.read(this.reader);
         this.result = this.materials.get(ResourceKey.create(GTRegistries.MATERIAL_REGISTRY, id)).orElseThrow(() -> {
-                    this.reader.setCursor(i);
-                    return ERROR_UNKNOWN_MATERIAL.createWithContext(this.reader, id);
-                }).value();
+            this.reader.setCursor(i);
+            return ERROR_UNKNOWN_MATERIAL.createWithContext(this.reader, id);
+        }).value();
     }
 
     private void parse() throws CommandSyntaxException {

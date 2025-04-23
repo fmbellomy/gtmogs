@@ -1,14 +1,11 @@
 package com.gregtechceu.gtceu.api.item;
 
 import com.gregtechceu.gtceu.common.block.LampBlock;
-
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
+
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,6 +15,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.state.BlockState;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +76,6 @@ public class LampBlockItem extends BlockItem implements IItemRendererProvider {
                 ByteBufCodecs.BOOL, LampData::inverted,
                 ByteBufCodecs.BOOL, LampData::bloom,
                 ByteBufCodecs.BOOL, LampData::lit,
-                LampData::new
-        );
+                LampData::new);
     }
 }

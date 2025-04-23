@@ -9,7 +9,6 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.Nullable;
 
-
 @OnlyIn(Dist.CLIENT)
 public class GTRendererProvider extends ATESRRendererProvider<BlockEntity> {
 

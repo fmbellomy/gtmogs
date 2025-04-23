@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.api.worldgen.ores;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.IWorldGenLayer;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.WorldGeneratorUtils;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.map.cache.server.ServerCache;
@@ -20,13 +20,13 @@ import net.minecraft.world.level.levelgen.placement.PlacementContext;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 
 /**
  * Responsible for (pre)generating ore veins.<br/>
@@ -124,7 +124,8 @@ public class OreGenerator {
                 })).toList();
     }
 
-    private Stream<Holder<OreVeinDefinition>> getEntries(WorldGenLevel level, BlockPos veinCenter, XoroshiroRandomSource random) {
+    private Stream<Holder<OreVeinDefinition>> getEntries(WorldGenLevel level, BlockPos veinCenter,
+                                                         XoroshiroRandomSource random) {
         return WorldGeneratorUtils.WORLD_GEN_LAYERS.values().stream()
                 .filter(layer -> layer.isApplicableForLevel(level.getLevel().dimension()))
                 .map(layer -> getEntry(level, level.getBiome(veinCenter), random, layer))
@@ -133,7 +134,7 @@ public class OreGenerator {
 
     @Nullable
     private Holder<OreVeinDefinition> getEntry(WorldGenLevel level, Holder<Biome> biome, RandomSource random,
-                                       IWorldGenLayer layer) {
+                                               IWorldGenLayer layer) {
         var veins = WorldGeneratorUtils.getCachedBiomeVeins(level.getLevel(), biome, random).stream()
                 .filter(vein -> vein.getValue().value().layer().equals(layer))
                 .toList();

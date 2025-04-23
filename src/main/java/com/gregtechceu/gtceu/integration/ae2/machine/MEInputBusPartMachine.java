@@ -26,10 +26,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.CustomData;
+
 import appeng.api.config.Actionable;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
-import net.minecraft.world.item.component.CustomData;
 
 public class MEInputBusPartMachine extends MEBusPartMachine
                                    implements IDataStickInteractable, IMachineLife, IHasCircuitSlot {

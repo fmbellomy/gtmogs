@@ -6,9 +6,10 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
+
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Collection;
 import java.util.function.Function;

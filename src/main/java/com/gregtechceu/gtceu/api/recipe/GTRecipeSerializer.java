@@ -10,8 +10,6 @@ import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.recipe.condition.ResearchCondition;
 
-import com.mojang.serialization.MapCodec;
-import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionHolder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -25,7 +23,9 @@ import net.minecraft.util.Tuple;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionHolder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -76,8 +76,8 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
     }
 
     public static RecipeCondition<?> conditionReader(RegistryFriendlyByteBuf buf) {
-        RecipeCondition<?> condition = GTRegistries.RECIPE_CONDITIONS.get(buf.readResourceLocation())
-                .factory.createDefault();
+        RecipeCondition<?> condition = GTRegistries.RECIPE_CONDITIONS.get(buf.readResourceLocation()).factory
+                .createDefault();
         return condition.fromNetwork(buf);
     }
 
@@ -207,46 +207,61 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
         if (!isKubeLoaded) {
             // I'll admit, it's not great.
             return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                            GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
-                            RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
-                            RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
-                            RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),
-                            RecipeCapability.CODEC.optionalFieldOf("tickOutputs", Map.of()).forGetter(val -> val.tickOutputs),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec()).optionalFieldOf("inputChanceLogics", Map.of()).forGetter(val -> val.inputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec()).optionalFieldOf("outputChanceLogics", Map.of()).forGetter(val -> val.outputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec()).optionalFieldOf("tickInputChanceLogics", Map.of()).forGetter(val -> val.tickInputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec()).optionalFieldOf("tickOutputChanceLogics", Map.of()).forGetter(val -> val.tickOutputChanceLogics),
-                            RecipeCondition.CODEC.listOf().optionalFieldOf("recipeConditions", List.of()).forGetter(val -> val.conditions),
-                            CompoundTag.CODEC.optionalFieldOf("data", new CompoundTag()).forGetter(val -> val.data),
-                            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("duration").forGetter(val -> val.duration),
-                            GTRegistries.RECIPE_CATEGORIES.byNameCodec().optionalFieldOf("category", GTRecipeCategory.DEFAULT).forGetter(val -> val.recipeCategory))
+                    GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
+                    RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
+                    RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
+                    RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),
+                    RecipeCapability.CODEC.optionalFieldOf("tickOutputs", Map.of()).forGetter(val -> val.tickOutputs),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("inputChanceLogics", Map.of()).forGetter(val -> val.inputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("outputChanceLogics", Map.of()).forGetter(val -> val.outputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("tickInputChanceLogics", Map.of())
+                            .forGetter(val -> val.tickInputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("tickOutputChanceLogics", Map.of())
+                            .forGetter(val -> val.tickOutputChanceLogics),
+                    RecipeCondition.CODEC.listOf().optionalFieldOf("recipeConditions", List.of())
+                            .forGetter(val -> val.conditions),
+                    CompoundTag.CODEC.optionalFieldOf("data", new CompoundTag()).forGetter(val -> val.data),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("duration").forGetter(val -> val.duration),
+                    GTRegistries.RECIPE_CATEGORIES.byNameCodec().optionalFieldOf("category", GTRecipeCategory.DEFAULT)
+                            .forGetter(val -> val.recipeCategory))
                     .apply(instance, (type,
                                       inputs, outputs, tickInputs, tickOutputs,
-                                      inputChanceLogics, outputChanceLogics, tickInputChanceLogics, tickOutputChanceLogics,
-                                      conditions, data, duration, recipeCategory) ->
-                            new GTRecipe(type, inputs, outputs, tickInputs, tickOutputs,
-                                    inputChanceLogics, outputChanceLogics, tickInputChanceLogics, tickOutputChanceLogics,
-                                    conditions, List.of(), data, duration, recipeCategory)));
+                                      inputChanceLogics, outputChanceLogics, tickInputChanceLogics,
+                                      tickOutputChanceLogics,
+                                      conditions, data, duration, recipeCategory) -> new GTRecipe(type, inputs, outputs,
+                                              tickInputs, tickOutputs,
+                                              inputChanceLogics, outputChanceLogics, tickInputChanceLogics,
+                                              tickOutputChanceLogics,
+                                              conditions, List.of(), data, duration, recipeCategory)));
         } else {
             return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                            GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
-                            RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
-                            RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
-                            RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),
-                            RecipeCapability.CODEC.optionalFieldOf("tickOutputs", Map.of()).forGetter(val -> val.tickOutputs),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
-                                    .optionalFieldOf("inputChanceLogics", Map.of()).forGetter(val -> val.inputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
-                                    .optionalFieldOf("outputChanceLogics", Map.of()).forGetter(val -> val.outputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
-                                    .optionalFieldOf("tickInputChanceLogics", Map.of()).forGetter(val -> val.tickInputChanceLogics),
-                            Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
-                                    .optionalFieldOf("tickOutputChanceLogics", Map.of()).forGetter(val -> val.tickOutputChanceLogics),
-                            RecipeCondition.CODEC.listOf().optionalFieldOf("recipeConditions", List.of()).forGetter(val -> val.conditions),
-                            IngredientActionHolder.CODEC.listOf().optionalFieldOf("kubejs:actions", List.of()).forGetter(val -> (List<IngredientActionHolder>) val.ingredientActions),
-                            CompoundTag.CODEC.optionalFieldOf("data", new CompoundTag()).forGetter(val -> val.data),
-                            ExtraCodecs.NON_NEGATIVE_INT.fieldOf("duration").forGetter(val -> val.duration),
-                            GTRegistries.RECIPE_CATEGORIES.byNameCodec().optionalFieldOf("category", GTRecipeCategory.DEFAULT).forGetter(val -> val.recipeCategory))
+                    GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
+                    RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
+                    RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
+                    RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),
+                    RecipeCapability.CODEC.optionalFieldOf("tickOutputs", Map.of()).forGetter(val -> val.tickOutputs),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("inputChanceLogics", Map.of()).forGetter(val -> val.inputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("outputChanceLogics", Map.of()).forGetter(val -> val.outputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("tickInputChanceLogics", Map.of())
+                            .forGetter(val -> val.tickInputChanceLogics),
+                    Codec.unboundedMap(RecipeCapability.DIRECT_CODEC, GTRegistries.CHANCE_LOGICS.byNameCodec())
+                            .optionalFieldOf("tickOutputChanceLogics", Map.of())
+                            .forGetter(val -> val.tickOutputChanceLogics),
+                    RecipeCondition.CODEC.listOf().optionalFieldOf("recipeConditions", List.of())
+                            .forGetter(val -> val.conditions),
+                    IngredientActionHolder.CODEC.listOf().optionalFieldOf("kubejs:actions", List.of())
+                            .forGetter(val -> (List<IngredientActionHolder>) val.ingredientActions),
+                    CompoundTag.CODEC.optionalFieldOf("data", new CompoundTag()).forGetter(val -> val.data),
+                    ExtraCodecs.NON_NEGATIVE_INT.fieldOf("duration").forGetter(val -> val.duration),
+                    GTRegistries.RECIPE_CATEGORIES.byNameCodec().optionalFieldOf("category", GTRecipeCategory.DEFAULT)
+                            .forGetter(val -> val.recipeCategory))
                     .apply(instance, GTRecipe::new));
         }
         // spotless::on
@@ -254,7 +269,8 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
 
     public static class KJSCallWrapper {
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, List<IngredientActionHolder>> STREAM_CODEC = IngredientActionHolder.STREAM_CODEC.apply(ByteBufCodecs.list());
+        public static final StreamCodec<RegistryFriendlyByteBuf, List<IngredientActionHolder>> STREAM_CODEC = IngredientActionHolder.STREAM_CODEC
+                .apply(ByteBufCodecs.list());
 
         public static List<?> getIngredientActions(RegistryFriendlyByteBuf buf) {
             return STREAM_CODEC.decode(buf);

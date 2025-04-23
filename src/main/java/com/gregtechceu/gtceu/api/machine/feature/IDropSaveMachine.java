@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.machine.feature;
 
 import net.minecraft.nbt.CompoundTag;
+
 import org.jetbrains.annotations.ApiStatus;
 
 /**

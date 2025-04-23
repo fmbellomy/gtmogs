@@ -13,8 +13,6 @@ import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
-import com.tterrag.registrate.AbstractRegistrate;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -28,7 +26,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
+import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.Builder;
 import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.builders.NoConfigBuilder;
@@ -36,9 +38,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.entry.RegistryEntry;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.registries.DeferredHolder;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -95,7 +95,8 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
         Optional<IEventBus> modEventBus = ModList.get().getModContainerById(modId).map(ModContainer::getEventBus);
         if (strict) {
             modEventBus.ifPresentOrElse(registrate::registerEventListeners, () -> {
-                String message = "# [GTRegistrate] Failed to register eventListeners for mod " + modId + ", This should be reported to this mod's dev #";
+                String message = "# [GTRegistrate] Failed to register eventListeners for mod " + modId +
+                        ", This should be reported to this mod's dev #";
                 String hashtags = "#".repeat(message.length());
                 GTCEu.LOGGER.fatal(hashtags);
                 GTCEu.LOGGER.fatal(message);
@@ -177,7 +178,7 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
 
     @Override
     public <T extends Item> @NotNull ItemBuilder<T, GTRegistrate> item(String name,
-                                                                     NonNullFunction<Item.Properties, T> factory) {
+                                                                       NonNullFunction<Item.Properties, T> factory) {
         return super.item(name, factory).lang(FormattingUtil.toEnglishName(name.replaceAll("\\.", "_")));
     }
 
@@ -193,17 +194,20 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
         this.currentTab = currentTab;
     }
 
-    public boolean isInCreativeTab(RegistryEntry<?, ?> entry, RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
+    public boolean isInCreativeTab(RegistryEntry<?, ?> entry,
+                                   RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
         return TAB_LOOKUP.get(entry) == tab;
     }
 
-    public void setCreativeTab(RegistryEntry<?, ?> entry, @Nullable RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
+    public void setCreativeTab(RegistryEntry<?, ?> entry,
+                               @Nullable RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
         TAB_LOOKUP.put(entry, tab);
     }
 
     protected <R, T extends R> RegistryEntry<R, T> accept(String name, ResourceKey<? extends Registry<R>> type,
-                                                 Builder<R, T, ?, ?> builder, NonNullSupplier<? extends T> creator,
-                                                 NonNullFunction<DeferredHolder<R, T>, ? extends RegistryEntry<R, T>> entryFactory) {
+                                                          Builder<R, T, ?, ?> builder,
+                                                          NonNullSupplier<? extends T> creator,
+                                                          NonNullFunction<DeferredHolder<R, T>, ? extends RegistryEntry<R, T>> entryFactory) {
         RegistryEntry<R, T> entry = super.accept(name, type, builder, creator, entryFactory);
 
         if (this.currentTab != null) {

@@ -21,17 +21,16 @@ import com.gregtechceu.gtceu.api.sound.ExistingSoundEntry;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.common.machine.trait.customlogic.*;
+import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.common.recipe.condition.RockBreakerCondition;
 import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.integration.xei.handlers.item.CycleItemStackHandler;
 import com.gregtechceu.gtceu.utils.ResearchManager;
 
 import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
-import lombok.experimental.ExtensionMethod;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -42,6 +41,8 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import lombok.experimental.ExtensionMethod;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -563,8 +564,10 @@ public class GTRecipeTypes {
                         boolean fluidsDivisible = RecipeUtil.isFluidStackDivisibleForDistillery(input, ratio) &&
                                 RecipeUtil.isFluidStackDivisibleForDistillery(output, ratio);
 
-                        SizedFluidIngredient dividedInputFluid = input.copyWithAmount(Math.max(1, input.amount() / ratio));
-                        SizedFluidIngredient dividedOutputFluid = output.copyWithAmount(Math.max(1, output.amount() / ratio));
+                        SizedFluidIngredient dividedInputFluid = input
+                                .copyWithAmount(Math.max(1, input.amount() / ratio));
+                        SizedFluidIngredient dividedOutputFluid = output
+                                .copyWithAmount(Math.max(1, output.amount() / ratio));
 
                         if (shouldDivide && fluidsDivisible) {
                             builder.chance(inputContent.chance)

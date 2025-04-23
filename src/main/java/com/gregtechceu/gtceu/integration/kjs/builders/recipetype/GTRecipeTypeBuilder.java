@@ -2,8 +2,8 @@ package com.gregtechceu.gtceu.integration.kjs.builders.recipetype;
 
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.gui.SteamTexture;
-import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
 
@@ -12,17 +12,18 @@ import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -72,6 +73,7 @@ public class GTRecipeTypeBuilder extends BuilderBase<GTRecipeType> {
         this.iconSupplier = null;
         this.uiBuilder = null;
     }
+
     public GTRecipeTypeBuilder category(String category) {
         this.category = category;
         return this;

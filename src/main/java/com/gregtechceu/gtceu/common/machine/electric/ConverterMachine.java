@@ -8,8 +8,8 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TieredEnergyMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.common.machine.trait.ConverterTrait;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
@@ -66,7 +66,8 @@ public class ConverterMachine extends TieredEnergyMachine {
     // ****** Interaction ******//
     //////////////////////////////////////
     @Override
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, Direction facing,
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                   Direction facing,
                                                    BlockHitResult hitResult) {
         if (!isRemote()) {
             if (!held.canPerformAction(GTItemAbilities.MALLET_CONFIGURE)) {

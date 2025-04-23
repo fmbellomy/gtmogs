@@ -3,12 +3,9 @@ package com.gregtechceu.gtceu.common.item.behavior;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.item.component.IEnchantableItem;
 import com.gregtechceu.gtceu.api.item.component.IItemAttributes;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -19,10 +16,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.enchantment.effects.EnchantmentValueEffect;
-import net.minecraft.world.item.enchantment.effects.RemoveBinomial;
 
 public class NanoSaberBehavior extends ToggleEnergyConsumerBehavior implements IItemAttributes, IEnchantableItem {
 
@@ -64,8 +57,8 @@ public class NanoSaberBehavior extends ToggleEnergyConsumerBehavior implements I
 
     @Override
     public boolean supportsEnchantment(ItemStack stack, Holder<Enchantment> enchantment) {
-        return enchantment.value().getEffects(EnchantmentEffectComponents.REPAIR_WITH_XP).isEmpty()
-                && enchantment.value().getEffects(EnchantmentEffectComponents.ITEM_DAMAGE).isEmpty()
-                && Items.IRON_SWORD.getDefaultInstance().supportsEnchantment(enchantment);
+        return enchantment.value().getEffects(EnchantmentEffectComponents.REPAIR_WITH_XP).isEmpty() &&
+                enchantment.value().getEffects(EnchantmentEffectComponents.ITEM_DAMAGE).isEmpty() &&
+                Items.IRON_SWORD.getDefaultInstance().supportsEnchantment(enchantment);
     }
 }

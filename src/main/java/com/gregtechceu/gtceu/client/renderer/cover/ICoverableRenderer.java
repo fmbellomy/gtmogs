@@ -20,14 +20,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.ParametersAreNullableByDefault;
 
 @ParametersAreNullableByDefault
 public interface ICoverableRenderer extends IRenderer {
@@ -38,7 +39,7 @@ public interface ICoverableRenderer extends IRenderer {
                                         @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
         var blockEntity = level == null ? null : level.getBlockEntity(pos);
         if (blockEntity != null) {
-            //noinspection DataFlowIssue
+            // noinspection DataFlowIssue
             var coverable = GTCapabilityHelper.getCoverable(blockEntity.getLevel(), blockEntity.getBlockPos(), null);
             if (coverable != null) {
                 var quads = new LinkedList<BakedQuad>();

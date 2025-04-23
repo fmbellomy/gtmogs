@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.misc;
 import java.util.Arrays;
 import java.util.function.LongSupplier;
 
-
 /**
  * Limits a rate/throughput across a certain amount of time, without needing an active tick subscription
  */

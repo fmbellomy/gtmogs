@@ -2,8 +2,8 @@ package com.gregtechceu.gtceu.api.gui.editor;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+
 import com.lowdragmc.lowdraglib.gui.editor.configurator.IConfigurableWidget;
 import com.lowdragmc.lowdraglib.gui.editor.data.Resources;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -18,6 +18,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 
 import lombok.Getter;
 import org.jetbrains.annotations.Nullable;
+
 import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.function.BiConsumer;

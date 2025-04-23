@@ -2,8 +2,8 @@ package com.gregtechceu.gtceu.api.cover.filter;
 
 import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
-
 import com.gregtechceu.gtceu.utils.TagExprFilter;
+
 import com.lowdragmc.lowdraglib.gui.widget.ImageWidget;
 import com.lowdragmc.lowdraglib.gui.widget.TextFieldWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
@@ -44,7 +44,7 @@ public abstract class TagFilter<T, S extends Filter<T, S>> implements Filter<T, 
     public void setFilterExpr(String filterExpr) {
         this.tagFilterExpression = filterExpr;
         matchExpr = TagExprFilter.parseExpression(tagFilterExpression);
-        //noinspection unchecked
+        // noinspection unchecked
         onUpdated.accept((S) this);
     }
 

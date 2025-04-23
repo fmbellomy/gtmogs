@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 import static com.gregtechceu.gtceu.api.GTValues.V;

@@ -8,8 +8,8 @@ import com.gregtechceu.gtceu.api.blockentity.PipeBlockEntity;
 import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IDurabilityBar;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
-import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
 import com.gregtechceu.gtceu.utils.BreadthFirstBlockSearch;
 import com.gregtechceu.gtceu.utils.GradientUtil;
 
@@ -47,6 +47,7 @@ import appeng.blockentity.networking.CableBusBlockEntity;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -491,15 +492,17 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
         return parent.getPaintingColor() == child.getPaintingColor();
     };
 
-    private static final TriPredicate<@Nullable BlockEntity, @Nullable BlockEntity, Direction> paintablePredicateWrapper = (parent, child,
-                                                                                                        direction) -> {
+    private static final TriPredicate<@Nullable BlockEntity, @Nullable BlockEntity, Direction> paintablePredicateWrapper = (parent,
+                                                                                                                            child,
+                                                                                                                            direction) -> {
         if (parent == null && child instanceof IPaintable) return true;
         return parent instanceof IPaintable pp && child instanceof IPaintable pc && paintablePredicate.test(pp, pc);
     };
 
     @SuppressWarnings("rawtypes")
-    private static final TriPredicate<@Nullable PipeBlockEntity, PipeBlockEntity, Direction> gtPipePredicate = (parent, child,
-                                                                                                      direction) -> {
+    private static final TriPredicate<@Nullable PipeBlockEntity, PipeBlockEntity, Direction> gtPipePredicate = (parent,
+                                                                                                                child,
+                                                                                                                direction) -> {
         if (parent == null) return true;
         if (!paintablePredicate.test(parent, child)) {
             return false;
@@ -508,8 +511,8 @@ public class ColorSprayBehaviour implements IDurabilityBar, IInteractionItem, IA
     };
 
     private static final TriPredicate<@Nullable MetaMachineBlockEntity, MetaMachineBlockEntity, Direction> gtMetaMachinePredicate = (parent,
-                                                                                                                           child,
-                                                                                                                           direction) -> {
+                                                                                                                                     child,
+                                                                                                                                     direction) -> {
         if (parent == null) return true;
         return paintablePredicate.test(parent.getMetaMachine(), child.getMetaMachine()) &&
                 parent.getMetaMachine().getDefinition().equals(child.getMetaMachine().getDefinition());

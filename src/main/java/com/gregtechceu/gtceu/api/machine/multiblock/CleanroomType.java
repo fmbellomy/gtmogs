@@ -46,5 +46,4 @@ public record CleanroomType(String name, String translationKey) {
     public static Set<CleanroomType> getAllTypes() {
         return new HashSet<>(CLEANROOM_TYPES.values());
     }
-
 }

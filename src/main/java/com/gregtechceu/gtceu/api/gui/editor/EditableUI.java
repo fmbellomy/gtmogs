@@ -6,6 +6,7 @@ import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import lombok.Getter;
+
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 

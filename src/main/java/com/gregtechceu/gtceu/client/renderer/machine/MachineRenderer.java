@@ -38,12 +38,13 @@ import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.common.util.TriState;
+
+import com.mojang.blaze3d.vertex.PoseStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -109,7 +110,8 @@ public class MachineRenderer extends TextureOverrideRenderer
     @OnlyIn(Dist.CLIENT)
     public final List<BakedQuad> renderModel(@Nullable BlockAndTintGetter level, @Nullable BlockPos pos,
                                              @Nullable BlockState state, @Nullable Direction side,
-                                             @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+                                             @NotNull RandomSource rand, @NotNull ModelData data,
+                                             RenderType renderType) {
         if (state != null && state.getBlock() instanceof MetaMachineBlock machineBlock) {
             var frontFacing = machineBlock.getFrontFacing(state);
             var machine = (level == null || pos == null) ? null : machineBlock.getMachine(level, pos);
@@ -121,7 +123,8 @@ public class MachineRenderer extends TextureOverrideRenderer
                 var modelFacing = side == null ? null : ModelFactory.modelFacing(side, frontFacing);
                 var quads = new LinkedList<BakedQuad>();
                 // render machine additional quads
-                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, machineModelState, data, renderType);
+                renderMachine(quads, definition, machine, frontFacing, side, rand, modelFacing, machineModelState, data,
+                        renderType);
 
                 // render auto IO
                 if (machine instanceof IAutoOutputItem autoOutputItem) {

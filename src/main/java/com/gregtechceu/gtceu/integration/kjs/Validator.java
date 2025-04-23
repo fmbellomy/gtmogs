@@ -1,10 +1,10 @@
 package com.gregtechceu.gtceu.integration.kjs;
 
-import dev.latvian.mods.kubejs.script.ConsoleJS;
 import net.minecraft.resources.ResourceLocation;
 
-import dev.latvian.mods.rhino.Context;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.Arrays;
 
 @FunctionalInterface

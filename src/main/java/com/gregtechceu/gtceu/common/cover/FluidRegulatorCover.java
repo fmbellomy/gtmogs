@@ -23,6 +23,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
 
 public class FluidRegulatorCover extends PumpCover {

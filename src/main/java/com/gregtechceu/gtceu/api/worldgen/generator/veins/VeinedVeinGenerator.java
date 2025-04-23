@@ -2,15 +2,14 @@ package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreVeinUtil;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -37,6 +36,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
@@ -205,7 +205,8 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return generatedBlocks;
     }
 
-    private void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed, OreVeinDefinition entry,
+    private void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed,
+                            OreVeinDefinition entry,
                             double chance, List<? extends Map.Entry<Integer, VeinBlockDefinition>> rareEntries,
                             BlockPos.MutableBlockPos pos,
                             List<? extends Map.Entry<Integer, VeinBlockDefinition>> commonEntries) {
@@ -312,8 +313,8 @@ public class VeinedVeinGenerator extends VeinGenerator {
     public record VeinBlockDefinition(Either<List<OreConfiguration.TargetBlockState>, Material> block, int weight) {
 
         public static final Codec<VeinBlockDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        BLOCK_ENTRY_CODEC.fieldOf("block").forGetter(x -> x.block),
-                        Codec.INT.fieldOf("weight").forGetter(x -> x.weight))
+                BLOCK_ENTRY_CODEC.fieldOf("block").forGetter(x -> x.block),
+                Codec.INT.fieldOf("weight").forGetter(x -> x.weight))
                 .apply(instance, VeinBlockDefinition::new));
 
         public VeinBlockDefinition(Material block, int weight) {

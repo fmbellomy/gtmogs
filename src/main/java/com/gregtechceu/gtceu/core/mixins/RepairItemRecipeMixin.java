@@ -63,8 +63,6 @@ public abstract class RepairItemRecipeMixin extends CustomRecipe {
         }
     }
 
-
-
     @Inject(
             method = "assemble(Lnet/minecraft/world/item/crafting/CraftingInput;Lnet/minecraft/core/HolderLookup$Provider;)Lnet/minecraft/world/item/ItemStack;",
             at = @At(value = "RETURN", ordinal = 1),

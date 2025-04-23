@@ -1,16 +1,15 @@
 package com.gregtechceu.gtceu.api.item.tool;
 
-import com.google.common.collect.Sets;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.sound.ExistingSoundEntry;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
 import com.gregtechceu.gtceu.api.tag.TagUtil;
+import com.gregtechceu.gtceu.common.item.tool.behavior.*;
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
 import com.gregtechceu.gtceu.data.sound.GTSoundEntries;
-import com.gregtechceu.gtceu.common.item.tool.behavior.*;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.resources.ResourceLocation;
@@ -23,16 +22,17 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.enchantment.Enchantments;
-
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.Tolerate;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.Tags;
+
+import com.google.common.collect.Sets;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.experimental.Tolerate;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -43,13 +43,13 @@ public class GTToolType {
     @Getter
     private static final Map<String, GTToolType> types = new HashMap<>();
 
-    //FIXME the speed and breakability values are all broken. refer to (vanilla?) for correct-er values.
+    // FIXME the speed and breakability values are all broken. refer to (vanilla?) for correct-er values.
     public static final GTToolType SWORD = GTToolType.builder("sword")
             .toolTag(ItemTags.SWORDS)
             .definition(b -> b.tool(new Tool(List.of(
-                            Tool.Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
-                            Tool.Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
-                            1.0F, 1))
+                    Tool.Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F),
+                    Tool.Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F)),
+                    1.0F, 1))
                     .attacking().attackDamage(3.0F).attackSpeed(-2.4F))
             .toolClassNames("sword")
             .defaultAbilities(ItemAbilities.DEFAULT_SWORD_ACTIONS)
@@ -176,7 +176,8 @@ public class GTToolType {
                             ToolModeSwitchBehavior.INSTANCE))
             .sound(GTSoundEntries.WRENCH_TOOL, true)
             .symbol('w')
-            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE, GTItemAbilities.WRENCH_CONNECT)
+            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE,
+                    GTItemAbilities.WRENCH_CONNECT)
             .materialAmount(4 * GTValues.M)
             .build();
     public static final GTToolType FILE = GTToolType.builder("file")
@@ -387,7 +388,8 @@ public class GTToolType {
             .sound(GTSoundEntries.WRENCH_TOOL, true)
             .electric(GTValues.LV)
             .toolClasses(GTToolType.WRENCH)
-            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE, GTItemAbilities.WRENCH_CONNECT)
+            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE,
+                    GTItemAbilities.WRENCH_CONNECT)
             .build();
     public static final GTToolType WRENCH_HV = GTToolType.builder("hv_wrench")
             .idFormat("hv_%s_wrench")
@@ -403,7 +405,8 @@ public class GTToolType {
             .sound(GTSoundEntries.WRENCH_TOOL, true)
             .electric(GTValues.HV)
             .toolClasses(GTToolType.WRENCH)
-            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE, GTItemAbilities.WRENCH_CONNECT)
+            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE,
+                    GTItemAbilities.WRENCH_CONNECT)
             .build();
     public static final GTToolType WRENCH_IV = GTToolType.builder("iv_wrench")
             .idFormat("iv_%s_wrench")
@@ -419,7 +422,8 @@ public class GTToolType {
             .sound(GTSoundEntries.WRENCH_TOOL, true)
             .electric(GTValues.IV)
             .toolClasses(GTToolType.WRENCH)
-            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE, GTItemAbilities.WRENCH_CONNECT)
+            .defaultAbilities(GTItemAbilities.WRENCH_DIG, GTItemAbilities.WRENCH_DISMANTLE,
+                    GTItemAbilities.WRENCH_CONNECT)
             .build();
 
     public static final GTToolType WIRE_CUTTER_LV = GTToolType.builder("lv_wirecutter")
@@ -546,7 +550,6 @@ public class GTToolType {
 
         IGTTool create(GTToolType type, MaterialToolTier tier, Material material, IGTToolDefinition definition,
                        Item.Properties properties);
-
     }
 
     public static Builder builder(String name) {

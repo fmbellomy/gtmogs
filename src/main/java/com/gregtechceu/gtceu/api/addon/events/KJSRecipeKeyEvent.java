@@ -1,11 +1,9 @@
 package com.gregtechceu.gtceu.api.addon.events;
 
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.ContentJS;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.GTRecipeComponents;
 
-import dev.latvian.mods.kubejs.recipe.component.RecipeComponentType;
 import lombok.Getter;
 
 import java.util.HashMap;

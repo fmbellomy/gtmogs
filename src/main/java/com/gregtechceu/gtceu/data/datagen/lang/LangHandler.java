@@ -11,6 +11,7 @@ import net.neoforged.neoforge.common.data.LanguageProvider;
 
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

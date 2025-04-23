@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
 /**
  * Represents cover instance attached on the specific side of meta tile entity
  * Cover filters out interaction and logic of meta tile entity
@@ -151,7 +150,8 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     //////////////////////////////////////
     // ******* Interaction *******//
     //////////////////////////////////////
-    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+    public ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                    BlockHitResult hitResult) {
         if (this instanceof IUICover) {
             if (playerIn instanceof ServerPlayer serverPlayer) {
                 CoverUIFactory.INSTANCE.openUI(this, serverPlayer);
@@ -162,7 +162,8 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
-    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held, BlockHitResult hitResult) {
+    public ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
+                                                   BlockHitResult hitResult) {
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 

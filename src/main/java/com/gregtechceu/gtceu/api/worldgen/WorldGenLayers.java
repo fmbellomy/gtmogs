@@ -4,8 +4,8 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
-
 import com.gregtechceu.gtceu.integration.kjs.events.WorldGenLayerKubeEvent;
+
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.StringRepresentable;

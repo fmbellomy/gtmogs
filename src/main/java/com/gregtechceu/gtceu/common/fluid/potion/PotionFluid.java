@@ -16,9 +16,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
-import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -109,7 +109,7 @@ public class PotionFluid extends BaseFlowingFluid {
                 @Override
                 public int getTintColor(FluidStack stack) {
                     return stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
-                            .getColor()| 0xff000000;
+                            .getColor() | 0xff000000;
                 }
             });
         }

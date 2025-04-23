@@ -20,7 +20,8 @@ public record CapabilityMapComponent() implements RecipeComponent<CapabilityMap>
     public static final Codec<CapabilityMap> CODEC = RecipeCapability.CODEC
             .xmap(CapabilityMap::new, Function.identity());
     public static final CapabilityMapComponent INSTANCE = new CapabilityMapComponent();
-    public static final RecipeComponentType<CapabilityMap> TYPE = RecipeComponentType.unit(GTCEu.id("capability_map"), INSTANCE);
+    public static final RecipeComponentType<CapabilityMap> TYPE = RecipeComponentType.unit(GTCEu.id("capability_map"),
+            INSTANCE);
 
     @Override
     public RecipeComponentType<?> type() {

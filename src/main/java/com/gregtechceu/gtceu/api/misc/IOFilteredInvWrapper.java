@@ -7,6 +7,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.util.List;
 import java.util.function.Predicate;
 

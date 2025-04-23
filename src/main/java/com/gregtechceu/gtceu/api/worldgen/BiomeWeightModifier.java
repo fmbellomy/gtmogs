@@ -10,7 +10,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
 
@@ -18,8 +17,8 @@ public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
 
     public static final Codec<BiomeWeightModifier> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             RegistryCodecs.homogeneousList(Registries.BIOME).fieldOf("biomes").forGetter(mod -> mod.biomes),
-            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight)
-    ).apply(instance, BiomeWeightModifier::new));
+            Codec.INT.fieldOf("added_weight").forGetter(mod -> mod.addedWeight))
+            .apply(instance, BiomeWeightModifier::new));
 
     public HolderSet<Biome> biomes;
     public int addedWeight;

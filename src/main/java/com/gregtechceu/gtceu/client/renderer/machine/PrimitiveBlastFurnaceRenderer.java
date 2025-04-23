@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.RenderTypeHelper;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class PrimitiveBlastFurnaceRenderer extends WorkableCasingMachineRenderer {

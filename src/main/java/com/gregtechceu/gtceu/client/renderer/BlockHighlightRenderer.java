@@ -12,12 +12,11 @@ import com.gregtechceu.gtceu.api.pipenet.IPipeType;
 import com.gregtechceu.gtceu.common.item.behavior.CoverPlaceBehavior;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.core.mixins.GuiGraphicsAccessor;
-
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+
 import com.lowdragmc.lowdraglib.client.utils.RenderUtils;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
-import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -35,11 +34,13 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
+
 import java.util.Set;
 import java.util.function.Function;
 
@@ -65,20 +66,22 @@ public class BlockHighlightRenderer {
                     gridHighlight = highLight;
                 } else if (level.getBlockState(blockPos).getBlock() instanceof IToolGridHighLight highLight) {
                     gridHighlight = highLight;
-                } else if (toolType.contains(GTToolType.WRENCH) || held.canPerformAction(GTItemAbilities.WRENCH_ROTATE)) {
-                    var behavior = CustomBlockRotations.getCustomRotation(level.getBlockState(blockPos).getBlock());
-                    if (behavior != null && behavior.showGrid()) {
-                        gridHighlight = new IToolGridHighLight() {
+                } else
+                    if (toolType.contains(GTToolType.WRENCH) || held.canPerformAction(GTItemAbilities.WRENCH_ROTATE)) {
+                        var behavior = CustomBlockRotations.getCustomRotation(level.getBlockState(blockPos).getBlock());
+                        if (behavior != null && behavior.showGrid()) {
+                            gridHighlight = new IToolGridHighLight() {
 
-                            @Override
-                            public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state,
-                                                            Set<GTToolType> toolTypes, ItemStack held, Direction side) {
-                                return behavior.showSideTip(state, side) ? GuiTextures.TOOL_FRONT_FACING_ROTATION :
-                                        null;
-                            }
-                        };
+                                @Override
+                                public ResourceTexture sideTips(Player player, BlockPos pos, BlockState state,
+                                                                Set<GTToolType> toolTypes, ItemStack held,
+                                                                Direction side) {
+                                    return behavior.showSideTip(state, side) ? GuiTextures.TOOL_FRONT_FACING_ROTATION :
+                                            null;
+                                }
+                            };
+                        }
                     }
-                }
                 if (gridHighlight == null) {
                     return;
                 }

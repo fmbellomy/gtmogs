@@ -5,20 +5,19 @@ import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.ingredient.FluidContainerIngredient;
-import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.machine.GTMachines;
+import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
@@ -1285,7 +1284,8 @@ public class RecipeAddition {
     private static void addCarpetRecipe(RecipeOutput provider, DyeColor color) {
         String colorName = color.getName();
         VanillaRecipeHelper.addShapedRecipe(provider, colorName + "_carpet",
-                new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(colorName + "_carpet"))), "WW",
+                new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(colorName + "_carpet"))),
+                "WW",
                 'W', BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(colorName + "_wool")));
     }
 
@@ -1296,7 +1296,8 @@ public class RecipeAddition {
         for (DyeColor color : DyeColor.values()) {
             String dyeName = color.getName();
             VanillaRecipeHelper.addShapedRecipe(provider, dyeName + "_glass_pane",
-                    new ItemStack(BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(dyeName + "_stained_glass_pane")), 2),
+                    new ItemStack(BuiltInRegistries.ITEM
+                            .get(ResourceLocation.withDefaultNamespace(dyeName + "_stained_glass_pane")), 2),
                     "sG",
                     'G', BuiltInRegistries.ITEM.get(ResourceLocation.withDefaultNamespace(dyeName + "_stained_glass")));
         }

@@ -36,7 +36,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Supplier;
 
-
 import static com.gregtechceu.gtceu.common.pack.GTDynamicDataPack.writeJson;
 
 public class GTDynamicResourcePack implements PackResources {

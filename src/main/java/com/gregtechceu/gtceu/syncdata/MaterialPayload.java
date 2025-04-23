@@ -8,10 +8,10 @@ import com.lowdragmc.lowdraglib.syncdata.payload.ObjectTypedPayload;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.nbt.Tag;
-
-import lombok.NoArgsConstructor;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+
+import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor

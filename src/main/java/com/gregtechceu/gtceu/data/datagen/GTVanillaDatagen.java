@@ -3,22 +3,22 @@ package com.gregtechceu.gtceu.data.datagen;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.registry.registrate.SoundEntryBuilder;
-import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
-import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
-import com.gregtechceu.gtceu.data.worldgen.*;
 import com.gregtechceu.gtceu.data.damagesource.GTDamageTypes;
 import com.gregtechceu.gtceu.data.datagen.tag.BiomeTagsLoader;
 import com.gregtechceu.gtceu.data.datagen.tag.DamageTagsLoader;
+import com.gregtechceu.gtceu.data.enchantment.GTEnchantmentProviders;
+import com.gregtechceu.gtceu.data.sound.GTJukeboxSongs;
+import com.gregtechceu.gtceu.data.worldgen.*;
 
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 import java.util.Set;

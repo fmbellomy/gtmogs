@@ -28,6 +28,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +72,7 @@ public interface ICoverable extends ITickSubscription, IAppearance {
      * {@link ICoverable#placeCoverOnSide(Direction, ItemStack, CoverDefinition, ServerPlayer)} instead
      * 
      * @param coverBehavior the cover to set, or {@code null} to remove an existing cover
-     * @param side the side to set the cover for
+     * @param side          the side to set the cover for
      */
     @ApiStatus.Internal
     void setCoverAtSide(@Nullable CoverBehavior coverBehavior, Direction side);

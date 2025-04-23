@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.RenderTypeHelper;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 
 public class LargeMixerRenderer extends WorkableCasingMachineRenderer {

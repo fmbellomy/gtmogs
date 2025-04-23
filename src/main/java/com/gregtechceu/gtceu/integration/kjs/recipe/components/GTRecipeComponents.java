@@ -4,32 +4,25 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.addon.AddonFinder;
 import com.gregtechceu.gtceu.api.addon.events.KJSRecipeKeyEvent;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
-import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
+import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeCapabilities;
 
-import com.mojang.serialization.Codec;
-import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
-import dev.latvian.mods.kubejs.recipe.match.ItemMatch;
-import dev.latvian.mods.kubejs.recipe.match.ReplacementMatch;
-import dev.latvian.mods.rhino.type.TypeInfo;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import com.google.gson.JsonElement;
-import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.fluid.FluidLike;
-import dev.latvian.mods.kubejs.recipe.*;
-import dev.latvian.mods.kubejs.recipe.component.*;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
+import com.mojang.serialization.Codec;
+import dev.latvian.mods.kubejs.recipe.*;
+import dev.latvian.mods.kubejs.recipe.component.*;
+import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
+import dev.latvian.mods.rhino.type.TypeInfo;
 
 import java.util.*;
 
 public class GTRecipeComponents {
-
 
     public static final RecipeComponent<CompoundTag> TAG = new RecipeComponent<>() {
 
@@ -66,7 +59,8 @@ public class GTRecipeComponents {
             return TypeInfo.STRING;
         }
     };
-    public static final RecipeComponentType<ResourceLocation> RESOURCE_LOCATION_TYPE = RecipeComponentType.unit(GTCEu.id("resource_location"), RESOURCE_LOCATION);
+    public static final RecipeComponentType<ResourceLocation> RESOURCE_LOCATION_TYPE = RecipeComponentType
+            .unit(GTCEu.id("resource_location"), RESOURCE_LOCATION);
     public static final RecipeComponent<RecipeCapability<?>> RECIPE_CAPABILITY = new RecipeComponent<>() {
 
         @Override
@@ -84,7 +78,8 @@ public class GTRecipeComponents {
             return TypeInfo.of(RecipeCapability.class);
         }
     };
-    public static final RecipeComponentType<RecipeCapability<?>> RECIPE_CAPABILITY_TYPE = RecipeComponentType.unit(GTCEu.id("recipe_capability"), RECIPE_CAPABILITY);
+    public static final RecipeComponentType<RecipeCapability<?>> RECIPE_CAPABILITY_TYPE = RecipeComponentType
+            .unit(GTCEu.id("recipe_capability"), RECIPE_CAPABILITY);
     public static final RecipeComponent<ChanceLogic> CHANCE_LOGIC = new RecipeComponent<>() {
 
         @Override
@@ -102,7 +97,8 @@ public class GTRecipeComponents {
             return TypeInfo.of(ChanceLogic.class);
         }
     };
-    public static final RecipeComponentType<ChanceLogic> CHANCE_LOGIC_TYPE = RecipeComponentType.unit(GTCEu.id("chance_logic"), CHANCE_LOGIC);
+    public static final RecipeComponentType<ChanceLogic> CHANCE_LOGIC_TYPE = RecipeComponentType
+            .unit(GTCEu.id("chance_logic"), CHANCE_LOGIC);
 
     public static final RecipeComponent<RecipeCondition<?>> RECIPE_CONDITION = new RecipeComponent<>() {
 
@@ -121,8 +117,8 @@ public class GTRecipeComponents {
             return TypeInfo.of(RecipeCondition.class);
         }
     };
-    public static final RecipeComponentType<RecipeCondition<?>> RECIPE_CONDITION_TYPE = RecipeComponentType.unit(GTCEu.id("recipe_condition"), RECIPE_CONDITION);
-
+    public static final RecipeComponentType<RecipeCondition<?>> RECIPE_CONDITION_TYPE = RecipeComponentType
+            .unit(GTCEu.id("recipe_condition"), RECIPE_CONDITION);
 
     public static final ContentJS<SizedIngredient> ITEM = ContentJS.create(SizedIngredientComponent.NESTED,
             GTRecipeCapabilities.ITEM);

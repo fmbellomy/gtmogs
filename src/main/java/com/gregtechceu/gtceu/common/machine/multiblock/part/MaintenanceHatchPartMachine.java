@@ -42,6 +42,7 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;

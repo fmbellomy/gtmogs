@@ -12,7 +12,6 @@ import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -67,7 +66,7 @@ public class MedicalConditionParser {
         MedicalCondition condition = MedicalCondition.CONDITIONS.get(name);
         if (condition == null) {
             this.reader.setCursor(i);
-            throw  ERROR_UNKNOWN_CONDITION.createWithContext(this.reader, name);
+            throw ERROR_UNKNOWN_CONDITION.createWithContext(this.reader, name);
         }
         this.result = condition;
     }

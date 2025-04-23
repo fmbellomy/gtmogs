@@ -27,7 +27,6 @@ import lombok.Getter;
 import java.io.IOException;
 import java.lang.reflect.Array;
 
-
 import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX_COLOR;
 
 @OnlyIn(Dist.CLIENT)

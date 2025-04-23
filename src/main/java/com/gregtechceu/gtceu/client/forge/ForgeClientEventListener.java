@@ -12,11 +12,11 @@ import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-import net.neoforged.bus.api.SubscribeEvent;
 
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 @OnlyIn(Dist.CLIENT)

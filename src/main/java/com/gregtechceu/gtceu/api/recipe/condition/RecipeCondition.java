@@ -24,6 +24,7 @@ public abstract class RecipeCondition<T extends RecipeCondition<T>> {
 
     public static final Codec<RecipeCondition<?>> CODEC = GTRegistries.RECIPE_CONDITIONS.byNameCodec()
             .dispatch(RecipeCondition::getType, RecipeConditionType::getCodec);
+
     // spotless:off
     public static <RC extends RecipeCondition<?>> Products.P1<RecordCodecBuilder.Mu<RC>, Boolean> isReverse(RecordCodecBuilder.Instance<RC> instance) {
         return instance.group(Codec.BOOL.optionalFieldOf("reverse", false).forGetter(val -> val.isReverse));

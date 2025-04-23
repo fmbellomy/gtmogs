@@ -2,9 +2,9 @@ package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
+import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.core.MixinHelpers;
 import com.gregtechceu.gtceu.data.loot.DungeonLootLoader;
-import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.data.recipe.GTCraftingComponents;
 import com.gregtechceu.gtceu.data.recipe.GTRecipes;
 
@@ -61,8 +61,8 @@ public abstract class ReloadableServerResourcesMixin {
             }
 
             @Override
-            public void accept(@NotNull ResourceLocation id,@NotNull Recipe<?> recipe,
-                               @Nullable AdvancementHolder advancement, ICondition @NotNull ... conditions) {
+            public void accept(@NotNull ResourceLocation id, @NotNull Recipe<?> recipe,
+                               @Nullable AdvancementHolder advancement, ICondition @NotNull... conditions) {
                 GTDynamicDataPack.addRecipe(id, recipe, advancement, frozen);
             }
         });

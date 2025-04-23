@@ -5,9 +5,9 @@ import com.gregtechceu.gtceu.api.recipe.kind.ShapedFluidContainerRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
-
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
+
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;

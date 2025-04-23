@@ -1,7 +1,8 @@
 package com.gregtechceu.gtceu.api.recipe.content;
 
-import com.mojang.serialization.Codec;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+
+import com.mojang.serialization.Codec;
 import org.apache.commons.lang3.math.NumberUtils;
 
 public class SerializerLong implements IContentSerializer<Long> {

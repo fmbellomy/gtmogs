@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 import lombok.Getter;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
@@ -63,6 +62,7 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
     protected void applyImplicitComponents(BlockEntity.DataComponentInput componentInput) {
         super.applyImplicitComponents(componentInput);
         metaMachine.applyImplicitComponents(new ExDataComponentInput() {
+
             @Override
             public @Nullable <T> T get(DataComponentType<T> component) {
                 return componentInput.get(component);
@@ -106,7 +106,7 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
 
     @Override
     public @Nullable ResourceTexture sideTips(Player player, BlockPos pos, BlockState state, Set<GTToolType> toolTypes,
-                                    ItemStack held, Direction side) {
+                                              ItemStack held, Direction side) {
         return metaMachine.sideTips(player, pos, state, toolTypes, held, side);
     }
 

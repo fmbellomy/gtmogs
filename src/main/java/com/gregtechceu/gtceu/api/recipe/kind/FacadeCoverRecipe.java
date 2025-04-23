@@ -3,9 +3,9 @@ package com.gregtechceu.gtceu.api.recipe.kind;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.common.item.behavior.FacadeItemBehaviour;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
-import com.gregtechceu.gtceu.common.item.behavior.FacadeItemBehaviour;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;

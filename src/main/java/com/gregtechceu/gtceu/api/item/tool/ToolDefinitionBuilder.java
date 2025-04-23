@@ -123,7 +123,6 @@ public class ToolDefinitionBuilder {
     public IGTToolDefinition build() {
         return new IGTToolDefinition() {
 
-
             private final List<IToolBehavior<?>> behaviors = ImmutableList
                     .copyOf(ToolDefinitionBuilder.this.behaviours);
             private final Tool tool = ToolDefinitionBuilder.this.tool;

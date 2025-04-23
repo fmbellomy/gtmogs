@@ -3,6 +3,10 @@ package com.gregtechceu.gtceu.integration.kjs.recipe;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
 
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.Ingredient;
+
 import dev.latvian.mods.kubejs.KubeJS;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
@@ -22,10 +26,6 @@ import it.unimi.dsi.fastutil.chars.CharArraySet;
 import it.unimi.dsi.fastutil.chars.CharList;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import lombok.Getter;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingBookCategory;
-import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -107,11 +107,9 @@ public interface GTShapedRecipeSchema {
             // Use vanilla shaped recipe type if KubeJS is not needed
             if (type == type.event.shaped // if this type == kubejs:shaped
                     && type.event.shaped != type.event.vanillaShaped // check if not in serverOnly mode
-                    && !json.has(KubeJSCraftingRecipe.INGREDIENT_ACTIONS_KEY)
-                    && !json.has(KubeJSCraftingRecipe.MODIFY_RESULT_KEY)
-                    && !json.has(KubeJSCraftingRecipe.STAGE_KEY)
-                    && !json.has(KubeJSCraftingRecipe.MIRROR_KEY)
-            ) {
+                    && !json.has(KubeJSCraftingRecipe.INGREDIENT_ACTIONS_KEY) &&
+                    !json.has(KubeJSCraftingRecipe.MODIFY_RESULT_KEY) && !json.has(KubeJSCraftingRecipe.STAGE_KEY) &&
+                    !json.has(KubeJSCraftingRecipe.MIRROR_KEY)) {
                 return type.event.vanillaShaped;
             }
 

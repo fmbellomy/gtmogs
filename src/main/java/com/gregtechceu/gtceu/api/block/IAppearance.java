@@ -10,7 +10,8 @@ import org.jetbrains.annotations.Nullable;
 public interface IAppearance {
 
     /**
-     * @see net.neoforged.neoforge.common.extensions.IBlockExtension#getAppearance(BlockState, BlockAndTintGetter, BlockPos, Direction, BlockState, BlockPos)
+     * @see net.neoforged.neoforge.common.extensions.IBlockExtension#getAppearance(BlockState, BlockAndTintGetter,
+     *      BlockPos, Direction, BlockState, BlockPos)
      *      IBlockExtension#getAppearance
      */
     @Nullable

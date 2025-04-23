@@ -1,8 +1,8 @@
 package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
-
 import com.gregtechceu.gtceu.utils.GTUtil;
+
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;

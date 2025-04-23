@@ -1,11 +1,12 @@
 package com.gregtechceu.gtceu.api.item.datacomponents;
 
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
 
 public record CreativeMachineInfo(int outputPerCycle, int ticksPerCycle) {
 
@@ -18,6 +19,5 @@ public record CreativeMachineInfo(int outputPerCycle, int ticksPerCycle) {
     public static final StreamCodec<ByteBuf, CreativeMachineInfo> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.VAR_INT, CreativeMachineInfo::outputPerCycle,
             ByteBufCodecs.VAR_INT, CreativeMachineInfo::ticksPerCycle,
-            CreativeMachineInfo::new
-    );
+            CreativeMachineInfo::new);
 }

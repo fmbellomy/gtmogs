@@ -23,8 +23,8 @@ public record GTTool(
             Codec.FLOAT.optionalFieldOf("attack_damage").forGetter(GTTool::attackDamage),
             Codec.INT.optionalFieldOf("enchantability").forGetter(GTTool::enchantability),
             Codec.INT.optionalFieldOf("harvest_level").forGetter(GTTool::harvestLevel),
-            Codec.INT.optionalFieldOf("last_crafting_use").forGetter(GTTool::lastCraftingUse)
-    ).apply(instance, GTTool::new));
+            Codec.INT.optionalFieldOf("last_crafting_use").forGetter(GTTool::lastCraftingUse))
+            .apply(instance, GTTool::new));
     public static final StreamCodec<ByteBuf, GTTool> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.optional(ByteBufCodecs.FLOAT), GTTool::toolSpeed,
             ByteBufCodecs.optional(ByteBufCodecs.FLOAT), GTTool::attackDamage,

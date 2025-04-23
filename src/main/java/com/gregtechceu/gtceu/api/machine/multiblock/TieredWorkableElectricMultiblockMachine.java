@@ -8,9 +8,7 @@ import com.gregtechceu.gtceu.api.machine.feature.ITieredMachine;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
-
 import lombok.Getter;
-
 
 /**
  * @author screret

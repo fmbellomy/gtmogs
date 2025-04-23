@@ -18,11 +18,13 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class GTBiomeModifiers {
 
-    public static final ResourceKey<BiomeModifier> RUBBER_TREE = ResourceKey.create(NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+    public static final ResourceKey<BiomeModifier> RUBBER_TREE = ResourceKey.create(
+            NeoForgeRegistries.Keys.BIOME_MODIFIERS,
             GTCEu.id("rubber_tree"));
     public static final ResourceKey<BiomeModifier> RUBBER_TREE_SWAMP = ResourceKey.create(
             NeoForgeRegistries.Keys.BIOME_MODIFIERS, GTCEu.id("rubber_tree_swamp"));
-    public static final ResourceKey<BiomeModifier> STONE_BLOB = ResourceKey.create(NeoForgeRegistries.Keys.BIOME_MODIFIERS,
+    public static final ResourceKey<BiomeModifier> STONE_BLOB = ResourceKey.create(
+            NeoForgeRegistries.Keys.BIOME_MODIFIERS,
             GTCEu.id("stone_blob"));
     public static final ResourceKey<BiomeModifier> RAW_OIL_SPROUT = ResourceKey
             .create(NeoForgeRegistries.Keys.BIOME_MODIFIERS, GTCEu.id("raw_oil_sprout"));

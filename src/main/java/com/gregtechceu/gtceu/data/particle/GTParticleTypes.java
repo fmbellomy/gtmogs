@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.data.particle;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.common.particle.HazardParticleOptions;
 
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -12,6 +11,8 @@ import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import com.mojang.serialization.MapCodec;
 import org.jetbrains.annotations.NotNull;
 
 public class GTParticleTypes {

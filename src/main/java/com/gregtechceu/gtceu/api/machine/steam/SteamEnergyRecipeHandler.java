@@ -10,9 +10,10 @@ import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.utils.GTMath;
 
 import net.neoforged.neoforge.fluids.FluidStack;
-
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -32,7 +33,8 @@ public class SteamEnergyRecipeHandler implements IRecipeHandler<Long> {
         long eut = left.stream().reduce(0L, Long::sum);
         int totalSteam = GTMath.saturatedCast((long) Math.ceil(eut * conversionRate));
         if (totalSteam > 0) {
-            SizedFluidIngredient steam = io == IO.IN ? SizedFluidIngredient.of(GTMaterials.Steam.getFluidTag(), totalSteam) :
+            SizedFluidIngredient steam = io == IO.IN ?
+                    SizedFluidIngredient.of(GTMaterials.Steam.getFluidTag(), totalSteam) :
                     SizedFluidIngredient.of(GTMaterials.Steam.getFluid(totalSteam));
             List<SizedFluidIngredient> list = new ArrayList<>();
             list.add(steam);

@@ -1,24 +1,22 @@
 package com.gregtechceu.gtceu.api.registry;
 
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.Table;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.cover.CoverDefinition;
 import com.gregtechceu.gtceu.api.item.tool.behavior.ToolBehaviorType;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
+import com.gregtechceu.gtceu.api.material.Element;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
-import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
-import com.gregtechceu.gtceu.api.material.Element;
-import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
-import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
-import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
-import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.sound.SoundEntry;
+import com.gregtechceu.gtceu.api.worldgen.DimensionMarker;
+import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
@@ -27,8 +25,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
-
 import net.neoforged.neoforge.registries.RegisterEvent;
+
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import org.jetbrains.annotations.ApiStatus;
 
 public final class GTRegistries {
@@ -77,6 +77,7 @@ public final class GTRegistries {
     }
 
     private static final Table<Registry<?>, ResourceLocation, Object> TO_REGISTER = HashBasedTable.create();
+
     public static <V, T extends V> T register(Registry<V> registry, ResourceLocation name, T value) {
         TO_REGISTER.put(registry, name, value);
         return value;

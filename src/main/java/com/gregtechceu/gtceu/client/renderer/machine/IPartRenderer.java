@@ -11,10 +11,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
 import net.neoforged.neoforge.client.model.data.ModelData;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.List;
 
 public interface IPartRenderer {
@@ -38,7 +39,8 @@ public interface IPartRenderer {
                             modelState);
                     return true;
                 } else if (renderer instanceof MachineRenderer machineRenderer) {
-                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), modelState, side, rand, data, renderType);
+                    machineRenderer.renderBaseModel(quads, block.definition, controller.self(), modelState, side, rand,
+                            data, renderType);
                     return true;
                 }
             }

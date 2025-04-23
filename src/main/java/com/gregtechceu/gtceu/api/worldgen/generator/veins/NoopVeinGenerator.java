@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
 
-import lombok.NoArgsConstructor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
@@ -13,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.MapCodec;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.Map;

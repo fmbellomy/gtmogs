@@ -16,6 +16,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
+
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
 import java.util.Objects;
@@ -36,8 +37,8 @@ public class ItemTagLoader {
         addTag(provider, lens, Color.Purple).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).getKey());
 
         provider.addTag(CustomTags.PISTONS)
-                        .add(Items.PISTON.builtInRegistryHolder().key())
-                        .add(Items.STICKY_PISTON.builtInRegistryHolder().key());
+                .add(Items.PISTON.builtInRegistryHolder().key())
+                .add(Items.STICKY_PISTON.builtInRegistryHolder().key());
         provider.addTag(CustomTags.BRICKS_FIREBRICK).add(GTItems.FIRECLAY_BRICK.getKey());
         provider.addTag(Tags.Items.BRICKS).addTag(CustomTags.BRICKS_FIREBRICK);
 

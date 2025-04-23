@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.integration.kjs.built.KJSTagPrefix;
 
-import dev.latvian.mods.kubejs.registry.BuilderBase;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +14,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 
+import dev.latvian.mods.kubejs.registry.BuilderBase;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 

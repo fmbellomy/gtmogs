@@ -9,10 +9,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -83,7 +83,8 @@ public class CampfireRecipeBuilder {
     }
 
     private CampfireCookingRecipe create() {
-        return new CampfireCookingRecipe(Objects.requireNonNullElse(this.group, ""), this.category, this.input, this.output,
+        return new CampfireCookingRecipe(Objects.requireNonNullElse(this.group, ""), this.category, this.input,
+                this.output,
                 this.experience, this.cookingTime);
     }
 

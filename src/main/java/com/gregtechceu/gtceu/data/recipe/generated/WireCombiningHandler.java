@@ -12,8 +12,8 @@ import com.gregtechceu.gtceu.data.recipe.VanillaRecipeHelper;
 import net.minecraft.data.recipes.RecipeOutput;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.PACKER_RECIPES;

@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+
 import java.util.ArrayList;
 
 public interface IMaintenanceMachine extends IMultiPart {

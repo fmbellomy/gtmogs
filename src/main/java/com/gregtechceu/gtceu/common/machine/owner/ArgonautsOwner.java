@@ -11,6 +11,7 @@ import earth.terrarium.argonauts.api.guild.GuildApi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+
 import java.util.*;
 
 public non-sealed class ArgonautsOwner extends MachineOwner {

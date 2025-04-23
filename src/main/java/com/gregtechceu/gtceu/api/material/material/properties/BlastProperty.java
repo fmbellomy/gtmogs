@@ -3,12 +3,13 @@ package com.gregtechceu.gtceu.api.material.material.properties;
 import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
+
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.ExtensionMethod;
-import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 public class BlastProperty implements IMaterialProperty {
 

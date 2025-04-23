@@ -1,24 +1,21 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.worldgen;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
-import com.gregtechceu.gtceu.utils.RegistryUtil;
-import com.mojang.datafixers.util.Pair;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import dev.latvian.mods.rhino.util.HideFromJS;
-import lombok.Setter;
-import lombok.experimental.Accessors;
+
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
+
+import com.mojang.datafixers.util.Pair;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.*;
 

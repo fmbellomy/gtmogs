@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.worldgen.bedrockfluid;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import lombok.Setter;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -11,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,8 @@ public class FluidVeinWorldEntry {
     @Getter
     private int operationsRemaining;
 
-    public FluidVeinWorldEntry(@Nullable Holder<BedrockFluidDefinition> definition, int fluidYield, int operationsRemaining) {
+    public FluidVeinWorldEntry(@Nullable Holder<BedrockFluidDefinition> definition, int fluidYield,
+                               int operationsRemaining) {
         this.definition = definition;
         this.fluidYield = fluidYield;
         this.operationsRemaining = operationsRemaining;

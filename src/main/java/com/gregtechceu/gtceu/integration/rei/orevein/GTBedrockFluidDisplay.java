@@ -6,9 +6,10 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.rei.ModularDisplay;
 
+import net.minecraft.core.Holder;
+
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
-import net.minecraft.core.Holder;
 
 import java.util.ArrayList;
 import java.util.List;

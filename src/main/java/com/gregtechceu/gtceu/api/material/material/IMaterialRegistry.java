@@ -63,7 +63,8 @@ public interface IMaterialRegistry extends Iterable<Material> {
      * @param modId the namespace to get the fallback for
      * @return the fallback material, used for when another material does not exist
      */
-    @NotNull Material getFallbackMaterial(@NotNull String modId);
+    @NotNull
+    Material getFallbackMaterial(@NotNull String modId);
 
     Stream<Material> stream();
 

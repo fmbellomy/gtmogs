@@ -186,7 +186,8 @@ public class CustomTags {
     public static final TagKey<EntityType<?>> HEAT_IMMUNE = TagUtil.createModTag(Registries.ENTITY_TYPE, "heat_immune");
     public static final TagKey<EntityType<?>> CHEMICAL_IMMUNE = TagUtil.createModTag(Registries.ENTITY_TYPE,
             "chemical_immune");
-    public static final TagKey<EntityType<?>> IRON_GOLEMS = TagUtil.createTag(Registries.ENTITY_TYPE, "iron_golems", false);
+    public static final TagKey<EntityType<?>> IRON_GOLEMS = TagUtil.createTag(Registries.ENTITY_TYPE, "iron_golems",
+            false);
     public static final TagKey<EntityType<?>> SPIDERS = TagUtil.createTag(Registries.ENTITY_TYPE, "spiders", false);
 
     public static final TagKey<Fluid> LIGHTER_FLUIDS = TagUtil.createFluidTag("lighter_fluids");

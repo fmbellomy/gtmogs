@@ -1,11 +1,13 @@
 package com.gregtechceu.gtceu.data.item;
 
-import com.google.common.collect.Sets;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
+
 import net.minecraft.Util;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.extensions.IBlockExtension;
+
+import com.google.common.collect.Sets;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -111,7 +113,6 @@ public class GTItemAbilities {
      * Exposed by tools that can interact with covers.
      */
     public static final ItemAbility INTERACT_WITH_COVER = ItemAbility.get("interact_with_cover");
-
 
     // spotless:off
     public static final Set<ItemAbility> WRENCH_CONFIGURE_ACTIONS = of(WRENCH_CONFIGURE_ALL, WRENCH_CONFIGURE_ITEMS, WRENCH_CONFIGURE_FLUIDS);

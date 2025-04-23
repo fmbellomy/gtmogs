@@ -12,13 +12,13 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.core.Direction;
+
 import appeng.api.networking.*;
 import appeng.api.networking.security.IActionSource;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.EnumSet;
-
 
 public abstract class MEHatchPartMachine extends FluidHatchPartMachine implements IGridConnectedMachine {
 
