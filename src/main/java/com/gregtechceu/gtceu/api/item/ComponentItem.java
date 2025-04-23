@@ -30,7 +30,6 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -44,8 +43,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ComponentItem extends Item implements IUIHolder.Item, IItemRendererProvider, IComponentItem {
-
-    protected int burnTime = -1;
 
     @Getter
     protected List<IItemComponent> components;
@@ -358,11 +355,6 @@ public class ComponentItem extends Item implements IUIHolder.Item, IItemRenderer
     }
 
     @Override
-    public int getBurnTime(ItemStack itemStack, @Nullable RecipeType<?> recipeType) {
-        return burnTime;
-    }
-
-    @Override
     public @Nullable FoodProperties getFoodProperties(ItemStack stack, @Nullable LivingEntity entity) {
         for (IItemComponent component : components) {
             if (component instanceof IEdibleItem foodBehavior) {
@@ -390,10 +382,6 @@ public class ComponentItem extends Item implements IUIHolder.Item, IItemRenderer
             }
         }
         return super.getDrinkingSound();
-    }
-
-    public void burnTime(int burnTime) {
-        this.burnTime = burnTime;
     }
 
     /**

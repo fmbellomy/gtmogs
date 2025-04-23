@@ -25,6 +25,7 @@ import net.minecraft.world.level.ItemLike;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import it.unimi.dsi.fastutil.chars.*;
 import it.unimi.dsi.fastutil.objects.Reference2LongOpenHashMap;
+import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaRecipeHelper {
@@ -274,6 +275,7 @@ public class VanillaRecipeHelper {
                 i++;
                 switch (content) {
                     case Ingredient ingredient -> builder.define(sign, ingredient);
+                    case ICustomIngredient ingredient -> builder.define(sign, ingredient.toVanilla());
                     case ItemStack itemStack -> builder.define(sign, itemStack);
                     case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.define(sign, (TagKey<Item>) key);
                     case TagPrefix prefix -> {
@@ -369,6 +371,7 @@ public class VanillaRecipeHelper {
                 i++;
                 switch (content) {
                     case Ingredient ingredient -> builder.define(sign, ingredient);
+                    case ICustomIngredient ingredient -> builder.define(sign, ingredient.toVanilla());
                     case ItemStack itemStack -> builder.define(sign, itemStack);
                     case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.define(sign, (TagKey<Item>) key);
                     case ItemLike itemLike -> builder.define(sign, itemLike);
@@ -435,6 +438,7 @@ public class VanillaRecipeHelper {
                 i++;
                 switch (content) {
                     case Ingredient ingredient -> builder.define(sign, ingredient);
+                    case ICustomIngredient ingredient -> builder.define(sign, ingredient.toVanilla());
                     case ItemStack itemStack -> builder.define(sign, itemStack);
                     case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.define(sign, (TagKey<Item>) key);
                     case TagPrefix prefix -> {
@@ -509,6 +513,7 @@ public class VanillaRecipeHelper {
         for (Object content : recipe) {
             switch (content) {
                 case Ingredient ingredient -> builder.requires(ingredient);
+                case ICustomIngredient ingredient -> builder.requires(ingredient.toVanilla());
                 case ItemStack itemStack -> builder.requires(itemStack);
                 case TagKey<?> key when key.isFor(Registries.ITEM) -> builder.requires((TagKey<Item>) key);
                 case ItemLike itemLike -> builder.requires(itemLike);
@@ -565,10 +570,16 @@ public class VanillaRecipeHelper {
             ItemLike itemLike;
             switch (ingredient) {
                 case Ingredient ingr -> {
-                    ItemStack[] stacks = ingr.getItems();
-                    if (stacks.length == 0) continue;
-                    ItemStack stack = stacks[0];
-                    if (stack == ItemStack.EMPTY) continue;
+                    if (ingr.hasNoItems()) continue;
+                    ItemStack stack = ingr.getItems()[0];
+                    if (stack.isEmpty()) continue;
+                    itemLike = stack.getItem();
+                }
+                case ICustomIngredient custom -> {
+                    Ingredient ingr = custom.toVanilla();
+                    if (ingr.hasNoItems()) continue;
+                    ItemStack stack = ingr.getItems()[0];
+                    if (stack.isEmpty()) continue;
                     itemLike = stack.getItem();
                 }
                 case ItemStack itemStack -> itemLike = itemStack.getItem();

@@ -77,6 +77,8 @@ import com.tterrag.registrate.util.entry.BlockEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
+import net.neoforged.neoforge.registries.datamaps.builtin.Compostable;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -713,6 +715,7 @@ public class GTBlocks {
             .tag(BlockTags.SAPLINGS)
             .item()
             .model(GTModels::rubberTreeSaplingModel)
+            .dataMap(NeoForgeDataMaps.COMPOSTABLES, new Compostable(0.3f))
             .tag(ItemTags.SAPLINGS)
             .build()
             .register();
@@ -778,6 +781,7 @@ public class GTBlocks {
             .color(() -> GTBlocks::leavesBlockColor)
             .item()
             .color(() -> GTBlocks::leavesItemColor)
+            .dataMap(NeoForgeDataMaps.COMPOSTABLES, new Compostable(0.3f))
             .tag(ItemTags.LEAVES)
             .build()
             .register();

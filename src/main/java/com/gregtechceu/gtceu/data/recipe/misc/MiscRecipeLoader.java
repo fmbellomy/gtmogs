@@ -392,13 +392,13 @@ public class MiscRecipeLoader {
 
         // Dyed Lens Decomposition
         for (ItemEntry<Item> item : GLASS_LENSES.values()) {
-            EXTRACTOR_RECIPES.recipeBuilder("extract_" + item.get()).EUt(VA[LV]).duration(15)
+            EXTRACTOR_RECIPES.recipeBuilder(item.getId().withPrefix("extract_")).EUt(VA[LV]).duration(15)
                     .inputItems(item)
                     .outputFluids(Glass.getFluid(108))
                     .category(GTRecipeCategories.EXTRACTOR_RECYCLING)
                     .save(provider);
 
-            MACERATOR_RECIPES.recipeBuilder("macerate_" + item.get()).EUt(VA[LV]).duration(15)
+            MACERATOR_RECIPES.recipeBuilder(item.getId().withPrefix("macerate_")).EUt(VA[LV]).duration(15)
                     .inputItems(item)
                     .outputItems(dustSmall, Glass, 3)
                     .category(GTRecipeCategories.MACERATOR_RECYCLING)

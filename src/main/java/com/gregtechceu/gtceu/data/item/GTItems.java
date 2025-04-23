@@ -70,6 +70,8 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
+import net.neoforged.neoforge.registries.datamaps.builtin.FurnaceFuel;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import java.util.*;
@@ -2018,11 +2020,11 @@ public class GTItems {
             .tag(CustomTags.DOUGHS)
             .register();
     public static ItemEntry<ComponentItem> PLANT_BALL = REGISTRATE.item("plant_ball", ComponentItem::new)
-            .onRegister(burnTime(75)).register();
+            .dataMap(NeoForgeDataMaps.FURNACE_FUELS, new FurnaceFuel(75)).register();
     public static ItemEntry<ComponentItem> STICKY_RESIN = REGISTRATE.item("sticky_resin", ComponentItem::new)
-            .lang("Sticky Resin").onRegister(burnTime(200)).register();
+            .lang("Sticky Resin").dataMap(NeoForgeDataMaps.FURNACE_FUELS, new FurnaceFuel(200)).register();
     public static ItemEntry<ComponentItem> BIO_CHAFF = REGISTRATE.item("bio_chaff", ComponentItem::new)
-            .onRegister(burnTime(200)).register();
+            .dataMap(NeoForgeDataMaps.FURNACE_FUELS, new FurnaceFuel(200)).register();
     public static ItemEntry<Item> ENERGIUM_DUST = REGISTRATE.item("energium_dust", Item::new)
             .register();
 
@@ -2568,10 +2570,6 @@ public class GTItems {
             });
 
         }
-    }
-
-    public static <T extends ComponentItem> NonNullConsumer<T> burnTime(int burnTime) {
-        return item -> item.burnTime(burnTime);
     }
 
     public static <T extends IComponentItem> NonNullConsumer<T> attach(IItemComponent components) {
