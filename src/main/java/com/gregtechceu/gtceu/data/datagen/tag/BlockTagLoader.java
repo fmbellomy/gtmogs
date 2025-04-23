@@ -17,14 +17,17 @@ public class BlockTagLoader {
         provider.addTag(CustomTags.ENDSTONE_ORE_REPLACEABLES)
                         .addTag(Tags.Blocks.END_STONES);
 
+        provider.addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
+        provider.addTag(CustomTags.NEEDS_DURANIUM_TOOL);
+
+        provider.addTag(CustomTags.INCORRECT_FOR_DURANIUM_TOOL)
+                .addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
         provider.addTag(BlockTags.INCORRECT_FOR_DIAMOND_TOOL)
                 .addTag(Tags.Blocks.NEEDS_NETHERITE_TOOL)
                 .addTag(CustomTags.NEEDS_DURANIUM_TOOL)
                 .addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
         provider.addTag(BlockTags.INCORRECT_FOR_NETHERITE_TOOL)
                 .addTag(CustomTags.NEEDS_DURANIUM_TOOL)
-                .addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
-        provider.addTag(CustomTags.INCORRECT_FOR_DURANIUM_TOOL)
                 .addTag(CustomTags.NEEDS_NEUTRONIUM_TOOL);
 
         // this is awful. I don't care, though.

@@ -1,6 +1,6 @@
 {
-  "parent": "gtceu:block/lamp_off",
-  "textures": {
-    "inactive": "gtceu:block/lamps/orange_off"
-  }
+    "parent": "gtceu:block/lamp_off",
+    "textures": {
+        "inactive": "gtceu:block/lamps/orange_off"
+    }
 }

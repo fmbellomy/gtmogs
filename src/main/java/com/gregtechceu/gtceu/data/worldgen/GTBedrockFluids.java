@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -58,7 +59,7 @@ public class GTBedrockFluids {
     private static void register(BootstrapContext<BedrockFluidDefinition> context,
                                  ResourceKey<BedrockFluidDefinition> key,
                                  Consumer<BedrockFluidDefinition.Builder> consumer) {
-        BedrockFluidDefinition.Builder builder = BedrockFluidDefinition.builder();
+        BedrockFluidDefinition.Builder builder = BedrockFluidDefinition.builder(context.lookup(Registries.BIOME));
         consumer.accept(builder);
         context.register(key, builder.register());
     }

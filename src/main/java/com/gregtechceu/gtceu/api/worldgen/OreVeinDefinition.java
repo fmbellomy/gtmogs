@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
 import net.minecraft.core.registries.Registries;
@@ -98,10 +99,13 @@ public class OreVeinDefinition {
     @Setter
     private List<IndicatorGenerator> indicatorGenerators;
 
+    private final HolderGetter<Biome> biomeLookup;
+
     public OreVeinDefinition(OreVeinDefinition other) {
         this(other.clusterSize, other.density, other.weight, other.layer,
                 Set.copyOf(other.dimensionFilter), other.heightRange, other.discardChanceOnAirExposure,
-                other.biomes, other.biomeWeightModifier, other.veinGenerator, List.copyOf(other.indicatorGenerators));
+                other.biomes, other.biomeWeightModifier, other.veinGenerator, List.copyOf(other.indicatorGenerators),
+                other.biomeLookup);
     }
 
     public OreVeinDefinition(IntProvider clusterSize, float density, int weight, IWorldGenLayer layer,
@@ -111,14 +115,14 @@ public class OreVeinDefinition {
                              @Nullable List<IndicatorGenerator> indicatorGenerators) {
         this(clusterSize, density, weight,
                 layer, new HashSet<>(dimensionFilter), heightRange,discardChanceOnAirExposure, biomes, biomeWeightModifier,
-                veinGenerator, indicatorGenerators);
+                veinGenerator, indicatorGenerators, null);
     }
 
     public OreVeinDefinition(IntProvider clusterSize, float density, int weight, IWorldGenLayer layer,
                              Set<ResourceKey<Level>> dimensionFilter, HeightRangePlacement heightRange,
                              float discardChanceOnAirExposure, @Nullable HolderSet<Biome> biomes,
                              @Nullable BiomeWeightModifier biomeWeightModifier, @Nullable VeinGenerator veinGenerator,
-                             @Nullable List<IndicatorGenerator> indicatorGenerators) {
+                             @Nullable List<IndicatorGenerator> indicatorGenerators, HolderGetter<Biome> biomeLookup) {
         this.clusterSize = clusterSize;
         this.density = density;
         this.weight = weight;
@@ -130,6 +134,7 @@ public class OreVeinDefinition {
         this.biomeWeightModifier = biomeWeightModifier;
         this.veinGenerator = veinGenerator;
         this.indicatorGenerators = Objects.requireNonNullElseGet(indicatorGenerators, ArrayList::new);
+        this.biomeLookup = biomeLookup;
     }
 
     public OreVeinDefinition clusterSize(IntProvider clusterSize) {
@@ -155,20 +160,18 @@ public class OreVeinDefinition {
     public OreVeinDefinition layer(IWorldGenLayer layer) {
         this.layer = layer;
         if (this.dimensionFilter == null || this.dimensionFilter.isEmpty()) {
-            dimensions(layer.getLevels().toArray(ResourceLocation[]::new));
+            dimensions(layer.getLevels());
         }
         return this;
     }
 
-    public OreVeinDefinition dimensions(ResourceLocation... dimensions) {
-        this.dimensionFilter = Arrays.stream(dimensions)
-                .map(location -> ResourceKey.create(Registries.DIMENSION, location))
-                .collect(Collectors.toSet());
+    public OreVeinDefinition dimensions(Set<ResourceKey<Level>> dimensions) {
+        this.dimensionFilter = dimensions;
         return this;
     }
 
     public OreVeinDefinition biomes(TagKey<Biome> biomes) {
-        this.biomes = GTRegistries.builtinRegistry().lookupOrThrow(Registries.BIOME).getOrThrow(biomes);
+        this.biomes = biomeLookup.getOrThrow(biomes);
         return this;
     }
 

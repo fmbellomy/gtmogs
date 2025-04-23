@@ -138,8 +138,9 @@ public class GTCEu {
      * 
      * @return if the current thread is the client thread
      */
+    @SuppressWarnings("ConstantValue")
     public static boolean isClientThread() {
-        return isClientSide() && Minecraft.getInstance().isSameThread();
+        return isClientSide() && Minecraft.getInstance() != null && Minecraft.getInstance().isSameThread();
     }
 
     /**

@@ -1,16 +1,7 @@
 {
-  "values": [
-    {
-      "id": "#neoforge:needs_netherite_tool",
-      "required": false
-    },
-    {
-      "id": "#gtceu:needs_duranium_tool",
-      "required": false
-    },
-    {
-      "id": "#gtceu:needs_neutronium_tool",
-      "required": false
-    }
-  ]
+    "values": [
+        "#neoforge:needs_netherite_tool",
+        "#gtceu:needs_duranium_tool",
+        "#gtceu:needs_neutronium_tool"
+    ]
 }

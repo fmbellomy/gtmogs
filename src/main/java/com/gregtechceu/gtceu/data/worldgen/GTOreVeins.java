@@ -7,8 +7,10 @@ import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +18,7 @@ import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.UniformInt;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
@@ -128,18 +131,18 @@ public class GTOreVeins {
         return key;
     }
 
-    public static OreVeinDefinition blankOreDefinition() {
+    public static OreVeinDefinition blankOreDefinition(HolderGetter<Biome> biomeLookup) {
         return new OreVeinDefinition(
                 ConstantInt.ZERO, 0, 0, IWorldGenLayer.NOWHERE, Set.of(),
                 HeightRangePlacement.uniform(VerticalAnchor.absolute(0), VerticalAnchor.absolute(0)),
                 0, HolderSet.empty(), BiomeWeightModifier.EMPTY, NoopVeinGenerator.INSTANCE,
-                new ArrayList<>());
+                new ArrayList<>(), biomeLookup);
     }
 
     private static void register(BootstrapContext<OreVeinDefinition> context,
                                  ResourceKey<OreVeinDefinition> key,
                                  Consumer<OreVeinDefinition> consumer) {
-        OreVeinDefinition builder = blankOreDefinition();
+        OreVeinDefinition builder = blankOreDefinition(context.lookup(Registries.BIOME));
         consumer.accept(builder);
         context.register(key, builder);
     }

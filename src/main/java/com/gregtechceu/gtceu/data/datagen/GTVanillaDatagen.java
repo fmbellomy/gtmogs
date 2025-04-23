@@ -47,7 +47,8 @@ public class GTVanillaDatagen {
                             .add(NeoForgeRegistries.Keys.BIOME_MODIFIERS, GTBiomeModifiers::bootstrap)
                             .add(Registries.JUKEBOX_SONG, GTJukeboxSongs::bootstrap)
                             .add(Registries.ENCHANTMENT_PROVIDER, GTEnchantmentProviders::bootstrap)
-                            .add(GTRegistries.BEDROCK_FLUID_REGISTRY, GTBedrockFluids::bootstrap),
+                            .add(GTRegistries.BEDROCK_FLUID_REGISTRY, GTBedrockFluids::bootstrap)
+                            .add(GTRegistries.ORE_VEIN_REGISTRY, GTOreVeins::bootstrap),
                     set));
             generator.addProvider(true,
                     new DamageTagsLoader(packOutput, provider.getRegistryProvider(), existingFileHelper));

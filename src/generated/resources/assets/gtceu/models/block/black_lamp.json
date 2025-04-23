@@ -1,7 +1,7 @@
 {
-  "parent": "gtceu:block/lamp",
-  "textures": {
-    "active": "gtceu:block/lamps/black",
-    "active_overlay": "gtceu:block/lamps/black"
-  }
+    "parent": "gtceu:block/lamp",
+    "textures": {
+        "active": "gtceu:block/lamps/black",
+        "active_overlay": "gtceu:block/lamps/black"
+    }
 }

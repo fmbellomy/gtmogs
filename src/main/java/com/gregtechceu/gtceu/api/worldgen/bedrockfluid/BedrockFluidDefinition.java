@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -88,6 +89,7 @@ public class BedrockFluidDefinition {
         this.depletedYield = depletedYield;
         this.storedFluid = storedFluid;
         this.originalModifiers = originalModifiers;
+        /* FIXME datagen broke
         this.biomeWeightModifier = new BiomeWeightModifier(
                 HolderSet.direct(originalModifiers.stream().flatMap(mod -> mod.biomes.stream()).toList()),
                 originalModifiers.stream().mapToInt(mod -> mod.addedWeight).sum()) {
@@ -103,6 +105,7 @@ public class BedrockFluidDefinition {
                 return mod;
             }
         };
+         */
         this.dimensionFilter = dimensionFilter;
     }
 
@@ -125,8 +128,8 @@ public class BedrockFluidDefinition {
         };
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(HolderGetter<Biome> biomeLookup) {
+        return new Builder(biomeLookup);
     }
 
     @Accessors(chain = true, fluent = true)
@@ -147,10 +150,14 @@ public class BedrockFluidDefinition {
         private Set<ResourceKey<Level>> dimensions = Collections.emptySet();
         private final List<BiomeWeightModifier> biomes = new LinkedList<>();
 
-        private Builder() {}
+        private final HolderGetter<Biome> biomeLookup;
+
+        private Builder(HolderGetter<Biome> biomeLookup) {
+            this.biomeLookup = biomeLookup;
+        }
 
         public Builder copy() {
-            var copied = new Builder();
+            var copied = new Builder(this.biomeLookup);
             copied.weight = weight;
             copied.minimumYield = minimumYield;
             copied.maximumYield = maximumYield;
@@ -166,15 +173,13 @@ public class BedrockFluidDefinition {
         }
 
         public Builder biomes(int weight, TagKey<Biome> biomes) {
-            this.biomes.add(new BiomeWeightModifier(GTRegistries.builtinRegistry()
-                    .registryOrThrow(Registries.BIOME).getOrCreateTag(biomes), weight));
+            this.biomes.add(new BiomeWeightModifier(biomeLookup.getOrThrow(biomes), weight));
             return this;
         }
 
         @SafeVarargs
         public final Builder biomes(int weight, ResourceKey<Biome>... biomes) {
-            this.biomes.add(new BiomeWeightModifier(HolderSet.direct(GTRegistries.builtinRegistry()
-                    .registryOrThrow(Registries.BIOME)::getHolderOrThrow, biomes), weight));
+            this.biomes.add(new BiomeWeightModifier(HolderSet.direct(biomeLookup::getOrThrow, biomes), weight));
             return this;
         }
 
