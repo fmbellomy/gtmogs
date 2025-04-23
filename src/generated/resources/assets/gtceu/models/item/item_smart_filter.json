@@ -1,10 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-<<<<<<<< HEAD:src/generated/resources/assets/gtceu/models/item/hv_prospector.json
-    "layer0": "gtceu:item/hv_prospector"
-========
-    "layer0": "gtceu:item/item_smart_filter"
->>>>>>>> sc/remake-1.21.1-branch:src/generated/resources/assets/gtceu/models/item/item_smart_filter.json
+      "layer0": "gtceu:item/item_smart_filter"
   }
 }

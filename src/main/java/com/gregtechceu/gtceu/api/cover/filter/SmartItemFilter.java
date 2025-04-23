@@ -114,7 +114,7 @@ public class SmartItemFilter implements ItemFilter {
 
         @Override
         public String getTooltip() {
-            return "cover.item_smart_filter.filtering_mode." + name;
+            return "cover.smart_item_filter.filtering_mode." + name;
         }
 
         @Override

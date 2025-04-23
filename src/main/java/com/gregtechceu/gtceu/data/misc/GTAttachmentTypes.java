@@ -22,8 +22,4 @@ public class GTAttachmentTypes {
                 }
                 return null;
             }).build());
-
-    public static void init(IEventBus modBus) {
-        ATTACHMENT_TYPES.register(modBus);
-    }
 }

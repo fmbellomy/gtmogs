@@ -261,6 +261,7 @@ public class FluidBuilder {
     public @NotNull Supplier<? extends Fluid> build(Material material, FluidStorageKey key,
                                                     GTRegistrate registrate) {
         determineName(material, key);
+        determineTextures(material, key);
 
         if (name == null) {
             throw new IllegalStateException("Could not determine fluid name");
@@ -286,7 +287,8 @@ public class FluidBuilder {
         var builder = registrate.fluid(this.name, this.still, this.flowing,
                         (p, $1, $2) -> makeFluidType(registrate, p, material, key, langKey),
                         (p) -> new GTFluid.Flowing(this.state, this.burnTime, p))
-                .source((p) -> new GTFluid.Source(this.state, this.burnTime, p));
+                .source((p) -> new GTFluid.Source(this.state, this.burnTime, p))
+                .setData(ProviderType.LANG, NonNullBiConsumer.noop());
         if (this.hasFluidBlock) {
             builder.block()
                     .blockstate((ctx, prov) -> prov
@@ -298,6 +300,7 @@ public class FluidBuilder {
             builder.bucket((fluid, properties) -> new GTBucketItem(fluid, properties, material, langKey))
                     .properties(p -> p.craftRemainder(Items.BUCKET).stacksTo(1))
                     .setData(ProviderType.LANG, NonNullBiConsumer.noop())
+                    .setData(ProviderType.ITEM_MODEL, NonNullBiConsumer.noop())
                     .register();
         } else builder.noBucket();
 

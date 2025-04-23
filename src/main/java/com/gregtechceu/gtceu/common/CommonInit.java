@@ -34,6 +34,7 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.datafixer.GTDataFixers;
 import com.gregtechceu.gtceu.data.item.GTArmorMaterials;
 import com.gregtechceu.gtceu.data.loot.ChestGenHooks;
+import com.gregtechceu.gtceu.data.misc.GTAttachmentTypes;
 import com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs;
 import com.gregtechceu.gtceu.data.misc.GTDimensionMarkers;
 import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
@@ -137,6 +138,7 @@ public class CommonInit {
 
         GTFoods.init();
         GTToolBehaviors.init();
+        GTAttachmentTypes.ATTACHMENT_TYPES.register(modBus);
         GTDataComponents.DATA_COMPONENTS.register(modBus);
         GTArmorMaterials.ARMOR_MATERIALS.register(modBus);
         GTItems.init();

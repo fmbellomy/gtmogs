@@ -318,38 +318,6 @@ public class MixinHelpers {
         });
     }
 
-    public static List<CompletableFuture<WritableRegistry<?>>> injectGTReloadableRegistries(List<CompletableFuture<WritableRegistry<?>>> original,
-                                                                                            LayeredRegistryAccess<RegistryLayer> registries,
-                                                                                            ResourceManager resourceManager,
-                                                                                            Executor backgroundExecutor,
-                                                                                            RegistryOps<JsonElement> ops) {
-        var list = new ArrayList<>(original);
-        list.add(parseGTRegistry(GTRegistries.ORE_VEIN_REGISTRY, OreVeinDefinition.DIRECT_CODEC,
-                ops, resourceManager, backgroundExecutor));
-        list.add(parseGTRegistry(GTRegistries.BEDROCK_FLUID_REGISTRY, BedrockFluidDefinition.DIRECT_CODEC,
-                ops, resourceManager, backgroundExecutor));
-        list.add(parseGTRegistry(GTRegistries.BEDROCK_ORE_REGISTRY, BedrockOreDefinition.DIRECT_CODEC,
-                ops, resourceManager, backgroundExecutor));
-        return list;
-    }
-
-    private static <T> CompletableFuture<WritableRegistry<?>> parseGTRegistry(ResourceKey<? extends Registry<T>> registryKey,
-                                                                              Codec<T> codec,
-                                                                              RegistryOps<JsonElement> registryOps,
-                                                                              ResourceManager resourceManager,
-                                                                              Executor backgroundExecutor) {
-        return CompletableFuture.supplyAsync(() -> {
-            GTRegistry<T> registry = new GTRegistry<>(registryKey);
-            Map<ResourceLocation, JsonElement> map = new HashMap<>();
-            String s = Registries.elementsDirPath(registryKey);
-            SimpleJsonResourceReloadListener.scanDirectory(resourceManager, s, GSON, map);
-            map.forEach((id, json) -> codec.parse(registryOps, json)
-                    .result()
-                    .ifPresent(value -> registry.register(ResourceKey.create(registryKey, id), value)));
-            return registry;
-        }, backgroundExecutor);
-    }
-
     public static void addFluidTexture(Material material, FluidStorage.FluidEntry value) {
         if (value != null) {
             IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(value.getFluid().get());

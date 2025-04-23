@@ -14,6 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.ModLoadingContext;
 
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -26,11 +27,16 @@ public class GTRegistry<T> extends MappedRegistry<T> {
         this(ResourceKeyAccessor.callCreate(GTRegistries.ROOT_GT_REGISTRY_NAME, registryName));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
     public GTRegistry(ResourceKey<? extends Registry<T>> registryKey) {
-        super(registryKey, Lifecycle.stable());
-        if (!registryKey.location().equals(GTRegistries.ROOT_GT_REGISTRY_NAME)) {
-            GTRegistries.ROOT.register((ResourceKey) registryKey, this, RegistrationInfo.BUILT_IN);
+        this(registryKey, Lifecycle.stable(), false);
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    @ApiStatus.Internal
+    public GTRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle registryLifecycle, boolean hasIntrusiveHolders) {
+        super(key, registryLifecycle, hasIntrusiveHolders);
+        if (!key.location().equals(GTRegistries.ROOT_GT_REGISTRY_NAME)) {
+            GTRegistries.ROOT.register((ResourceKey) key, this, RegistrationInfo.BUILT_IN);
         }
     }
 
