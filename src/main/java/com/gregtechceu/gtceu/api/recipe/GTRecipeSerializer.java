@@ -21,21 +21,56 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Tuple;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.RecipeType;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.latvian.mods.kubejs.recipe.ingredientaction.IngredientActionHolder;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.function.Function;
 
 @SuppressWarnings("DataFlowIssue")
 public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
 
+    // spotless:off
+    public static final Codec<GTRecipeType> GT_RECIPE_TYPE_CODEC = BuiltInRegistries.RECIPE_TYPE.byNameCodec()
+            .comapFlatMap(recipeType -> {
+                if (recipeType instanceof GTRecipeType gtRecipeType) {
+                    return DataResult.success(gtRecipeType);
+                } else {
+                    return DataResult.error(() -> "Recipe type " + recipeType + " is not a GTRecipeType");
+                }
+            }, Function.identity());
+    public static final StreamCodec<ByteBuf, GTRecipeType> GT_RECIPE_TYPE_STREAM_CODEC = new StreamCodec<>() {
+
+        private static final StreamCodec<ByteBuf, RecipeType<?>> STREAM_CODEC = ResourceLocation.STREAM_CODEC
+                .map(BuiltInRegistries.RECIPE_TYPE::get, BuiltInRegistries.RECIPE_TYPE::getKey);
+
+        @Override
+        public @NotNull GTRecipeType decode(@NotNull ByteBuf buffer) {
+            RecipeType<?> recipeType = STREAM_CODEC.decode(buffer);
+            if (!(recipeType instanceof GTRecipeType gtRecipeType)) {
+                throw new DecoderException("Recipe type " + recipeType + " is not a GTRecipeType");
+            }
+            return gtRecipeType;
+        }
+
+        @Override
+        public void encode(@NotNull ByteBuf buffer, @NotNull GTRecipeType value) {
+            STREAM_CODEC.encode(buffer, value);
+        }
+    };
+
     public static final MapCodec<GTRecipe> CODEC = makeCodec(GTCEu.Mods.isKubeJSLoaded());
     public static final StreamCodec<RegistryFriendlyByteBuf, GTRecipe> STREAM_CODEC = StreamCodec
             .of(GTRecipeSerializer::toNetwork, GTRecipeSerializer::fromNetwork);
+    // spotless:on
 
     @Override
     public @NotNull MapCodec<GTRecipe> codec() {
@@ -207,7 +242,7 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
         if (!isKubeLoaded) {
             // I'll admit, it's not great.
             return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
+                    GT_RECIPE_TYPE_CODEC.fieldOf("type").forGetter(val -> val.recipeType),
                     RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
                     RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
                     RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),
@@ -239,7 +274,7 @@ public class GTRecipeSerializer implements RecipeSerializer<GTRecipe> {
                                               conditions, List.of(), data, duration, recipeCategory)));
         } else {
             return RecordCodecBuilder.mapCodec(instance -> instance.group(
-                    GTRegistries.RECIPE_TYPES.byNameCodec().fieldOf("type").forGetter(val -> val.recipeType),
+                    GT_RECIPE_TYPE_CODEC.fieldOf("type").forGetter(val -> val.recipeType),
                     RecipeCapability.CODEC.optionalFieldOf("inputs", Map.of()).forGetter(val -> val.inputs),
                     RecipeCapability.CODEC.optionalFieldOf("outputs", Map.of()).forGetter(val -> val.outputs),
                     RecipeCapability.CODEC.optionalFieldOf("tickInputs", Map.of()).forGetter(val -> val.tickInputs),

@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.registry;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.core.mixins.ResourceKeyAccessor;
 
 import net.minecraft.core.*;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -9,8 +8,6 @@ import net.minecraft.network.VarInt;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.ModLoadingContext;
 
 import com.google.common.collect.Maps;
 import com.mojang.serialization.Lifecycle;
@@ -23,47 +20,14 @@ import java.util.*;
 @SuppressWarnings("UnusedReturnValue")
 public class GTRegistry<T> extends MappedRegistry<T> {
 
-    public GTRegistry(ResourceLocation registryName) {
-        this(ResourceKeyAccessor.callCreate(GTRegistries.ROOT_GT_REGISTRY_NAME, registryName));
-    }
-
     public GTRegistry(ResourceKey<? extends Registry<T>> registryKey) {
         this(registryKey, Lifecycle.stable(), false);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @ApiStatus.Internal
     public GTRegistry(ResourceKey<? extends Registry<T>> key, Lifecycle registryLifecycle,
                       boolean hasIntrusiveHolders) {
         super(key, registryLifecycle, hasIntrusiveHolders);
-        if (!key.location().equals(GTRegistries.ROOT_GT_REGISTRY_NAME)) {
-            GTRegistries.ROOT.register((ResourceKey) key, this, RegistrationInfo.BUILT_IN);
-        }
-    }
-
-    @Override
-    public Registry<T> freeze() {
-        if (!checkActiveModContainerIsOwner()) {
-            return this;
-        }
-        return super.freeze();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void unfreeze() {
-        if (!checkActiveModContainerIsOwner()) {
-            return;
-        }
-        super.unfreeze();
-    }
-
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private boolean checkActiveModContainerIsOwner() {
-        ModContainer container = ModLoadingContext.get().getActiveContainer();
-        return container != null && (container.getModId().equals(this.key().location().getNamespace()) ||
-                container.getModId().equals(GTCEu.MOD_ID) ||
-                container.getModId().equals("minecraft")); // check for minecraft in case of datagen or a mishap
     }
 
     public <V extends T> V register(ResourceKey<T> key, V value) {
@@ -86,7 +50,7 @@ public class GTRegistry<T> extends MappedRegistry<T> {
     @Nullable
     public <V extends T> V replace(ResourceKey<T> key, V value) {
         if (!containsKey(key)) {
-            GTCEu.LOGGER.warn("[GTRegistry] couldn't find key {} in registry {}", key, key().location());
+            GTCEu.LOGGER.warn("[GTRegistry] Couldn't find key {} in registry {}", key, key().location());
         }
         registerOrOverride(key, value);
         return value;
@@ -132,15 +96,19 @@ public class GTRegistry<T> extends MappedRegistry<T> {
     }
 
     public boolean remove(ResourceKey<T> key) {
-        Holder<T> holder = this.getHolder(key).orElse(null);
+        Holder.Reference<T> holder = this.getHolder(key).orElse(null);
         if (holder == null) {
             return false;
         }
         return remove(holder);
     }
 
-    public boolean remove(Holder<T> holder) {
+    public boolean remove(Holder.Reference<T> holder) {
         ResourceKey<T> key = holder.getKey();
+        if (key == null) {
+            GTCEu.LOGGER.warn("[GTRegistry] Invalid holder {}", holder);
+            return false;
+        }
         boolean removed = true;
         removed &= this.gtceu$getByKey().remove(key) != null;
         removed &= this.gtceu$getByLocation().remove(key.location()) != null;
