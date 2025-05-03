@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.gui.widget;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.client.TooltipsHandler;
 import com.gregtechceu.gtceu.integration.xei.entry.fluid.FluidEntryList;
@@ -394,8 +393,7 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
             }
             if (!FluidStack.isSameFluidSameComponents(fluidStack, lastFluidInTank)) {
                 this.lastFluidInTank = fluidStack.copy();
-                var tag = fluidStack.save(GTRegistries.builtinRegistry());
-                writeUpdateInfo(2, buffer -> buffer.writeNbt(tag));
+                writeUpdateInfo(2, buffer -> FluidStack.OPTIONAL_STREAM_CODEC.encode(buffer, fluidStack));
             } else if (fluidStack.getAmount() != lastFluidInTank.getAmount()) {
                 this.lastFluidInTank.setAmount(fluidStack.getAmount());
                 writeUpdateInfo(3, buffer -> buffer.writeVarInt(lastFluidInTank.getAmount()));
@@ -417,8 +415,7 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
             buffer.writeVarInt(lastTankCapacity);
             FluidStack fluidStack = fluidTank.getFluidInTank(tank);
             this.lastFluidInTank = fluidStack.copy();
-            var tag = fluidStack.save(buffer.registryAccess());
-            buffer.writeNbt(tag);
+            FluidStack.OPTIONAL_STREAM_CODEC.encode(buffer, fluidStack);
         }
     }
 
@@ -438,7 +435,7 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
         } else if (id == 1) {
             this.lastFluidInTank = null;
         } else if (id == 2) {
-            this.lastFluidInTank = FluidStack.parseOptional(buffer.registryAccess(), buffer.readNbt());
+            this.lastFluidInTank = FluidStack.OPTIONAL_STREAM_CODEC.decode(buffer);
         } else if (id == 3 && lastFluidInTank != null) {
             this.lastFluidInTank.setAmount(buffer.readVarInt());
         } else if (id == 4) {
