@@ -139,6 +139,7 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
 
     @Override
     public void addInfo(ItemStack itemStack, List<Component> lines) {
+        super.addInfo(itemStack, lines);
         GTArmor data = itemStack.getOrDefault(GTDataComponents.ARMOR_DATA, GTArmor.EMPTY);
 
         Component state = data.enabled() ? Component.translatable("metaarmor.hud.status.enabled") :
@@ -153,7 +154,6 @@ public class AdvancedNanoMuscleSuite extends NanoMuscleSuite implements IJetpack
         state = data.hover() ? Component.translatable("metaarmor.hud.status.enabled") :
                 Component.translatable("metaarmor.hud.status.disabled");
         lines.add(Component.translatable("metaarmor.hud.hover_mode", state));
-        super.addInfo(itemStack, lines);
     }
 
     @Override

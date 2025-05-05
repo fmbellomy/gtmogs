@@ -1,9 +1,10 @@
 tasks.register('slimJar', Jar) {
+    dependsOn("classes")
     archiveClassifier = "slim"
     from sourceSets.main.output
 }
 
-// Add slim and sources jar to components.java
+// Add sources jar to components.java
 java {
     withSourcesJar()
 }

@@ -1,19 +1,17 @@
 package com.gregtechceu.gtceu.data.datagen.datamap;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
+import com.gregtechceu.gtceu.data.recipe.misc.ComposterRecipes;
+
+import net.neoforged.neoforge.registries.datamaps.builtin.Compostable;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 
 import com.tterrag.registrate.providers.RegistrateDataMapProvider;
-import com.tterrag.registrate.util.entry.RegistryEntry;
-import org.jetbrains.annotations.NotNull;
 
 public class DataMapsHandler {
 
-    public static void init(RegistrateDataMapProvider provider) {}
-
-    private static ResourceKey<Item> getItemKey(@NotNull RegistryEntry<Block, ? extends Block> entry) {
-        return entry.getSibling(Registries.ITEM).getKey();
+    public static void init(RegistrateDataMapProvider provider) {
+        final var compostables = provider.builder(NeoForgeDataMaps.COMPOSTABLES);
+        ComposterRecipes.addComposterRecipes((item, chance) -> compostables.add(item.builtInRegistryHolder(),
+                new Compostable(chance), false));
     }
 }

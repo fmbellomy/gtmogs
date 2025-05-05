@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.material.material.stack;
 
+import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.material.material.Material;
 
 import it.unimi.dsi.fastutil.objects.Reference2LongMap;
@@ -12,6 +13,7 @@ public class ItemMaterialInfo {
 
     private final List<MaterialStack> sortedMaterials = new ArrayList<>();
     private int sortedHash = 0;
+    private String toStringValue;
 
     public ItemMaterialInfo(MaterialStack... materialStacks) {
         this(Arrays.asList(materialStacks));
@@ -51,12 +53,23 @@ public class ItemMaterialInfo {
         setSortedMaterials(materials);
     }
 
-    private void setSortedMaterials(Reference2LongMap<Material> materials) {
+    private void setSortedMaterials(Reference2LongMap<Material> matStacks) {
         sortedMaterials.clear();
-        materials.reference2LongEntrySet().stream()
-                .sorted(Comparator.comparingLong(Reference2LongMap.Entry::getLongValue))
-                .forEach(entry -> sortedMaterials.add(new MaterialStack(entry.getKey(), entry.getLongValue())));
+
+        for (var entry : matStacks.reference2LongEntrySet()) {
+            sortedMaterials.add(new MaterialStack(entry.getKey(), entry.getLongValue()));
+        }
+        sortedMaterials.sort(Comparator.comparingLong(MaterialStack::amount));
+
         sortedHash = sortedMaterials.hashCode();
+
+        StringBuilder ret = new StringBuilder("[ ");
+        for (var matStack : sortedMaterials) {
+            ret.append(matStack.amount() / (float) GTValues.M).append("x ")
+                    .append(matStack.material().getResourceLocation()).append(" ");
+        }
+        ret.append("]");
+        toStringValue = ret.toString();
     }
 
     @Override
@@ -75,6 +88,6 @@ public class ItemMaterialInfo {
 
     @Override
     public String toString() {
-        return sortedMaterials.isEmpty() ? "" : sortedMaterials.getFirst().material().getResourceLocation().toString();
+        return toStringValue;
     }
 }

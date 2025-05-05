@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.api.item;
 
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.item.capability.ElectricItem;
 import com.gregtechceu.gtceu.api.item.component.ElectricStats;
@@ -549,10 +548,8 @@ public interface IGTTool extends IUIHolder.Item, ItemLike {
 
         // electric info
         if (this.isElectric()) {
-            tooltip.add(Component.translatable("metaitem.generic.electric_item.tooltip",
-                    FormattingUtil.formatNumbers(getCharge(stack)),
-                    FormattingUtil.formatNumbers(getMaxCharge(stack)),
-                    GTValues.VNF[getElectricTier()]));
+            ElectricStats.addCurrentChargeTooltip(tooltip, getCharge(stack), getMaxCharge(stack), getElectricTier(),
+                    false);
         }
 
         // durability info

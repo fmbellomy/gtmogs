@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.core.mixins;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
 import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.core.MixinHelpers;
 import com.gregtechceu.gtceu.data.loot.DungeonLootLoader;
@@ -50,7 +49,6 @@ public abstract class ReloadableServerResourcesMixin {
 
         // Register recipes & unification data again
         long startTime = System.currentTimeMillis();
-        ItemMaterialData.reinitializeMaterialData();
         GTCraftingComponents.init();
         GTRecipes.recipeAddition(new RecipeOutput() {
 

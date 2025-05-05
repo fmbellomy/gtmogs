@@ -8,16 +8,13 @@ import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.tags.TagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.neoforged.neoforge.common.Tags;
 
-import com.tterrag.registrate.providers.RegistrateTagsProvider;
+import com.tterrag.registrate.providers.RegistrateItemTagsProvider;
 
 import java.util.Objects;
 
@@ -26,33 +23,41 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
 public class ItemTagLoader {
 
-    public static void init(RegistrateTagsProvider<Item> provider) {
+    public static void init(RegistrateItemTagsProvider provider) {
+        provider.addTag(CustomTags.CORAL_BLOCK_ITEMS)
+                .add(Items.BRAIN_CORAL_BLOCK, Items.BUBBLE_CORAL_BLOCK, Items.FIRE_CORAL_BLOCK, Items.TUBE_CORAL_BLOCK,
+                        Items.HORN_CORAL_BLOCK, Items.DEAD_BRAIN_CORAL_BLOCK, Items.DEAD_BUBBLE_CORAL_BLOCK,
+                        Items.DEAD_FIRE_CORAL_BLOCK, Items.DEAD_TUBE_CORAL_BLOCK, Items.DEAD_HORN_CORAL_BLOCK);
+        provider.addTag(CustomTags.CORAL_ITEMS)
+                .add(Items.BRAIN_CORAL, Items.BUBBLE_CORAL, Items.FIRE_CORAL, Items.TUBE_CORAL, Items.HORN_CORAL,
+                        Items.DEAD_BRAIN_CORAL, Items.DEAD_BUBBLE_CORAL, Items.DEAD_FIRE_CORAL, Items.DEAD_TUBE_CORAL,
+                        Items.DEAD_HORN_CORAL, Items.BRAIN_CORAL_FAN, Items.BUBBLE_CORAL_FAN, Items.FIRE_CORAL_FAN,
+                        Items.TUBE_CORAL_FAN, Items.HORN_CORAL_FAN, Items.DEAD_BRAIN_CORAL_FAN,
+                        Items.DEAD_BUBBLE_CORAL_FAN, Items.DEAD_FIRE_CORAL_FAN, Items.DEAD_TUBE_CORAL_FAN,
+                        Items.DEAD_HORN_CORAL_FAN);
         addTag(provider, lens, Color.White)
-                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Glass).getKey())
-                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, NetherStar).getKey());
-        addTag(provider, lens, Color.LightBlue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).getKey());
-        addTag(provider, lens, Color.Red).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).getKey());
-        addTag(provider, lens, Color.Green).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).getKey());
-        addTag(provider, lens, Color.Blue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).getKey());
-        addTag(provider, lens, Color.Purple).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).getKey());
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Glass).get())
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, NetherStar).get());
+        addTag(provider, lens, Color.LightBlue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).get());
+        addTag(provider, lens, Color.Red).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).get());
+        addTag(provider, lens, Color.Green).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).get());
+        addTag(provider, lens, Color.Blue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).get());
+        addTag(provider, lens, Color.Purple).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).get());
 
         provider.addTag(CustomTags.PISTONS)
-                .add(Items.PISTON.builtInRegistryHolder().key())
-                .add(Items.STICKY_PISTON.builtInRegistryHolder().key());
-        provider.addTag(CustomTags.BRICKS_FIREBRICK).add(GTItems.FIRECLAY_BRICK.getKey());
+                .add(Items.PISTON, Items.STICKY_PISTON);
+        provider.addTag(CustomTags.BRICKS_FIREBRICK).add(GTItems.FIRECLAY_BRICK.get());
         provider.addTag(Tags.Items.BRICKS).addTag(CustomTags.BRICKS_FIREBRICK);
-
-        create(provider, dye, Color.Brown, GTMaterialItems.MATERIAL_ITEMS.get(dust, MetalMixture).get());
 
         // add treated wood stick to vanilla sticks tag
         // noinspection DataFlowIssue ChemicalHelper#getTag can't return null with treated wood rod
         provider.addTag(Tags.Items.RODS_WOODEN)
-                .add(GTMaterialItems.MATERIAL_ITEMS.get(TagPrefix.rod, TreatedWood).getKey());
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(TagPrefix.rod, TreatedWood).get());
 
         // add treated and untreated wood plates to vanilla planks tag
         provider.addTag(ItemTags.PLANKS)
-                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, TreatedWood).getKey())
-                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, Wood).getKey());
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, TreatedWood).get())
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(plate, Wood).get());
 
         provider.addTag(CustomTags.CIRCUITS)
                 .addTag(CustomTags.ULV_CIRCUITS)
@@ -148,40 +153,9 @@ public class ItemTagLoader {
                 .addOptional(GTItems.SENSOR_OpV.getId());
     }
 
-    private static TagsProvider.TagAppender<Item> addTag(RegistrateTagsProvider<Item> provider,
-                                                         TagPrefix prefix, Material material) {
+    private static IntrinsicHolderTagsProvider.IntrinsicTagAppender<Item> addTag(RegistrateItemTagsProvider provider,
+                                                                                 TagPrefix prefix, Material material) {
         return provider.addTag(Objects.requireNonNull(ChemicalHelper.getTag(prefix, material),
                 "%s/%s doesn't have any tags!".formatted(prefix, material)));
-    }
-
-    private static void create(RegistrateTagsProvider<Item> provider, TagPrefix prefix, Material material,
-                               Item... rls) {
-        create(provider, ChemicalHelper.getTag(prefix, material), rls);
-    }
-
-    public static void create(RegistrateTagsProvider<Item> provider, TagKey<Item> tagKey, ResourceLocation... rls) {
-        var builder = provider.addTag(tagKey);
-        for (ResourceLocation rl : rls) {
-            builder.addOptional(rl);
-        }
-    }
-
-    @SafeVarargs
-    public static void create(RegistrateTagsProvider<Item> provider, TagKey<Item> tagKey, TagKey<Item>... rls) {
-        var builder = provider.addTag(tagKey);
-        for (TagKey<Item> tag : rls) {
-            builder.addTag(tag);
-        }
-    }
-
-    public static void create(RegistrateTagsProvider<Item> provider, TagKey<Item> tagKey, Item... rls) {
-        var builder = provider.addTag(tagKey);
-        for (Item item : rls) {
-            builder.add(BuiltInRegistries.ITEM.getResourceKey(item).get());
-        }
-    }
-
-    private static ResourceLocation rl(String name) {
-        return ResourceLocation.parse(name);
     }
 }

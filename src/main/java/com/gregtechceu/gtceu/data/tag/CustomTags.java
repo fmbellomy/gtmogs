@@ -100,6 +100,8 @@ public class CustomTags {
     public static final TagKey<Item> PPE_ARMOR = TagUtil.createModItemTag("ppe_armor");
     public static final TagKey<Item> STEP_BOOTS = TagUtil.createModItemTag("step_boots");
     public static final TagKey<Item> RUBBER_LOGS = TagUtil.createModItemTag("rubber_logs");
+    public static final TagKey<Item> CORAL_BLOCK_ITEMS = TagUtil.createItemTag("coral_blocks");
+    public static final TagKey<Item> CORAL_ITEMS = TagUtil.createItemTag("corals");
 
     public static final TagKey<Item> BRICKS_FIREBRICK = TagUtil.createItemTag("bricks/firebrick");
 

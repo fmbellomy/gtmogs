@@ -27,15 +27,12 @@ import net.neoforged.neoforge.registries.datamaps.DataMapType;
 
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.mojang.serialization.JsonOps;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -47,7 +44,7 @@ import java.util.*;
 public class GTDynamicDataPack implements PackResources {
 
     protected static final ObjectSet<String> SERVER_DOMAINS = new ObjectOpenHashSet<>();
-    protected static final Map<ResourceLocation, byte[]> DATA = new HashMap<>();
+    protected static final GTDynamicPackContents CONTENTS = new GTDynamicPackContents();
 
     private final PackLocationInfo info;
 
@@ -65,7 +62,11 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     public static void clearServer() {
-        DATA.clear();
+        CONTENTS.clearData();
+    }
+
+    private static void addToData(ResourceLocation location, byte[] bytes) {
+        CONTENTS.addToData(location, bytes);
     }
 
     public static void addRecipe(ResourceLocation recipeId, Recipe<?> recipe, @Nullable AdvancementHolder advancement,
@@ -77,7 +78,7 @@ public class GTDynamicDataPack implements PackResources {
         if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
             writeJson(recipeId, "recipe", parent, recipeBytes);
         }
-        DATA.put(getRecipeLocation(recipeId), recipeBytes);
+        addToData(getRecipeLocation(recipeId), recipeBytes);
         if (advancement != null) {
             JsonElement advancementJson = Advancement.CODEC
                     .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), advancement.value())
@@ -86,7 +87,7 @@ public class GTDynamicDataPack implements PackResources {
             if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
                 writeJson(advancement.id(), "advancement", parent, advancementBytes);
             }
-            DATA.put(getAdvancementLocation(Objects.requireNonNull(advancement.id())), advancementBytes);
+            addToData(getAdvancementLocation(advancement.id()), advancementBytes);
         }
     }
 
@@ -98,10 +99,10 @@ public class GTDynamicDataPack implements PackResources {
         if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
             writeJson(lootTableId, "loot_table", parent, lootTableBytes);
         }
-        if (DATA.containsKey(lootTableId)) {
-            GTCEu.LOGGER.error("duplicated loot table: {}", lootTableId);
+        if (CONTENTS.getResource(lootTableId) != null) {
+            GTCEu.LOGGER.error("duplicate loot table: {}", lootTableId);
         }
-        DATA.put(getLootTableLocation(lootTableId), lootTableBytes);
+        addToData(getLootTableLocation(lootTableId), lootTableBytes);
     }
 
     public static <T, R> void addDataMap(DataMapType<R, T> type, DataMapProvider.Builder<T, R> builder,
@@ -116,15 +117,12 @@ public class GTDynamicDataPack implements PackResources {
         if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
             writeJson(dataMapId, null, parent, dataMapBytes);
         }
-        if (DATA.containsKey(dataMapId)) {
-            GTCEu.LOGGER.error("duplicated loot table: {}", dataMapId);
-        }
-        DATA.put(dataMapId, dataMapBytes);
+        addToData(dataMapId, dataMapBytes);
     }
 
     /**
      * if {@code subDir} is null, no file ending is appended.
-     * 
+     *
      * @param id     the resource location of the file to be written.
      * @param subDir a nullable subdirectory for the data.
      * @param parent the parent folder where to write data to.
@@ -146,14 +144,7 @@ public class GTDynamicDataPack implements PackResources {
                 output.write(json);
             }
         } catch (IOException e) {
-            GTCEu.LOGGER.error("Failed to save data JSON to disk.", e);
-        }
-    }
-
-    public static void addAdvancement(ResourceLocation loc, JsonObject obj) {
-        ResourceLocation l = getAdvancementLocation(loc);
-        synchronized (DATA) {
-            DATA.put(l, obj.toString().getBytes(StandardCharsets.UTF_8));
+            GTCEu.LOGGER.error("Failed to save data JSON for id {} to disk.", id, e);
         }
     }
 
@@ -164,12 +155,9 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     @Override
-    public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
+    public @Nullable IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
         if (type == PackType.SERVER_DATA) {
-            var byteArray = DATA.get(location);
-            if (byteArray != null)
-                return () -> new ByteArrayInputStream(byteArray);
-            else return null;
+            return CONTENTS.getResource(location);
         } else {
             return null;
         }
@@ -178,26 +166,18 @@ public class GTDynamicDataPack implements PackResources {
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
         if (packType == PackType.SERVER_DATA) {
-            if (!path.endsWith("/")) path += "/";
-            final String finalPath = path;
-            DATA.keySet().stream().filter(Objects::nonNull).filter(loc -> loc.getPath().startsWith(finalPath))
-                    .forEach((id) -> {
-                        IoSupplier<InputStream> resource = this.getResource(packType, id);
-                        if (resource != null) {
-                            resourceOutput.accept(id, resource);
-                        }
-                    });
+            CONTENTS.listResources(namespace, path, resourceOutput);
         }
     }
 
     @Override
-    public @NotNull Set<String> getNamespaces(PackType type) {
+    public Set<String> getNamespaces(PackType type) {
         return type == PackType.SERVER_DATA ? SERVER_DOMAINS : Set.of();
     }
 
-    @Nullable
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T getMetadataSection(MetadataSectionSerializer<T> metaReader) {
+    public @Nullable <T> T getMetadataSection(MetadataSectionSerializer<T> metaReader) {
         if (metaReader == PackMetadataSection.TYPE) {
             return (T) new PackMetadataSection(Component.literal("GTCEu dynamic data"),
                     SharedConstants.getCurrentVersion().getPackVersion(PackType.SERVER_DATA));
@@ -206,8 +186,8 @@ public class GTDynamicDataPack implements PackResources {
     }
 
     @Override
-    public @NotNull PackLocationInfo location() {
-        return this.info;
+    public PackLocationInfo location() {
+        return info;
     }
 
     @Override

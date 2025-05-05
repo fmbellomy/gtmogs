@@ -597,7 +597,7 @@ public class VanillaRecipeHelper {
             if (info != null) {
                 for (MaterialStack ms : info.getMaterials()) {
                     if (!(ms.material() instanceof MarkerMaterial)) {
-                        addMaterialStack(materialStacksExploded, inputCountMap, ms, lastChar);
+                        addMaterialStack(materialStacksExploded, outputCount, inputCountMap, ms, lastChar);
                     }
                 }
                 continue;
@@ -606,14 +606,14 @@ public class VanillaRecipeHelper {
             // Then try to get a single Material (UnificationEntry needs this, for example)
             MaterialStack materialStack = ChemicalHelper.getMaterialStack(itemLike);
             if (!materialStack.isEmpty() && !(materialStack.material() instanceof MarkerMaterial)) {
-                addMaterialStack(materialStacksExploded, inputCountMap, materialStack, lastChar);
+                addMaterialStack(materialStacksExploded, outputCount, inputCountMap, materialStack, lastChar);
             }
 
             // Gather any secondary materials if this item has an OrePrefix
             TagPrefix prefix = ChemicalHelper.getPrefix(itemLike);
             if (!prefix.isEmpty() && !prefix.secondaryMaterials().isEmpty()) {
                 for (MaterialStack ms : prefix.secondaryMaterials()) {
-                    addMaterialStack(materialStacksExploded, inputCountMap, ms, lastChar);
+                    addMaterialStack(materialStacksExploded, outputCount, inputCountMap, ms, lastChar);
                 }
             }
         }
@@ -622,8 +622,8 @@ public class VanillaRecipeHelper {
     }
 
     private static void addMaterialStack(@NotNull Reference2LongOpenHashMap<Material> materialStacksExploded,
-                                         @NotNull Char2IntFunction inputCountMap, @NotNull MaterialStack ms, char c) {
-        long amount = materialStacksExploded.getOrDefault(ms.material(), 0L);
-        materialStacksExploded.put(ms.material(), (ms.amount() * inputCountMap.get(c)) + amount);
+                                         int outputStackCount, @NotNull Char2IntFunction inputCountMap,
+                                         @NotNull MaterialStack ms, char c) {
+        materialStacksExploded.merge(ms.material(), (ms.amount() * inputCountMap.get(c) / outputStackCount), Long::sum);
     }
 }

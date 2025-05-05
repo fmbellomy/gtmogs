@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.neoforged.neoforge.common.conditions.ICondition;
 
+import dev.latvian.mods.kubejs.plugin.builtin.event.ServerEvents;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -57,6 +58,7 @@ public class GTRecipes {
         };
 
         // Decomposition info loading
+        ItemMaterialData.reinitializeMaterialData();
         MaterialInfoLoader.init();
 
         // com.gregtechceu.gtceu.data.recipe.generated.*
@@ -104,12 +106,13 @@ public class GTRecipes {
         // Config-dependent recipes
         RecipeAddition.init(consumer);
 
+        AddonFinder.getAddonList().forEach(addon -> addon.addRecipes(consumer));
+
         // Must run recycling recipes very last
-        if (!GTCEu.Mods.isKubeJSLoaded()) {
+        if (!(GTCEu.Mods.isKubeJSLoaded() && KJSCallWrapper.recipeEventHasListeners())) {
             RecyclingRecipes.init(consumer);
             ItemMaterialData.resolveItemMaterialInfos(consumer);
         }
-        AddonFinder.getAddonList().forEach(addon -> addon.addRecipes(consumer));
     }
 
     /*
@@ -123,5 +126,12 @@ public class GTRecipes {
 
         RecipeRemoval.init(actualConsumer);
         AddonFinder.getAddonList().forEach(addon -> addon.removeRecipes(actualConsumer));
+    }
+
+    private static class KJSCallWrapper {
+
+        private static boolean recipeEventHasListeners() {
+            return ServerEvents.RECIPES.hasListeners();
+        }
     }
 }

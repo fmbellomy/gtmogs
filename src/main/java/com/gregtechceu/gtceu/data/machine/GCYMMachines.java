@@ -19,6 +19,7 @@ import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeChemicalBathRende
 import com.gregtechceu.gtceu.client.renderer.machine.gcym.LargeMixerRenderer;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.DistillationTowerMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeChemicalBathMachine;
+import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeMacerationTowerMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.gcym.LargeMixerMachine;
 import com.gregtechceu.gtceu.common.machine.multiblock.part.ParallelHatchPartMachine;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -76,7 +77,7 @@ public class GCYMMachines {
             IV, LuV, ZPM, UV);
 
     public final static MultiblockMachineDefinition LARGE_MACERATION_TOWER = REGISTRATE
-            .multiblock("large_maceration_tower", WorkableElectricMultiblockMachine::new)
+            .multiblock("large_maceration_tower", LargeMacerationTowerMachine::new)
             .langValue("Large Maceration Tower")
             .tooltips(Component.translatable("gtceu.multiblock.parallelizable.tooltip"))
             .tooltips(Component.translatable("gtceu.machine.available_recipe_map_1.tooltip",

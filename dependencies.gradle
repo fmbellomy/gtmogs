@@ -55,10 +55,10 @@ dependencies {
     // GameStages
     compileOnly(forge.gamestages)
 
-    // Standard runtime s //
+    // Standard runtime mods //
     runtimeOnly(forge.jade)
     runtimeOnly(forge.ae2)
-    runtimeOnly(forge.kotlinforforge)
+    runtimeOnly(forge.spark)
 
     // Runtime Recipe Viewers - uncomment whichever one you want to use //
     runtimeOnly(forge.emi)
@@ -92,7 +92,7 @@ dependencies {
         transitive = false
     }
 
-    extraRuntimeOnly(forge.spark)
+    extraRuntimeOnly(forge.kotlinforforge)
     extraRuntimeOnly(forge.observable)
     //////////////////////////
 
