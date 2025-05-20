@@ -384,8 +384,7 @@ public class ToolHelper {
                     if (prefix.isEmpty()) {
                         for (Content output : hammerRecipe.getOutputContents(ItemRecipeCapability.CAP)) {
                             if (dropChance >= 1.0F || random.nextFloat() <= dropChance) {
-                                drops.add(ItemRecipeCapability.CAP.of(output.content).copy()
-                                        .getItems()[0]);
+                                drops.add(ItemRecipeCapability.CAP.of(output.content).copy().getItems()[0]);
                             }
                         }
                     } else if (TagPrefix.ORES.containsKey(prefix)) {

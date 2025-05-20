@@ -181,11 +181,11 @@ public class MEOutputHatchPartMachine extends MEHatchPartMachine implements IMac
                     it.remove();
                     continue;
                 }
-
                 FluidStack output = fluids[0];
-                ingredient = ingredient.shrink(storage.fill(output, action));
-                if (ingredient.amount() <= 0) it.remove();
-                else it.set(ingredient);
+                int remainingAmount = ingredient.amount() - storage.fill(output, action);
+
+                if (remainingAmount > 0) it.set(ingredient.copyWithAmount(remainingAmount));
+                else it.remove();
             }
             return left.isEmpty() ? null : left;
         }
