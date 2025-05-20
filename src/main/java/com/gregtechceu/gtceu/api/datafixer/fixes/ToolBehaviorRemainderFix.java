@@ -1,8 +1,9 @@
 package com.gregtechceu.gtceu.api.datafixer.fixes;
 
+import net.minecraft.util.datafix.fixes.ItemStackComponentRemainderFix;
+
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import net.minecraft.util.datafix.fixes.ItemStackComponentRemainderFix;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class ToolBehaviorRemainderFix extends ItemStackComponentRemainderFix {
@@ -26,5 +27,4 @@ public abstract class ToolBehaviorRemainderFix extends ItemStackComponentRemaind
     }
 
     protected abstract <T> @NotNull Dynamic<T> fixBehavior(@NotNull Dynamic<T> tag);
-
 }

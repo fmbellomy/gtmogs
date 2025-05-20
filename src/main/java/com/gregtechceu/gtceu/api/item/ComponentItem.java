@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.item.component.*;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
-import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 
 import net.minecraft.core.BlockPos;
@@ -42,7 +41,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ComponentItem extends Item implements IUIHolder.Item, IItemRendererProvider, IComponentItem {
+public class ComponentItem extends Item
+                           implements HeldItemUIFactory.IHeldItemUIHolder, IItemRendererProvider, IComponentItem {
 
     @Getter
     protected List<IItemComponent> components;

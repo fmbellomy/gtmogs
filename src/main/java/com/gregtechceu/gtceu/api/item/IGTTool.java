@@ -28,7 +28,6 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
-import com.lowdragmc.lowdraglib.gui.modular.IUIHolder;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 
 import net.minecraft.client.color.item.ItemColor;
@@ -71,7 +70,7 @@ import java.util.stream.Collectors;
 
 import static com.gregtechceu.gtceu.api.item.tool.ToolHelper.*;
 
-public interface IGTTool extends IUIHolder.Item, ItemLike {
+public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
 
     GTToolType getToolType();
 

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.common.datafixer.fixes;
 
 import com.gregtechceu.gtceu.api.datafixer.fixes.ToolBehaviorRemainderFix;
+
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
 import org.jetbrains.annotations.NotNull;
@@ -13,7 +14,6 @@ public class EntityDamageBehaviorFix extends ToolBehaviorRemainderFix {
         super(outputSchema, "EntityDamageBehaviorFix", "gtceu:tool_behaviors");
     }
 
-    // spotless:off
     @Override
     protected <T> @NotNull Dynamic<T> fixBehavior(@NotNull Dynamic<T> tag) {
         Optional<Dynamic<T>> bonusList = tag.get("bonus_list").result();
@@ -36,11 +36,8 @@ public class EntityDamageBehaviorFix extends ToolBehaviorRemainderFix {
                                     bonus = bonus.set("entities", bonus.createString("#" + entry.getKey()));
                                 }
                                 return bonus;
-                            })
-            ));
+                            })));
         }
-
         return tag;
     }
-    // spotless:on
 }

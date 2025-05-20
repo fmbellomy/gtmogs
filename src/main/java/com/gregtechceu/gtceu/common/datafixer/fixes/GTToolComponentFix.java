@@ -1,8 +1,9 @@
 package com.gregtechceu.gtceu.common.datafixer.fixes;
 
+import net.minecraft.util.datafix.fixes.ItemStackComponentRemainderFix;
+
 import com.mojang.datafixers.schemas.Schema;
 import com.mojang.serialization.Dynamic;
-import net.minecraft.util.datafix.fixes.ItemStackComponentRemainderFix;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
