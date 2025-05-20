@@ -121,17 +121,15 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                 continue;
             }
 
-            int amount;
-            if (ingredient instanceof SizedIngredient si) amount = si.count();
-            else amount = items[0].getCount();
+            int amount = ingredient.count();
 
             for (int slot = 0; slot < storage.getSlots(); ++slot) {
-                ItemStack stored = storage.getStackInSlot(slot);
-                int count = (visited[slot] == null ? stored.getCount() : visited[slot].getCount());
+                ItemStack current = visited[slot] == null ? storage.getStackInSlot(slot) : visited[slot];
+                int count = current.getCount();
 
                 if (io == IO.IN) {
-                    if (count == 0) continue;
-                    if ((visited[slot] == null && ingredient.test(stored)) || ingredient.test(visited[slot])) {
+                    if (current.isEmpty()) continue;
+                    if (ingredient.test(current)) {
                         var extracted = getActioned(storage, slot, recipe.ingredientActions);
                         if (extracted == null) extracted = storage.extractItem(slot, Math.min(count, amount), simulate);
                         if (!extracted.isEmpty()) {
@@ -142,7 +140,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                 } else { // IO.OUT
                     ItemStack output = items[0].copyWithCount(amount);
                     // Only try this slot if not visited or if visited with the same type of item
-                    if (visited[slot] == null || visited[slot].is(output.getItem())) {
+                    if (visited[slot] == null || ItemStack.isSameItemSameComponents(visited[slot], output)) {
                         if (count < output.getMaxStackSize() && count < storage.getSlotLimit(slot)) {
                             var remainder = getActioned(storage, slot, recipe.ingredientActions);
                             if (remainder == null) remainder = storage.insertItem(slot, output, simulate);
