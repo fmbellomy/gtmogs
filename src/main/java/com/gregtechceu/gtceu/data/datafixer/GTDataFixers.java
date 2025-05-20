@@ -3,7 +3,9 @@ package com.gregtechceu.gtceu.data.datafixer;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.datafixer.DataFixesInternals;
+import com.gregtechceu.gtceu.common.datafixer.fixes.EntityDamageBehaviorFix;
 import com.gregtechceu.gtceu.common.datafixer.fixes.GTItemStackComponentizationFix;
+import com.gregtechceu.gtceu.common.datafixer.fixes.GTToolComponentFix;
 import com.gregtechceu.gtceu.common.datafixer.fixes.OilVariantsRenameFix;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
@@ -82,6 +84,10 @@ public class GTDataFixers {
                 createRenamer("gtceu:palladium_substation", "gtceu:palladium_substation_casing")));
         builder.addFixer(BlockRenameFix.create(schemaV2, "Palladium Substation Casing block rename fix",
                 createRenamer("gtceu:palladium_substation", "gtceu:palladium_substation_casing")));
+
+        Schema schemaV3 = builder.addSchema(3, SAME_NAMESPACED);
+        builder.addFixer(new GTToolComponentFix(schemaV3));
+        builder.addFixer(new EntityDamageBehaviorFix(schemaV3));
     }
 
     private static UnaryOperator<String> createRenamer(String oldName, String newName) {

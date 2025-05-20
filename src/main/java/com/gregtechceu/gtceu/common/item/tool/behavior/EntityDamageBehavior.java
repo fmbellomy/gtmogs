@@ -40,8 +40,10 @@ import java.util.*;
 public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior> {
 
     // spotless:off
-    private static final Codec<Object2FloatMap<HolderSet<EntityType<?>>>> BONUS_LIST_CODEC = Codec.pair(RegistryCodecs.homogeneousList(Registries.ENTITY_TYPE), Codec.FLOAT)
-            .listOf()
+    private static final Codec<Object2FloatMap<HolderSet<EntityType<?>>>> BONUS_LIST_CODEC = Codec.mapPair(
+                    RegistryCodecs.homogeneousList(Registries.ENTITY_TYPE).fieldOf("entities"),
+                    Codec.FLOAT.fieldOf("bonus")
+            ).codec().listOf()
             .xmap(list -> {
                 Object2FloatOpenHashMap<HolderSet<EntityType<?>>> map = new Object2FloatOpenHashMap<>();
                 for (var pair : list) {
@@ -58,8 +60,8 @@ public class EntityDamageBehavior implements IToolBehavior<EntityDamageBehavior>
 
     public static final Codec<EntityDamageBehavior> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.STRING.lenientOptionalFieldOf("mob_type").forGetter(val -> val.mobType),
-            BONUS_LIST_CODEC.fieldOf("bonus_list").forGetter(EntityDamageBehavior::getBonusList))
-            .apply(instance, EntityDamageBehavior::new));
+            BONUS_LIST_CODEC.fieldOf("bonus_list").forGetter(EntityDamageBehavior::getBonusList)
+    ).apply(instance, EntityDamageBehavior::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, Object2FloatMap<HolderSet<EntityType<?>>>> BONUS_LIST_STREAM_CODEC = ByteBufCodecs.map(
             Object2FloatOpenHashMap::new,

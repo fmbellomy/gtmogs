@@ -15,7 +15,7 @@ public record GTTool(Optional<Integer> enchantability, int lastCraftingUse) {
 
     public static final Codec<GTTool> CODEC = RecordCodecBuilder.create(instance -> instance.group(
             Codec.INT.optionalFieldOf("enchantability").forGetter(GTTool::enchantability),
-            Codec.INT.orElse(0).fieldOf("last_crafting_use").forGetter(GTTool::lastCraftingUse))
+            Codec.INT.lenientOptionalFieldOf("last_crafting_use", 0).forGetter(GTTool::lastCraftingUse))
             .apply(instance, GTTool::new));
     public static final StreamCodec<ByteBuf, GTTool> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.optional(ByteBufCodecs.VAR_INT), GTTool::enchantability,

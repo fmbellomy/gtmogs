@@ -20,6 +20,6 @@ public interface IItemUIFactory extends IInteractionItem {
         if (player instanceof ServerPlayer serverPlayer) {
             HeldItemUIFactory.INSTANCE.openUI(serverPlayer, usedHand);
         }
-        return InteractionResultHolder.success(item);
+        return InteractionResultHolder.sidedSuccess(item, level.isClientSide());
     }
 }
