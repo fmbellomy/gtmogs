@@ -102,6 +102,7 @@ public class GTMaterials {
         gem.setIgnored(Coal, Items.COAL);
         gem.setIgnored(Amethyst, Items.AMETHYST_SHARD);
         gem.setIgnored(EchoShard, Items.ECHO_SHARD);
+        excludeAllGems(Wax, Items.HONEYCOMB);
         excludeAllGems(Charcoal, Items.CHARCOAL);
         excludeAllGems(Flint, Items.FLINT);
         excludeAllGems(EnderPearl, Items.ENDER_PEARL);
@@ -126,7 +127,6 @@ public class GTMaterials {
         ingot.setIgnored(Copper, Items.COPPER_INGOT);
         ingot.setIgnored(Netherite, Items.NETHERITE_INGOT);
         ingot.setIgnored(Brick, Items.BRICK);
-        ingot.setIgnored(Wax, Items.HONEYCOMB);
 
         nugget.setIgnored(Gold, Items.GOLD_NUGGET);
         nugget.setIgnored(Iron, Items.IRON_NUGGET);

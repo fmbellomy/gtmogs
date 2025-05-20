@@ -120,8 +120,8 @@ public class MixinHelpers {
                 return;
             }
             // If AE2 is loaded, add the Fluid P2P attunement tag to all the buckets
-            var p2pFluidAttunements = new ResourceLocation("ae2", "p2p_attunements/fluid_p2p_tunnel");
-            for (Material material : GTCEuAPI.materialManager.getRegisteredMaterials()) {
+            var p2pFluidAttunements = ResourceLocation.fromNamespaceAndPath("ae2", "p2p_attunements/fluid_p2p_tunnel");
+            for (Material material : GTCEuAPI.materialManager) {
                 FluidProperty property = material.getProperty(PropertyKey.FLUID);
                 if (property == null) {
                     continue;

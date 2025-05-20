@@ -569,7 +569,7 @@ public class UnknownCompositionMaterials {
                 .buildAndRegister();
 
         Wax = new Material.Builder(GTCEu.id("wax"))
-                .ingot().fluid()
+                .gem().fluid()
                 .color(0xfabf29)
                 .flags(NO_SMELTING)
                 .buildAndRegister();
@@ -580,8 +580,7 @@ public class UnknownCompositionMaterials {
                 .buildAndRegister();
 
         CrackedBauxiteSlurry = new Material.Builder(GTCEu.id("cracked_bauxite_slurry"))
-                .liquid(new FluidBuilder()
-                        .temperature(775))
+                .liquid(775)
                 .color(0x052C50)
                 .buildAndRegister();
 
