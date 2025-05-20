@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.common.cover.PumpCover;
 import com.gregtechceu.gtceu.data.item.GTItemAbilities;
+import com.gregtechceu.gtceu.utils.GTMath;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
@@ -27,10 +28,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMaps;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
 import java.util.Set;
 
 public class FluidVoidingCover extends PumpCover {
@@ -67,16 +69,16 @@ public class FluidVoidingCover extends PumpCover {
     }
 
     void voidAny(IFluidHandlerModifiable fluidHandler) {
-        final Map<FluidStack, Integer> fluidAmounts = enumerateDistinctFluids(fluidHandler, TransferDirection.EXTRACT);
+        Object2LongMap<FluidStack> fluidAmounts = enumerateDistinctFluids(fluidHandler, TransferDirection.EXTRACT);
 
-        for (FluidStack fluidStack : fluidAmounts.keySet()) {
-            if (!filterHandler.test(fluidStack))
-                continue;
+        for (var entry : Object2LongMaps.fastIterable(fluidAmounts)) {
+            var stack = entry.getKey();
+            if (!filterHandler.test(stack)) continue;
 
-            var toDrain = fluidStack.copy();
-            toDrain.setAmount(fluidAmounts.get(fluidStack));
-
-            fluidHandler.drain(toDrain, IFluidHandler.FluidAction.EXECUTE);
+            for (int op : GTMath.split(entry.getLongValue())) {
+                var toDrain = stack.copyWithAmount(op);
+                fluidHandler.drain(toDrain, IFluidHandler.FluidAction.EXECUTE);
+            }
         }
     }
 

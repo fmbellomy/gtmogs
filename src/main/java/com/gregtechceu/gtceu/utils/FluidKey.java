@@ -33,15 +33,15 @@ public class FluidKey {
         if (!(o instanceof FluidKey fluidKey)) return false;
         if (!Objects.equals(fluid, fluidKey.fluid))
             return false;
-        if (component == null && fluidKey.component != null) return false;
-        else return component == null || component.equals(fluidKey.component);
+        if (component.isEmpty() && !fluidKey.component.isEmpty()) return false;
+        else return component.isEmpty() || component.equals(fluidKey.component);
     }
 
     @Override
     public int hashCode() {
         int hash = 0;
         hash += Objects.hash(fluid);
-        if (component != null && !component.isEmpty()) {
+        if (!component.isEmpty()) {
             hash += component.hashCode();
         }
         return hash;

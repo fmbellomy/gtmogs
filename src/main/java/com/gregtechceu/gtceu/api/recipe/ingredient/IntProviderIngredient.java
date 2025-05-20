@@ -14,6 +14,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 
+import com.google.common.base.Preconditions;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.Getter;
@@ -35,22 +36,24 @@ public class IntProviderIngredient implements ICustomIngredient {
     @Getter
     protected final IntProvider countProvider;
     @Setter
-    protected Integer sampledCount = null;
+    protected int sampledCount = -1;
     @Getter
     protected final Ingredient inner;
     @Setter
     protected ItemStack[] itemStacks = null;
 
-    public IntProviderIngredient(Ingredient inner, IntProvider countProvider) {
+    protected IntProviderIngredient(Ingredient inner, IntProvider countProvider) {
         this.inner = inner;
         this.countProvider = countProvider;
     }
 
-    public IntProviderIngredient(@NotNull TagKey<Item> tag, IntProvider amount) {
-        this(Ingredient.of(tag), amount);
+    public static Ingredient ofTag(@NotNull TagKey<Item> tag, IntProvider countProvider) {
+        return of(Ingredient.of(tag), countProvider);
     }
 
-    public static Ingredient create(Ingredient inner, IntProvider countProvider) {
+    public static Ingredient of(Ingredient inner, IntProvider countProvider) {
+        Preconditions.checkArgument(countProvider.getMinValue() >= 0,
+                "IntProviderIngredient must have a min value of at least 0.");
         return new IntProviderIngredient(inner, countProvider).toVanilla();
     }
 
@@ -79,7 +82,7 @@ public class IntProviderIngredient implements ICustomIngredient {
     }
 
     public int getSampledCount(@NotNull RandomSource random) {
-        if (sampledCount == null) {
+        if (sampledCount == -1) {
             sampledCount = countProvider.sample(random);
         }
         return sampledCount;

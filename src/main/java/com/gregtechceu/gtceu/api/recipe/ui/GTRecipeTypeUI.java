@@ -46,6 +46,8 @@ import com.google.common.collect.Table;
 import dev.emi.emi.api.EmiApi;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2IntAVLTreeMap;
+import it.unimi.dsi.fastutil.objects.Object2IntSortedMap;
 import lombok.Getter;
 import lombok.Setter;
 import me.shedaniel.rei.api.client.view.ViewSearchBuilder;
@@ -56,7 +58,6 @@ import java.io.DataInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.function.BiConsumer;
 import java.util.function.DoubleSupplier;
 import java.util.stream.Collectors;
@@ -292,11 +293,11 @@ public class GTRecipeTypeUI {
     protected WidgetGroup addInventorySlotGroup(boolean isOutputs, boolean isSteam, boolean isHighPressure) {
         int maxCount = 0;
         int totalR = 0;
-        TreeMap<RecipeCapability<?>, Integer> map = new TreeMap<>(RecipeCapability.COMPARATOR);
+        Object2IntSortedMap<RecipeCapability<?>> map = new Object2IntAVLTreeMap<>(RecipeCapability.COMPARATOR);
         if (isOutputs) {
-            for (var value : recipeType.maxOutputs.entrySet()) {
+            for (var value : recipeType.maxOutputs.object2IntEntrySet()) {
                 if (value.getKey().doRenderSlot) {
-                    int val = value.getValue();
+                    int val = value.getIntValue();
                     if (val > maxCount) {
                         maxCount = Math.min(val, 3);
                     }
@@ -305,9 +306,9 @@ public class GTRecipeTypeUI {
                 }
             }
         } else {
-            for (var value : recipeType.maxInputs.entrySet()) {
+            for (var value : recipeType.maxInputs.object2IntEntrySet()) {
                 if (value.getKey().doRenderSlot) {
-                    int val = value.getValue();
+                    int val = value.getIntValue();
                     if (val > maxCount) {
                         maxCount = Math.min(val, 3);
                     }
@@ -318,13 +319,13 @@ public class GTRecipeTypeUI {
         }
         WidgetGroup group = new WidgetGroup(0, 0, maxCount * 18 + 8, totalR * 18 + 8);
         int index = 0;
-        for (var entry : map.entrySet()) {
+        for (var entry : map.object2IntEntrySet()) {
             RecipeCapability<?> cap = entry.getKey();
             var widgetClass = cap.getWidgetClass();
             if (widgetClass == null) {
                 continue;
             }
-            int capCount = entry.getValue();
+            int capCount = entry.getIntValue();
             for (int slotIndex = 0; slotIndex < capCount; slotIndex++) {
                 var slot = cap.createWidget();
                 // noinspection DataFlowIssue

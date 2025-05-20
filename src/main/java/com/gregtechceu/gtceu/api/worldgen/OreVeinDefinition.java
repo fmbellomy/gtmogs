@@ -26,9 +26,9 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -90,7 +90,6 @@ public class OreVeinDefinition {
 
     @Getter
     @Setter
-    @Nullable
     private VeinGenerator veinGenerator;
 
     @Getter
@@ -138,6 +137,15 @@ public class OreVeinDefinition {
         this.veinGenerator = veinGenerator;
         this.indicatorGenerators = Objects.requireNonNullElseGet(indicatorGenerators, ArrayList::new);
         this.biomeLookup = biomeLookup;
+    }
+
+    public boolean isForBiome(Holder<Biome> biome) {
+        if (biomes == null) return true;
+        return biomes.size() == 0 || biomes.contains(biome);
+    }
+
+    public int weightForBiome(Holder<Biome> biome) {
+        return weight + biomeWeightModifier.applyAsInt(biome);
     }
 
     public OreVeinDefinition clusterSize(IntProvider clusterSize) {
@@ -196,13 +204,13 @@ public class OreVeinDefinition {
 
     public OreVeinDefinition heightRangeUniform(int min, int max) {
         heightRange(HeightRangePlacement.uniform(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max)));
-        inferredProperties.heightRange = Pair.of(min, max);
+        inferredProperties.heightRange = IntIntPair.of(min, max);
         return this;
     }
 
     public OreVeinDefinition heightRangeTriangle(int min, int max) {
         heightRange(HeightRangePlacement.triangle(VerticalAnchor.absolute(min), VerticalAnchor.absolute(max)));
-        inferredProperties.heightRange = Pair.of(min, max);
+        inferredProperties.heightRange = IntIntPair.of(min, max);
         return this;
     }
 
@@ -236,8 +244,8 @@ public class OreVeinDefinition {
     public OreVeinDefinition dikeVeinGenerator(Consumer<DikeVeinGenerator> config) {
         var veinGenerator = new DikeVeinGenerator();
         if (inferredProperties.heightRange != null) {
-            veinGenerator.minYLevel(inferredProperties.heightRange.getFirst());
-            veinGenerator.maxYLevel(inferredProperties.heightRange.getSecond());
+            veinGenerator.minYLevel(inferredProperties.heightRange.firstInt());
+            veinGenerator.maxYLevel(inferredProperties.heightRange.secondInt());
         }
 
         config.accept(veinGenerator);
@@ -249,8 +257,8 @@ public class OreVeinDefinition {
     public OreVeinDefinition veinedVeinGenerator(Consumer<VeinedVeinGenerator> config) {
         var veinGenerator = new VeinedVeinGenerator();
         if (inferredProperties.heightRange != null) {
-            veinGenerator.minYLevel(inferredProperties.heightRange.getFirst());
-            veinGenerator.maxYLevel(inferredProperties.heightRange.getSecond());
+            veinGenerator.minYLevel(inferredProperties.heightRange.firstInt());
+            veinGenerator.maxYLevel(inferredProperties.heightRange.secondInt());
         }
 
         config.accept(veinGenerator);
@@ -271,8 +279,8 @@ public class OreVeinDefinition {
     public OreVeinDefinition cuboidVeinGenerator(Consumer<CuboidVeinGenerator> config) {
         var veinGenerator = new CuboidVeinGenerator();
         if (inferredProperties.heightRange != null) {
-            veinGenerator.minY(inferredProperties.heightRange.getFirst());
-            veinGenerator.maxY(inferredProperties.heightRange.getSecond());
+            veinGenerator.minY(inferredProperties.heightRange.firstInt());
+            veinGenerator.maxY(inferredProperties.heightRange.secondInt());
         }
 
         config.accept(veinGenerator);
@@ -322,6 +330,6 @@ public class OreVeinDefinition {
 
     private static class InferredProperties {
 
-        public Pair<Integer, Integer> heightRange = null;
+        public IntIntPair heightRange = null;
     }
 }

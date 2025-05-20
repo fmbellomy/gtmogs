@@ -84,7 +84,7 @@ public class ItemRecipeCapability extends RecipeCapability<SizedIngredient> {
                                     new CastedFloat(intProviderIngredient.getCountProvider()),
                                     ConstantFloat.of((float) modifier.multiplier())),
                             ConstantFloat.of((float) modifier.addition())));
-            var newIngredient = IntProviderIngredient.create(intProviderIngredient.getInner(), newIntProvider);
+            var newIngredient = IntProviderIngredient.of(intProviderIngredient.getInner(), newIntProvider);
             return new SizedIngredient(newIngredient, 1);
         }
         return content.copyWithCount(modifier.apply(content.count()));

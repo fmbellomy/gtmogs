@@ -22,7 +22,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -287,7 +286,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
                 currentStack.shrink(1);
                 performedFill = true;
                 if (!remainingStack.isEmpty() && !player.addItem(remainingStack)) {
-                    Block.popResource(player.level(), player.getOnPos(), remainingStack);
+                    player.drop(remainingStack, true);
                     break;
                 }
             }
@@ -295,8 +294,7 @@ public class AEFluidConfigSlotWidget extends AEConfigSlotWidget implements IGhos
                 SoundEvent soundevent = initialFluid.getFluid().getFluidType().getSound(initialFluid,
                         SoundActions.BUCKET_FILL);
                 if (soundevent != null) {
-                    player.level().playSound(null, player.position().x, player.position().y + 0.5, player.position().z,
-                            soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+                    player.level().playSound(null, player, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
                 }
                 gui.getModularUIContainer().setCarried(currentStack);
                 return currentStack.getCount();

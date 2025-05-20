@@ -26,6 +26,9 @@ import java.util.Optional;
 import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlotWidget.drawSelectionOverlay;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawText;
 
+/**
+ * Display a certain {@link FluidStack} element.
+ */
 public class AEFluidDisplayWidget extends Widget {
 
     private final AEListGridWidget gridWidget;

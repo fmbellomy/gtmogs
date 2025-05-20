@@ -126,8 +126,8 @@ public class CommonEventListener {
             IElectricItem helmet = GTCapabilityHelper.getElectricItem(item);
             if (item.is(GTItems.QUANTUM_HELMET.asItem()) && helmet != null) {
                 MobEffectInstance effect = event.getEffectInstance();
-                Integer cost = QuarkTechSuite.potionRemovalCost.get(effect.getEffect());
-                if (cost != null) {
+                int cost = QuarkTechSuite.potionRemovalCost.getOrDefault(effect.getEffect(), -1);
+                if (cost != -1) {
                     cost = cost * (effect.getAmplifier() + 1);
                     if (helmet.canUse(cost)) {
                         helmet.discharge(cost, helmet.getTier(), true, false, false);

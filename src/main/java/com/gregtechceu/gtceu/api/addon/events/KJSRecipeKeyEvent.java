@@ -9,11 +9,6 @@ import lombok.Getter;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author screret
- * @date 2023/7/5
- * @implNote An event for adding KJS recipe keys
- */
 @SuppressWarnings("unused")
 public class KJSRecipeKeyEvent {
 

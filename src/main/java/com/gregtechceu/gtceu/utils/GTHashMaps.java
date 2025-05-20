@@ -123,13 +123,13 @@ public final class GTHashMaps {
      * @return a {@link Set} of unique {@link FluidKey}s for each fluid in the handler. Will be oversized stacks if
      *         required
      */
-    public static Map<FluidKey, Integer> fromFluidCollection(Collection<FluidStack> fluidInputs) {
+    public static Object2IntMap<FluidKey> fromFluidCollection(Collection<FluidStack> fluidInputs) {
         final Object2IntMap<FluidKey> map = new Object2IntLinkedOpenHashMap<>();
 
         // Create a single stack of the combined count for each item
 
         for (FluidStack fluidStack : fluidInputs) {
-            if (fluidStack != null && fluidStack.getAmount() > 0) {
+            if (!fluidStack.isEmpty()) {
                 FluidKey key = new FluidKey(fluidStack);
                 map.merge(key, fluidStack.getAmount(), Integer::sum);
             }

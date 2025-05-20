@@ -112,7 +112,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
             if (io == IO.OUT &&
                     ingredient.ingredient().getCustomIngredient() instanceof IntProviderIngredient provider) {
                 provider.setItemStacks(null);
-                provider.setSampledCount(null);
+                provider.setSampledCount(-1);
             }
 
             var items = ingredient.getItems();

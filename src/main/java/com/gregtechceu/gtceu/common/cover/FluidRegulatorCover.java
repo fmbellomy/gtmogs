@@ -24,8 +24,6 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler.FluidAction;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Map;
-
 public class FluidRegulatorCover extends PumpCover {
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(FluidRegulatorCover.class,
@@ -128,28 +126,23 @@ public class FluidRegulatorCover extends PumpCover {
                           int platformTransferLimit) {
         int fluidLeftToTransfer = platformTransferLimit;
 
-        final Map<FluidStack, Integer> sourceAmounts = enumerateDistinctFluids(source, TransferDirection.EXTRACT);
-        final Map<FluidStack, Integer> destinationAmounts = enumerateDistinctFluids(destination,
-                TransferDirection.INSERT);
+        var sourceAmounts = enumerateDistinctFluids(source, TransferDirection.EXTRACT);
+        var destinationAmounts = enumerateDistinctFluids(destination, TransferDirection.INSERT);
 
         for (FluidStack fluidStack : sourceAmounts.keySet()) {
-            if (fluidLeftToTransfer <= 0)
-                break;
+            if (fluidLeftToTransfer <= 0) break;
 
             int amountToKeep = getFilteredFluidAmount(fluidStack);
-            int amountInDest = destinationAmounts.getOrDefault(fluidStack, 0);
-            if (amountInDest >= amountToKeep)
-                continue;
+            long amountInDest = destinationAmounts.getOrDefault(fluidStack, 0);
+            if (amountInDest >= amountToKeep) continue;
 
             FluidStack fluidToMove = fluidStack.copy();
-            fluidToMove.setAmount(Math.min(fluidLeftToTransfer, amountToKeep - amountInDest));
-            if (fluidToMove.getAmount() <= 0)
-                continue;
+            fluidToMove.setAmount(Math.min(fluidLeftToTransfer, (int) (amountToKeep - amountInDest)));
+            if (fluidToMove.getAmount() <= 0) continue;
 
             FluidStack drained = source.drain(fluidToMove, FluidAction.SIMULATE);
             int fillableAmount = destination.fill(drained, FluidAction.SIMULATE);
-            if (fillableAmount <= 0)
-                continue;
+            if (fillableAmount <= 0) continue;
 
             fluidToMove.setAmount(Math.min(fluidToMove.getAmount(), fillableAmount));
 

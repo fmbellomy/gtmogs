@@ -19,11 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-/**
- * @author Screret
- * @date 2023/6/9
- * @implNote WorldGenLayers
- */
 public enum WorldGenLayers implements IWorldGenLayer, StringRepresentable {
 
     STONE("stone", new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES), Set.of(Level.OVERWORLD)),

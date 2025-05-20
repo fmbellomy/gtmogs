@@ -63,6 +63,7 @@
         "emi.FillRecipePacketMixin",
         "emi.FluidEmiStackMixin",
         "jei.FluidHelperMixin",
+        "ldlib.ModularWrapperWidgetMixin",
         "neoforge.GameDataMixin",
         "rei.InputSlotCrafterMixin",
         "rei.RecipeFinderMixin",

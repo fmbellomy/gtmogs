@@ -15,8 +15,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
+import java.util.function.ToIntFunction;
 
-public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
+public class BiomeWeightModifier implements ToIntFunction<Holder<Biome>> {
 
     public static final BiomeWeightModifier EMPTY = new BiomeWeightModifier(HolderSet.empty(), 0);
     // spotless:off
@@ -39,7 +40,7 @@ public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
     }
 
     @Override
-    public Integer apply(Holder<Biome> biome) {
+    public int applyAsInt(Holder<Biome> biome) {
         if (isEmpty()) {
             return 0;
         }
@@ -93,11 +94,11 @@ public class BiomeWeightModifier implements Function<Holder<Biome>, Integer> {
         }
 
         @Override
-        public Integer apply(Holder<Biome> biome) {
+        public int applyAsInt(Holder<Biome> biome) {
             int mod = 0;
             for (var modifier : originalModifiers) {
                 if (modifier.biomes.contains(biome)) {
-                    mod += modifier.apply(biome);
+                    mod += modifier.applyAsInt(biome);
                 }
             }
             return mod;

@@ -36,7 +36,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 
-import org.apache.commons.lang3.tuple.Pair;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -47,7 +47,7 @@ import static net.minecraft.world.level.block.AbstractCandleBlock.LIT;
 
 public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddInformation, IAbilityItem {
 
-    private static final Pair<Integer, Integer> DURABILITY_BAR_COLORS = GradientUtil.getGradient(0xF07F1D, 10);
+    private static final IntIntPair DURABILITY_BAR_COLORS = GradientUtil.getGradient(0xF07F1D, 10);
     private final ResourceLocation overrideLocation;
     private final boolean usesFluid;
     private final boolean hasMultipleUses;
@@ -232,7 +232,10 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
         } else if (hasMultipleUses) {
             if (usesLeft == 0) {
                 stack.setCount(0);
-                player.addItem(new ItemStack(destroyItem));
+                ItemStack brokenStack = new ItemStack(destroyItem);
+                if (!player.addItem(brokenStack)) {
+                    player.drop(brokenStack, true);
+                }
             } else {
                 stack.set(DataComponents.DAMAGE, maxUses - usesLeft);
             }
@@ -267,7 +270,7 @@ public class LighterBehavior implements IDurabilityBar, IInteractionItem, IAddIn
     }
 
     @Override
-    public @Nullable Pair<Integer, Integer> getDurabilityColorsForDisplay(ItemStack itemStack) {
+    public @Nullable IntIntPair getDurabilityColorsForDisplay(ItemStack itemStack) {
         if (hasMultipleUses && usesFluid) {
             return DURABILITY_BAR_COLORS;
         }

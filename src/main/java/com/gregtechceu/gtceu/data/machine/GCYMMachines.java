@@ -51,10 +51,6 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.NaquadahAlloy;
 import static com.gregtechceu.gtceu.data.recipe.GCYMRecipeTypes.ALLOY_BLAST_RECIPES;
 import static com.gregtechceu.gtceu.data.recipe.GTRecipeTypes.*;
 
-/**
- * @author Rundas
- * @implNote Gregicality Multiblocks
- */
 public class GCYMMachines {
 
     public static void init() {}

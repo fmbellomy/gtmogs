@@ -18,6 +18,9 @@ import static com.gregtechceu.gtceu.integration.ae2.gui.widget.slot.AEConfigSlot
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawItemStack;
 import static com.lowdragmc.lowdraglib.gui.util.DrawerHelper.drawText;
 
+/**
+ * Display a certain {@link appeng.api.stacks.GenericStack} element.
+ */
 public class AEItemDisplayWidget extends Widget {
 
     private final AEListGridWidget gridWidget;

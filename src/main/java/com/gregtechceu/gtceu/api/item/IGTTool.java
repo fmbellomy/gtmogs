@@ -34,9 +34,7 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.*;
-import net.minecraft.core.component.DataComponentMap;
-import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -49,6 +47,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
@@ -98,8 +97,21 @@ public interface IGTTool extends IUIHolder.Item, ItemLike {
 
     default ItemStack getRaw() {
         ItemStack stack = new ItemStack(asItem());
-        getBehaviorsComponent(stack);
+        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+        stack.set(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY);
+        stack.remove(DataComponents.MAX_DAMAGE);
+        stack.remove(DataComponents.DAMAGE);
+        stack.remove(DataComponents.UNBREAKABLE);
+        stack.remove(GTDataComponents.GT_TOOL);
+        stack.remove(GTDataComponents.AOE);
+        stack.remove(GTDataComponents.RELOCATE_MINED_BLOCKS);
+        stack.remove(GTDataComponents.RELOCATE_MOB_DROPS);
+        stack.remove(GTDataComponents.INNATE_ENCHANTMENTS);
         return stack;
+    }
+
+    private <T> void seTypedComponent(TypedDataComponent<T> component, PatchedDataComponentMap map) {
+        component.applyTo(map);
     }
 
     default ItemStack get() {
@@ -680,7 +692,7 @@ public interface IGTTool extends IUIHolder.Item, ItemLike {
     }
 
     // Sound Playing
-    default void playCraftingSound(Player player, ItemStack stack) {
+    default void playCraftingSound(@Nullable Player player, ItemStack stack) {
         // player null check for things like auto-crafters
         if (ConfigHolder.INSTANCE.client.toolCraftingSounds && getSound() != null && player != null) {
             if (canPlaySound(stack)) {
@@ -696,16 +708,13 @@ public interface IGTTool extends IUIHolder.Item, ItemLike {
     }
 
     default boolean canPlaySound(ItemStack stack) {
-        return Math.abs(
-                (int) System.currentTimeMillis() - stack.getOrDefault(GTDataComponents.GT_TOOL, GTTool.EMPTY)
-                        .lastCraftingUse().orElse(0)) >
-                1000;
+        int lastUse = stack.getOrDefault(GTDataComponents.GT_TOOL, GTTool.EMPTY).lastCraftingUse();
+        return Math.abs((int) System.currentTimeMillis() - lastUse) > 1000;
     }
 
     default void playSound(Player player) {
         if (ConfigHolder.INSTANCE.client.toolUseSounds && getSound() != null) {
-            player.level().playSound(null, player.position().x, player.position().y, player.position().z,
-                    getSound().getMainEvent(), SoundSource.PLAYERS, 1F, 1F);
+            player.level().playSound(null, player, getSound().getMainEvent(), SoundSource.PLAYERS, 1F, 1F);
         }
     }
 

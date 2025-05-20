@@ -10,7 +10,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 
-import org.apache.commons.lang3.tuple.Pair;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
 
 public final class ToolChargeBarRenderer {
 
@@ -70,10 +70,10 @@ public final class ToolChargeBarRenderer {
         float level = manager.getDurabilityForDisplay(stack);
         if (level == 0.0 && !manager.showEmptyBar(stack)) return false;
         if (level == 1.0 && !manager.showFullBar(stack)) return false;
-        Pair<Integer, Integer> colors = manager.getDurabilityColorsForDisplay(stack);
+        IntIntPair colors = manager.getDurabilityColorsForDisplay(stack);
         boolean doDepletedColor = manager.doDamagedStateColors(stack);
-        int left = colors != null ? colors.getLeft() : colorBarLeftDurability;
-        int right = colors != null ? colors.getRight() : colorBarRightDurability;
+        int left = colors != null ? colors.leftInt() : colorBarLeftDurability;
+        int right = colors != null ? colors.rightInt() : colorBarRightDurability;
         render(graphics, manager.getBarWidth(stack), xPosition, yPosition, 0, true, left, right, doDepletedColor);
         return true;
     }

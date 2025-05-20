@@ -24,30 +24,61 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 public class ItemTagLoader {
 
     public static void init(RegistrateItemTagsProvider provider) {
+        // spotless:off
+        // the coral blocks: alive, dead, both
+        provider.addTag(CustomTags.ALIVE_CORAL_BLOCK_ITEMS)
+                .add(Items.BRAIN_CORAL_BLOCK, Items.BUBBLE_CORAL_BLOCK, Items.FIRE_CORAL_BLOCK, Items.TUBE_CORAL_BLOCK, Items.HORN_CORAL_BLOCK);
+        provider.addTag(CustomTags.DEAD_CORAL_BLOCK_ITEMS)
+                .add(Items.DEAD_BRAIN_CORAL_BLOCK, Items.DEAD_BUBBLE_CORAL_BLOCK, Items.DEAD_FIRE_CORAL_BLOCK, Items.DEAD_TUBE_CORAL_BLOCK, Items.DEAD_HORN_CORAL_BLOCK);
         provider.addTag(CustomTags.CORAL_BLOCK_ITEMS)
-                .add(Items.BRAIN_CORAL_BLOCK, Items.BUBBLE_CORAL_BLOCK, Items.FIRE_CORAL_BLOCK, Items.TUBE_CORAL_BLOCK,
-                        Items.HORN_CORAL_BLOCK, Items.DEAD_BRAIN_CORAL_BLOCK, Items.DEAD_BUBBLE_CORAL_BLOCK,
-                        Items.DEAD_FIRE_CORAL_BLOCK, Items.DEAD_TUBE_CORAL_BLOCK, Items.DEAD_HORN_CORAL_BLOCK);
+                .addTag(CustomTags.ALIVE_CORAL_BLOCK_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_BLOCK_ITEMS);
+
+        // the coral plants (the V-shaped pointy ones)
+        provider.addTag(CustomTags.ALIVE_CORAL_PLANT_ITEMS)
+                .add(Items.BRAIN_CORAL, Items.BUBBLE_CORAL, Items.FIRE_CORAL, Items.TUBE_CORAL, Items.HORN_CORAL);
+        provider.addTag(CustomTags.DEAD_CORAL_PLANT_ITEMS)
+                .add(Items.DEAD_BRAIN_CORAL, Items.DEAD_BUBBLE_CORAL, Items.DEAD_FIRE_CORAL, Items.DEAD_TUBE_CORAL, Items.DEAD_HORN_CORAL);
+        provider.addTag(CustomTags.CORAL_PLANT_ITEMS)
+                .addTag(CustomTags.ALIVE_CORAL_PLANT_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_PLANT_ITEMS);
+
+        // the coral fans (the flat circular ones)
+        provider.addTag(CustomTags.ALIVE_CORAL_FAN_ITEMS)
+                .add(Items.BRAIN_CORAL_FAN, Items.BUBBLE_CORAL_FAN, Items.FIRE_CORAL_FAN, Items.TUBE_CORAL_FAN, Items.HORN_CORAL_FAN);
+        provider.addTag(CustomTags.DEAD_CORAL_FAN_ITEMS)
+                .add(Items.DEAD_BRAIN_CORAL_FAN, Items.DEAD_BUBBLE_CORAL_FAN, Items.DEAD_FIRE_CORAL_FAN, Items.DEAD_TUBE_CORAL_FAN, Items.DEAD_HORN_CORAL_FAN);
+        provider.addTag(CustomTags.CORAL_FAN_ITEMS)
+                .addTag(CustomTags.ALIVE_CORAL_FAN_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_FAN_ITEMS);
+
+        // all the coral items (except the blocks)
+        provider.addTag(CustomTags.ALIVE_CORAL_ITEMS)
+                .addTag(CustomTags.ALIVE_CORAL_PLANT_ITEMS)
+                .addTag(CustomTags.ALIVE_CORAL_FAN_ITEMS);
+        provider.addTag(CustomTags.DEAD_CORAL_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_PLANT_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_FAN_ITEMS);
         provider.addTag(CustomTags.CORAL_ITEMS)
-                .add(Items.BRAIN_CORAL, Items.BUBBLE_CORAL, Items.FIRE_CORAL, Items.TUBE_CORAL, Items.HORN_CORAL,
-                        Items.DEAD_BRAIN_CORAL, Items.DEAD_BUBBLE_CORAL, Items.DEAD_FIRE_CORAL, Items.DEAD_TUBE_CORAL,
-                        Items.DEAD_HORN_CORAL, Items.BRAIN_CORAL_FAN, Items.BUBBLE_CORAL_FAN, Items.FIRE_CORAL_FAN,
-                        Items.TUBE_CORAL_FAN, Items.HORN_CORAL_FAN, Items.DEAD_BRAIN_CORAL_FAN,
-                        Items.DEAD_BUBBLE_CORAL_FAN, Items.DEAD_FIRE_CORAL_FAN, Items.DEAD_TUBE_CORAL_FAN,
-                        Items.DEAD_HORN_CORAL_FAN);
+                .addTag(CustomTags.ALIVE_CORAL_ITEMS)
+                .addTag(CustomTags.DEAD_CORAL_ITEMS);
+        // spotless:on
+
         addTag(provider, lens, Color.White)
                 .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Glass).get())
                 .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, NetherStar).get());
-        addTag(provider, lens, Color.LightBlue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).get());
-        addTag(provider, lens, Color.Red).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).get());
-        addTag(provider, lens, Color.Green).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).get());
-        addTag(provider, lens, Color.Blue).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).get());
-        addTag(provider, lens, Color.Purple).add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).get());
+        addTag(provider, lens, Color.LightBlue)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Diamond).get());
+        addTag(provider, lens, Color.Red)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Ruby).get());
+        addTag(provider, lens, Color.Green)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Emerald).get());
+        addTag(provider, lens, Color.Blue)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Sapphire).get());
+        addTag(provider, lens, Color.Purple)
+                .add(GTMaterialItems.MATERIAL_ITEMS.get(lens, Amethyst).get());
 
-        provider.addTag(CustomTags.PISTONS)
-                .add(Items.PISTON, Items.STICKY_PISTON);
-        provider.addTag(CustomTags.BRICKS_FIREBRICK).add(GTItems.FIRECLAY_BRICK.get());
-        provider.addTag(Tags.Items.BRICKS).addTag(CustomTags.BRICKS_FIREBRICK);
+        provider.addTag(CustomTags.PISTONS).add(Items.PISTON, Items.STICKY_PISTON);
 
         // add treated wood stick to vanilla sticks tag
         // noinspection DataFlowIssue ChemicalHelper#getTag can't return null with treated wood rod

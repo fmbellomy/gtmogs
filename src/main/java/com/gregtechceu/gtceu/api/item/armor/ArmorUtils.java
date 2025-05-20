@@ -24,11 +24,13 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.EventHooks;
 
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIntPair;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ArmorUtils {
@@ -56,10 +58,10 @@ public class ArmorUtils {
      * @param tier of charger
      * @return Map of the inventory and a list of the index of a chargable item
      */
-    public static List<Pair<NonNullList<ItemStack>, List<Integer>>> getChargeableItem(Player player, int tier) {
-        List<Pair<NonNullList<ItemStack>, List<Integer>>> inventorySlotMap = new ArrayList<>();
+    public static List<Pair<NonNullList<ItemStack>, IntList>> getChargeableItem(Player player, int tier) {
+        List<Pair<NonNullList<ItemStack>, IntList>> inventorySlotMap = new ArrayList<>();
 
-        List<Integer> openMainSlots = new ArrayList<>();
+        IntList openMainSlots = new IntArrayList();
         for (int i = 0; i < player.getInventory().items.size(); i++) {
             ItemStack current = player.getInventory().items.get(i);
             IElectricItem item = GTCapabilityHelper.getElectricItem(current);
@@ -74,7 +76,7 @@ public class ArmorUtils {
             inventorySlotMap.add(Pair.of(player.getInventory().items, openMainSlots));
         }
 
-        List<Integer> openArmorSlots = new ArrayList<>();
+        IntList openArmorSlots = new IntArrayList();
         for (int i = 0; i < player.getInventory().armor.size(); i++) {
             ItemStack current = player.getInventory().armor.get(i);
             IElectricItem item = GTCapabilityHelper.getElectricItem(current);
@@ -98,7 +100,7 @@ public class ArmorUtils {
         }
 
         if (isPossibleToCharge(offHand) && offHandItem.getTier() <= tier) {
-            inventorySlotMap.add(Pair.of(player.getInventory().offhand, Collections.singletonList(0)));
+            inventorySlotMap.add(Pair.of(player.getInventory().offhand, IntList.of(0)));
         }
 
         return inventorySlotMap;
@@ -185,14 +187,14 @@ public class ArmorUtils {
 
         public void draw(GuiGraphics poseStack) {
             for (int i = 0; i < stringAmount; i++) {
-                Pair<Integer, Integer> coords = this.getStringCoord(i);
-                poseStack.drawString(mc.font, stringList.get(i), coords.getFirst(), coords.getSecond(), 0xFFFFFF,
+                IntIntPair coords = this.getStringCoord(i);
+                poseStack.drawString(mc.font, stringList.get(i), coords.firstInt(), coords.secondInt(), 0xFFFFFF,
                         false);
             }
         }
 
         @NotNull
-        private Pair<Integer, Integer> getStringCoord(int index) {
+        private IntIntPair getStringCoord(int index) {
             int posX;
             int posY;
             int fontHeight = mc.font.lineHeight;
@@ -221,7 +223,7 @@ public class ArmorUtils {
                 default -> throw new IllegalArgumentException(
                         "Armor Hud config hudLocation is improperly configured. Allowed values: [1,2,3,4]");
             }
-            return Pair.of(posX, posY);
+            return IntIntPair.of(posX, posY);
         }
 
         public void reset() {

@@ -10,10 +10,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.unimi.dsi.fastutil.ints.IntObjectPair;
 import org.jetbrains.annotations.NotNullByDefault;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,15 +38,15 @@ public class ShapedFluidContainerRecipe extends ShapedRecipe {
             for (int y = 0; y <= inv.height() - this.getHeight(); ++y) {
                 var stack = this.findFluidReplacement(inv, x, y, false);
                 if (stack != null) {
-                    replacedSlot = stack.getFirst();
-                    items.set(replacedSlot, stack.getSecond());
+                    replacedSlot = stack.firstInt();
+                    items.set(replacedSlot, stack.second());
                     break OUTER_LOOP;
                 }
 
                 stack = this.findFluidReplacement(inv, x, y, true);
                 if (stack != null) {
-                    replacedSlot = stack.getFirst();
-                    items.set(replacedSlot, stack.getSecond());
+                    replacedSlot = stack.firstInt();
+                    items.set(replacedSlot, stack.second());
                     break OUTER_LOOP;
                 }
             }
@@ -69,8 +69,7 @@ public class ShapedFluidContainerRecipe extends ShapedRecipe {
      * Checks if the region of a crafting inventory is match for the recipe.
      */
     @Nullable
-    private Pair<Integer, ItemStack> findFluidReplacement(CraftingInput inv, int width, int height,
-                                                          boolean mirrored) {
+    private IntObjectPair<ItemStack> findFluidReplacement(CraftingInput inv, int width, int height, boolean mirrored) {
         for (int x = 0; x < inv.width(); ++x) {
             for (int y = 0; y < inv.height(); ++y) {
                 int offsetX = x - width;
@@ -89,7 +88,7 @@ public class ShapedFluidContainerRecipe extends ShapedRecipe {
                     int slot = x + y * inv.width();
                     ItemStack stack = inv.getItem(slot);
                     if (fluidContainerIngredient.test(stack)) {
-                        return Pair.of(slot, fluidContainerIngredient.getExtractedStack(stack));
+                        return IntObjectPair.of(slot, fluidContainerIngredient.getExtractedStack(stack));
                     }
                 }
             }
@@ -105,21 +104,19 @@ public class ShapedFluidContainerRecipe extends ShapedRecipe {
 
     public static class Serializer implements RecipeSerializer<ShapedFluidContainerRecipe> {
 
-        public static final MapCodec<ShapedFluidContainerRecipe> CODEC = RecordCodecBuilder
-                .mapCodec(instance -> instance.group(
-                        Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
-                        CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC)
-                                .forGetter(ShapedRecipe::category),
-                        ShapedRecipePattern.MAP_CODEC.forGetter(i -> i.pattern),
-                        ItemStack.STRICT_CODEC.fieldOf("result")
-                                .forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
-                        Codec.BOOL.optionalFieldOf("show_notification", true)
-                                .forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification()))
-                        .apply(instance, ShapedFluidContainerRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, ShapedFluidContainerRecipe> STREAM_CODEC = StreamCodec
-                .of(
-                        ShapedFluidContainerRecipe.Serializer::toNetwork,
-                        ShapedFluidContainerRecipe.Serializer::fromNetwork);
+        // spotless:off
+        public static final MapCodec<ShapedFluidContainerRecipe> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
+                Codec.STRING.optionalFieldOf("group", "").forGetter(ShapedRecipe::getGroup),
+                CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(ShapedRecipe::category),
+                ShapedRecipePattern.MAP_CODEC.forGetter(i -> i.pattern),
+                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(val -> ((ShapedRecipeAccessor) val).getResult()),
+                Codec.BOOL.optionalFieldOf("show_notification", true).forGetter(val -> ((ShapedRecipeAccessor) val).getShowNotification())
+        ).apply(instance, ShapedFluidContainerRecipe::new));
+
+        public static final StreamCodec<RegistryFriendlyByteBuf, ShapedFluidContainerRecipe> STREAM_CODEC = StreamCodec.of(
+                ShapedFluidContainerRecipe.Serializer::toNetwork, ShapedFluidContainerRecipe.Serializer::fromNetwork
+        );
+        // spotless:on
 
         @Override
         public MapCodec<ShapedFluidContainerRecipe> codec() {

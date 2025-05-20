@@ -52,7 +52,7 @@ public record GTArmor(
             ByteBufCodecs.BOOL, GTArmor::onGround,
             ByteBufCodecs.BYTE, GTArmor::toggleTimer,
             ByteBufCodecs.SHORT, GTArmor::burnTimer,
-            ByteBufCodecs.INT, GTArmor::nightVisionTimer,
+            ByteBufCodecs.VAR_INT, GTArmor::nightVisionTimer,
             ByteBufCodecs.BYTE, GTArmor::runningTimer,
             ByteBufCodecs.BYTE, GTArmor::boostedJumpTimer,
             ByteBufCodecs.BYTE, GTArmor::consumerTicks,

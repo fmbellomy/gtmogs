@@ -77,7 +77,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -2587,7 +2586,7 @@ public class GTItems {
     }
 
     public static <T extends Item> NonNullConsumer<T> modelPredicate(ResourceLocation predicate,
-                                                                     Function<ItemStack, Float> property) {
+                                                                     StackProperty property) {
         return item -> {
             if (GTCEu.isClientSide()) {
                 ItemProperties.register(item, predicate, (itemStack, c, l, i) -> property.apply(itemStack));
@@ -2613,5 +2612,11 @@ public class GTItems {
             Collections.reverse(names);
             prov.add(ctx.get(), names.stream().map(StringUtils::capitalize).collect(Collectors.joining(" ")));
         };
+    }
+
+    @FunctionalInterface
+    public interface StackProperty {
+
+        float apply(ItemStack stack);
     }
 }

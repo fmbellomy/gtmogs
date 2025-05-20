@@ -23,11 +23,9 @@ import lombok.Getter;
 import java.util.EnumSet;
 
 /**
- * A MachineTrait that is only used for hosting grid node and does not provide grid node capability.
- * Because {@link IGridConnectedMachine} already extends {@link appeng.api.networking.IInWorldGridNodeHost}.
+ * A MachineTrait that is only used for hosting a grid node and does not provide grid node capability,
+ * because {@link IGridConnectedMachine} already extends {@link appeng.api.networking.IInWorldGridNodeHost}.
  *
- * @author GateGuardian
- * @date 2024/7/14
  * @see appeng.api.networking.IInWorldGridNodeHost
  * @see IGridConnectedMachine
  */

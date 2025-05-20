@@ -502,8 +502,7 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
                         SoundActions.BUCKET_FILL);
                 if (soundevent == null)
                     soundevent = SoundEvents.BUCKET_FILL;
-                player.level().playSound(null, player.position().x, player.position().y + 0.5, player.position().z,
-                        soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.level().playSound(null, player, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 if (currentStack.isEmpty()) {
                     gui.getModularUIContainer().setCarried(filledResult);
@@ -549,8 +548,7 @@ public class TankWidget extends Widget implements IRecipeIngredientSlot, IConfig
                         SoundActions.BUCKET_EMPTY);
                 if (soundevent == null)
                     soundevent = SoundEvents.BUCKET_EMPTY;
-                player.level().playSound(null, player.position().x, player.position().y + 0.5, player.position().z,
-                        soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.level().playSound(null, player, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
 
                 if (currentStack.isEmpty()) {
                     gui.getModularUIContainer().setCarried(drainedResult);

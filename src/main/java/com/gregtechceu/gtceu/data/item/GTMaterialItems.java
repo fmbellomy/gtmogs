@@ -165,7 +165,7 @@ public class GTMaterialItems {
                             .build()
                             // don't show the normal vanilla damage and attack speed tooltips, we handle those ourselves
                             .withTooltip(false);
-                    p.component(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+                    p.attributes(modifiers);
 
                     // Durability formula we are working with:
                     // Final Durability = (material durability * material durability

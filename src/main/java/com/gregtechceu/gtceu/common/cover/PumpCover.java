@@ -19,7 +19,6 @@ import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.api.transfer.fluid.ModifiableFluidHandlerWrapper;
 import com.gregtechceu.gtceu.common.cover.data.BucketMode;
 import com.gregtechceu.gtceu.common.cover.data.ManualIOMode;
-import com.gregtechceu.gtceu.utils.FluidStackHashStrategy;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
@@ -33,20 +32,19 @@ import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class PumpCover extends CoverBehavior implements IUICover, IControllable {
 
@@ -95,7 +93,7 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
 
         this.maxFluidTransferRate = maxTransferRate;
         this.transferRate = maxFluidTransferRate;
-        this.mBLeftToTransferLastSecond = Mth.floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
+        this.mBLeftToTransferLastSecond = transferRate * 20;
 
         subscriptionHandler = new ConditionalSubscriptionHandler(coverHolder, this::update, this::isSubscriptionActive);
         filterHandler = FilterHandlers.fluid(this)
@@ -217,8 +215,7 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
         }
 
         if (timer % 20 == 0) {
-            this.mBLeftToTransferLastSecond = Mth
-                    .floor(transferRate * coverHolder.getLevel().tickRateManager().tickrate());
+            this.mBLeftToTransferLastSecond = transferRate * 20;
         }
 
         subscriptionHandler.updateSubscription();
@@ -256,23 +253,17 @@ public class PumpCover extends CoverBehavior implements IUICover, IControllable 
         EXTRACT
     }
 
-    protected Map<FluidStack, Integer> enumerateDistinctFluids(IFluidHandlerModifiable fluidHandler,
-                                                               TransferDirection direction) {
-        final Map<FluidStack, Integer> summedFluids = new Object2IntOpenCustomHashMap<>(
-                FluidStackHashStrategy.comparingAllButAmount());
-
+    protected Object2LongMap<FluidStack> enumerateDistinctFluids(IFluidHandlerModifiable fluidHandler,
+                                                                 TransferDirection direction) {
+        // Long map because we could have multiple tanks of the same fluid summing up to > Integer.MAX_VALUE
+        var summedFluids = new Object2LongOpenHashMap<FluidStack>();
         for (int tank = 0; tank < fluidHandler.getTanks(); tank++) {
-            if (!canTransfer(fluidHandler, direction, tank))
-                continue;
+            if (!canTransfer(fluidHandler, direction, tank)) continue;
 
             FluidStack fluidStack = fluidHandler.getFluidInTank(tank);
-            if (fluidStack.isEmpty())
-                continue;
+            if (fluidStack.isEmpty()) continue;
 
-            summedFluids.putIfAbsent(fluidStack, 0);
-            summedFluids.computeIfPresent(fluidStack, (stack, totalAmount) -> {
-                return totalAmount + stack.getAmount();
-            });
+            summedFluids.addTo(fluidStack, fluidStack.getAmount());
         }
 
         return summedFluids;

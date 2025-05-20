@@ -3,6 +3,7 @@ package com.gregtechceu.gtceu.integration.kjs.builders.worldgen;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.worldgen.BiomeWeightModifier;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
+import com.gregtechceu.gtceu.api.worldgen.bedrockore.WeightedMaterial;
 
 import net.minecraft.core.HolderSet;
 import net.minecraft.resources.ResourceKey;
@@ -12,7 +13,6 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 
-import com.mojang.datafixers.util.Pair;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -35,7 +35,7 @@ public class BedrockOreBuilder extends BuilderBase<BedrockOreDefinition> {
     @Setter
     private int depletedYield; // yield after the vein is depleted
     @Setter
-    private List<Pair<Material, Integer>> materials = new ArrayList<>(); // the ores which the vein contains
+    private List<WeightedMaterial> materials = new ArrayList<>(); // the ores which the vein contains
     private final transient Set<ResourceKey<Level>> dimensions = new HashSet<>();
     private final List<BiomeWeightModifier> biomes = new LinkedList<>();
 
@@ -57,7 +57,7 @@ public class BedrockOreBuilder extends BuilderBase<BedrockOreDefinition> {
     }
 
     public BedrockOreBuilder material(Material material, int amount) {
-        this.materials.add(Pair.of(material, amount));
+        this.materials.add(new WeightedMaterial(material, amount));
         return this;
     }
 

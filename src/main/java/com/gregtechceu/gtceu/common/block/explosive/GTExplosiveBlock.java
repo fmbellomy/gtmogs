@@ -69,8 +69,7 @@ public abstract class GTExplosiveBlock extends Block {
             GTExplosiveEntity entity = createEntity(world, pos, exploder);
             entity.setFuse(fuseLength);
             world.addFreshEntity(entity);
-            world.playSound(null, entity.getX(), entity.getY(), entity.getZ(), SoundEvents.TNT_PRIMED,
-                    SoundSource.BLOCKS, 1.0f, 1.0f);
+            world.playSound(null, entity, SoundEvents.TNT_PRIMED, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
     }
 

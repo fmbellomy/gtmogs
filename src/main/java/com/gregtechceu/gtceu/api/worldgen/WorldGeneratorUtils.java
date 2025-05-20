@@ -5,13 +5,13 @@ import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
+import com.gregtechceu.gtceu.utils.WeightedEntry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.WorldGenLevel;
@@ -51,10 +51,12 @@ public class WorldGeneratorUtils {
     public static final HashBiMap<ResourceLocation, Supplier<? extends IndicatorGenerator>> INDICATOR_GENERATOR_FUNCTIONS = HashBiMap
             .create();
 
+    public record WeightedVein(Holder<OreVeinDefinition> vein, int weight) implements WeightedEntry {}
+
     private static class WorldOreVeinCache {
 
         private final List<Holder<OreVeinDefinition>> worldVeins;
-        private final List<Entry<Integer, Holder<OreVeinDefinition>>> veins = new LinkedList<>();
+        private final Map<Holder<Biome>, List<WeightedVein>> biomeVeins = new Object2ObjectOpenHashMap<>();
 
         public WorldOreVeinCache(ServerLevel level) {
             this.worldVeins = level.registryAccess().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY).holders()
@@ -64,30 +66,20 @@ public class WorldGeneratorUtils {
                     .collect(Collectors.toList());
         }
 
-        private List<Entry<Integer, Holder<OreVeinDefinition>>> getEntry(Holder<Biome> biome) {
-            if (!veins.isEmpty())
-                return veins;
-            List<Entry<Integer, Holder<OreVeinDefinition>>> result = worldVeins.stream()
-                    .filter(vein -> vein.value().canGenerate())
-                    .filter(vein -> vein.value().biomes().size() == 0 || vein.value().biomes().contains(biome))
-                    .map(vein -> new AbstractMap.SimpleEntry<>(
-                            vein.value().weight() + vein.value().biomeWeightModifier().apply(biome),
-                            vein))
-                    .filter(entry -> entry.getKey() > 0)
-                    .collect(Collectors.toList());
-            veins.addAll(result);
-            return result;
+        private List<WeightedVein> getEntry(Holder<Biome> biome) {
+            if (biomeVeins.containsKey(biome)) return biomeVeins.get(biome);
+            var biomeVeins = worldVeins.stream()
+                    .filter(vein -> vein.value().isForBiome(biome))
+                    .map(vein -> new WeightedVein(vein, vein.value().weightForBiome(biome)))
+                    .filter(vein -> vein.weight > 0)
+                    .toList();
+            this.biomeVeins.put(biome, biomeVeins);
+            return biomeVeins;
         }
     }
 
-    public static List<Entry<Integer, Holder<OreVeinDefinition>>> getCachedBiomeVeins(ServerLevel level,
-                                                                                      Holder<Biome> biome,
-                                                                                      RandomSource random) {
-        if (oreVeinCache.containsKey(level))
-            return oreVeinCache.get(level).getEntry(biome);
-        WorldOreVeinCache worldOreVeinCache = new WorldOreVeinCache(level);
-        oreVeinCache.put(level, worldOreVeinCache);
-        return worldOreVeinCache.getEntry(biome);
+    public static List<WeightedVein> getCachedBiomeVeins(ServerLevel level, Holder<Biome> biome) {
+        return oreVeinCache.computeIfAbsent(level, WorldOreVeinCache::new).getEntry(biome);
     }
 
     public static Optional<String> getWorldGenLayerKey(IWorldGenLayer layer) {

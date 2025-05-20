@@ -34,11 +34,11 @@ public class BlockTagLoader {
         // this is awful. I don't care, though.
         // spotless:off
         provider.addTag(BlockTags.REPLACEABLE)
-                        .add(GTMaterials.Oil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                        .add(GTMaterials.LightOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                        .add(GTMaterials.HeavyOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                        .add(GTMaterials.RawOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                        .add(GTMaterials.NaturalGas.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey());
+                .add(GTMaterials.Oil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
+                .add(GTMaterials.LightOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
+                .add(GTMaterials.HeavyOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
+                .add(GTMaterials.RawOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
+                .add(GTMaterials.NaturalGas.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey());
         // spotless:on
 
         provider.addTag(BlockTags.MINEABLE_WITH_AXE)

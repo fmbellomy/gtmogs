@@ -6,7 +6,6 @@ import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
-import com.gregtechceu.gtceu.api.item.datacomponents.GTTool;
 import com.gregtechceu.gtceu.api.item.datacomponents.ToolBehaviors;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
@@ -28,6 +27,7 @@ import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeTypes;
+import com.gregtechceu.gtceu.data.tag.CustomTags;
 import com.gregtechceu.gtceu.utils.DummyMachineBlockEntity;
 import com.gregtechceu.gtceu.utils.InfiniteEnergyContainer;
 
@@ -40,12 +40,17 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stat;
 import net.minecraft.stats.Stats;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
@@ -186,16 +191,38 @@ public class ToolHelper {
     }
 
     public static ItemStack getAndSetToolData(GTToolType toolType, Material material, int maxDurability,
-                                              int harvestLevel,
-                                              float toolSpeed, float attackDamage) {
+                                              int harvestLevel, float toolSpeed, float attackDamage) {
         var entry = GTMaterialItems.TOOL_ITEMS.get(material, toolType);
         if (entry == null) return ItemStack.EMPTY;
         ItemStack stack = entry.get().getRaw();
-        stack.update(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY, val -> val.withTooltip(false));
+        stack.set(DataComponents.DAMAGE, 0);
         stack.set(DataComponents.MAX_DAMAGE, maxDurability);
-        GTTool toolComponent = new GTTool(Optional.of(toolSpeed), Optional.of(attackDamage), Optional.empty(),
-                Optional.of(harvestLevel), Optional.empty());
-        stack.set(GTDataComponents.GT_TOOL, toolComponent);
+
+        Tool tool = toolType.toolDefinition.getTool();
+        List<Tool.Rule> rules = new ArrayList<>(tool.rules());
+        rules.add(Tool.Rule.deniesDrops(CustomTags.INCORRECT_TOOL_TIERS[harvestLevel]));
+        for (TagKey<Block> tag : toolType.harvestTags) {
+            rules.add(Tool.Rule.minesAndDrops(tag, toolSpeed));
+        }
+        stack.set(DataComponents.TOOL, new Tool(rules, tool.defaultMiningSpeed(), tool.damagePerBlock()));
+        if (!stack.has(GTDataComponents.TOOL_BEHAVIORS)) {
+            stack.set(GTDataComponents.TOOL_BEHAVIORS, new ToolBehaviors(toolType.toolDefinition.getBehaviors()));
+        }
+
+        ItemAttributeModifiers modifiers = ItemAttributeModifiers.builder()
+                .add(Attributes.ATTACK_DAMAGE,
+                        new AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, attackDamage,
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .add(Attributes.ATTACK_SPEED,
+                        new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, toolType.toolDefinition.getAttackSpeed(),
+                                AttributeModifier.Operation.ADD_VALUE),
+                        EquipmentSlotGroup.MAINHAND)
+                .build()
+                // don't show the normal vanilla damage and attack speed tooltips, we handle those ourselves
+                .withTooltip(false);
+        stack.set(DataComponents.ATTRIBUTE_MODIFIERS, modifiers);
+
         return stack;
     }
 
@@ -474,9 +501,7 @@ public class ToolHelper {
         IGTTool tool = (IGTTool) stack.getItem();
         ToolHelper.damageItem(stack, player);
         if (tool.getSound() != null) {
-            world.playSound(null, player.getX(), player.getY(), player.getZ(), tool.getSound().getMainEvent(),
-                    SoundSource.PLAYERS, 1.0F,
-                    1.0F);
+            world.playSound(null, player, tool.getSound().getMainEvent(), SoundSource.PLAYERS, 1.0F, 1.0F);
         }
         player.swing(hand);
     }

@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-@SuppressWarnings("unused")
 @JeiPlugin
 public class GTJEIPlugin implements IModPlugin {
 

@@ -10,12 +10,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.booleans.BooleanBooleanPair;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 @NoArgsConstructor
 public class CPacketKeysPressed implements CustomPacketPayload {
 
@@ -30,7 +31,7 @@ public class CPacketKeysPressed implements CustomPacketPayload {
         this.updateKeys = updateKeys;
     }
 
-    public CPacketKeysPressed(Pair<Boolean, Boolean>[] updateKeys) {
+    public CPacketKeysPressed(BooleanBooleanPair[] updateKeys) {
         this.updateKeys = updateKeys;
     }
 
@@ -46,11 +47,10 @@ public class CPacketKeysPressed implements CustomPacketPayload {
     }
 
     public static CPacketKeysPressed decode(FriendlyByteBuf buf) {
-        // noinspection unchecked
-        Pair<Boolean, Boolean>[] updateKeys = new Pair[KeyBind.VALUES.length];
+        BooleanBooleanPair[] updateKeys = new BooleanBooleanPair[KeyBind.VALUES.length];
         int size = buf.readVarInt();
         for (int i = 0; i < size; i++) {
-            updateKeys[buf.readVarInt()] = Pair.of(buf.readBoolean(), buf.readBoolean());
+            updateKeys[buf.readVarInt()] = BooleanBooleanPair.of(buf.readBoolean(), buf.readBoolean());
         }
         return new CPacketKeysPressed(updateKeys);
     }
@@ -58,12 +58,11 @@ public class CPacketKeysPressed implements CustomPacketPayload {
     public void execute(IPayloadContext context) {
         if (context.player() instanceof ServerPlayer player) {
             KeyBind[] keybinds = KeyBind.VALUES;
-            // noinspection unchecked
-            Pair<Boolean, Boolean>[] updateKeys = (Pair<Boolean, Boolean>[]) this.updateKeys;
+            BooleanBooleanPair[] updateKeys = (BooleanBooleanPair[]) this.updateKeys;
             for (int i = 0; i < updateKeys.length; i++) {
-                Pair<Boolean, Boolean> pair = updateKeys[i];
+                BooleanBooleanPair pair = updateKeys[i];
                 if (pair != null) {
-                    keybinds[i].update(pair.getFirst(), pair.getSecond(), player);
+                    keybinds[i].update(pair.firstBoolean(), pair.secondBoolean(), player);
                 }
             }
         }

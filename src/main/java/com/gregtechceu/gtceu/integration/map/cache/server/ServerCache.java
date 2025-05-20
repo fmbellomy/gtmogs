@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.integration.map.cache.server;
 
 import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectOre;
@@ -69,15 +68,17 @@ public class ServerCache extends WorldCache {
         List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, pos, radius);
         List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
         for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
-            if (nearbyVein.definition().value().indicatorGenerators().stream()
-                    .anyMatch(generator -> generator.block() != null && Objects.requireNonNull(generator.block())
-                            .map(state -> {
-                                MaterialStack mat = ChemicalHelper.getMaterialStack(state.getBlock().asItem());
-                                if (mat.isEmpty()) return false;
-                                return mat.material() == material;
-                            },
-                                    mat -> mat == material))) {
-                foundVeins.add(nearbyVein);
+            for (var gen : nearbyVein.definition().value().indicatorGenerators()) {
+                var block = gen.block();
+                if (block == null) continue;
+                boolean found = block.map(state -> {
+                    var ms = ChemicalHelper.getMaterialStack(state.getBlock().asItem());
+                    return !ms.isEmpty() && ms.material() == material;
+                }, mat -> mat == material);
+                if (found) {
+                    foundVeins.add(nearbyVein);
+                    break;
+                }
             }
         }
 

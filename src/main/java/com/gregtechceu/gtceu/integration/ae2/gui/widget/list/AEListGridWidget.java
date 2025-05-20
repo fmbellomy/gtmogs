@@ -19,6 +19,9 @@ import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A display only widget for {@link KeyStorage}
+ */
 public abstract class AEListGridWidget extends DraggableScrollableWidgetGroup {
 
     protected final KeyStorage list;

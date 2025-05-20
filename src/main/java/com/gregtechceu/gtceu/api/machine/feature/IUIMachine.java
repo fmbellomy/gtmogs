@@ -11,6 +11,9 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.BlockHitResult;
 
+/**
+ * A machine that has a gui that can be opened via right click.
+ */
 public interface IUIMachine extends IUIHolder, IMachineFeature {
 
     default boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {

@@ -40,8 +40,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.crafting.*;
 
-import it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import it.unimi.dsi.fastutil.objects.*;
 import lombok.experimental.ExtensionMethod;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -205,18 +204,18 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
     @Override
     public int getMaxParallelRatio(IRecipeCapabilityHolder holder, GTRecipe recipe, int parallelAmount) {
         // Find all the fluids in the combined Fluid Input inventories and create oversized FluidStacks
-        Map<FluidKey, Integer> fluidStacks = holder.getCapabilitiesFlat(IO.IN, FluidRecipeCapability.CAP).stream()
+        Object2IntMap<FluidKey> fluidStacks = holder.getCapabilitiesFlat(IO.IN, FluidRecipeCapability.CAP).stream()
                 .map(container -> container.getContents().stream().filter(FluidStack.class::isInstance)
                         .map(FluidStack.class::cast).toList())
-                .flatMap(container -> GTHashMaps.fromFluidCollection(container).entrySet().stream())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, Integer::sum,
-                        Object2IntLinkedOpenHashMap::new));
+                .flatMap(container -> GTHashMaps.fromFluidCollection(container).object2IntEntrySet().stream())
+                .collect(Collectors.toMap(Map.Entry::getKey, Object2IntMap.Entry::getIntValue,
+                        Integer::sum, Object2IntLinkedOpenHashMap::new));
 
         int minMultiplier = Integer.MAX_VALUE;
         // map the recipe input fluids to account for duplicated fluids,
         // so their sum is counted against the total of fluids available in the input
-        Map<SizedFluidIngredient, Integer> fluidCountMap = new HashMap<>();
-        Map<SizedFluidIngredient, Integer> notConsumableMap = new HashMap<>();
+        Object2IntMap<SizedFluidIngredient> fluidCountMap = new Object2IntOpenHashMap<>();
+        Object2IntMap<SizedFluidIngredient> notConsumableMap = new Object2IntOpenHashMap<>();
         for (Content content : recipe.getInputContents(FluidRecipeCapability.CAP)) {
             SizedFluidIngredient fluidInput = FluidRecipeCapability.CAP.of(content.content);
             final int fluidAmount = fluidInput.amount();
@@ -232,18 +231,18 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
         }
 
         // Iterate through the recipe inputs, excluding the not consumable fluids from the fluid inventory map
-        for (Map.Entry<SizedFluidIngredient, Integer> notConsumableFluid : notConsumableMap.entrySet()) {
-            int needed = notConsumableFluid.getValue();
+        for (var notConsumableFluid : notConsumableMap.object2IntEntrySet()) {
+            int needed = notConsumableFluid.getIntValue();
             int available = 0;
             // For every fluid gathered from the fluid inputs.
-            for (Map.Entry<FluidKey, Integer> inputFluid : fluidStacks.entrySet()) {
+            for (var inputFluid : fluidStacks.object2IntEntrySet()) {
                 // Strip the Non-consumable tags here, as FluidKey compares the tags, which causes finding matching
                 // fluids
                 // in the input tanks to fail, because there is nothing in those hatches with a non-consumable tag
-                FluidStack stack = new FluidStack(inputFluid.getKey().fluid, inputFluid.getValue(),
+                FluidStack stack = new FluidStack(inputFluid.getKey().fluid, inputFluid.getIntValue(),
                         inputFluid.getKey().component);
                 if (notConsumableFluid.getKey().test(stack)) {
-                    available = inputFluid.getValue();
+                    available = inputFluid.getIntValue();
                     if (available > needed) {
                         inputFluid.setValue(available - needed);
                         needed -= available;
@@ -274,15 +273,15 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
         }
 
         // Iterate through the fluid inputs in the recipe
-        for (Map.Entry<SizedFluidIngredient, Integer> fs : fluidCountMap.entrySet()) {
-            int needed = fs.getValue();
+        for (var fs : fluidCountMap.object2IntEntrySet()) {
+            int needed = fs.getIntValue();
             int available = 0;
             // For every fluid gathered from the fluid inputs.
-            for (Map.Entry<FluidKey, Integer> inputFluid : fluidStacks.entrySet()) {
-                FluidStack stack = new FluidStack(inputFluid.getKey().fluid, inputFluid.getValue(),
+            for (var inputFluid : fluidStacks.object2IntEntrySet()) {
+                FluidStack stack = new FluidStack(inputFluid.getKey().fluid, inputFluid.getIntValue(),
                         inputFluid.getKey().component);
                 if (fs.getKey().test(stack)) {
-                    available += inputFluid.getValue();
+                    available += inputFluid.getIntValue();
                 }
             }
             if (available >= needed) {

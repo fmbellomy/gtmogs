@@ -274,8 +274,8 @@ public class GTMaterials {
     @NotNull
     public static Material get(String name) {
         var mat = GTCEuAPI.materialManager.getMaterial(ResourceLocation.parse(name));
-        // mat could be null here due to the registry grabbing a material that isn't in the map
-        if (mat == null) {
+        // material could be null here due to the registry grabbing a material that isn't in the map
+        if (mat == null || mat.isNull()) {
             GTCEu.LOGGER.warn("{} is not a known Material", name);
             return GTMaterials.NULL;
         }
@@ -668,6 +668,7 @@ public class GTMaterials {
     public static Material DiethylenetriaminepentaaceticAcid;
     public static Material SodiumNitrite;
     public static Material HydrogenPeroxide;
+    public static Material IlmeniteSlag;
 
     /**
      * Organic chemistry
@@ -890,6 +891,11 @@ public class GTMaterials {
     public static Material PCBCoolant;
     public static Material Sculk;
     public static Material Wax;
+    public static Material BauxiteSlurry;
+    public static Material CrackedBauxiteSlurry;
+    public static Material BauxiteSludge;
+    public static Material DecalcifiedBauxiteSludge;
+    public static Material BauxiteSlag;
 
     /**
      * Second Degree Compounds

@@ -55,10 +55,7 @@ import java.util.*;
 import java.util.function.BiFunction;
 
 /**
- * @author KilaBash
- * @date 2023/2/19
- * @implNote SimpleMachine
- *           All simple single machines are implemented here.
+ * All simple single machines are implemented here.
  */
 public class SimpleTieredMachine extends WorkableTieredMachine
                                  implements IAutoOutputBoth, IFancyUIMachine, IHasCircuitSlot {

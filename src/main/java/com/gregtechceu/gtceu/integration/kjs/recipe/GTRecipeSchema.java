@@ -204,19 +204,14 @@ public interface GTRecipeSchema {
             return input(FluidRecipeCapability.CAP, (Object[]) inputs);
         }
 
-        public GTKubeRecipe itemOutputsRanged(SizedIngredient ingredient, int min, int max) {
-            return output(ItemRecipeCapability.CAP, new SizedIngredient(
-                    new IntProviderIngredient(ingredient.ingredient(), UniformInt.of(min, max)).toVanilla(), 1));
-        }
-
         public GTKubeRecipe outputItemsRanged(Ingredient ingredient, int min, int max) {
             return output(ItemRecipeCapability.CAP,
-                    new SizedIngredient(new IntProviderIngredient(ingredient, UniformInt.of(min, max)).toVanilla(), 1));
+                    new SizedIngredient(IntProviderIngredient.of(ingredient, UniformInt.of(min, max)), 1));
         }
 
+        @HideFromJS
         public GTKubeRecipe outputItemsRanged(ItemStack stack, int min, int max) {
-            return output(ItemRecipeCapability.CAP,
-                    new IntProviderIngredient(Ingredient.of(stack), UniformInt.of(min, max)));
+            return outputItemsRanged(RecipeUtil.makeItemIngredient(stack), min, max);
         }
 
         public GTKubeRecipe outputItemsRanged(TagPrefix orePrefix, Material material, int min, int max) {

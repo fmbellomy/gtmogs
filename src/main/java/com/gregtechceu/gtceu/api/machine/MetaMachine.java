@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.machine;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.block.BlockProperties;
 import com.gregtechceu.gtceu.api.block.IAppearance;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
@@ -47,8 +46,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.TickTask;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -78,6 +75,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * an abstract layer of a gregtech machine.
+ * Because I have to implement BlockEntities for both fabric and forge platform.
+ * All fundamental features will be implemented here.
+ * To add additional features, you can see {@link IMachineFeature}
+ */
 public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscription, IAppearance, IToolGridHighLight,
                          IFancyTooltip, IPaintable, IRedstoneSignalMachine {
 
@@ -234,19 +237,6 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         if (!isRemote()) {
             var subscription = new TickableSubscription(runnable);
             waitingToAdd.add(subscription);
-            var blockState = getBlockState();
-            if (!blockState.getValue(BlockProperties.SERVER_TICK)) {
-                if (getLevel() instanceof ServerLevel serverLevel) {
-                    blockState = blockState.setValue(BlockProperties.SERVER_TICK, true);
-                    holder.getSelf().setBlockState(blockState);
-                    serverLevel.getServer().tell(new TickTask(0, () -> {
-                        if (!isInValid()) {
-                            serverLevel.setBlockAndUpdate(getPos(),
-                                    getBlockState().setValue(BlockProperties.SERVER_TICK, true));
-                        }
-                    }));
-                }
-            }
             return subscription;
         } else if (getLevel() instanceof DummyWorld) {
             var subscription = new TickableSubscription(runnable);
@@ -264,9 +254,6 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
 
     public final void serverTick() {
         executeTick();
-        if (serverTicks.isEmpty() && waitingToAdd.isEmpty() && !isInValid()) {
-            getLevel().setBlockAndUpdate(getPos(), getBlockState().setValue(BlockProperties.SERVER_TICK, false));
-        }
     }
 
     public boolean isFirstDummyWorldTick = true;
@@ -287,8 +274,8 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
             serverTicks.addAll(waitingToAdd);
             waitingToAdd.clear();
         }
-        var iter = serverTicks.iterator();
-        while (iter.hasNext()) {
+
+        for (var iter = serverTicks.iterator(); iter.hasNext();) {
             var tickable = iter.next();
             if (tickable.isStillSubscribed()) {
                 tickable.run();

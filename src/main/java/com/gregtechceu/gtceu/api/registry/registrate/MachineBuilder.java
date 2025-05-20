@@ -256,8 +256,8 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
         return this;
     }
 
-    public MachineBuilder<DEFINITION> conditionalTooltip(Component component, Supplier<Boolean> condition) {
-        return conditionalTooltip(component, condition.get());
+    public MachineBuilder<DEFINITION> conditionalTooltip(Component component, BooleanSupplier condition) {
+        return conditionalTooltip(component, condition.getAsBoolean());
     }
 
     public MachineBuilder<DEFINITION> conditionalTooltip(Component component, boolean condition) {

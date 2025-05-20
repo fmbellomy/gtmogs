@@ -54,7 +54,7 @@ public class SizedIngredientExtensions {
             copied.itemStacks = Arrays.stream(toCopy.itemStacks).map(ItemStack::copy)
                     .toArray(ItemStack[]::new);
         }
-        if (toCopy.sampledCount != null) {
+        if (toCopy.sampledCount != -1) {
             copied.sampledCount = toCopy.sampledCount;
         }
         return copied.toVanilla();
