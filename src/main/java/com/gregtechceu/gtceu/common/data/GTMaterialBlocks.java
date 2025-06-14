@@ -115,7 +115,7 @@ public class GTMaterialBlocks {
             var oreTag = ore.getKey();
             final TagPrefix.OreType oreType = ore.getValue();
             String typePrefix = "";
-            if (oreTag == TagPrefix.ore) {
+            if (oreTag != TagPrefix.ore) {
                 typePrefix = FormattingUtil.toLowerCaseUnderscore(oreTag.name) + "_";
             }
             var entry = registrate.block("%s%s_ore".formatted(typePrefix, material.getName()),
@@ -167,6 +167,7 @@ public class GTMaterialBlocks {
                 .block("%s_indicator".formatted(material.getName()), p -> new SurfaceRockBlock(p, material))
                 .initialProperties(() -> Blocks.GRAVEL)
                 .properties(p -> p.noLootTable().strength(0.25f))
+                .transform(GTBlocks.unificationBlock(TagPrefix.surfaceRock, material))
                 .setData(ProviderType.LANG, NonNullBiConsumer.noop())
                 .setData(ProviderType.LOOT, NonNullBiConsumer.noop())
                 .setData(ProviderType.BLOCKSTATE, NonNullBiConsumer.noop())
