@@ -23,6 +23,7 @@ import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.feature.IInteractedMachine;
 import com.gregtechceu.gtceu.api.misc.forge.FilteredFluidHandlerItemStack;
+import com.gregtechceu.gtceu.api.misc.virtualregistry.VirtualEnderRegistry;
 import com.gregtechceu.gtceu.api.pattern.MultiblockWorldSavedData;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
@@ -40,7 +41,10 @@ import com.gregtechceu.gtceu.common.item.armor.IJetpack;
 import com.gregtechceu.gtceu.common.item.armor.QuarkTechSuite;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.common.network.GTNetwork;
-import com.gregtechceu.gtceu.common.network.packets.*;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSendWorldID;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncBedrockOreVeins;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncFluidVeins;
+import com.gregtechceu.gtceu.common.network.packets.SPacketSyncOreVeins;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketAddHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketRemoveHazardZone;
 import com.gregtechceu.gtceu.common.network.packets.hazard.SPacketSyncLevelHazards;
@@ -353,6 +357,7 @@ public class ForgeCommonEventListener {
     @SubscribeEvent
     public static void serverStopped(ServerStoppedEvent event) {
         ServerCache.instance.clear();
+        VirtualEnderRegistry.release();
     }
 
     @SubscribeEvent
