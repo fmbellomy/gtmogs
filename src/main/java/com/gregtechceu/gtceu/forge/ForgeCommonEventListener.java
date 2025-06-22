@@ -9,6 +9,8 @@ import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
 import com.gregtechceu.gtceu.api.capability.compat.EUToFEProvider;
 import com.gregtechceu.gtceu.api.capability.forge.GTCapability;
+import com.gregtechceu.gtceu.api.cosmetics.CapeRegistry;
+import com.gregtechceu.gtceu.api.cosmetics.event.RegisterGTCapesEvent;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
@@ -28,6 +30,7 @@ import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
 import com.gregtechceu.gtceu.common.commands.GTCommands;
 import com.gregtechceu.gtceu.common.commands.HazardCommands;
 import com.gregtechceu.gtceu.common.commands.MedicalConditionCommands;
+import com.gregtechceu.gtceu.common.cosmetics.GTCapes;
 import com.gregtechceu.gtceu.common.data.*;
 import com.gregtechceu.gtceu.common.data.machines.GTAEMachines;
 import com.gregtechceu.gtceu.common.fluid.potion.BottleItemFluidHandler;
@@ -146,8 +149,14 @@ public class ForgeCommonEventListener {
     }
 
     @SubscribeEvent
-    public static void attachCapabilities(AttachCapabilitiesEvent<BlockEntity> event) {
+    public static void registerBlockEntityCapabilities(AttachCapabilitiesEvent<BlockEntity> event) {
         event.addCapability(GTCEu.id("fe_capability"), new EUToFEProvider(event.getObject()));
+    }
+
+    @SubscribeEvent
+    public static void registerCapes(RegisterGTCapesEvent event) {
+        GTCapes.registerGTCapes(event);
+        GTCapes.giveDevCapes(event);
     }
 
     @SubscribeEvent
@@ -280,7 +289,9 @@ public class ForgeCommonEventListener {
 
     @SubscribeEvent
     public static void serverStarting(ServerStartingEvent event) {
-        WorldIDSaveData.init(event.getServer().overworld());
+        ServerLevel mainLevel = event.getServer().overworld();
+        WorldIDSaveData.init(mainLevel);
+        CapeRegistry.registerToServer(mainLevel);
     }
 
     @SubscribeEvent
@@ -301,7 +312,8 @@ public class ForgeCommonEventListener {
 
     @SubscribeEvent
     public static void onPlayerJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+        Player player = event.getEntity();
+        if (player instanceof ServerPlayer serverPlayer) {
             GTNetwork.NETWORK.sendToPlayer(new SPacketSendWorldID(), serverPlayer);
 
             if (!ConfigHolder.INSTANCE.gameplay.environmentalHazards)
@@ -311,6 +323,8 @@ public class ForgeCommonEventListener {
             var data = EnvironmentalHazardSavedData.getOrCreate(level);
             GTNetwork.NETWORK.sendToPlayer(new SPacketSyncLevelHazards(data.getHazardZones()), serverPlayer);
         }
+        CapeRegistry.detectNewCapes(player);
+        CapeRegistry.loadCurrentCapesOnLogin(player);
     }
 
     @SubscribeEvent
