@@ -324,8 +324,8 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
 
         registry.register(TagPrefix.class, o -> {
             if (o instanceof TagPrefix tagPrefix) return tagPrefix;
-            if (o instanceof CharSequence chars) return TagPrefix.get(chars.toString());
-            return null;
+            if (o instanceof ResourceLocation resLoc) return GTRegistries.TAG_PREFIXES.get(resLoc);
+            return GTRegistries.TAG_PREFIXES.get(GTResourceLocation.wrap(o).wrapped());
         });
         registry.register(MaterialEntry.class, MaterialEntry::of);
 

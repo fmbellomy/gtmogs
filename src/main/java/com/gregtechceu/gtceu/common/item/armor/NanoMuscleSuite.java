@@ -31,6 +31,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -126,12 +127,13 @@ public class NanoMuscleSuite extends ArmorLogicSuite implements IStepAssist {
      */
 
     @Override
-    public void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage,
-                            EquipmentSlot equipmentSlot) {
+    public int damageArmor(@Nullable LivingEntity entity, ItemStack itemStack,
+                           int damage, EquipmentSlot equipmentSlot) {
         IElectricItem item = GTCapabilityHelper.getElectricItem(itemStack);
         if (item != null) {
-            item.discharge((long) energyPerUse / 10 * damage, item.getTier(), true, false, false);
+            item.discharge(energyPerUse / 10L * damage, item.getTier(), true, false, false);
         }
+        return super.damageArmor(entity, itemStack, damage, equipmentSlot);
     }
 
     @Override

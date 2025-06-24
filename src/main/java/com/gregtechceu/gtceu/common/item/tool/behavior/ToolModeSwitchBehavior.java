@@ -84,12 +84,12 @@ public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehav
                 .map(aByte -> ModeType.values()[aByte], val -> (byte) val.ordinal());
 
         @Getter
-        private final String id;
+        private final @NotNull String serializedName;
         @Getter
         private final Component name;
 
         ModeType(String id, Component name) {
-            this.id = id;
+            this.serializedName = id;
             this.name = name;
         }
 
@@ -99,11 +99,6 @@ public class ToolModeSwitchBehavior implements IToolBehavior<ToolModeSwitchBehav
                 case FLUID -> BOTH;
                 case BOTH -> ITEM;
             };
-        }
-
-        @Override
-        public @NotNull String getSerializedName() {
-            return id;
         }
     }
 }

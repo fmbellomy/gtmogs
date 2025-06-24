@@ -115,8 +115,7 @@ public class ItemVoidingCover extends ConveyorCover implements IUICover, IContro
             playerIn.sendSystemMessage(Component.translatable(isWorkingEnabled() ?
                     "cover.voiding.message.enabled" : "cover.voiding.message.disabled"));
         }
-        playerIn.swing(hand);
-        return ItemInteractionResult.CONSUME;
+        return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
     }
 
     // TODO: Decide grid behavior

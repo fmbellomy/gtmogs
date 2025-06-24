@@ -528,7 +528,7 @@ public class ItemCollectorMachine extends TieredEnergyMachine
         if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
             return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
         }
-        if (!playerIn.isShiftKeyDown() && !isRemote()) {
+        if (!playerIn.isShiftKeyDown()) {
             var tool = playerIn.getItemInHand(hand);
             if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.FAIL;
             if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
@@ -543,8 +543,7 @@ public class ItemCollectorMachine extends TieredEnergyMachine
                 // remove the output facing when wrenching the current one to disable it
                 setOutputFacingItems(null);
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
+            return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
         }
 
         return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);

@@ -39,11 +39,11 @@ import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
 import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.utils.DummyWorld;
-import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.locale.Language;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.RandomSource;
@@ -357,8 +357,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 playerIn.sendSystemMessage(Component.translatable(mufflableMachine.isMuffled() ?
                         "gtceu.machine.muffle.on" : "gtceu.machine.muffle.off"));
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
+            return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
@@ -373,10 +372,9 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         boolean isShiftDown = playerIn.isShiftKeyDown();
         if (held.canPerformAction(GTItemAbilities.WRENCH_ROTATE)) {
             if (gridSide == getFrontFacing() && allowExtendedFacing()) {
-                setUpwardsFacing(isShiftDown ? getUpwardsFacing().getCounterClockWise() :
+                setUpwardsFacing(playerIn.isShiftKeyDown() ? getUpwardsFacing().getCounterClockWise() :
                         getUpwardsFacing().getClockWise());
-                playerIn.swing(hand);
-                return ItemInteractionResult.CONSUME;
+                return ItemInteractionResult.sidedSuccess(isRemote());
             }
             if (isShiftDown) {
                 if (gridSide == getFrontFacing() || !isFacingValid(gridSide)) {
@@ -385,12 +383,11 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                 if (!isRemote()) {
                     setFrontFacing(gridSide);
                 }
-                playerIn.swing(hand);
-                return ItemInteractionResult.CONSUME;
+                return ItemInteractionResult.sidedSuccess(isRemote());
             }
         }
         if (!isShiftDown && held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
-            if (isRemote()) return ItemInteractionResult.CONSUME;
+            if (isRemote()) return ItemInteractionResult.SUCCESS;
 
             boolean canConfigAll = held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE_ALL);
 
@@ -406,10 +403,8 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                     autoOutputFluid.setOutputFacingFluids(gridSide);
                 }
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return ItemInteractionResult.sidedSuccess(isRemote());
     }
 
     protected ItemInteractionResult onSoftMalletClick(Player playerIn, InteractionHand hand, ItemStack held,
@@ -418,29 +413,24 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
             return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
         }
         var controllable = GTCapabilityHelper.getControllable(getLevel(), getPos(), gridSide);
-        if (controllable != null) {
-            if (!isRemote()) {
-                if (!playerIn.isShiftKeyDown() || !controllable.isWorkingEnabled()) {
-                    controllable.setWorkingEnabled(!controllable.isWorkingEnabled());
-                    playerIn.sendSystemMessage(Component.translatable(controllable.isWorkingEnabled() ?
-                            "behaviour.soft_hammer.enabled" : "behaviour.soft_hammer.disabled"));
-                } else {
-                    controllable.setSuspendAfterFinish(true);
-                    playerIn.sendSystemMessage(Component.translatable("behaviour.soft_hammer.idle_after_cycle"));
-                }
+        if (controllable == null) return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        if (!isRemote()) {
+            if (!playerIn.isShiftKeyDown() || !controllable.isWorkingEnabled()) {
+                controllable.setWorkingEnabled(!controllable.isWorkingEnabled());
+                playerIn.sendSystemMessage(Component.translatable(controllable.isWorkingEnabled() ?
+                        "behaviour.soft_hammer.enabled" : "behaviour.soft_hammer.disabled"));
+            } else {
+                controllable.setSuspendAfterFinish(true);
+                playerIn.sendSystemMessage(Component.translatable("behaviour.soft_hammer.idle_after_cycle"));
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
         }
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
     }
 
     protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
                                                        Direction gridSide, BlockHitResult hitResult) {
-        if (isRemote())
-            return ItemInteractionResult.CONSUME;
         if (playerIn.isShiftKeyDown()) {
-            boolean flag = false;
+            boolean changed = false;
             if (this instanceof IAutoOutputItem autoOutputItem) {
                 if (autoOutputItem.getOutputFacingItems() == gridSide) {
                     autoOutputItem.setAllowInputFromOutputSideItems(!autoOutputItem.isAllowInputFromOutputSideItems());
@@ -448,7 +438,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                             .translatable("gtceu.machine.basic.input_from_output_side." +
                                     (autoOutputItem.isAllowInputFromOutputSideItems() ? "allow" : "disallow"))
                             .append(Component.translatable("gtceu.creative.chest.item")), true);
-                    flag = true;
+                    changed = true;
                 }
             }
             if (this instanceof IAutoOutputFluid autoOutputFluid) {
@@ -459,31 +449,29 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
                             .translatable("gtceu.machine.basic.input_from_output_side." +
                                     (autoOutputFluid.isAllowInputFromOutputSideFluids() ? "allow" : "disallow"))
                             .append(Component.translatable("gtceu.creative.tank.fluid")), true);
-                    flag = true;
+                    changed = true;
                 }
             }
-            if (flag) {
-                playerIn.swing(hand);
-                return ItemInteractionResult.SUCCESS;
+            if (changed) {
+                return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
             }
         } else {
-            boolean flag = false;
+            boolean changed = false;
             if (this instanceof IAutoOutputItem autoOutputItem) {
                 if (autoOutputItem.getOutputFacingItems() == gridSide) {
                     autoOutputItem.setAutoOutputItems(!autoOutputItem.isAutoOutputItems());
-                    flag = true;
+                    changed = true;
                 }
             }
             if (this instanceof IAutoOutputFluid autoOutputFluid) {
                 if (autoOutputFluid.getOutputFacingFluids() == gridSide) {
                     autoOutputFluid.setAutoOutputFluids(!autoOutputFluid.isAutoOutputFluids());
-                    flag = true;
+                    changed = true;
 
                 }
             }
-            if (flag) {
-                playerIn.swing(hand);
-                return ItemInteractionResult.SUCCESS;
+            if (changed) {
+                return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
             }
         }
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
@@ -598,9 +586,6 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
     }
 
     public boolean isFacingValid(Direction facing) {
-        if (allowExtendedFacing()) {
-            return true;
-        }
         if (hasFrontFacing() && facing == getFrontFacing()) return false;
         var coverContainer = getCoverContainer();
         if (coverContainer.hasCover(facing)) {
@@ -831,7 +816,7 @@ public class MetaMachine implements IEnhancedManaged, IToolable, ITickSubscripti
         getDefinition().getTooltipBuilder().accept(getDefinition().asStack(), tooltips);
         String mainKey = String.format("%s.machine.%s.tooltip", getDefinition().getId().getNamespace(),
                 getDefinition().getId().getPath());
-        if (LocalizationUtils.exist(mainKey)) {
+        if (Language.getInstance().has(mainKey)) {
             tooltips.add(0, Component.translatable(mainKey));
         }
     }

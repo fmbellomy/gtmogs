@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 
 public class FilteredFluidHandlerItemStack extends FluidHandlerItemStack {
 
-    Predicate<FluidStack> filter;
+    protected final Predicate<FluidStack> filter;
 
     /**
      * @param container The container itemStack, data is stored on it directly as NBT.
@@ -22,26 +22,6 @@ public class FilteredFluidHandlerItemStack extends FluidHandlerItemStack {
                                          Predicate<FluidStack> filter) {
         super(GTDataComponents.FLUID_CONTENT, container, capacity);
         this.filter = filter;
-    }
-
-    @Override
-    public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
-        FluidStack drained = super.drain(resource, action);
-        this.removeTagWhenEmpty(action);
-        return drained;
-    }
-
-    @Override
-    public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-        FluidStack drained = super.drain(maxDrain, action);
-        this.removeTagWhenEmpty(action);
-        return drained;
-    }
-
-    private void removeTagWhenEmpty(FluidAction action) {
-        if (getFluid().isEmpty() && action == FluidAction.EXECUTE) {
-            this.setContainerToEmpty();
-        }
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
+@SuppressWarnings("unused")
 @Accessors(chain = true)
 public class GTRecipeTypeBuilder extends BuilderBase<GTRecipeType> {
 
@@ -139,7 +140,7 @@ public class GTRecipeTypeBuilder extends BuilderBase<GTRecipeType> {
         var type = GTRecipeTypes.register(name, category);
         type.maxInputs.putAll(maxInputs);
         type.maxOutputs.putAll(maxOutputs);
-        type.getSlotOverlays().putAll(slotOverlays);
+        type.getRecipeUI().getSlotOverlays().putAll(slotOverlays);
         type.getRecipeUI().setProgressBarTexture(progressBarTexture);
         type.getRecipeUI().setSteamProgressBarTexture(steamProgressBarTexture);
         type.getRecipeUI().setSteamMoveType(steamMoveType);

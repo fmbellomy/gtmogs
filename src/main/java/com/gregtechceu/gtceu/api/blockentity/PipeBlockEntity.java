@@ -387,26 +387,24 @@ public abstract class PipeBlockEntity<PipeType extends Enum<PipeType> & IPipeTyp
                 boolean isOpen = this.isConnected(gridSide);
                 this.setConnection(gridSide, !isOpen, false);
             }
-            playerIn.swing(hand);
-            return Pair.of(getPipeTuneTool(), ItemInteractionResult.CONSUME);
-        } else
-            if (toolTypes.contains(GTToolType.CROWBAR) || held.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
-                if (coverBehavior != null) {
-                    if (!isRemote()) {
-                        getCoverContainer().removeCover(gridSide, playerIn);
-                        playerIn.swing(hand);
-                        return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
-                    }
-                } else {
-                    if (!frameMaterial.isNull()) {
-                        Block.popResource(getLevel(), getPipePos(),
-                                GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, frameMaterial).asStack());
-                        frameMaterial = GTMaterials.NULL;
-                        playerIn.swing(hand);
-                        return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.CONSUME);
-                    }
+            return Pair.of(getPipeTuneTool(), ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide));
+        // spotless:off
+        } else if (toolTypes.contains(GTToolType.CROWBAR) || held.canPerformAction(GTItemAbilities.CROWBAR_REMOVE_COVER)) {
+            if (coverBehavior != null) {
+                if (!isRemote()) {
+                    getCoverContainer().removeCover(gridSide, playerIn);
+                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide));
+                }
+            } else {
+                if (!frameMaterial.isNull()) {
+                    Block.popResource(getLevel(), getPipePos(),
+                            GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, frameMaterial).asStack());
+                    frameMaterial = GTMaterials.NULL;
+                    return Pair.of(GTToolType.CROWBAR, ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide));
                 }
             }
+        }
+        // spotless:on
 
         return Pair.of(null, ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION);
     }

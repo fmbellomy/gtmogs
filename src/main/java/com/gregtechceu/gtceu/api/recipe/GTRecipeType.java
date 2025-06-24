@@ -3,7 +3,6 @@ package com.gregtechceu.gtceu.api.recipe;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.gui.SteamTexture;
-import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.recipe.chance.boost.ChanceBoostFunction;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
@@ -26,11 +25,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectArrayMap;
-import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.objects.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,8 +62,6 @@ public class GTRecipeType implements RecipeType<GTRecipe> {
     @Getter
     @Setter
     private GTRecipeTypeUI recipeUI = new GTRecipeTypeUI(this);
-    @Getter
-    private final Byte2ObjectMap<IGuiTexture> slotOverlays = new Byte2ObjectArrayMap<>();
     @Setter
     @Getter
     private GTRecipeType smallRecipeMap;
@@ -251,32 +245,27 @@ public class GTRecipeType implements RecipeType<GTRecipe> {
         return this;
     }
 
+    public GTRecipeBuilder recipeBuilder(ResourceLocation id) {
+        return recipeBuilder.copy(id);
+    }
+
     public GTRecipeBuilder recipeBuilder(ResourceLocation id, Object... append) {
         if (append.length > 0) {
-            return recipeBuilder.copy(id.withPath(path -> path + Arrays.stream(append)
-                    .map(Object::toString).map(FormattingUtil::toLowerCaseUnderscore)
-                    .reduce("", (a, b) -> a + "_" + b)));
+            String toAppend = Arrays.stream(append)
+                    .map(Object::toString)
+                    .map(FormattingUtil::toLowerCaseUnderscore)
+                    .reduce("", (a, b) -> a + "_" + b);
+            id = id.withSuffix(toAppend);
         }
-        return recipeBuilder.copy(id);
+        return recipeBuilder(id);
+    }
+
+    public GTRecipeBuilder recipeBuilder(String id) {
+        return recipeBuilder(GTCEu.id(id));
     }
 
     public GTRecipeBuilder recipeBuilder(String id, Object... append) {
         return recipeBuilder(GTCEu.id(id), append);
-    }
-
-    public GTRecipeBuilder recipeBuilder(MaterialEntry entry, Object... append) {
-        return recipeBuilder(
-                GTCEu.id(entry.tagPrefix() +
-                        (entry.material().isNull() ? "" : "_" + entry.material().getName())),
-                append);
-    }
-
-    public GTRecipeBuilder recipeBuilder(Supplier<? extends ItemLike> item, Object... append) {
-        return recipeBuilder(item.get(), append);
-    }
-
-    public GTRecipeBuilder recipeBuilder(ItemLike itemLike, Object... append) {
-        return recipeBuilder(ResourceLocation.parse(itemLike.asItem().getDescriptionId()), append);
     }
 
     public GTRecipeBuilder copyFrom(GTRecipeBuilder builder) {

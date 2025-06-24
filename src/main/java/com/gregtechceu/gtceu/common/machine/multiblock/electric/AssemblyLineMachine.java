@@ -5,6 +5,8 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.IRecipeHandler;
 import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
+import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.WorkableElectricMultiblockMachine;
 import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
@@ -12,7 +14,6 @@ import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -26,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.function.ToIntFunction;
 
 public class AssemblyLineMachine extends WorkableElectricMultiblockMachine {
 
@@ -57,15 +57,9 @@ public class AssemblyLineMachine extends WorkableElectricMultiblockMachine {
         return checkFluidInputs(recipe);
     }
 
-    @Override
-    public void onStructureFormed() {
-        getDefinition()
-                .setPartSorter(Comparator.comparingInt(it -> multiblockPartSorter().applyAsInt(it.self().getPos())));
-        super.onStructureFormed();
-    }
-
-    private ToIntFunction<BlockPos> multiblockPartSorter() {
-        return RelativeDirection.RIGHT.getSorter(getFrontFacing(), getUpwardsFacing(), isFlipped());
+    public static Comparator<IMultiPart> partSorter(MultiblockControllerMachine mc) {
+        return Comparator.comparing(p -> p.self().getPos(),
+                RelativeDirection.RIGHT.getSorter(mc.getFrontFacing(), mc.getUpwardsFacing(), mc.isFlipped()));
     }
 
     private boolean checkItemInputs(@NotNull GTRecipe recipe) {

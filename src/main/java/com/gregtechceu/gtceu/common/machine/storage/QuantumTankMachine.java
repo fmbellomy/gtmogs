@@ -294,7 +294,7 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
     protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
                                                   Direction gridSide,
                                                   BlockHitResult hitResult) {
-        if (!playerIn.isShiftKeyDown() && !isRemote()) {
+        if (!playerIn.isShiftKeyDown()) {
             var tool = playerIn.getItemInHand(hand);
             if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.FAIL;
             if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
@@ -303,8 +303,7 @@ public class QuantumTankMachine extends TieredMachine implements IAutoOutputFlui
             } else {
                 setOutputFacingFluids(null);
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
+            return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
         }
 
         return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);

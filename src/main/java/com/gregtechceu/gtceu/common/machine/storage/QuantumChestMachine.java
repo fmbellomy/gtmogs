@@ -326,7 +326,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
     }
 
     private static boolean isDoubleHit(UUID uuid) {
-        return (System.currentTimeMillis() - INTERACTION_LOGGER.getOrDefault(uuid, System.currentTimeMillis())) < 300;
+        return (System.currentTimeMillis() - INTERACTION_LOGGER.getLong(uuid)) < 300;
     }
 
     @Override
@@ -353,7 +353,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
         if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
             return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
         }
-        if (!playerIn.isShiftKeyDown() && !isRemote()) {
+        if (!playerIn.isShiftKeyDown()) {
             var tool = playerIn.getItemInHand(hand);
             if (tool.getDamageValue() >= tool.getMaxDamage()) return ItemInteractionResult.FAIL;
             if (hasFrontFacing() && gridSide == getFrontFacing()) return ItemInteractionResult.FAIL;
@@ -362,8 +362,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
             } else {
                 setOutputFacingItems(null);
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
+            return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
         }
 
         return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
@@ -371,8 +370,7 @@ public class QuantumChestMachine extends TieredMachine implements IAutoOutputIte
 
     @Override
     protected ItemInteractionResult onScrewdriverClick(Player playerIn, InteractionHand hand, ItemStack held,
-                                                       Direction gridSide,
-                                                       BlockHitResult hitResult) {
+                                                       Direction gridSide, BlockHitResult hitResult) {
         if (!isRemote()) {
             if (gridSide == getOutputFacingItems()) {
                 if (isAllowInputFromOutputSideItems()) {

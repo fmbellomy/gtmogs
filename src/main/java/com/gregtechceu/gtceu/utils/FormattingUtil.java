@@ -48,6 +48,7 @@ public class FormattingUtil {
         for (int i = 0; i < charArray.length; i++) {
             int relativeIndex = charArray[i] - NUMBER_BASE;
             if (relativeIndex >= 0 && relativeIndex <= 9) {
+                // is superscript
                 if (startIndex == SMALL_UP_NUMBER_BASE) {
                     if (relativeIndex == 1) {
                         charArray[i] = SMALL_UP_NUMBER_ONE;
@@ -68,12 +69,12 @@ public class FormattingUtil {
     }
 
     /**
-     * Does almost the same thing as UPPER_CAMEL.to(LOWER_UNDERSCORE, string), but it also inserts underscores between
-     * words and numbers.
+     * Does almost the same thing as {@code UPPER_CAMEL.to(LOWER_UNDERSCORE, string)},
+     * but it also inserts underscores between words and numbers.
      *
      * @param string Any string with ASCII characters.
      * @return A string that is all lowercase, with underscores inserted before word/number boundaries:
-     * 
+     *
      *         <pre>
      *         <br>{@code "maragingSteel300" -> "maraging_steel_300"}
      *         <br>{@code "gtceu:maraging_steel_300" -> "gtceu:maraging_steel_300"}
@@ -100,7 +101,7 @@ public class FormattingUtil {
 
     /**
      * Check if {@code string} has any uppercase characters.
-     * 
+     *
      * @param string the string to check
      * @return if the string has any uppercase characters.
      */

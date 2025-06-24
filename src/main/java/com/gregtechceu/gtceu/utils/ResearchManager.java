@@ -21,6 +21,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipProvider;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 
@@ -72,32 +73,44 @@ public final class ResearchManager {
         if (!ConfigHolder.INSTANCE.machines.enableResearch) return;
 
         for (GTRecipeBuilder.ResearchRecipeEntry entry : builder.researchRecipeEntries()) {
-            createDefaultResearchRecipe(builder.recipeType, entry.researchId(), entry.researchStack(),
+            if (entry.researchItem().isEmpty() && entry.researchFluid().isEmpty())
+                throw new IllegalStateException("Both entry types in the research entry are null!");
+
+            createDefaultResearchRecipe(builder.recipeType, entry.researchId(),
+                    entry.researchItem(), entry.researchFluid(),
                     entry.dataStack(), entry.duration(), entry.EUt(), entry.CWUt(), provider);
         }
     }
 
     public static void createDefaultResearchRecipe(@NotNull GTRecipeType recipeType, @NotNull String researchId,
-                                                   @NotNull ItemStack researchItem, @NotNull ItemStack dataItem,
+                                                   @NotNull ItemStack researchItem, @NotNull FluidStack researchFluid,
+                                                   @NotNull ItemStack dataItem,
                                                    int duration, int EUt, int CWUt, RecipeOutput provider) {
         if (!ConfigHolder.INSTANCE.machines.enableResearch) return;
 
         dataItem.set(GTDataComponents.RESEARCH_ITEM, new ResearchItem(researchId, recipeType));
 
         if (CWUt > 0) {
-            GTRecipeTypes.RESEARCH_STATION_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
-                    .inputItems(dataItem.getItem())
-                    .inputItems(researchItem)
-                    .outputItems(dataItem)
+            var builder = GTRecipeTypes.RESEARCH_STATION_RECIPES
+                    .recipeBuilder(researchId)
+                    .inputItems(dataItem.getItem());
+
+            if (!researchItem.isEmpty()) builder.inputItems(researchItem);
+            if (!researchFluid.isEmpty()) builder.inputFluids(researchFluid);
+
+            builder.outputItems(dataItem)
                     .EUt(EUt)
                     .CWUt(CWUt)
                     .totalCWU(duration)
                     .save(provider);
         } else {
-            GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
-                    .inputItems(dataItem.getItem())
-                    .inputItems(researchItem)
-                    .outputItems(dataItem)
+            var builder = GTRecipeTypes.SCANNER_RECIPES.recipeBuilder(FormattingUtil.toLowerCaseUnderscore(researchId))
+                    .inputItems(dataItem.getItem());
+
+            if (!researchItem.isEmpty()) builder.inputItems(researchItem);
+            if (!researchFluid.isEmpty()) builder.inputFluids(researchFluid);
+
+            builder.outputItems(dataItem)
                     .duration(duration)
                     .EUt(EUt)
                     .researchScan(true)
@@ -105,7 +118,8 @@ public final class ResearchManager {
         }
     }
 
-    public record ResearchItem(String researchId, GTRecipeType recipeType) implements TooltipProvider {
+    public record ResearchItem(@NotNull String researchId, @NotNull GTRecipeType recipeType)
+            implements TooltipProvider {
 
         // spotless:off
         public static final Codec<ResearchItem> CODEC = RecordCodecBuilder.create(instance -> instance.group(

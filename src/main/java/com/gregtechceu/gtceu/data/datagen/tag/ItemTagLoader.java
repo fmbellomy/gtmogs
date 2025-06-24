@@ -21,6 +21,7 @@ import java.util.Objects;
 import static com.gregtechceu.gtceu.api.tag.TagPrefix.*;
 import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 
+@SuppressWarnings({ "SameParameterValue", "DataFlowIssue" })
 public class ItemTagLoader {
 
     public static void init(RegistrateItemTagsProvider provider) {

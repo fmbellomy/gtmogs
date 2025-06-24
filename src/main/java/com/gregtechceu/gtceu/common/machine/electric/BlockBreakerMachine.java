@@ -456,8 +456,7 @@ public class BlockBreakerMachine extends TieredEnergyMachine
     //////////////////////////////////////
     @Override
     protected ItemInteractionResult onWrenchClick(Player playerIn, InteractionHand hand, ItemStack held,
-                                                  Direction gridSide,
-                                                  BlockHitResult hitResult) {
+                                                  Direction gridSide, BlockHitResult hitResult) {
         if (!held.canPerformAction(GTItemAbilities.WRENCH_CONFIGURE)) {
             return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);
         }
@@ -476,8 +475,7 @@ public class BlockBreakerMachine extends TieredEnergyMachine
                 // remove the output facing when wrenching the current one to disable it
                 setOutputFacingItems(null);
             }
-            playerIn.swing(hand);
-            return ItemInteractionResult.CONSUME;
+            return ItemInteractionResult.sidedSuccess(playerIn.level().isClientSide);
         }
 
         return super.onWrenchClick(playerIn, hand, held, gridSide, hitResult);

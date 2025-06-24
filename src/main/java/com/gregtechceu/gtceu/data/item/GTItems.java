@@ -214,7 +214,6 @@ public class GTItems {
     public static ItemEntry<Item> SHAPE_EXTRUDER_BOTTLE;
     public static ItemEntry<Item> SHAPE_EXTRUDER_FOIL;
     public static ItemEntry<Item> SHAPE_EXTRUDER_GEAR_SMALL;
-    public static ItemEntry<Item> SHAPE_EXTRUDER_ROD_LONG;
     public static ItemEntry<Item> SHAPE_EXTRUDER_ROTOR;
 
     static {
@@ -285,10 +284,6 @@ public class GTItems {
                 .register();
         SHAPE_EXTRUDERS[24] = SHAPE_EXTRUDER_GEAR_SMALL = REGISTRATE.item("small_gear_extruder_mold", Item::new)
                 .lang("Extruder Mold (Small Gear)")
-                .onRegister(materialInfo(new ItemMaterialInfo(new MaterialStack(GTMaterials.Steel, GTValues.M * 4))))
-                .register();
-        SHAPE_EXTRUDERS[25] = SHAPE_EXTRUDER_ROD_LONG = REGISTRATE.item("long_rod_extruder_mold", Item::new)
-                .lang("Extruder Mold (Long Rod)")
                 .onRegister(materialInfo(new ItemMaterialInfo(new MaterialStack(GTMaterials.Steel, GTValues.M * 4))))
                 .register();
         SHAPE_EXTRUDERS[26] = SHAPE_EXTRUDER_ROTOR = REGISTRATE.item("rotor_extruder_mold", Item::new)
@@ -393,8 +388,7 @@ public class GTItems {
                 .onRegister(attach(cellName(),
                         ThermalFluidStats.create(FluidType.BUCKET_VOLUME * capacity, prop, true),
                         new ItemFluidContainer()))
-                .onRegister(
-                        materialInfo(new ItemMaterialInfo(new MaterialStack(mat, GTValues.M * matSize))))
+                .onRegister(materialInfo(new ItemMaterialInfo(new MaterialStack(mat, GTValues.M * matSize))))
                 .register();
     }
 
@@ -408,7 +402,7 @@ public class GTItems {
             .lang("Matchbox")
             .properties(p -> p.stacksTo(1))
             .setData(ProviderType.ITEM_MODEL, NonNullBiConsumer.noop())
-            .onRegister(attach(new LighterBehavior(false, true, false, Items.PAPER, 16)))
+            .onRegister(attach(new LighterBehavior(false, true, false, () -> new ItemStack(Items.PAPER, 1), 16)))
             .tag(Tags.Items.TOOLS_IGNITER)
             .register();
     public static ItemEntry<ComponentItem> TOOL_LIGHTER_INVAR = REGISTRATE.item("invar_lighter", ComponentItem::new)
@@ -416,12 +410,11 @@ public class GTItems {
             .properties(p -> p.stacksTo(1))
             .setData(ProviderType.ITEM_MODEL, NonNullBiConsumer.noop())
             .onRegister(attach(new LighterBehavior(true, true, true)))
-            .onRegister(attach(FilteredFluidContainer.create(100, true,
-                    x -> x.is(CustomTags.LIGHTER_FLUIDS)),
+            .onRegister(attach(new FilteredFluidContainer(100, true, x -> x.is(CustomTags.LIGHTER_FLUIDS)),
                     new ItemFluidContainer()))
-            .tag(Tags.Items.TOOLS_IGNITER)
             .onRegister(modelPredicate(GTCEu.id("lighter_open"),
                     (itemStack) -> itemStack.getOrDefault(GTDataComponents.LIGHTER_OPEN, false) ? 1.0f : 0.0f))
+            .tag(Tags.Items.TOOLS_IGNITER)
             .register();
     public static ItemEntry<ComponentItem> TOOL_LIGHTER_PLATINUM = REGISTRATE
             .item("platinum_lighter", ComponentItem::new)
@@ -429,12 +422,11 @@ public class GTItems {
             .properties(p -> p.stacksTo(1).rarity(Rarity.UNCOMMON))
             .setData(ProviderType.ITEM_MODEL, NonNullBiConsumer.noop())
             .onRegister(attach(new LighterBehavior(true, true, true)))
-            .onRegister(attach(FilteredFluidContainer.create(1000, true,
-                    x -> x.is(CustomTags.LIGHTER_FLUIDS)),
+            .onRegister(attach(new FilteredFluidContainer(1000, true, x -> x.is(CustomTags.LIGHTER_FLUIDS)),
                     new ItemFluidContainer()))
-            .tag(Tags.Items.TOOLS_IGNITER)
             .onRegister(modelPredicate(GTCEu.id("lighter_open"),
                     (itemStack) -> itemStack.getOrDefault(GTDataComponents.LIGHTER_OPEN, false) ? 1.0f : 0.0f))
+            .tag(Tags.Items.TOOLS_IGNITER)
             .register();
 
     public static ItemEntry<Item> CARBON_FIBERS = REGISTRATE.item("carbon_fibers", Item::new)
@@ -1887,7 +1879,9 @@ public class GTItems {
     public static ItemEntry<ComponentItem> COVER_ENDER_FLUID_LINK = REGISTRATE
             .item("ender_fluid_link_cover", ComponentItem::new)
             .lang("Ender Fluid Link")
+            .onRegister(attach(new CoverPlaceBehavior(GTCovers.ENDER_FLUID_LINK)))
             .register();
+
     public static ItemEntry<ComponentItem> COVER_FLUID_VOIDING = REGISTRATE
             .item("fluid_voiding_cover", ComponentItem::new)
             .lang("Fluid Voiding Cover")

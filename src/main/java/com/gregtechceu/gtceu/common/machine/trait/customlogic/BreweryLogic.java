@@ -317,7 +317,10 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
                     PotionFluidHelper.MB_PER_RECIPE);
 
             String name = toFluid.getFluid().builtInRegistryHolder().key().location().getPath();
-            Optional<Holder<Potion>> output = impl.getOutput().get(DataComponents.POTION_CONTENTS).potion();
+
+            Optional<Holder<Potion>> output = impl.getOutput()
+                    .getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                    .potion();
             if (output.isPresent()) {
                 name = Potion.getName(output, "");
             }

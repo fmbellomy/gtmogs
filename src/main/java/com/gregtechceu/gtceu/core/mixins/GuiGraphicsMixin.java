@@ -39,12 +39,12 @@ public class GuiGraphicsMixin {
             cancellable = true)
     protected void gtceu$renderItem(@Nullable LivingEntity livingEntity, @Nullable Level level, ItemStack stack,
                                     int x, int y, int seed, int z, CallbackInfo ci) {
-        if (GTCEU$OVERRIDING_FOR.get() != null) {
+        if (GTCEU$OVERRIDING_FOR.get() != null || !Screen.hasShiftDown()) {
             return;
         }
 
         ResearchManager.ResearchItem researchData = stack.get(GTDataComponents.RESEARCH_ITEM);
-        if (Screen.hasShiftDown() && researchData != null) {
+        if (researchData != null) {
             Collection<GTRecipe> recipes = researchData.recipeType().getDataStickEntry(researchData.researchId());
             if (recipes != null && !recipes.isEmpty()) {
                 for (var recipe : recipes) {

@@ -6,15 +6,15 @@ import com.gregtechceu.gtceu.data.tag.CustomTags;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagEntry;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 
 import com.tterrag.registrate.providers.RegistrateTagsProvider;
 
 public class BlockTagLoader {
 
-    public static void init(RegistrateTagsProvider<Block> provider) {
+    public static void init(RegistrateTagsProvider.IntrinsicImpl<Block> provider) {
         provider.addTag(CustomTags.ENDSTONE_ORE_REPLACEABLES)
                 .addTag(Tags.Blocks.END_STONES);
 
@@ -34,16 +34,16 @@ public class BlockTagLoader {
         // this is awful. I don't care, though.
         // spotless:off
         provider.addTag(BlockTags.REPLACEABLE)
-                .add(GTMaterials.Oil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                .add(GTMaterials.LightOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                .add(GTMaterials.HeavyOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                .add(GTMaterials.RawOil.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey())
-                .add(GTMaterials.NaturalGas.getFluid().defaultFluidState().createLegacyBlock().getBlockHolder().getKey());
+                .add(GTMaterials.Oil.getFluid().defaultFluidState().createLegacyBlock().getBlock())
+                .add(GTMaterials.LightOil.getFluid().defaultFluidState().createLegacyBlock().getBlock())
+                .add(GTMaterials.HeavyOil.getFluid().defaultFluidState().createLegacyBlock().getBlock())
+                .add(GTMaterials.RawOil.getFluid().defaultFluidState().createLegacyBlock().getBlock())
+                .add(GTMaterials.NaturalGas.getFluid().defaultFluidState().createLegacyBlock().getBlock());
         // spotless:on
 
         provider.addTag(BlockTags.MINEABLE_WITH_AXE)
-                .add(TagEntry.element(GTMachines.WOODEN_DRUM.getId()))
-                .add(TagEntry.element(GTMachines.WOODEN_CRATE.getId()));
+                .add(GTMachines.WOODEN_DRUM.getBlock())
+                .add(GTMachines.WOODEN_CRATE.getBlock());
 
         // always add the wrench/pickaxe tag as a valid tag to mineable/wrench etc.
         provider.addTag(CustomTags.MINEABLE_WITH_WRENCH)
@@ -58,5 +58,12 @@ public class BlockTagLoader {
                 .addOptional(ResourceLocation.fromNamespaceAndPath("rftoolsutility", "matter_receiver"))
                 .addOptional(ResourceLocation.fromNamespaceAndPath("rftoolsutility", "dialing_device"))
                 .addOptional(ResourceLocation.fromNamespaceAndPath("travelanchors", "travel_anchor"));
+
+        provider.addTag(CustomTags.CHARCOAL_PILE_IGNITER_WALLS)
+                .addTag(BlockTags.DIRT) // any dirt blocks
+                .remove(Blocks.MOSS_BLOCK, Blocks.MUD, Blocks.MUDDY_MANGROVE_ROOTS) // except moss and mud
+                .add(Blocks.DIRT_PATH) // path blocks
+                .addTag(Tags.Blocks.SANDS).addTag(BlockTags.SAND) // any sand blocks
+                .addTag(BlockTags.TERRACOTTA); // any terracotta
     }
 }

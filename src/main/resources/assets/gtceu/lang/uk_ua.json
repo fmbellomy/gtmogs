@@ -49,6 +49,7 @@
     "death.attack.gtceu.hammer": "%s був розчавлений %s",
     "death.attack.gtceu.wrench_hv": "Труби %s розхиталися через %s",
     "death.attack.gtceu.wrench_lv": "Труби %s розхиталися через %s",
+
     "tagprefix.planks": "Дошки (%s)",
     "tagprefix.door": "Двері (%s)",
     "tagprefix.fence": "Паркан (%s)",
@@ -96,7 +97,7 @@
     "tagprefix.refined_ore": "%s (рафінована руда)",
     "tagprefix.sand": "%s (піщана руда)",
     "tagprefix.tuff": "%s (туфова руда)",
-    "block.surface_rock": "%s (поверхневий поклад)",
+
     "item.gtceu.crushed_bentonite_ore": "Дроблений бентоніт",
     "item.gtceu.crushed_cassiterite_sand_ore": "Дроблений каситеритовий пісок",
     "item.gtceu.crushed_pitchblende_ore": "Дроблений настуран",
@@ -173,6 +174,7 @@
     "item.gtceu.tungstensteel_fluid_cell": "Вольфрамова сталева комірка (%s)",
     "item.gtceu.universal_fluid_cell": "Універсальна комірка (%s)",
     "item.gtceu.glass_vial": "Скляна пробірка (%s)",
+
     "tagprefix.cable_gt_hex": "16x кабель (%s)",
     "tagprefix.wire_gt_hex": "16x дріт (%s)",
     "tagprefix.cable_gt_single": "1x кабель (%s)",
@@ -198,6 +200,8 @@
     "tagprefix.pipe_large_restrictive": "Велика обмежувальна предметна труба (%s)",
     "tagprefix.pipe_huge_item": "Величезна предметна труба (%s)",
     "tagprefix.pipe_huge_restrictive": "Величезна обмежувальна предметна труба (%s)",
+
+    "block.gtceu.surface_rock": "%s (поверхневий поклад)",
     "block.gtceu.small_duct_pipe": "Мала вентиляційна труба",
     "block.gtceu.normal_duct_pipe": "Вентиляційна труба",
     "block.gtceu.large_duct_pipe": "Велика вентиляційна труба",
@@ -290,6 +294,7 @@
     "item.gtceu.small_wood_dust": "Дрібна деревна целюлоза",
     "item.gtceu.platinum_group_sludge_dust": "Шлам платинової групи",
     "item.gtceu.portable_scanner": "Портативний сканер",
+
     "behavior.portable_scanner.amp_per_sec": "В середньому (за останню секунду): %s A",
     "behavior.portable_scanner.eu_per_sec": "В середньому (за останню секунду): %s EU/т",
     "behavior.portable_scanner.bedrock_fluid.amount": "Розміщена рідина: %s %s - %s%%",
@@ -341,6 +346,7 @@
     "behavior.portable_scanner.workable_production": "Ймовірно виробляє: %s EU/т з %s A",
     "behavior.portable_scanner.workable_progress": "Прогрес: %s s / %s s",
     "behavior.portable_scanner.workable_stored_energy": "Збережена енергія: %s EU / %s EU",
+
     "item.gtceu.terminal": "Термінал",
     "item.gtceu.terminal.tooltip": "Shift+ПКМ по контролеру для автоматичної побудови конструкції",
     "item.gtceu.programmed_circuit": "Програмна плата",
@@ -351,6 +357,7 @@
     "item.gtceu.sus_record": "Платівка",
     "item.gtceu.sus_record.desc": "§7підозріло!",
     "metaitem.record.sus.tooltip": "§7Leonz - Among Us Drip",
+
     "item.gtceu.tool.tooltip.attack_speed": "%s§9 швидкости атаки",
     "item.gtceu.tool.tooltip.crafting_uses": "%s§a використань у майструванні",
     "item.gtceu.tool.tooltip.general_uses": "%s§b міцности",
@@ -406,6 +413,7 @@
     "item.gtceu.tool.aoe.layers": " Шари",
     "item.gtceu.tool.aoe.rows": "Рядки",
     "item.gtceu.tool.replace_tool_head": "Об'єднайте з іншою головкою інструмента, щоб замінити її",
+
     "item.gtceu.tool.axe": "Сокира (%s)",
     "item.gtceu.tool.butchery_knife": "М'ясний ніж (%s)",
     "item.gtceu.tool.buzzsaw": "LV електропила (%s)",
@@ -448,6 +456,7 @@
     "item.gtceu.dynamite": "Динамітна шашка",
     "item.gtceu.invar_lighter": "Інварова запальничка",
     "item.gtceu.platinum_lighter": "Платинова запальничка",
+
     "gtceu.tool.class.axe": "Сокира",
     "gtceu.tool.class.butchery_knife": "М'ясний ніж",
     "gtceu.tool.class.crowbar": "Лом",
@@ -471,6 +480,7 @@
     "gtceu.tool.class.sword": "Меч",
     "gtceu.tool.class.wire_cutter": "Кусачки",
     "gtceu.tool.class.wrench": "Гайковий ключ",
+
     "gtceu.multiblock.assembly_line.description": "Конвеєрна лінія - це велика багатоблочна конструкція, що складається з 5 до 16 \"скибок\". теоретично, це великий збиральний апарат, який використовується для створення просунутих крафтових компонентів.",
     "gtceu.multiblock.charcoal_pile.description.0": "Перетворює колоди на крихке деревне вугілля в зоні 9х4х9 під собою.",
     "gtceu.multiblock.charcoal_pile.description.2": "Підлога ями повинна бути викладена з цегли, а для стін і даху можна використовувати будь-який грунтовий блок. Усередині ями не повинно бути повітря.",
@@ -699,6 +709,7 @@
     "gtceu.multiblock.validation_failed": "Неправильна кількість входів/виходів.",
     "gtceu.multiblock.waiting": "ПОПЕРЕДЖЕННЯ: Машина очікує.",
     "gtceu.multiblock.work_paused": "Робота зупинена.",
+
     "material.gtceu.acetic_acid": "Оцтова кислота",
     "material.gtceu.acetic_anhydride": "Оцтовий ангідрид",
     "material.gtceu.acetone": "Ацетон",
@@ -1356,6 +1367,7 @@
     "material.gtceu.zinc_sulfide": "Сульфід цинку",
     "material.gtceu.zincite": "Цинкіт",
     "material.gtceu.zirconium": "Цирконій",
+
     "gtceu.jei.bedrock_fluid.heavy_oil_deposit": "Поклад важкої нафти",
     "gtceu.jei.bedrock_fluid.lava_deposit": "Поклад лави",
     "gtceu.jei.bedrock_fluid.light_oil_deposit": "Поклад легкої нафти",
@@ -1444,6 +1456,7 @@
     "gtceu.jei.ore_vein_diagram.spawn_range": "Висота залягання:",
     "gtceu.jei.ore_vein_diagram.weight": "Вага: %s",
     "gtceu.jei.programmed_circuit": "Сторінка програмної плати",
+
     "command.gtceu.medical_condition.get": "Гравець %s має такі медичні показання:",
     "command.gtceu.medical_condition.get.element": "Ураження - %s§r: %s хвилин %s секунд",
     "command.gtceu.medical_condition.get.element.permanent": "Ураження - %s§r: %s хвилин %s секунд (постійне)",
@@ -1473,6 +1486,7 @@
     "gtceu.hazard_trigger.inhalation": "При вдиханні",
     "gtceu.hazard_trigger.skin_contact": "При контакті зі шкірою",
     "gtceu.hazard_trigger.none": "Ніяк",
+
     "gtceu.oc.tooltip.0": "Мінімум: %s",
     "gtceu.oc.tooltip.1": "ЛКМ, щоб збільшити розгін",
     "gtceu.oc.tooltip.2": "ПКМ, щоб зменьшити розгін",
@@ -1516,10 +1530,8 @@
     "metaitem.electric.discharge_mode.tooltip": "Використовуйте крадькома, щоб змінити режим розряджання",
     "metaitem.generic.electric_item.stored": "%d/%d EU (%s)",
     "metaitem.generic.electric_item.tooltip": "%d/%d EU - рівень %s",
-    "item.gtceu.battery.charge_detailed.0": "§a%s/%s EU§7 - рівень %s§7 (§aзалишилось %s/%s %s§7)",
+    "item.gtceu.battery.charge_detailed": "%s/%s EU§7 - рівень %s§7 (залишилось %s/%s %s§7)",
     "item.gtceu.battery.charge_time": "§aHolds %s %s of Power (%s)",
-    "item.gtceu.battery.charge_detailed.2": "§c%s/%s EU§7 - рівень %s§7 (§aзалишилось %s/%s %s§7)",
-    "item.gtceu.battery.charge_detailed.1": "§e%s/%s EU§7 - рівень %s§7 (§aзалишилось %s/%s %s§7)",
     "item.gtceu.battery.charge_unit.hour": "годин",
     "item.gtceu.battery.charge_unit.minute": "хвилин",
     "item.gtceu.battery.charge_unit.second": "секунд",
@@ -1544,6 +1556,7 @@
     "metaitem.tool.tooltip.primary_material": "§fМатеріал:§e %s",
     "metaitem.tool.tooltip.rotor.efficiency": "Ефективність турбіни:§9 %d%%",
     "metaitem.tool.tooltip.rotor.power": "Потужність турбіни:§9 %d%%",
+
     "gtceu.fluid.gas_vapor": "%s (пара)",
     "gtceu.fluid.plasma": "%s (плазма)",
     "gtceu.fluid.gas_generic": "%s (газ)",
@@ -1569,6 +1582,7 @@
     "gtceu.fluid_pipe.channels": "§eКанали:§f %d",
     "gtceu.fluid.empty": "Порожньо",
     "gtceu.fluid.generic": "%s",
+
     "block.gtceu.long_distance_item_pipeline_input_pos": " - вхід: %s",
     "block.gtceu.long_distance_item_pipeline_output_pos": " - вихід: %s",
     "block.gtceu.long_distance_item_pipeline_pipe_count": " - труби: %s",
@@ -1612,6 +1626,7 @@
     "gtceu.jade.cleaned_this_second": "Очищена небезпека: %s/s",
     "gtceu.tooltip.potion.each": "%s %s§7 на§r %s§7 тактів, який застосується із§r %s%%§7 ймовірністю§r",
     "gtceu.tooltip.potion.header": "§6Містить ефекти:",
+
     "behaviour.setting.item_auto_output.tooltip": "%s автовиведення is %s",
     "behaviour.setting.allow.input.from.output.tooltip": "%s вхід з вихідної сторони %s",
     "behaviour.setting.output.direction.tooltip": "%s напрям виведення: %s",
@@ -1648,6 +1663,7 @@
     "behaviour.prospecting": "Використовується для геологорозвідки",
     "behaviour.soft_hammer.disabled": "Робота зупинена",
     "behaviour.soft_hammer.enabled": "Робота відновлена",
+
     "gtceu.machine.iv_alloy_smelter.tooltip": "§7Інтегратор сплавів",
     "gtceu.machine.luv_alloy_smelter.tooltip": "§7Інтегратор сплавів",
     "gtceu.machine.zpm_alloy_smelter.tooltip": "§7Інтегратор сплавів",
@@ -2008,6 +2024,7 @@
     "gtceu.machine.transformer.description": "§7Трансформує енергію між рівнями напруги",
     "gtceu.machine.uv_fluid_heater.tooltip": "§7Тепловий просякач",
     "gtceu.machine.ev_fluid_drilling_rig.tooltip": "Свердловинний дренажер",
+
     "gtceu.machine.me.item_import.data_stick.name": "§oКонфігураційні дані ME-вхідної шини",
     "gtceu.machine.me.fluid_import.data_stick.name": "§oКонфігураційні дані ME-вхідного люка",
     "gtceu.machine.me.import_paste_settings": "Застосовані налаштування з картки даних",
@@ -2246,6 +2263,7 @@
     "gtceu.machine.world_accelerator.mode_entity": "Режим випадкового такту",
     "gtceu.machine.world_accelerator.mode_tile": "Режим блока-сутності",
     "gtceu.machine.world_accelerator.working_area": "§bРобоча зона:",
+
     "gtceu.universal.kiloliters": "%s B",
     "gtceu.universal.liters": "%s мВ",
     "gtceu.universal.tooltip.fluid_stored": "§2Збережена рідина:§f %s, %d мВ",
@@ -2283,8 +2301,6 @@
     "gtceu.universal.tooltip.base_production_fluid": "§eБазове виробництво:§f %d мВ/т",
     "gtceu.universal.tooltip.produces_fluid": "§eВиробляє:§f %d мВ/т",
     "gtceu.universal.tooltip.chunk_mode": "Режим чанків: ",
-    "gtceu.universal.disabled": "Спільний доступ конструкції§4 вимкнено",
-    "gtceu.universal.enabled": "Спільний доступ конструкції§a увімкнено",
     "gtceu.universal.tooltip.silk_touch": "Шовковий дотик: ",
     "gtceu.universal.tooltip.terrain_resist": "Ця машина не вибухне під час контакту з хім. елементами",
     "gtceu.universal.tooltip.uses_per_op": "Використовує§f %d EU на операцію",
@@ -2292,11 +2308,13 @@
     "gtceu.universal.tooltip.uses_per_tick": "Використовує§f %d EU/т§7  під час роботи",
     "gtceu.universal.tooltip.uses_per_hour_lubricant": "Використовує§f %d мВ/год§7§6 мастила§7 під час роботи",
     "gtceu.universal.tooltip.uses_per_tick_steam": "Використовує§f %d мВ/т§7§f пари§7 під час роботи",
+
     "command.gtceu.share_prospection_data.notification": "%s ділиться з вами розвідницькими даними!",
     "command.gtceu.dump_data.success": "Перекинуто %s ресурсів з реєстру %s до %s",
     "command.gtceu.place_vein.failure": "Не вдалося розмістити жилу %s на позиції %s",
     "command.gtceu.place_vein.success": "Розміщено жилу %s на позиції %s",
-    "gtceu.gui.авто_output.name": "авто",
+
+    "gtceu.gui.auto_output.name": "авто",
     "gtceu.gui.charger_slot.tooltip.0": "§fГніздо для зарядного пристрою§r",
     "gtceu.gui.charger_slot.tooltip.1": "§7Живиться від %s акумуляторів§r",
     "gtceu.gui.charger_slot.tooltip.2": "§7Заряджає %s інструментів та акумуляторів",
@@ -2392,6 +2410,8 @@
     "gtceu.gui.toggle_view.disabled": "Перемкнути вид (Рідини)",
     "gtceu.gui.toggle_view.enabled": "Перемкнути вид (Предмети)",
     "gtceu.gui.waiting_list": "Черга на відправлення:",
+    "gtceu.part_sharing.disabled": "Спільний доступ конструкції§4 вимкнено",
+    "gtceu.part_sharing.enabled": "Спільний доступ конструкції§a увімкнено",
     "item.gtceu.ash_dust": "Попіл",
     "item.gtceu.basaltic_mineral_sand_dust": "Базальтовий мінеральний пісок",
     "item.gtceu.bone_dust": "Кісткове борошно",
@@ -2988,6 +3008,7 @@
     "item.gtceu.wetware_processor_computer.tooltip.0": "§7Остаточне злиття плоті та машини",
     "item.gtceu.wetware_processor_mainframe": "Животехнічний процесорний мейнфрейм",
     "item.gtceu.wetware_processor_mainframe.tooltip.0": "§7Краще, що коли-небудь хтось бачив",
+
     "item.gtceu.zero_point_module": "Модуль нульової точки",
     "block.gtceu.uiv_alloy_smelter": "§2Епічний плавильник сплавів III§r",
     "block.gtceu.uv_alloy_smelter": "§3Ультимативний плавильник сплавів§r ",
@@ -4327,6 +4348,7 @@
     "item.gtceu.wetware_printed_circuit_board.tooltip": "§7Плата, що містить життя",
     "item.gtceu.data_orb.tooltip": "§7Сховище даних великої місткості",
     "item.gtceu.data_stick.tooltip": "§7Сховище даних малої місткості",
+
     "block.gtceu.advanced_data_access_hatch": "Просунутий люк доступу до даних",
     "block.gtceu.data_access_hatch": "Люк доступу до даних",
     "block.gtceu.alloy_blast_smelter": "Плавильник сплавів",
@@ -4492,6 +4514,7 @@
     "block.gtceu.wire_coil.tooltip_pyro": "§8Піролізна піч:",
     "block.gtceu.wire_coil.tooltip_smelter": "§8Мультиплавильня:",
     "block.gtceu.wood_drum": "Дерев'яна діжка",
+
     "block.gtceu.wood_wall": "Дерев'яна стіна",
     "block.gtceu.casing_coke_bricks": "Цегла коксової печі",
     "block.gtceu.coke_oven_bricks": "Цегла коксової печі",
@@ -4805,12 +4828,14 @@
     "block.gtceu.polished_dark_concrete": "Полірований темний бетон",
     "block.gtceu.small_dark_concrete_bricks": "Дрібна темна бетонна цегла",
     "block.gtceu.square_dark_concrete_bricks": "Квадратна темна бетонна цегла",
+
     "fluid.empty": "Порожньо",
     "fluid_cell.empty": "Порожньо",
     "fluid.spawnlocation.name": "Інфо про рідинну жилу",
     "fluid.gtceu.potion": "Зілля",
     "fluid.tile.lava": "Лава",
     "fluid.tile.water": "Вода",
+
     "gtceu.top.allow_output_input": "Відкритий вхід",
     "gtceu.top.auto_output": "Автовиведення",
     "gtceu.top.buffer_bound_pos": "Прив'язано до - X: %s, Y: %s, Z: %s",
@@ -4854,6 +4879,7 @@
     "gtceu.top.unit.items": "Предмети",
     "gtceu.top.valid_structure": "Конструкцію сформовано",
     "gtceu.top.working_disabled": "Роботу зупинено",
+
     "gtceu.tool_action.crowbar": "§8Використовуйте лом, щоб зняти кришки",
     "gtceu.tool_action.hammer": "§8Використовуйте молот, щоб приглушити звуки",
     "gtceu.tool_action.screwdriver.access_covers": "§8Використовуйте викрутку для доступу до кришок",
@@ -4867,6 +4893,7 @@
     "gtceu.tool_action.tape": "§8Використовуйте стрічку для усунення проблем з технічним обслуговуванням",
     "gtceu.tool_action.wrench.connect": "§8Використовуйте гайковий ключ для встановлення з'єднань, крадькома, щоб заблокувати з'єднання",
     "gtceu.tool_action.wrench.set_facing": "§8Використовуйте ключ, щоб встановити напрямок",
+
     "gtceu.recipe.environmental_hazard.reverse": "§cОбласть повинна бути захищена від %s",
     "gtceu.recipe.environmental_hazard": "§cВ області повинно бути %s",
     "gtceu.recipe.amperage": "Сила струму: %s",
@@ -4903,6 +4930,7 @@
     "gtceu.recipe.eu": "Використання: %s EU/т",
     "gtceu.recipe_memory_widget.tooltip.0": "§7Клацніть ЛКМ, щоб автоматично внести цей рецепт до сітки виготовлення",
     "gtceu.recipe_memory_widget.tooltip.1": "§7Клацайте із затиснутим Shift, щоб заблокувати/розблокувати цей рецепт",
+
     "effect.gtceu.weak_poison": "Слабке отруєння",
     "enchantment.damage.disjunction": "Розщеплення",
     "enchantment.disjunction": "Розщеплення",
@@ -4935,6 +4963,7 @@
     "gtceu.rock_breaker": "Кам'яна дробарка",
     "gtceu.steam_boiler": "Паровий котел",
     "gtceu.steam_turbine": "Парова турбіна",
+
     "block.filter_casing.tooltip": "Створює§a вільне від частинок§7 середовище",
     "block.sterilizing_filter_casing.tooltip": "Створює§a стерильне§7 середовище",
     "button.gtceu.mark_as_depleted.name": "Позначити як виснажений",
@@ -4970,6 +4999,7 @@
     "gtceu.vacuum_freezer": "Вакуумна морозильна камера",
     "item.toggle.advanced.info.tooltip": "§8<Крадіться, щоб відобразити конфігурацію зберігання>",
     "ore.spawnlocation.name": "Інформація про генерацію руд",
+
     "gtceu.cover.activity_detector.message_activity_inverted": "Моніторинг інвертованого стану активності",
     "gtceu.cover.activity_detector.message_activity_normal": "Моніторинг нормального стану активності",
     "gtceu.cover.activity_detector_advanced.message_activity_inverted": "Моніторинг інвертованого стану обробки",
@@ -5073,6 +5103,7 @@
     "recipe.condition.rain.tooltip": "Рівень дощу: %d",
     "recipe.condition.thunder.tooltip": "Рівень грози: %d",
     "recipe.condition.pos_y.tooltip": "Рівень Y: %d <= Y <= %d",
+
     "mataarmor.hud.supply_mode": "Режим живлення: %s",
     "metaarmor.energy_share.disable": "Енергопостачання: Заряджання приладів вимкнена",
     "metaarmor.energy_share.enable": "Енергопостачання: Заряджання приладів увімкнено",
@@ -5117,6 +5148,7 @@
     "metaarmor.tooltip.potions": "Знешкоджує шкідливі ефекти",
     "metaarmor.tooltip.speed": "Збільшує швидкість бігу",
     "metaarmor.tooltip.stepassist": "Збільшує висоту кроку",
+
     "gtceu.subtitle.portable_scanner": "Сканування",
     "gtceu.subtitle.assembler": "Збирач конструює",
     "gtceu.subtitle.centrifuge": "Центрифуга обертається",
@@ -5156,6 +5188,7 @@
     "gtceu.subtitle.turbine": "Свист турбіни",
     "gtceu.subtitle.wirecutter": "Дріт рветься",
     "gtceu.subtitle.wrench": "Ключ брязкає",
+
     "config.jade.plugin_gtceu.auto_output_info": "[GTCEu] Інфо автовиведення",
     "config.jade.plugin_gtceu.cable_info": "[GTCEu] Інфо кабелів",
     "config.jade.plugin_gtceu.controllable_provider": "[GTCEu] Контролювання",
@@ -5359,12 +5392,14 @@
     "gtceu.command.worldgen.reload.success": "Генерацію світу успішно перезавантажено з конфігурації.",
     "gtceu.command.worldgen.reload.usage": "Використання: /gtceu worldgen reload",
     "gtceu.command.worldgen.usage": "Використання: /gtceu worldgen <reload>",
+
     "gtceu.key.armor_charging": "Перемикач заряджання інвентаря від броні",
     "gtceu.key.armor_hover": "Перемикач наведення броні",
     "gtceu.key.armor_mode_switch": "Перемикач режиму броні",
     "gtceu.key.enable_boots": "Увімкнути посилений стрибок",
     "gtceu.key.enable_jetpack": "Реактивний ранець",
     "gtceu.key.tool_aoe_change": "Перемикач роботи по області інструменту",
+
     "cover.advanced_energy_detector.invert.disabled.0": "Вихід: Нормальний",
     "cover.advanced_energy_detector.invert.disabled.2": "Перемкніть, щоб інвертувати логіку редстоуна",
     "cover.advanced_energy_detector.invert.disabled.3": "За замовчуванням, редстоун випромінюється, коли мінімальне значення EU менше, і припиняє випромінювання, коли максимальне значення EU перевищує мінімальне.",
@@ -5522,6 +5557,7 @@
     "cover.voiding.voiding_mode.description.1": "§eЗнищувати до межі§r знищує все, що відповідає фільтру, до вказаної кількості.",
     "cover.voiding.voiding_mode.void_any": "Знищувати відповідне",
     "cover.voiding.voiding_mode.void_overflow": "Знищувати до межі",
+
     "gtceu.multiblock.charcoal_pile.description.1": "",
     "gtceu.multiblock.charcoal_pile.description.3": "",
     "gtceu.multiblock.primitive_water_pump.extra2.4": "",

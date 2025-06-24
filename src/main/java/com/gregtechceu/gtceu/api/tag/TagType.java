@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.tag;
 
 import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.Util;
 import net.minecraft.tags.TagKey;
@@ -47,7 +46,7 @@ public class TagType {
     public static TagType withPrefixFormatter(String tagPath) {
         TagType type = new TagType(tagPath);
         type.formatter = Util.memoize((prefix, mat) -> TagUtil.createItemTag(
-                type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name), mat.getName())));
+                type.tagPath.formatted(prefix.getLowerCaseName(), mat.getName())));
         return type;
     }
 
@@ -58,7 +57,7 @@ public class TagType {
     public static TagType withPrefixOnlyFormatter(String tagPath) {
         TagType type = new TagType(tagPath);
         type.formatter = Util.memoize((prefix, mat) -> TagUtil
-                .createItemTag(type.tagPath.formatted(FormattingUtil.toLowerCaseUnderscore(prefix.name))));
+                .createItemTag(type.tagPath.formatted(prefix.getLowerCaseName())));
         type.isParentTag = true;
         return type;
     }

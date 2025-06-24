@@ -19,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.neoforged.neoforge.network.connection.ConnectionType;
 
 import com.mojang.serialization.Codec;
@@ -123,8 +124,12 @@ public abstract class RecipeCapability<T> {
         return "%s_%s_%s".formatted(name, io.name().toLowerCase(Locale.ROOT), index);
     }
 
-    public Component getName() {
+    public MutableComponent getName() {
         return Component.translatable("recipe.capability.%s.name".formatted(name));
+    }
+
+    public MutableComponent getColoredName() {
+        return getName().withStyle(style -> style.withColor(this.color));
     }
 
     public boolean isRecipeSearchFilter() {

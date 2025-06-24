@@ -13,8 +13,6 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidUtil;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -22,17 +20,12 @@ public class FilteredFluidContainer implements IItemComponent, IComponentCapabil
 
     public final int capacity;
     public final boolean allowPartialFill;
-    @Nullable
     public Predicate<FluidStack> filter;
 
-    protected FilteredFluidContainer(int capacity, boolean allowPartialFill, Predicate<FluidStack> filter) {
+    public FilteredFluidContainer(int capacity, boolean allowPartialFill, Predicate<FluidStack> filter) {
         this.allowPartialFill = allowPartialFill;
         this.capacity = capacity;
         this.filter = filter;
-    }
-
-    public static FilteredFluidContainer create(int capacity, boolean allowPartialFill, Predicate<FluidStack> filter) {
-        return new FilteredFluidContainer(capacity, allowPartialFill, filter);
     }
 
     @Override
@@ -40,9 +33,8 @@ public class FilteredFluidContainer implements IItemComponent, IComponentCapabil
                                 TooltipFlag isAdvanced) {
         FluidStack tank = FluidUtil.getFluidContained(stack).orElse(FluidStack.EMPTY);
         if (!tank.isEmpty()) {
-            tooltipComponents
-                    .add(Component.translatable("gtceu.universal.tooltip.fluid_stored", tank.getHoverName(),
-                            FormattingUtil.formatNumbers(tank.getAmount())));
+            tooltipComponents.add(Component.translatable("gtceu.universal.tooltip.fluid_stored",
+                    tank.getHoverName(), FormattingUtil.formatNumbers(tank.getAmount())));
         }
     }
 

@@ -90,7 +90,7 @@ public class PotionFluidHelper {
         List<MobEffectInstance> list = potion.customEffects();
         if (potion.is(Potions.WATER) && list.isEmpty())
             return new FluidStack(Fluids.WATER, amount);
-        return PotionFluid.withEffects(amount, potion.potion().get(), list);
+        return PotionFluid.of(amount, potion);
     }
 
     public static FluidStack getFluidFromPotion(Holder<Potion> potion, int amount) {

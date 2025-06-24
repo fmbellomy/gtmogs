@@ -2,8 +2,10 @@ package com.gregtechceu.gtceu.api.item;
 
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.MaterialBlock;
+import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.DustProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
+import com.gregtechceu.gtceu.api.tag.TagPrefix;
 
 import com.lowdragmc.lowdraglib.client.renderer.IBlockRendererProvider;
 import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
@@ -14,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -22,8 +25,13 @@ import org.jetbrains.annotations.Nullable;
 
 public class MaterialBlockItem extends BlockItem implements IItemRendererProvider {
 
-    public MaterialBlockItem(MaterialBlock block, Properties properties) {
+    public final TagPrefix tagPrefix;
+    public final Material material;
+
+    public MaterialBlockItem(Block block, Properties properties, TagPrefix tagPrefix, Material material) {
         super(block, properties);
+        this.tagPrefix = tagPrefix;
+        this.material = material;
     }
 
     @Override
@@ -38,13 +46,8 @@ public class MaterialBlockItem extends BlockItem implements IItemRendererProvide
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static ItemColor tintColor() {
-        return (itemStack, index) -> {
-            if (itemStack.getItem() instanceof MaterialBlockItem materialBlockItem) {
-                return materialBlockItem.getBlock().material.getLayerARGB(index);
-            }
-            return -1;
-        };
+    public static ItemColor tintColor(Material material) {
+        return (itemStack, index) -> material.getLayerARGB(index);
     }
 
     @Nullable
@@ -78,10 +81,11 @@ public class MaterialBlockItem extends BlockItem implements IItemRendererProvide
     }
 
     public int getItemBurnTime() {
-        var material = getBlock().material;
         DustProperty property = material.isNull() ? null : material.getProperty(PropertyKey.DUST);
-        if (property != null)
-            return (int) (property.getBurnTime() * getBlock().tagPrefix.getMaterialAmount(material) / GTValues.M);
-        return 0;
+        if (property != null) {
+            return (int) (property.getBurnTime() * tagPrefix.getMaterialAmount(material) / GTValues.M);
+        } else {
+            return 0;
+        }
     }
 }

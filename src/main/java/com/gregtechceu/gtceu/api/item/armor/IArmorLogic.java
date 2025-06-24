@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.api.item.armor;
 
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,8 +41,10 @@ public interface IArmorLogic {
         return false;
     }
 
-    default void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage,
-                             EquipmentSlot equipmentSlot) {}
+    default int damageArmor(@Nullable LivingEntity entity, ItemStack itemStack, int damage,
+                            EquipmentSlot equipmentSlot) {
+        return 0;
+    }
 
     default List<ItemAttributeModifiers.Entry> getDefaultAttributeModifiers(EquipmentSlot slot, ItemStack stack) {
         return Collections.emptyList();

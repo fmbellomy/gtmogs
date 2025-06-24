@@ -87,7 +87,6 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     private RotationState rotationState = RotationState.NON_Y_AXIS;
     /**
      * Whether this machine can be rotated or face upwards.
-     * todo: set to true by default if we manage to rotate the model accordingly
      */
     @Setter
     private boolean allowExtendedFacing = false;
@@ -249,8 +248,6 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
         return this;
     }
 
-    // Go home IntelliJ, you're drunk.
-    @SuppressWarnings("NullableProblems")
     public MachineBuilder<DEFINITION> tooltips(@Nullable Component... components) {
         tooltips.addAll(Arrays.stream(components).filter(Objects::nonNull).toList());
         return this;

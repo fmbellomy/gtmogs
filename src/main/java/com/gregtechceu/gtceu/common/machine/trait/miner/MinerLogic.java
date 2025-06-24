@@ -160,7 +160,6 @@ public class MinerLogic extends RecipeLogic implements IRecipeCapabilityHolder {
     @Override
     public void onMachineLoad() {
         super.onMachineLoad();
-        // noinspection ConstantValue
         if (getMachine().getLevel() != null) {
             var registry = getMachine().getLevel().registryAccess().registryOrThrow(Registries.ENCHANTMENT);
             this.pickaxeTool.enchant(registry.getHolderOrThrow(Enchantments.FORTUNE), fortune);
@@ -361,7 +360,8 @@ public class MinerLogic extends RecipeLogic implements IRecipeCapabilityHolder {
 
     protected boolean doPostProcessing(NonNullList<ItemStack> blockDrops, BlockState blockState,
                                        LootParams.Builder builder) {
-        ItemStack oreDrop = blockDrops.get(0);
+        ItemStack oreDrop = new ItemStack(blockState.getBlock());
+        if (oreDrop.isEmpty()) return false;
 
         // create dummy recipe handler
         inputItemHandler.storage.setStackInSlot(0, oreDrop);
@@ -369,7 +369,7 @@ public class MinerLogic extends RecipeLogic implements IRecipeCapabilityHolder {
 
         var matches = machine.getRecipeType().searchRecipe(this, r -> RecipeHelper.matchContents(this, r).isSuccess());
 
-        while (matches != null && matches.hasNext()) {
+        while (matches.hasNext()) {
             GTRecipe match = matches.next();
             if (match == null) continue;
 

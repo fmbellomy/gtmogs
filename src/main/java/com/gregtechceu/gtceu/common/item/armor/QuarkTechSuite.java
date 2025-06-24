@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
@@ -41,6 +40,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntOpenHashMap;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -303,13 +303,13 @@ public class QuarkTechSuite extends ArmorLogicSuite implements IStepAssist {
      */
 
     @Override
-    public void damageArmor(LivingEntity entity, ItemStack itemStack, DamageSource source, int damage,
-                            EquipmentSlot equipmentSlot) {
+    public int damageArmor(@Nullable LivingEntity entity, ItemStack itemStack,
+                           int damage, EquipmentSlot equipmentSlot) {
         IElectricItem item = GTCapabilityHelper.getElectricItem(itemStack);
-        if (item == null) {
-            return;
+        if (item != null) {
+            item.discharge(energyPerUse / 100L * damage, item.getTier(), true, false, false);
         }
-        item.discharge(energyPerUse / 100L * damage, item.getTier(), true, false, false);
+        return super.damageArmor(entity, itemStack, damage, equipmentSlot);
     }
 
     @Override

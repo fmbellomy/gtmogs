@@ -15,9 +15,7 @@ public class ItemFluidContainer implements IRecipeRemainder {
             var drained = handler.drain(FluidType.BUCKET_VOLUME, FluidAction.SIMULATE);
             if (drained.getAmount() != FluidType.BUCKET_VOLUME) return ItemStack.EMPTY;
             handler.drain(FluidType.BUCKET_VOLUME, FluidAction.EXECUTE);
-            var copy = handler.getContainer();
-            copy.getComponentsPatch().forget(type -> true);
-            return copy;
+            return handler.getContainer();
         }).orElse(itemStack);
     }
 }

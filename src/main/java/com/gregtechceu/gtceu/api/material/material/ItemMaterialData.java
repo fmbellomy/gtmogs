@@ -25,13 +25,13 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import com.mojang.datafixers.util.Pair;
-import com.tterrag.registrate.util.entry.BlockEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -78,11 +78,9 @@ public class ItemMaterialData {
                                              @NotNull MaterialEntry materialEntry) {
         registerItemEntry(supplier, materialEntry);
         ITEM_MATERIAL_ENTRY.add(Pair.of(() -> supplier.get().asItem(), materialEntry));
-        switch (supplier) {
-            case BlockEntry<?> entry -> registerBlockEntry(entry, materialEntry);
-            case DeferredHolder<?, ?> deferredHolder -> registerDeferredHolderEntry(deferredHolder, materialEntry);
-            case MemoizedBlockSupplier<?> blockSupplier -> registerBlockEntry(blockSupplier, materialEntry);
-            default -> {}
+        var blockSupplier = convertToBlock(supplier);
+        if (blockSupplier != null) {
+            registerBlockEntry(blockSupplier, materialEntry);
         }
     }
 
@@ -130,19 +128,23 @@ public class ItemMaterialData {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static void registerDeferredHolderEntry(@NotNull DeferredHolder<?, ?> deferredHolder,
-                                                    @NotNull MaterialEntry materialEntry) {
-        var key = deferredHolder.getKey();
-        if (key.isFor(Registries.BLOCK)) {
-            registerBlockEntry((Supplier<? extends Block>) deferredHolder, materialEntry);
-        }
-    }
-
     private static void registerBlockEntry(@NotNull Supplier<? extends Block> supplier,
                                            @NotNull MaterialEntry materialEntry) {
         MATERIAL_ENTRY_BLOCK_MAP.computeIfAbsent(materialEntry, k -> new ArrayList<>())
                 .add(supplier);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static @Nullable Supplier<? extends Block> convertToBlock(@NotNull Supplier<? extends ItemLike> supplier) {
+        if (supplier instanceof DeferredHolder<?, ?> registryObject) {
+            var key = registryObject.getKey();
+            if (key.isFor(Registries.BLOCK)) {
+                return (Supplier<? extends Block>) registryObject;
+            }
+        } else if (supplier instanceof MemoizedBlockSupplier<?> blockSupplier) {
+            return blockSupplier;
+        }
+        return null;
     }
 
     public static void reinitializeMaterialData() {

@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,7 +41,8 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
     protected List<IItemComponent> components;
 
     public ArmorComponentItem(Holder<ArmorMaterial> material, ArmorItem.Type type, Properties properties) {
-        super(material, type, properties);
+        // Some trickery to always receive damage events without ever actually breaking the armor
+        super(material, type, properties.durability(Integer.MAX_VALUE));
         components = new ArrayList<>();
     }
 
@@ -110,9 +110,23 @@ public class ArmorComponentItem extends ArmorItem implements IComponentItem {
         return armorLogic.getArmorDisplay(player, armor, slot);
     }
 
-    public void damageArmor(LivingEntity entity, @NotNull ItemStack stack, DamageSource source, int damage,
-                            EquipmentSlot slot) {
-        armorLogic.damageArmor(entity, stack, source, damage, slot);
+    @Override
+    public void setDamage(ItemStack stack, int damage) {}
+
+    @Override
+    public boolean isDamaged(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, @Nullable T entity,
+                                                   Consumer<Item> onBroken) {
+        return armorLogic.damageArmor(entity, stack, amount, this.getEquipmentSlot());
     }
 
     @SuppressWarnings("removal") // eh, it works for now.

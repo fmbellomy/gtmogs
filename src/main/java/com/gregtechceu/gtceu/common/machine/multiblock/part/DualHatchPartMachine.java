@@ -5,7 +5,9 @@ import com.gregtechceu.gtceu.api.gui.GuiTextures;
 import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.gui.widget.TankWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
+import com.gregtechceu.gtceu.data.machine.GTMachines;
 import com.gregtechceu.gtceu.utils.GTTransferUtils;
 
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -15,6 +17,8 @@ import com.lowdragmc.lowdraglib.syncdata.ISubscription;
 import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
 import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.fluids.FluidType;
 
 import org.jetbrains.annotations.Nullable;
@@ -117,6 +121,34 @@ public class DualHatchPartMachine extends ItemBusPartMachine {
             }
             updateInventorySubscription();
         }
+    }
+
+    @Override
+    public boolean swapIO() {
+        BlockPos blockPos = getHolder().pos();
+        MachineDefinition newDefinition = null;
+
+        if (io == IO.IN) {
+            newDefinition = GTMachines.DUAL_EXPORT_HATCH[this.getTier()];
+        } else if (io == IO.OUT) {
+            newDefinition = GTMachines.DUAL_IMPORT_HATCH[this.getTier()];
+        }
+        if (newDefinition == null) return false;
+
+        BlockState newBlockState = newDefinition.getBlock().defaultBlockState();
+
+        getLevel().setBlockAndUpdate(blockPos, newBlockState);
+
+        if (getLevel().getBlockEntity(blockPos) instanceof IMachineBlockEntity newHolder) {
+            if (newHolder.getMetaMachine() instanceof DualHatchPartMachine newMachine) {
+                newMachine.setFrontFacing(this.getFrontFacing());
+                newMachine.setUpwardsFacing(this.getUpwardsFacing());
+                for (int i = 0; i < this.tank.getTanks(); i++) {
+                    newMachine.tank.setFluidInTank(i, this.tank.getFluidInTank(i));
+                }
+            }
+        }
+        return true;
     }
 
     ///////////////////////////////

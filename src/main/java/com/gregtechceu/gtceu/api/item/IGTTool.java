@@ -31,10 +31,10 @@ import com.lowdragmc.lowdraglib.gui.factory.HeldItemUIFactory;
 import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.*;
 import net.minecraft.core.component.*;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.locale.Language;
+import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
@@ -562,10 +562,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         }
     }
 
-    // Client-side methods
-
-    @OnlyIn(Dist.CLIENT)
-    default void definition$appendHoverText(@NotNull ItemStack stack, Item.TooltipContext context,
+    default void definition$appendHoverText(@NotNull ItemStack stack, @NotNull Item.TooltipContext context,
                                             @NotNull List<Component> tooltip, TooltipFlag flag) {
         if (!(stack.getItem() instanceof IGTTool tool)) return;
 
@@ -607,7 +604,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
 
             int harvestLevel = tool.getTotalHarvestLevel();
             String harvestName = "item.gtceu.tool.harvest_level." + harvestLevel;
-            if (I18n.exists(harvestName)) { // if there's a defined name for the harvest level, use it
+            if (Language.getInstance().has(harvestName)) { // if there's a defined name for the harvest level, use it
                 tooltip.add(Component.translatable("item.gtceu.tool.tooltip.harvest_level_extra", harvestLevel,
                         Component.translatable(harvestName)));
             } else {
@@ -620,7 +617,7 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         AoESymmetrical aoeDefinition = getAoEDefinition(stack);
 
         if (!aoeDefinition.isNone()) {
-            addedBehaviorNewLine = tooltip.add(Component.literal(""));
+            addedBehaviorNewLine = tooltip.add(CommonComponents.EMPTY);
             tooltip.add(Component.translatable("item.gtceu.tool.behavior.aoe_mining",
                     aoeDefinition.column() * 2 + 1, aoeDefinition.row() * 2 + 1, aoeDefinition.layer() + 1));
         }
@@ -628,29 +625,29 @@ public interface IGTTool extends HeldItemUIFactory.IHeldItemUIHolder, ItemLike {
         if (stack.has(GTDataComponents.RELOCATE_MINED_BLOCKS)) {
             if (!addedBehaviorNewLine) {
                 addedBehaviorNewLine = true;
-                tooltip.add(Component.literal(""));
+                tooltip.add(CommonComponents.EMPTY);
             }
             tooltip.add(Component.translatable("item.gtceu.tool.behavior.relocate_mining"));
         }
 
         if (!addedBehaviorNewLine && !toolStats.getBehaviors().isEmpty()) {
-            tooltip.add(Component.literal(""));
+            tooltip.add(CommonComponents.EMPTY);
         }
         toolStats.getBehaviors().forEach(behavior -> behavior.addInformation(stack, context, tooltip, flag));
 
         // unique tooltip
-        String uniqueTooltip = "item.gtceu.tool." + BuiltInRegistries.ITEM.getKey(this.asItem()).getPath() + ".tooltip";
-        if (I18n.exists(uniqueTooltip)) {
-            tooltip.add(Component.literal(""));
+        String uniqueTooltip = this.getToolType().getUnlocalizedName() + ".tooltip";
+        if (Language.getInstance().has(uniqueTooltip)) {
+            tooltip.add(CommonComponents.EMPTY);
             tooltip.add(Component.translatable(uniqueTooltip));
         }
 
-        tooltip.add(Component.literal(""));
+        tooltip.add(CommonComponents.EMPTY);
 
         // valid tools
         tooltip.add(Component.translatable("item.gtceu.tool.usable_as",
                 getToolClassNames(stack).stream()
-                        .filter(s -> I18n.exists("gtceu.tool.class." + s))
+                        .filter(s -> Language.getInstance().has("gtceu.tool.class." + s))
                         .map(s -> Component.translatable("gtceu.tool.class." + s))
                         .collect(Component::empty, FormattingUtil::combineComponents,
                                 FormattingUtil::combineComponents)));

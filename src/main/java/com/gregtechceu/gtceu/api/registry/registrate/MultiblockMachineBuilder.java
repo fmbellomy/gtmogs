@@ -47,6 +47,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import lombok.experimental.Tolerate;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,7 +69,7 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
     private boolean allowFlip = true;
     private final List<Supplier<ItemStack[]>> recoveryItems = new ArrayList<>();
     @Setter
-    private Comparator<IMultiPart> partSorter = (a, b) -> 0;
+    private Function<MultiblockControllerMachine, Comparator<IMultiPart>> partSorter = (c) -> (a, b) -> 0;
     @Setter
     @Nullable
     private TriFunction<IMultiController, IMultiPart, Direction, BlockState> partAppearance;
@@ -276,13 +277,17 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
 
     @Override
     public MultiblockMachineBuilder conditionalTooltip(Component component, BooleanSupplier condition) {
-        return conditionalTooltip(component, condition.getAsBoolean());
+        return (MultiblockMachineBuilder) super.conditionalTooltip(component, condition);
     }
 
     @Override
     public MultiblockMachineBuilder conditionalTooltip(Component component, boolean condition) {
-        if (condition)
-            tooltips(component);
+        return (MultiblockMachineBuilder) super.conditionalTooltip(component, condition);
+    }
+
+    @Tolerate
+    public MultiblockMachineBuilder partSorter(Comparator<IMultiPart> sorter) {
+        this.partSorter = $ -> sorter;
         return this;
     }
 
@@ -384,7 +389,7 @@ public class MultiblockMachineBuilder extends MachineBuilder<MultiblockMachineDe
             definition.setRecoveryItems(
                     () -> recoveryItems.stream().map(Supplier::get).flatMap(Arrays::stream).toArray(ItemStack[]::new));
         }
-        definition.setPartSorter(partSorter);
+        definition.setPartSorter(GTMemoizer.memoizeFunctionWeakIdent(partSorter));
         if (partAppearance == null) {
             partAppearance = (controller, part, side) -> definition.getAppearance().get();
         }

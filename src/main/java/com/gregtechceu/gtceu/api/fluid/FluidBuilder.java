@@ -259,7 +259,7 @@ public class FluidBuilder {
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    public @NotNull Supplier<? extends Fluid> build(Material material, FluidStorageKey key,
+    public @NotNull Supplier<? extends Fluid> build(Material material, @NotNull FluidStorageKey key,
                                                     GTRegistrate registrate) {
         determineName(material, key);
         determineTextures(material, key);
@@ -330,8 +330,8 @@ public class FluidBuilder {
     }
 
     @ApiStatus.Internal
-    public void determineTextures(@NotNull Material material, @Nullable FluidStorageKey key) {
-        if (hasCustomStill || material.isNull() || key == null) {
+    public void determineTextures(@NotNull Material material, @NotNull FluidStorageKey key) {
+        if (hasCustomStill || material.isNull()) {
             still = ResourceLocation.fromNamespaceAndPath(material.getModid(), "block/fluids/fluid." + name);
         } else {
             still = key.getIconType().getBlockTexturePath(material.getMaterialIconSet(), true);

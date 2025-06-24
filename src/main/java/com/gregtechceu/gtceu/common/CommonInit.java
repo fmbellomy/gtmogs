@@ -29,6 +29,8 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerators;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerators;
 import com.gregtechceu.gtceu.common.block.*;
+import com.gregtechceu.gtceu.common.fluid.potion.BottleItemFluidHandler;
+import com.gregtechceu.gtceu.common.fluid.potion.PotionItemFluidHandler;
 import com.gregtechceu.gtceu.common.item.DrumMachineItem;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
@@ -80,6 +82,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.EventPriority;
@@ -93,6 +97,7 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
@@ -212,7 +217,7 @@ public class CommonInit {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onRegisterVeryLate(RegisterEvent event) {
+    public static void onRegisterEarly(RegisterEvent event) {
         // Material event *should* happen before any of the others here
         if (event.getRegistryKey() == GTRegistries.MATERIAL_REGISTRY) {
             // Fire Post-Material event, intended for when Materials need to be iterated over in-full before freezing
@@ -305,6 +310,8 @@ public class CommonInit {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
+        event.registerItem(FluidHandler.ITEM, BottleItemFluidHandler::new, Items.GLASS_BOTTLE);
+
         for (Block block : BuiltInRegistries.BLOCK) {
             if (ConfigHolder.INSTANCE.compat.energy.nativeEUToFE &&
                     event.isBlockRegistered(Capabilities.EnergyStorage.BLOCK, block)) {
@@ -341,9 +348,11 @@ public class CommonInit {
                 tool.attachCapabilities(event);
             } else if (item instanceof DrumMachineItem drum) {
                 drum.attachCapabilities(event);
-            } else if (item instanceof GTBucketItem bucket) {
+            } else if (item instanceof GTBucketItem) {
                 event.registerItem(Capabilities.FluidHandler.ITEM,
-                        (stack, ctx) -> new FluidBucketWrapper(stack), bucket);
+                        (stack, ctx) -> new FluidBucketWrapper(stack), item);
+            } else if (item instanceof PotionItem) {
+                event.registerItem(Capabilities.FluidHandler.ITEM, PotionItemFluidHandler::new, item);
             }
         }
     }

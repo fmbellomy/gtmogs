@@ -27,7 +27,6 @@ import net.minecraft.core.Direction;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -43,7 +42,6 @@ public class BatteryBufferMachine extends TieredEnergyMachine
 
     @Persisted
     @Getter
-    @Setter
     private boolean isWorkingEnabled;
     @Getter
     private final int inventorySize;
@@ -138,6 +136,12 @@ public class BatteryBufferMachine extends TieredEnergyMachine
     // ****** Battery Logic ******//
     //////////////////////////////////////
 
+    @Override
+    public void setWorkingEnabled(boolean workingEnabled) {
+        isWorkingEnabled = workingEnabled;
+        energyContainer.checkOutputSubscription();
+    }
+
     private List<Object> getNonFullBatteries() {
         List<Object> batteries = new ArrayList<>();
         for (int i = 0; i < batteryInventory.getSlots(); i++) {
@@ -202,6 +206,16 @@ public class BatteryBufferMachine extends TieredEnergyMachine
                     inventorySize * AMPS_PER_BATTERY, GTValues.V[tier], inventorySize);
             this.setSideInputCondition(side -> side != getFrontFacing() && isWorkingEnabled());
             this.setSideOutputCondition(side -> side == getFrontFacing() && isWorkingEnabled());
+        }
+
+        @Override
+        public void checkOutputSubscription() {
+            if (isWorkingEnabled()) {
+                super.checkOutputSubscription();
+            } else if (outputSubs != null) {
+                outputSubs.unsubscribe();
+                outputSubs = null;
+            }
         }
 
         @Override

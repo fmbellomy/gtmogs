@@ -266,7 +266,7 @@ public class GTOreVeins {
                 .dikeVeinGenerator(generator -> generator
                         .withBlock(new DikeBlockDefinition(Beryllium, 3, 5, 30))
                         .withBlock(new DikeBlockDefinition(Emerald, 2, 5, 19))
-                        .withBlock(new DikeBlockDefinition(Emerald, 2, 16, 30)))
+                        .withBlock(new DikeBlockDefinition(Thorium, 2, 16, 30)))
                 .surfaceIndicatorGenerator(indicator -> indicator
                         .surfaceRock(Beryllium)
                         .placement(SurfaceIndicatorGenerator.IndicatorPlacement.ABOVE)));
@@ -711,7 +711,7 @@ public class GTOreVeins {
                 .layeredVeinGenerator(generator -> generator
                         .withLayerPattern(() -> GTLayerPattern.builder(deepslateRules)
                                 .layer(l -> l.weight(3).mat(Bentonite).size(2, 4))
-                                .layer(l -> l.weight(2).mat(Magnetite).size(1, 1))
+                                .layer(l -> l.weight(2).mat(Magnesite).size(1, 1))
                                 .layer(l -> l.weight(2).mat(Olivine).size(1, 1))
                                 .layer(l -> l.weight(1).mat(GlauconiteSand).size(1, 1))
                                 .build()))

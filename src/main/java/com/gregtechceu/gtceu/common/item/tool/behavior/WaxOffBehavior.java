@@ -75,11 +75,11 @@ public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
             blocks.add(pos);
         }
 
-        boolean unWaxed = false;
+        boolean unwaxed = false;
         for (BlockPos blockPos : blocks) {
             UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
                     context.getHitResult().withPosition(blockPos));
-            unWaxed |= level.setBlock(blockPos, getUnWaxed(level.getBlockState(blockPos), newCtx),
+            unwaxed |= level.setBlock(blockPos, getUnwaxed(level.getBlockState(blockPos), newCtx),
                     Block.UPDATE_ALL_IMMEDIATE);
             level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, blockPos, 0);
 
@@ -88,28 +88,28 @@ public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
                 break;
         }
 
-        if (unWaxed) {
-            level.playSound(null, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
+        if (unwaxed) {
+            level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
 
         return InteractionResult.PASS;
     }
 
-    public static Set<BlockPos> getUnWaxableBlocks(ItemStack stack, AoESymmetrical aoeDefinition, Level Level,
+    public static Set<BlockPos> getUnWaxableBlocks(ItemStack stack, AoESymmetrical aoeDefinition, Level level,
                                                    Player player, HitResult rayTraceResult) {
-        return ToolHelper.iterateAoE(stack, aoeDefinition, Level, player, rayTraceResult,
-                WaxOffBehavior.INSTANCE::isBlockUnWaxable);
+        return ToolHelper.iterateAoE(stack, aoeDefinition, level, player, rayTraceResult,
+                WaxOffBehavior::isBlockUnWaxable);
     }
 
-    protected boolean isBlockUnWaxable(ItemStack stack, Level level, Player player, BlockPos pos,
-                                       UseOnContext context) {
+    protected static boolean isBlockUnWaxable(ItemStack stack, Level level, Player player, BlockPos pos,
+                                              UseOnContext context) {
         BlockState state = level.getBlockState(pos);
         BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, true);
         return newState != null && newState != state;
     }
 
-    protected BlockState getUnWaxed(BlockState unscrapedState, UseOnContext context) {
+    protected BlockState getUnwaxed(BlockState unscrapedState, UseOnContext context) {
         return unscrapedState.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, false);
     }
 

@@ -672,8 +672,7 @@ public class GTRecipeTypes {
         GCYMRecipeTypes.init();
     }
 
-    @Nullable
-    public static GTRecipeType get(String name) {
+    public @Nullable static GTRecipeType get(String name) {
         RecipeType<?> type = BuiltInRegistries.RECIPE_TYPE.get(GTCEu.id(name));
         if (type instanceof GTRecipeType gtType) {
             return gtType;

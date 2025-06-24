@@ -16,6 +16,8 @@ public class GTNetwork {
         PayloadRegistrar registar = event.registrar(GTCEuAPI.NETWORK_VERSION);
 
         registar.playToServer(CPacketKeysPressed.TYPE, CPacketKeysPressed.CODEC, CPacketKeysPressed::execute);
+        registar.playToClient(SPacketNotifyCapeChange.TYPE, SPacketNotifyCapeChange.CODEC,
+                SPacketNotifyCapeChange::execute);
 
         registar.playToClient(SPacketAddHazardZone.TYPE, SPacketAddHazardZone.CODEC, SPacketAddHazardZone::execute);
         registar.playToClient(SPacketRemoveHazardZone.TYPE, SPacketRemoveHazardZone.CODEC,

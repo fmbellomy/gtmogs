@@ -35,6 +35,7 @@ import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
@@ -608,11 +609,11 @@ public interface GTRecipeSchema {
             return dimension(dimension, false);
         }
 
-        public GTKubeRecipe biome(ResourceLocation biome, boolean reverse) {
+        public GTKubeRecipe biome(ResourceKey<Biome> biome, boolean reverse) {
             return addCondition(new BiomeCondition(biome).setReverse(reverse));
         }
 
-        public GTKubeRecipe biome(ResourceLocation biome) {
+        public GTKubeRecipe biome(ResourceKey<Biome> biome) {
             return biome(biome, false);
         }
 

@@ -12,6 +12,7 @@ import com.gregtechceu.gtceu.client.renderer.item.decorator.*;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.data.entity.GTEntityTypes;
+import com.gregtechceu.gtceu.data.fluid.GTFluids;
 import com.gregtechceu.gtceu.data.particle.GTParticleTypes;
 import com.gregtechceu.gtceu.integration.map.ClientCacheManager;
 import com.gregtechceu.gtceu.integration.map.cache.client.GTClientCache;
@@ -22,12 +23,20 @@ import com.gregtechceu.gtceu.integration.map.layer.builtin.OreRenderLayer;
 import com.gregtechceu.gtceu.utils.input.KeyBind;
 
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.fluids.FluidStack;
+
+import org.jetbrains.annotations.NotNull;
 
 public class ClientInit {
 
@@ -85,5 +94,29 @@ public class ClientInit {
                 GTCEu.isModLoaded(GTValues.MODID_FTB_CHUNKS)) {
             FTBChunksPlugin.addEventListeners();
         }
+    }
+
+    @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+        event.registerFluidType(new IClientFluidTypeExtensions() {
+
+            private static final ResourceLocation TEXTURE = GTCEu.id("block/fluids/fluid.potion");
+
+            @Override
+            public @NotNull ResourceLocation getStillTexture() {
+                return TEXTURE;
+            }
+
+            @Override
+            public @NotNull ResourceLocation getFlowingTexture() {
+                return TEXTURE;
+            }
+
+            @Override
+            public int getTintColor(@NotNull FluidStack stack) {
+                return stack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY)
+                        .getColor() | 0xff000000;
+            }
+        }, GTFluids.POTION.getType());
     }
 }

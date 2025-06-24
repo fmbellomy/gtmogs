@@ -27,7 +27,6 @@ import dev.emi.emi.config.EmiConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.nio.file.Path;
@@ -67,7 +66,7 @@ public class GTCEu {
     }
 
     public static ResourceLocation id(String path) {
-        if (Strings.isBlank(path)) {
+        if (path.isBlank()) {
             return TEMPLATE_LOCATION;
         }
 

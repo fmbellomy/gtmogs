@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.api.item.tool;
 
 import com.gregtechceu.gtceu.api.item.datacomponents.AoESymmetrical;
 import com.gregtechceu.gtceu.api.item.tool.behavior.IToolBehavior;
+import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -112,11 +113,9 @@ public class ToolDefinitionBuilder {
     }
 
     public ToolDefinitionBuilder defaultEnchantment(ResourceKey<Enchantment> enchantment, int level) {
-        return this.defaultEnchantment(enchantment, level, 0);
-    }
-
-    public ToolDefinitionBuilder defaultEnchantment(ResourceKey<Enchantment> enchantment, int level, int growth) {
-        this.defaultEnchantments.put(enchantment, level);
+        if (ConfigHolder.INSTANCE.recipes.enchantedTools) {
+            this.defaultEnchantments.put(enchantment, level);
+        }
         return this;
     }
 

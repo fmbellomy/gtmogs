@@ -8,10 +8,11 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.extensions.IItemExtension;
 
 import java.util.List;
 
-public interface IComponentItem extends ItemLike {
+public interface IComponentItem extends ItemLike, IItemExtension {
 
     List<IItemComponent> getComponents();
 

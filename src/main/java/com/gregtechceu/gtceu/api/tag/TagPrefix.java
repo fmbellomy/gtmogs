@@ -2,6 +2,10 @@ package com.gregtechceu.gtceu.api.tag;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
+import com.gregtechceu.gtceu.api.block.MaterialBlock;
+import com.gregtechceu.gtceu.api.block.OreBlock;
+import com.gregtechceu.gtceu.api.item.MaterialBlockItem;
+import com.gregtechceu.gtceu.api.item.TagPrefixItem;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.material.material.ItemMaterialData;
 import com.gregtechceu.gtceu.api.material.material.Material;
@@ -20,15 +24,15 @@ import com.gregtechceu.gtceu.integration.xei.widgets.GTOreByProduct;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
-import com.lowdragmc.lowdraglib.utils.LocalizationUtils;
-
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -743,7 +747,7 @@ public class TagPrefix {
     // Prefix to determine which kind of Rock this is.
     // Also has a base tag path of only the material, for things like obsidian etc.
     public static final TagPrefix rock = new TagPrefix("rock")
-            .defaultTagPath("%s")
+            .defaultTagPath("%ss")
             .langValue("%s")
             .miningToolTag(BlockTags.MINEABLE_WITH_PICKAXE)
             .unificationEnabled(false)
@@ -944,6 +948,12 @@ public class TagPrefix {
             .unificationEnabled(true)
             .enableRecycling();
 
+    public static final TagPrefix surfaceRock = new TagPrefix("surfaceRock")
+            .langValue("%s Surface Rock")
+            .defaultTagPath("surface_rocks/%s")
+            .unformattedTagPath("surface_rocks")
+            .materialAmount(GTValues.M / 3);
+
     public static class Conditions {
 
         public static final Predicate<Material> hasToolProperty = mat -> mat.hasProperty(PropertyKey.TOOL);
@@ -987,8 +997,17 @@ public class TagPrefix {
     private boolean generateRecycling = false;
     @Setter
     private boolean generateItem;
+    @Getter
+    @Setter
+    private ItemConstructor itemConstructor = TagPrefixItem::new;
     @Setter
     private boolean generateBlock;
+    @Getter
+    @Setter
+    private BlockConstructor blockConstructor = MaterialBlock::new;
+    @Getter
+    @Setter
+    private BlockItemConstructor blockItemConstructor = MaterialBlockItem::new;
     @Getter
     @Setter
     private BlockProperties blockProperties = new BlockProperties(() -> RenderType::translucent,
@@ -1026,10 +1045,10 @@ public class TagPrefix {
 
     public TagPrefix(String name) {
         this.name = name;
-        String lowerCaseUnder = FormattingUtil.toLowerCaseUnderscore(name);
+        String lowerCaseUnder = getLowerCaseName();
         this.idPattern = "%s_" + lowerCaseUnder;
         this.langValue = "%s " + FormattingUtil.toEnglishName(lowerCaseUnder);
-        GTRegistries.register(GTRegistries.TAG_PREFIXES, GTCEu.id(name), this);
+        GTRegistries.register(GTRegistries.TAG_PREFIXES, GTCEu.id(lowerCaseUnder), this);
     }
 
     public static TagPrefix oreTagPrefix(String name, TagKey<Block> miningToolTag) {
@@ -1040,6 +1059,7 @@ public class TagPrefix {
                 .materialIconType(MaterialIconType.ore)
                 .miningToolTag(miningToolTag)
                 .unificationEnabled(true)
+                .blockConstructor(OreBlock::new)
                 .generationCondition(hasOreProperty);
     }
 
@@ -1208,8 +1228,12 @@ public class TagPrefix {
                 hasItemTable() && this.itemTable.get() != null && getItemFromTable(material) != null;
     }
 
+    public String getLowerCaseName() {
+        return FormattingUtil.toLowerCaseUnderscore(this.name);
+    }
+
     public String getUnlocalizedName() {
-        return "tagprefix." + FormattingUtil.toLowerCaseUnderscore(name);
+        return "tagprefix." + getLowerCaseName();
     }
 
     public MutableComponent getLocalizedName(Material material) {
@@ -1217,16 +1241,15 @@ public class TagPrefix {
     }
 
     public String getUnlocalizedName(Material material) {
-        String formattedPrefix = FormattingUtil.toLowerCaseUnderscore(this.name);
         String matSpecificKey = String.format("item.%s.%s", material.getModid(),
                 this.idPattern.formatted(material.getName()));
-        if (LocalizationUtils.exist(matSpecificKey)) {
+        if (Language.getInstance().has(matSpecificKey)) {
             return matSpecificKey;
         }
         if (material.hasProperty(PropertyKey.POLYMER)) {
-            String localizationKey = String.format("tagprefix.polymer.%s", formattedPrefix);
+            String localizationKey = String.format("tagprefix.polymer.%s", getLowerCaseName());
             // Not every polymer tag prefix gets a special name
-            if (LocalizationUtils.exist(localizationKey)) {
+            if (Language.getInstance().has(localizationKey)) {
                 return localizationKey;
             }
         }
@@ -1316,5 +1339,23 @@ public class TagPrefix {
     @Override
     public String toString() {
         return name;
+    }
+
+    @FunctionalInterface
+    public interface ItemConstructor {
+
+        Item create(Item.Properties properties, TagPrefix prefix, Material material);
+    }
+
+    @FunctionalInterface
+    public interface BlockConstructor {
+
+        Block create(Block.Properties properties, TagPrefix prefix, Material material);
+    }
+
+    @FunctionalInterface
+    public interface BlockItemConstructor {
+
+        BlockItem create(Block block, Item.Properties properties, TagPrefix prefix, Material material);
     }
 }

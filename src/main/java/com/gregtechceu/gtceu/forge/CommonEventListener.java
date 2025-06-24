@@ -5,6 +5,8 @@ import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.capability.GTCapabilityHelper;
 import com.gregtechceu.gtceu.api.capability.IElectricItem;
 import com.gregtechceu.gtceu.api.capability.IMedicalConditionTracker;
+import com.gregtechceu.gtceu.api.cosmetics.CapeRegistry;
+import com.gregtechceu.gtceu.api.cosmetics.event.RegisterGTCapesEvent;
 import com.gregtechceu.gtceu.api.item.IGTTool;
 import com.gregtechceu.gtceu.api.item.armor.ArmorComponentItem;
 import com.gregtechceu.gtceu.api.item.tool.ToolHelper;
@@ -14,12 +16,14 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
+import com.gregtechceu.gtceu.api.misc.virtualregistry.VirtualEnderRegistry;
 import com.gregtechceu.gtceu.api.multiblock.MultiblockWorldSavedData;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.TooltipsHandler;
 import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.LocalizedHazardSavedData;
 import com.gregtechceu.gtceu.common.capability.WorldIDSaveData;
+import com.gregtechceu.gtceu.common.cosmetics.GTCapes;
 import com.gregtechceu.gtceu.common.data.loader.PostRegistryListener;
 import com.gregtechceu.gtceu.common.item.armor.IJetpack;
 import com.gregtechceu.gtceu.common.item.armor.IStepAssist;
@@ -47,7 +51,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.player.Player;
@@ -73,6 +79,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -80,6 +87,12 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class CommonEventListener {
+
+    @SubscribeEvent
+    public static void registerCapes(RegisterGTCapesEvent event) {
+        GTCapes.registerGTCapes(event);
+        GTCapes.giveDevCapes(event);
+    }
 
     @SubscribeEvent
     public static void tickPlayerInventoryHazards(PlayerTickEvent.Post event) {
@@ -220,12 +233,15 @@ public class CommonEventListener {
 
     @SubscribeEvent
     public static void serverStarting(ServerStartingEvent event) {
-        WorldIDSaveData.init(event.getServer().overworld());
+        ServerLevel mainLevel = event.getServer().overworld();
+        WorldIDSaveData.init(mainLevel);
+        CapeRegistry.registerToServer(mainLevel);
     }
 
     @SubscribeEvent
     public static void serverStopped(ServerStoppedEvent event) {
         ServerCache.instance.clear();
+        VirtualEnderRegistry.release();
     }
 
     @SubscribeEvent
@@ -240,7 +256,8 @@ public class CommonEventListener {
 
     @SubscribeEvent
     public static void onPlayerJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
-        if (event.getEntity() instanceof ServerPlayer serverPlayer) {
+        Player player = event.getEntity();
+        if (player instanceof ServerPlayer serverPlayer) {
             PacketDistributor.sendToPlayer(serverPlayer, new SPacketSendWorldID());
 
             if (!ConfigHolder.INSTANCE.gameplay.environmentalHazards)
@@ -250,6 +267,8 @@ public class CommonEventListener {
             var data = EnvironmentalHazardSavedData.getOrCreate(level);
             PacketDistributor.sendToPlayer(serverPlayer, new SPacketSyncLevelHazards(data.getHazardZones()));
         }
+        CapeRegistry.detectNewCapes(player);
+        CapeRegistry.loadCurrentCapesOnLogin(player);
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
@@ -262,7 +281,7 @@ public class CommonEventListener {
             ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
 
             if (boots.is(CustomTags.STEP_BOOTS) && boots.getItem() instanceof ArmorComponentItem armor) {
-                armor.getArmorLogic().damageArmor(player, boots, player.damageSources().fall(),
+                armor.getArmorLogic().damageArmor(player, boots,
                         (int) (player.fallDistance - 1.2f), EquipmentSlot.FEET);
                 player.fallDistance = 0;
                 event.setCanceled(true);
@@ -278,15 +297,18 @@ public class CommonEventListener {
     }
 
     @SubscribeEvent
-    public static void stepAssistHandler(PlayerTickEvent.Pre event) {
-        Player player = event.getEntity();
-        if (!player.isShiftKeyDown() && player.getItemBySlot(EquipmentSlot.FEET).is(CustomTags.STEP_BOOTS)) {
-            if (player.maxUpStep() < IStepAssist.MAGIC_STEP_HEIGHT) {
-                player.getAttribute(Attributes.STEP_HEIGHT)
-                        .addOrUpdateTransientModifier(IStepAssist.STEP_ASSIST_MODIFIER);
-            }
-        } else if (player.maxUpStep() == IStepAssist.MAGIC_STEP_HEIGHT) {
-            player.getAttribute(Attributes.STEP_HEIGHT).removeModifier(IStepAssist.STEP_ASSIST_MODIFIER);
+    public static void stepAssistHandler(EntityTickEvent.Pre event) {
+        if (!(event.getEntity() instanceof LivingEntity entity)) {
+            return;
+        }
+        AttributeInstance stepHeightAttribute = entity.getAttribute(Attributes.STEP_HEIGHT);
+        if (stepHeightAttribute == null) {
+            return;
+        }
+        if (!entity.isShiftKeyDown() && entity.getItemBySlot(EquipmentSlot.FEET).is(CustomTags.STEP_BOOTS)) {
+            stepHeightAttribute.addOrUpdateTransientModifier(IStepAssist.STEP_ASSIST_MODIFIER);
+        } else {
+            stepHeightAttribute.removeModifier(IStepAssist.STEP_ASSIST_MODIFIER);
         }
     }
 
