@@ -1,4 +1,9 @@
-@NotNullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
 package com.gregtechceu.gtceu.common.machine.multiblock.primitive;
 
-import org.jetbrains.annotations.NotNullByDefault;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;

@@ -1,4 +1,9 @@
-@NotNullByDefault
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+@FieldsAreNonnullByDefault
 package com.gregtechceu.gtceu.api.registry.registrate.forge;
 
-import org.jetbrains.annotations.NotNullByDefault;
+import net.minecraft.FieldsAreNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
+
+import javax.annotation.ParametersAreNonnullByDefault;
