@@ -1,5 +1,7 @@
 package com.gregtechceu.gtceu.core.mixins;
 
+import net.neoforged.bus.api.IEventBus;
+
 import com.google.common.collect.ListMultimap;
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.providers.ProviderType;
@@ -18,4 +20,10 @@ public interface AbstractRegistrateAccessor {
 
     @Accessor
     NonNullSupplier<Boolean> getDoDatagen();
+
+    @Accessor("modEventBus")
+    IEventBus getModEventBus();
+
+    @Accessor("modEventBus")
+    void setModEventBus(IEventBus modEventBus);
 }
