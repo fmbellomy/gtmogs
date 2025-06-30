@@ -144,8 +144,9 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
         duration = 0;
         isActive = false;
         lastFailedMatches = null;
-        if (status != Status.SUSPEND)
-            status = Status.IDLE;
+        if (status != Status.SUSPEND) {
+            setStatus(Status.IDLE);
+        }
         updateTickSubscription();
     }
 
@@ -435,7 +436,8 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
                 }
             }
             // try it again
-            if (!recipeDirty && !suspendAfterFinish && checkRecipe(lastRecipe).isSuccess()) {
+            var recipeCheck = checkRecipe(lastRecipe);
+            if (!recipeDirty && !suspendAfterFinish && recipeCheck.isSuccess()) {
                 setupRecipe(lastRecipe);
             } else {
                 if (suspendAfterFinish) {
@@ -443,6 +445,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
                     suspendAfterFinish = false;
                 } else {
                     setStatus(Status.IDLE);
+                    waitingReason = recipeCheck.reason();
                 }
                 consecutiveRecipes = 0;
                 progress = 0;
@@ -509,7 +512,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
 
     @Override
     public IGuiTexture getFancyTooltipIcon() {
-        if (isWaiting()) {
+        if (waitingReason != null) {
             return GuiTextures.INSUFFICIENT_INPUT;
         }
         return IGuiTexture.EMPTY;
@@ -517,7 +520,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
 
     @Override
     public List<Component> getFancyTooltip() {
-        if (isWaiting() && waitingReason != null) {
+        if (waitingReason != null) {
             return List.of(waitingReason);
         }
         return Collections.emptyList();
@@ -525,7 +528,7 @@ public class RecipeLogic extends MachineTrait implements IEnhancedManaged, IWork
 
     @Override
     public boolean showFancyTooltip() {
-        return isWaiting();
+        return waitingReason != null;
     }
 
     protected Map<RecipeCapability<?>, Object2IntMap<?>> makeChanceCaches() {
