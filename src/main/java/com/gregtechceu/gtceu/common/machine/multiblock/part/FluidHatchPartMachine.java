@@ -141,6 +141,11 @@ public class FluidHatchPartMachine extends TieredIOPartMachine implements IMachi
     }
 
     @Override
+    public void onPaintingColorChanged(int color) {
+        getHandlerList().setColor(color, true);
+    }
+
+    @Override
     public void addedToController(IMultiController controller) {
         if (!controller.allowCircuitSlots()) {
             if (!ConfigHolder.INSTANCE.machines.ghostCircuit) {
