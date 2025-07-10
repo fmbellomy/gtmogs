@@ -65,6 +65,7 @@
         "emi.FillRecipePacketMixin",
         "emi.FluidEmiStackMixin",
         "jei.FluidHelperMixin",
+        "ldlib.ItemStackPayloadMixin",
         "neoforge.ConfiguredModelBuilderAccessor",
         "neoforge.ConfiguredModelListAccessor",
         "neoforge.GameDataMixin",

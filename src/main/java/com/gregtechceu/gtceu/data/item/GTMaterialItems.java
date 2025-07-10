@@ -20,6 +20,7 @@ import com.gregtechceu.gtceu.common.item.armor.GTArmorItem;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -212,6 +213,8 @@ public class GTMaterialItems {
     public static void generateArmors() {
         REGISTRATE.creativeModeTab(TOOL);
         for (ArmorItem.Type type : ArmorItem.Type.values()) {
+            if (type.getSlot().getType() != EquipmentSlot.Type.HUMANOID_ARMOR) continue;
+
             for (Material material : GTCEuAPI.materialManager) {
                 GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(material.getModid());
                 if (material.hasProperty(PropertyKey.ARMOR)) {
