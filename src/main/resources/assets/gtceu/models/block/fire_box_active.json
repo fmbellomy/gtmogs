@@ -20,7 +20,7 @@
     {
       "from": [ -0.001,  0, -0.001 ],
       "to":   [ 16.001, 16, 16.001 ],
-      "forge_data": { "block_light": 15, "sky_light": 15 },
+      "neoforge_data": { "block_light": 15, "sky_light": 15 },
       "shade": false,
       "faces": {
         "north": { "texture": "#active_side", "cullface": "north", "tintindex": -101 },
