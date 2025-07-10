@@ -12,7 +12,6 @@
         "GuiGraphicsAccessor",
         "GuiGraphicsMixin",
         "HotbarManagerMixin",
-        "HumanoidArmorLayerMixin",
         "LevelRendererMixin",
         "ModelManagerMixin",
         "MultiPlayerGameModeMixin",
