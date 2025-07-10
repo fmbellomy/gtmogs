@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.MarkerMaterials.Color;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.data.item.GTMaterialItems;
 import com.gregtechceu.gtceu.data.tag.CustomTags;
@@ -28,6 +29,8 @@ public class ItemTagLoader {
         provider.addTag(CustomTags.DOUGHS).addTag(CustomTags.WHEAT_DOUGHS);
         provider.addTag(CustomTags.WHEAT_GRAINS).add(GTMaterialItems.MATERIAL_ITEMS.get(dust, Wheat).get());
         provider.addTag(CustomTags.GRAINS).addTag(CustomTags.WHEAT_GRAINS);
+
+        provider.addTag(TagUtil.createItemTag("foods/dough")).addTag(CustomTags.DOUGHS);
 
         // spotless:off
         // the coral blocks: alive, dead, both

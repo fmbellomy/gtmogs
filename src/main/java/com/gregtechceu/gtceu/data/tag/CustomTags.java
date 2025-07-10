@@ -17,10 +17,10 @@ public class CustomTags {
     // Added Vanilla tags
     public static final TagKey<Item> PISTONS = TagUtil.createItemTag("pistons");
     // common/mod compat tags
-    public static final TagKey<Item> DOUGHS = TagUtil.createItemTag("dough");
-    public static final TagKey<Item> WHEAT_DOUGHS = TagUtil.createItemTag("dough/wheat");
-    public static final TagKey<Item> GRAINS = TagUtil.createItemTag("grain");
-    public static final TagKey<Item> WHEAT_GRAINS = TagUtil.createItemTag("grain/wheat");
+    public static final TagKey<Item> DOUGHS = TagUtil.createItemTag("doughs");
+    public static final TagKey<Item> WHEAT_DOUGHS = TagUtil.createItemTag("doughs/wheat");
+    public static final TagKey<Item> GRAINS = TagUtil.createItemTag("grains");
+    public static final TagKey<Item> WHEAT_GRAINS = TagUtil.createItemTag("grains/wheat");
 
     // Why did I put them all here? Why not? Science isn't about why, it's about why NOT!
     // Why is so much of our science dangerous? Why don't you marry safe science if you love it so much!?
