@@ -33,7 +33,7 @@ public class AOEConfigUIBehavior implements IToolUIBehavior<AOEConfigUIBehavior>
     @Override
     public boolean openUI(@NotNull Player player, @NotNull InteractionHand hand) {
         return player.isShiftKeyDown() && !player.getItemInHand(hand)
-                .getOrDefault(GTDataComponents.AOE, AoESymmetrical.none()).isNone();
+                .getOrDefault(GTDataComponents.AOE, AoESymmetrical.ZERO).isZero();
     }
 
     @Override
@@ -70,12 +70,12 @@ public class AOEConfigUIBehavior implements IToolUIBehavior<AOEConfigUIBehavior>
                 }))
                 .widget(new LabelWidget(23, 65,
                         () -> Integer.toString(
-                                1 + 2 * held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none()).column())))
+                                1 + 2 * held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.ZERO).column())))
                 .widget(new LabelWidget(58, 65,
                         () -> Integer.toString(
-                                1 + 2 * held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none()).row())))
+                                1 + 2 * held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.ZERO).row())))
                 .widget(new LabelWidget(93, 65, () -> Integer
-                        .toString(1 + held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.none()).layer())));
+                        .toString(1 + held.getOrDefault(GTDataComponents.AOE, AoESymmetrical.ZERO).layer())));
     }
 
     @Override
