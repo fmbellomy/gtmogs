@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.api.material.material.info;
 
 import com.gregtechceu.gtceu.GTCEu;
+import com.gregtechceu.gtceu.data.model.GTModels;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 import com.gregtechceu.gtceu.integration.kjs.events.MaterialIconInfoKubeEvent;
 
@@ -137,13 +138,11 @@ public record MaterialIconType(String name) {
         return ICON_TYPES.get(name);
     }
 
-    @Nullable
     public ResourceLocation getBlockTexturePath(@NotNull MaterialIconSet materialIconSet, boolean doReadCache) {
         return getBlockTexturePath(materialIconSet, null, doReadCache);
     }
 
-    @Nullable // Safe: only null on registration on fabric, and no "required" textures are resolved at that point.
-    public ResourceLocation getBlockTexturePath(@NotNull MaterialIconSet materialIconSet, String suffix,
+    public ResourceLocation getBlockTexturePath(@NotNull MaterialIconSet materialIconSet, @Nullable String suffix,
                                                 boolean doReadCache) {
         if (doReadCache) {
             if (suffix == null || suffix.isBlank()) {
@@ -161,7 +160,7 @@ public record MaterialIconType(String name) {
         // noinspection ConstantConditions
         if (!GTCEu.isClientSide() || Minecraft.getInstance() == null ||
                 Minecraft.getInstance().getResourceManager() == null)
-            return null; // check minecraft for null for CI environments
+            return GTModels.BLANK_TEXTURE; // check minecraft for null for CI environments
         if (!iconSet.isRootIconset) {
             while (!iconSet.isRootIconset) {
                 ResourceLocation location = GTCEu
@@ -176,7 +175,7 @@ public record MaterialIconType(String name) {
                 .id(String.format("textures/block/material_sets/%s/%s%s.png", iconSet.name, this.name, suffix));
         if (!suffix.isEmpty() && !ResourceHelper.isResourceExist(location) &&
                 !ResourceHelper.isResourceExistRaw(location)) {
-            return null;
+            return GTModels.BLANK_TEXTURE;
         }
         location = GTCEu.id(String.format("block/material_sets/%s/%s%s", iconSet.name, this.name, suffix));
         if (suffix.isEmpty()) {

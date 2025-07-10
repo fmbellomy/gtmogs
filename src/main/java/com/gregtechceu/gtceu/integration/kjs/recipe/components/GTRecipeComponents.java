@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.addon.events.KJSRecipeKeyEvent;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
+import com.gregtechceu.gtceu.api.recipe.ingredient.EnergyStack;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeCapabilities;
 
@@ -120,11 +121,34 @@ public class GTRecipeComponents {
     public static final RecipeComponentType<RecipeCondition<?>> RECIPE_CONDITION_TYPE = RecipeComponentType
             .unit(GTCEu.id("recipe_condition"), RECIPE_CONDITION);
 
+    public static final RecipeComponent<EnergyStack.WithIO> ENERGY_STACK = new RecipeComponent<>() {
+
+        @Override
+        public RecipeComponentType<?> type() {
+            return ENERGY_STACK_TYPE;
+        }
+
+        @Override
+        public Codec<EnergyStack.WithIO> codec() {
+            return EnergyStack.WithIO.CODEC;
+        }
+
+        @Override
+        public TypeInfo typeInfo() {
+            return TypeInfo.of(EnergyStack.WithIO.class)
+                    .or(TypeInfo.of(EnergyStack.class))
+                    .or(TypeInfo.PRIMITIVE_LONG)
+                    .or(TypeInfo.LONG);
+        }
+    };
+    public static final RecipeComponentType<EnergyStack.WithIO> ENERGY_STACK_TYPE = RecipeComponentType
+            .unit(GTCEu.id("energy_stack"), ENERGY_STACK);
+
     public static final ContentJS<SizedIngredient> ITEM = ContentJS.create(SizedIngredientComponent.NESTED,
             GTRecipeCapabilities.ITEM);
     public static final ContentJS<SizedFluidIngredient> FLUID = ContentJS.create(SizedFluidIngredientComponent.NESTED,
             GTRecipeCapabilities.FLUID);
-    public static final ContentJS<Long> EU = ContentJS.create(NumberComponent.LONG_TYPE, GTRecipeCapabilities.EU);
+    public static final ContentJS<EnergyStack.WithIO> EU = ContentJS.create(ENERGY_STACK_TYPE, GTRecipeCapabilities.EU);
     public static final ContentJS<Integer> CWU = ContentJS.create(NumberComponent.INT_TYPE, GTRecipeCapabilities.CWU);
 
     public static final RecipeComponent<Map<RecipeCapability<?>, ChanceLogic>> CHANCE_LOGIC_MAP = new JavaMapRecipeComponent<>(

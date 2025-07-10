@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(FluidEntryDefinition.FluidEntryRenderer.class)
+@Mixin(value = FluidEntryDefinition.FluidEntryRenderer.class, remap = false)
 public class FluidEntryRendererMixin {
 
     @Inject(method = "getTooltip",

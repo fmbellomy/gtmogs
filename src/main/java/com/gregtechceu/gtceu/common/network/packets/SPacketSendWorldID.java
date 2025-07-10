@@ -21,17 +21,16 @@ public class SPacketSendWorldID implements CustomPacketPayload {
     public static final ResourceLocation ID = GTCEu.id("send_world_id");
     public static final Type<SPacketSendWorldID> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, SPacketSendWorldID> CODEC = StreamCodec
-            .ofMember(SPacketSendWorldID::encode, SPacketSendWorldID::decode);
+            .ofMember(SPacketSendWorldID::encode, SPacketSendWorldID::new);
 
     private String worldId;
 
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeUtf(WorldIDSaveData.getWorldID());
+    public SPacketSendWorldID(FriendlyByteBuf buf) {
+        worldId = buf.readUtf();
     }
 
-    public static SPacketSendWorldID decode(FriendlyByteBuf buf) {
-        String worldId = buf.readUtf();
-        return new SPacketSendWorldID(worldId);
+    public void encode(FriendlyByteBuf buf) {
+        buf.writeUtf(WorldIDSaveData.getWorldID());
     }
 
     public void execute(IPayloadContext context) {

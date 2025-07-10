@@ -144,13 +144,16 @@ public class GTDynamicDataPack implements PackResources {
                 output.write(json);
             }
         } catch (IOException e) {
-            GTCEu.LOGGER.error("Failed to save data JSON for id {} to disk.", id, e);
+            GTCEu.LOGGER.error("Failed to write JSON export for file {}", id, e);
         }
     }
 
     @Nullable
     @Override
     public IoSupplier<InputStream> getRootResource(String... elements) {
+        if (elements.length > 0 && elements[0].equals("pack.png")) {
+            return () -> GTCEu.class.getResourceAsStream("/icon.png");
+        }
         return null;
     }
 

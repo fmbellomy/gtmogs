@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.block;
 
+import com.gregtechceu.gtceu.api.block.property.GTBlockStateProperties;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 
 import net.minecraft.world.item.context.UseOnContext;
@@ -15,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class RubberLogBlock extends RotatedPillarBlock {
 
-    public static final BooleanProperty NATURAL = BooleanProperty.create("natural");
+    public static final BooleanProperty NATURAL = GTBlockStateProperties.NATURAL;
 
     public RubberLogBlock(Properties properties) {
         super(properties);

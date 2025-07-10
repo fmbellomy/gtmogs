@@ -1,14 +1,11 @@
 package com.gregtechceu.gtceu.common.item.behavior;
 
 import com.gregtechceu.gtceu.api.item.component.ICustomDescriptionId;
-import com.gregtechceu.gtceu.api.item.component.ICustomRenderer;
 import com.gregtechceu.gtceu.api.item.component.ISubItemHandler;
 import com.gregtechceu.gtceu.api.item.datacomponents.FacadeWrapper;
-import com.gregtechceu.gtceu.client.renderer.cover.FacadeCoverRenderer;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
-
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
+import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
@@ -20,19 +17,13 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 
-import com.google.common.collect.ImmutableList;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
-public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionId, ICustomRenderer {
-
-    @NotNull
-    @Override
-    public IRenderer getRenderer() {
-        return FacadeCoverRenderer.INSTANCE;
-    }
+public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionId {
 
     @Override
     public @Nullable Component getItemName(ItemStack stack) {
@@ -40,28 +31,25 @@ public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionI
         return Component.translatable(stack.getDescriptionId(), facadeState.getBlock().getName());
     }
 
+    public static final Supplier<List<BlockState>> DEFAULT_FACADES = GTMemoizer.memoize(() -> {
+        List<BlockState> states = new ArrayList<>();
+        states.add(Blocks.STONE.defaultBlockState());
+        states.add(GTBlocks.COIL_CUPRONICKEL.getDefaultState());
+        states.add(Blocks.GLASS.defaultBlockState());
+
+        return states;
+    });
+
     @Override
     public void fillItemCategory(Item item, CreativeModeTab category, NonNullList<ItemStack> items) {
-        List<BlockState> validFacades = ImmutableList.of(Blocks.STONE.defaultBlockState(),
-                GTBlocks.COIL_CUPRONICKEL.getDefaultState(), Blocks.GLASS.defaultBlockState());
-        for (BlockState facadeStack : validFacades) {
+        for (BlockState facadeState : DEFAULT_FACADES.get()) {
             ItemStack resultStack = item.getDefaultInstance();
-            setFacadeStack(resultStack, facadeStack);
+            setFacadeState(resultStack, facadeState);
             items.add(resultStack);
         }
     }
 
-    public static void setFacadeStack(ItemStack itemStack, ItemStack facadeStack) {
-        BlockState state;
-        if (!isValidFacade(facadeStack)) {
-            state = Blocks.STONE.defaultBlockState();
-        } else {
-            state = ((BlockItem) facadeStack.getItem()).getBlock().defaultBlockState();
-        }
-        itemStack.set(GTDataComponents.FACADE, new FacadeWrapper(state));
-    }
-
-    public static void setFacadeStack(ItemStack itemStack, BlockState state) {
+    public static void setFacadeState(ItemStack itemStack, BlockState state) {
         if (!isValidFacade(state)) {
             state = Blocks.STONE.defaultBlockState();
         }
@@ -72,8 +60,7 @@ public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionI
         if (!(itemStack.getItem() instanceof BlockItem blockItem)) {
             return false;
         }
-        var rawBlockState = blockItem.getBlock().defaultBlockState();
-        return !rawBlockState.hasBlockEntity() && rawBlockState.getRenderShape() == RenderShape.MODEL;
+        return isValidFacade(blockItem.getBlock().defaultBlockState());
     }
 
     public static boolean isValidFacade(BlockState state) {
@@ -81,15 +68,23 @@ public class FacadeItemBehaviour implements ISubItemHandler, ICustomDescriptionI
     }
 
     public static BlockState getFacadeState(ItemStack itemStack) {
-        BlockState unsafeState = getFacadeStackUnsafe(itemStack);
-        if (unsafeState == null) {
+        BlockState nullableState = getFacadeStateNullable(itemStack);
+        if (nullableState == null) {
             return Blocks.STONE.defaultBlockState();
         }
-        return unsafeState;
+        return nullableState;
+    }
+
+    public static BlockState getFacadeStateNullable(ItemStack itemStack) {
+        if (itemStack.getItem() instanceof BlockItem blockItem) {
+            return blockItem.getBlock().defaultBlockState();
+        }
+
+        return getFacadeStateUnsafe(itemStack);
     }
 
     @Nullable
-    private static BlockState getFacadeStackUnsafe(ItemStack itemStack) {
+    private static BlockState getFacadeStateUnsafe(ItemStack itemStack) {
         var facade = itemStack.get(GTDataComponents.FACADE);
         if (facade == null) {
             return null;

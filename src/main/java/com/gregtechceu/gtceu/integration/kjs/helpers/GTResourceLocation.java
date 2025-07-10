@@ -11,6 +11,7 @@ import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
 import dev.latvian.mods.kubejs.core.RegistryObjectKJS;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
+import dev.latvian.mods.rhino.Wrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.UnaryOperator;
@@ -26,9 +27,9 @@ public record GTResourceLocation(ResourceLocation wrapped) {
 
     @Nullable
     public static GTResourceLocation wrap(@Nullable Object o) {
-        if (o == null) {
-            return null;
-        }
+        if (o == null) return null;
+        o = Wrapper.unwrapped(o);
+
         ResourceLocation id = switch (o) {
             case ResourceLocation resLoc -> resLoc;
             case ResourceKey<?> key -> key.location();

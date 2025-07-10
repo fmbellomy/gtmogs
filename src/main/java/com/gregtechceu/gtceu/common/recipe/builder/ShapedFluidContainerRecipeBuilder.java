@@ -25,6 +25,6 @@ public class ShapedFluidContainerRecipeBuilder extends ShapedRecipeBuilder {
                 RecipeBuilder.determineBookCategory(this.category),
                 ShapedRecipePattern.of(key, rows),
                 this.output, false);
-        consumer.accept(recipeId.withPrefix("shaped_fluid_container/"), recipe, null);
+        consumer.accept(recipeId.withPrefix("shaped/"), recipe, null);
     }
 }

@@ -10,6 +10,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Predicate;
 
@@ -18,7 +19,7 @@ public class CustomFluidTank extends FluidTank
 
     @Getter
     @Setter
-    protected Runnable onContentsChanged = () -> {};
+    protected @NotNull Runnable onContentsChanged = () -> {};
 
     public CustomFluidTank(int capacity) {
         this(capacity, e -> true);

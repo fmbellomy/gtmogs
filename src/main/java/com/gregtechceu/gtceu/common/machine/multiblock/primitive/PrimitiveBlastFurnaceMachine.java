@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.api.gui.widget.SlotWidget;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IUIMachine;
+import com.gregtechceu.gtceu.api.machine.feature.multiblock.IFluidRenderMulti;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
 import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
 import com.gregtechceu.gtceu.config.ConfigHolder;
@@ -17,6 +18,9 @@ import com.lowdragmc.lowdraglib.gui.modular.ModularUI;
 import com.lowdragmc.lowdraglib.gui.texture.GuiTextureGroup;
 import com.lowdragmc.lowdraglib.gui.widget.LabelWidget;
 import com.lowdragmc.lowdraglib.gui.widget.ProgressWidget;
+import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,12 +33,30 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine implements IUIMachine {
+import lombok.Getter;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine implements IUIMachine, IFluidRenderMulti {
+
+    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
+            PrimitiveBlastFurnaceMachine.class, PrimitiveWorkableMachine.MANAGED_FIELD_HOLDER);
 
     private TickableSubscription hurtSubscription;
 
+    @Getter
+    @DescSynced
+    @RequireRerender
+    private final Set<BlockPos> fluidBlockOffsets = new HashSet<>();
+
     public PrimitiveBlastFurnaceMachine(IMachineBlockEntity holder, Object... args) {
         super(holder, args);
+    }
+
+    @Override
+    public ManagedFieldHolder getFieldHolder() {
+        return MANAGED_FIELD_HOLDER;
     }
 
     @Override
@@ -58,13 +80,20 @@ public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine imple
     @Override
     public void onStructureFormed() {
         super.onStructureFormed();
+        IFluidRenderMulti.super.onStructureFormed();
         this.hurtSubscription = subscribeServerTick(this::hurtEntities);
     }
 
     @Override
     public void onStructureInvalid() {
         super.onStructureInvalid();
+        IFluidRenderMulti.super.onStructureInvalid();
         unsubscribe(hurtSubscription);
+    }
+
+    @Override
+    public void saveOffsets() {
+        fluidBlockOffsets.add(getPos().relative(getFrontFacing().getOpposite()));
     }
 
     @Override
@@ -125,8 +154,8 @@ public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine imple
                 .widget(new SlotWidget(exportItems.storage, 2, 140, 38, true, false)
                         .setBackgroundTexture(
                                 new GuiTextureGroup(GuiTextures.PRIMITIVE_SLOT, GuiTextures.PRIMITIVE_DUST_OVERLAY)))
-                .widget(UITemplate.bindPlayerInventory(entityPlayer.getInventory(), GuiTextures.PRIMITIVE_SLOT, 7, 84,
-                        true));
+                .widget(UITemplate.bindPlayerInventory(entityPlayer.getInventory(),
+                        GuiTextures.PRIMITIVE_SLOT, 7, 84, true));
     }
 
     @Override
@@ -150,8 +179,8 @@ public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine imple
                 x += horizontalOffset;
             }
             if (ConfigHolder.INSTANCE.machines.machineSounds && GTValues.RNG.nextDouble() < 0.1) {
-                getLevel().playLocalSound(x, y, z, SoundEvents.FURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 1.0F, 1.0F,
-                        false);
+                getLevel().playLocalSound(x, y, z, SoundEvents.FURNACE_FIRE_CRACKLE,
+                        SoundSource.BLOCKS, 1.0F, 1.0F, false);
             }
             getLevel().addParticle(ParticleTypes.LARGE_SMOKE, x, y, z, 0, 0, 0);
             getLevel().addParticle(ParticleTypes.FLAME, x, y, z, 0, 0, 0);
@@ -160,7 +189,6 @@ public class PrimitiveBlastFurnaceMachine extends PrimitiveWorkableMachine imple
 
     private void hurtEntities() {
         BlockPos middlePos = self().getPos().offset(getFrontFacing().getOpposite().getNormal());
-        getLevel().getEntities(null,
-                new AABB(middlePos)).forEach(e -> e.hurt(e.damageSources().lava(), 3.0f));
+        getLevel().getEntities(null, new AABB(middlePos)).forEach(e -> e.hurt(e.damageSources().lava(), 3.0f));
     }
 }

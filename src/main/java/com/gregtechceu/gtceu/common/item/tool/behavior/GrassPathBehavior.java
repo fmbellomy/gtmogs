@@ -22,17 +22,14 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
-import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 
 public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
 
@@ -50,8 +47,7 @@ public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
     @NotNull
     @Override
     public InteractionResult onItemUse(UseOnContext context) {
-        if (context.getClickedFace() == Direction.DOWN)
-            return InteractionResult.PASS;
+        if (context.getClickedFace() == Direction.DOWN) return InteractionResult.PASS;
 
         Level level = context.getLevel();
         Player player = context.getPlayer();
@@ -61,55 +57,55 @@ public class GrassPathBehavior implements IToolBehavior<GrassPathBehavior> {
         ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
-        Set<BlockPos> blocks;
-        // only attempt to flatten if the center block is flattenable
-        if (!isBlockPathConvertible(stack, level, player, pos, context)) {
-            return InteractionResult.PASS;
-        }
-        if (aoeDefinition.isNone()) {
-            blocks = ImmutableSet.of(pos);
+        List<BlockPos> blocks;
+        // only attempt to till if the center block is tillable
+        if (level.isEmptyBlock(pos.above()) && isBlockPathConvertible(context)) {
+            if (aoeDefinition.isZero()) {
+                blocks = List.of(pos);
+            } else {
+                blocks = getPathConvertibleBlocks(aoeDefinition, context);
+                blocks.addFirst(context.getClickedPos());
+            }
         } else {
-            blocks = getPathConvertibleBlocks(stack, aoeDefinition, level, player, context.getHitResult());
-            blocks.add(pos);
+            return InteractionResult.PASS;
         }
 
         boolean pathed = false;
         for (BlockPos blockPos : blocks) {
-            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+            UseOnContext posContext = new UseOnContext(level, player, hand, stack,
                     context.getHitResult().withPosition(blockPos));
-            BlockState newState = getFlattened(level.getBlockState(blockPos), newCtx);
-            if (newState == null) {
-                continue;
-            }
+            BlockState newState = getFlattened(level.getBlockState(blockPos), posContext);
+            if (newState == null) continue;
             pathed |= level.setBlock(blockPos, newState, Block.UPDATE_ALL_IMMEDIATE);
-            ToolHelper.damageItem(context.getItemInHand(), context.getPlayer());
-            if (stack.isEmpty())
-                break;
+
+            ToolHelper.damageItem(stack, player);
+            if (stack.isEmpty()) break;
         }
 
         if (pathed) {
             level.playSound(player, pos, SoundEvents.SHOVEL_FLATTEN, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
-
         return InteractionResult.PASS;
     }
 
-    public static Set<BlockPos> getPathConvertibleBlocks(ItemStack stack, AoESymmetrical aoeDefinition, Level world,
-                                                         Player player, HitResult rayTraceResult) {
-        return ToolHelper.iterateAoE(stack, aoeDefinition, world, player, rayTraceResult,
-                GrassPathBehavior.INSTANCE::isBlockPathConvertible);
+    public static List<BlockPos> getPathConvertibleBlocks(AoESymmetrical aoeDefinition, UseOnContext context) {
+        return ToolHelper.iterateAoE(aoeDefinition, GrassPathBehavior::isBlockPathConvertible, context);
     }
 
-    protected boolean isBlockPathConvertible(ItemStack stack, Level level, Player player, BlockPos pos,
-                                             UseOnContext context) {
-        BlockState state = level.getBlockState(pos);
-        BlockState newState = state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, true);
-        return newState != null && newState != state;
+    protected static boolean isBlockPathConvertible(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        if (level.isEmptyBlock(pos.above())) {
+            BlockState state = level.getBlockState(pos);
+            BlockState newState = state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, true);
+            return newState != null && newState != state;
+        }
+        return false;
     }
 
-    protected BlockState getFlattened(BlockState unFlattenedState, UseOnContext context) {
-        return unFlattenedState.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
+    protected static BlockState getFlattened(BlockState state, UseOnContext context) {
+        return state.getToolModifiedState(context, ItemAbilities.SHOVEL_FLATTEN, false);
     }
 
     @Override

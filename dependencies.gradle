@@ -55,6 +55,10 @@ dependencies {
     // GameStages
     compileOnly(forge.gamestages)
 
+    // CC: Tweaked
+    compileOnly(forge.cc.tweaked.core.api)
+    compileOnly(forge.cc.tweaked.forge.api)
+
     // Standard runtime mods //
     runtimeOnly(forge.jade)
     runtimeOnly(forge.ae2)
@@ -72,6 +76,7 @@ dependencies {
     extraRuntimeOnly(forge.trenzalore)
     extraRuntimeOnly(forge.curios)
 //    extraRuntimeOnly(forge.worldstripper)
+    extraRuntimeOnly(forge.cc.tweaked.forge.impl)
 
     extraRuntimeOnly(forge.bundles.kjs)
 

@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IEnvironmentalHazardEmitter;
 import com.gregtechceu.gtceu.api.machine.feature.IFancyUIMachine;
 import com.gregtechceu.gtceu.api.machine.trait.NotifiableEnergyContainer;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.RecipeHelper;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.modifier.ModifierFunction;
@@ -50,6 +49,7 @@ public class SimpleGeneratorMachine extends WorkableTieredMachine
                                   Object... args) {
         this(holder, tier, 0.25f, tankScalingFunction, args);
     }
+
     //////////////////////////////////////
     // ***** Initialization ******//
     //////////////////////////////////////
@@ -64,11 +64,6 @@ public class SimpleGeneratorMachine extends WorkableTieredMachine
     @Override
     protected boolean isEnergyEmitter() {
         return true;
-    }
-
-    @Override
-    protected long getMaxInputOutputAmperage() {
-        return 1L;
     }
 
     @Override
@@ -97,7 +92,7 @@ public class SimpleGeneratorMachine extends WorkableTieredMachine
         if (!(machine instanceof SimpleGeneratorMachine generator)) {
             return RecipeModifier.nullWrongType(SimpleGeneratorMachine.class, machine);
         }
-        long EUt = RecipeHelper.getOutputEUt(recipe);
+        long EUt = recipe.getOutputEUt().getTotalEU();
         if (EUt <= 0) return ModifierFunction.NULL;
 
         int maxParallel = (int) (generator.getOverclockVoltage() / EUt);

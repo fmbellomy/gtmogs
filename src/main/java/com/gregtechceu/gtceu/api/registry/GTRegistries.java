@@ -68,21 +68,21 @@ public final class GTRegistries {
     public static final ResourceKey<Registry<DimensionMarker>> DIMENSION_MARKER_REGISTRY = makeRegistryKey(GTCEu.id("dimension_marker"));
 
     // GT Registries
-    public static final MappedRegistry<Element> ELEMENTS = makeRegistry(ELEMENT_REGISTRY);
-    public static final MaterialRegistry MATERIALS = makeMaterialRegistry();
-    public static final MappedRegistry<TagPrefix> TAG_PREFIXES = makeRegistry(TAG_PREFIX_REGISTRY);
+    public static final Registry<Element> ELEMENTS = makeRegistry(ELEMENT_REGISTRY);
+    public static final Registry<Material> MATERIALS = makeMaterialRegistry();
+    public static final Registry<TagPrefix> TAG_PREFIXES = makeRegistry(TAG_PREFIX_REGISTRY);
 
-    public static final MappedRegistry<SoundEntry> SOUNDS = makeRegistry(SOUND_REGISTRY, false);
-    public static final MappedRegistry<ChanceLogic> CHANCE_LOGICS = makeRegistry(CHANCE_LOGIC_REGISTRY);
-    public static final MappedRegistry<RecipeCapability<?>> RECIPE_CAPABILITIES = makeRegistry(RECIPE_CAPABILITY_REGISTRY);
-    public static final MappedRegistry<RecipeConditionType<?>> RECIPE_CONDITIONS = makeRegistry(RECIPE_CONDITION_REGISTRY);
-    public static final MappedRegistry<GTRecipeCategory> RECIPE_CATEGORIES = makeRegistry(RECIPE_CATEGORY_REGISTRY);
+    public static final Registry<SoundEntry> SOUNDS = makeRegistry(SOUND_REGISTRY, false);
+    public static final Registry<ChanceLogic> CHANCE_LOGICS = makeRegistry(CHANCE_LOGIC_REGISTRY);
+    public static final Registry<RecipeCapability<?>> RECIPE_CAPABILITIES = makeRegistry(RECIPE_CAPABILITY_REGISTRY);
+    public static final Registry<RecipeConditionType<?>> RECIPE_CONDITIONS = makeRegistry(RECIPE_CONDITION_REGISTRY);
+    public static final Registry<GTRecipeCategory> RECIPE_CATEGORIES = makeRegistry(RECIPE_CATEGORY_REGISTRY);
 
-    public static final MappedRegistry<MachineDefinition> MACHINES = makeRegistry(MACHINE_REGISTRY);
-    public static final MappedRegistry<CoverDefinition> COVERS = makeRegistry(COVER_REGISTRY);
+    public static final Registry<MachineDefinition> MACHINES = makeRegistry(MACHINE_REGISTRY);
+    public static final Registry<CoverDefinition> COVERS = makeRegistry(COVER_REGISTRY);
 
-    public static final MappedRegistry<ToolBehaviorType<?>> TOOL_BEHAVIORS = makeRegistry(TOOL_BEHAVIOR_REGISTRY);
-    public static final MappedRegistry<DimensionMarker> DIMENSION_MARKERS = makeRegistry(DIMENSION_MARKER_REGISTRY, false);
+    public static final Registry<ToolBehaviorType<?>> TOOL_BEHAVIORS = makeRegistry(TOOL_BEHAVIOR_REGISTRY);
+    public static final Registry<DimensionMarker> DIMENSION_MARKERS = makeRegistry(DIMENSION_MARKER_REGISTRY, false);
     // spotless:on
 
     public static <T> ResourceKey<Registry<T>> makeRegistryKey(ResourceLocation registryId) {
@@ -168,11 +168,20 @@ public final class GTRegistries {
     }
 
     public static RegistryAccess builtinRegistry() {
-        if (FROZEN == BLANK && GTCEu.isClientThread()) {
-            if (Minecraft.getInstance().getConnection() != null) {
-                return Minecraft.getInstance().getConnection().registryAccess();
-            }
+        if (GTCEu.isClientThread()) {
+            return ClientHelpers.getClientRegistries();
         }
         return FROZEN;
+    }
+
+    private static class ClientHelpers {
+
+        private static RegistryAccess getClientRegistries() {
+            if (Minecraft.getInstance().getConnection() != null) {
+                return Minecraft.getInstance().getConnection().registryAccess();
+            } else {
+                return FROZEN;
+            }
+        }
     }
 }

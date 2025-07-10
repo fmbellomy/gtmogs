@@ -11,7 +11,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -22,29 +21,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
 
-import com.google.common.collect.ImmutableSet;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Set;
 
 public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
 
-    public static final WaxOffBehavior INSTANCE = create();
+    public static final WaxOffBehavior INSTANCE = new WaxOffBehavior();
     public static final Codec<WaxOffBehavior> CODEC = Codec.unit(INSTANCE);
     public static final StreamCodec<ByteBuf, WaxOffBehavior> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
     protected WaxOffBehavior() {/**/}
-
-    protected static WaxOffBehavior create() {
-        return new WaxOffBehavior();
-    }
 
     @Override
     public boolean canPerformAction(ItemStack stack, ItemAbility action) {
@@ -57,60 +50,54 @@ public class WaxOffBehavior implements IToolBehavior<WaxOffBehavior> {
         Level level = context.getLevel();
         Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
-        InteractionHand hand = context.getHand();
-
         ItemStack stack = context.getItemInHand();
         AoESymmetrical aoeDefinition = ToolHelper.getAoEDefinition(stack);
 
+        List<BlockPos> blocks;
         // only attempt to strip if the center block is strippable
-        if (!isBlockUnWaxable(stack, level, player, pos, context)) {
-            return InteractionResult.PASS;
-        }
-
-        Set<BlockPos> blocks;
-        if (aoeDefinition.isNone() || player == null) {
-            blocks = ImmutableSet.of(pos);
+        if (isBlockUnwaxable(context)) {
+            if (aoeDefinition.isZero()) {
+                blocks = List.of(pos);
+            } else {
+                blocks = getUnwaxableBlocks(aoeDefinition, context);
+                blocks.addFirst(context.getClickedPos());
+            }
         } else {
-            blocks = getUnWaxableBlocks(stack, aoeDefinition, level, player, context.getHitResult());
-            blocks.add(pos);
+            return InteractionResult.PASS;
         }
 
         boolean unwaxed = false;
         for (BlockPos blockPos : blocks) {
-            UseOnContext newCtx = new UseOnContext(level, player, hand, stack,
+            UseOnContext posContext = new UseOnContext(level, player, context.getHand(), stack,
                     context.getHitResult().withPosition(blockPos));
-            unwaxed |= level.setBlock(blockPos, getUnwaxed(level.getBlockState(blockPos), newCtx),
-                    Block.UPDATE_ALL_IMMEDIATE);
+            BlockState newState = getUnwaxed(level.getBlockState(blockPos), posContext);
+            unwaxed |= level.setBlock(blockPos, newState, Block.UPDATE_ALL_IMMEDIATE);
             level.levelEvent(player, LevelEvent.PARTICLES_WAX_OFF, blockPos, 0);
+            level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(player, newState));
 
             ToolHelper.damageItem(stack, player);
-            if (stack.isEmpty())
-                break;
+            if (stack.isEmpty()) break;
         }
 
         if (unwaxed) {
             level.playSound(player, pos, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }
-
         return InteractionResult.PASS;
     }
 
-    public static Set<BlockPos> getUnWaxableBlocks(ItemStack stack, AoESymmetrical aoeDefinition, Level level,
-                                                   Player player, HitResult rayTraceResult) {
-        return ToolHelper.iterateAoE(stack, aoeDefinition, level, player, rayTraceResult,
-                WaxOffBehavior::isBlockUnWaxable);
+    public static List<BlockPos> getUnwaxableBlocks(AoESymmetrical aoeDefinition, UseOnContext context) {
+        return ToolHelper.iterateAoE(aoeDefinition, WaxOffBehavior::isBlockUnwaxable, context);
     }
 
-    protected static boolean isBlockUnWaxable(ItemStack stack, Level level, Player player, BlockPos pos,
-                                              UseOnContext context) {
-        BlockState state = level.getBlockState(pos);
+    protected static boolean isBlockUnwaxable(UseOnContext context) {
+        BlockState state = context.getLevel().getBlockState(context.getClickedPos());
         BlockState newState = state.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, true);
         return newState != null && newState != state;
     }
 
-    protected BlockState getUnwaxed(BlockState unscrapedState, UseOnContext context) {
-        return unscrapedState.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, false);
+    protected BlockState getUnwaxed(BlockState state, UseOnContext context) {
+        return state.getToolModifiedState(context, ItemAbilities.AXE_WAX_OFF, false);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.gregtechceu.gtceu.integration.kjs.recipe;
 
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
+import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.RecipeTypeFunction;
 import dev.latvian.mods.kubejs.recipe.component.ComponentValueMap;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;
@@ -10,10 +11,15 @@ import dev.latvian.mods.kubejs.util.Cast;
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.rhino.Context;
 
+import java.util.Collections;
+import java.util.List;
+
 public class IDRecipeConstructor extends RecipeConstructor {
 
+    private static final List<RecipeKey<?>> KEYS = Collections.singletonList(GTRecipeSchema.ID);
+
     public IDRecipeConstructor() {
-        super(GTRecipeSchema.ID);
+        super(KEYS);
     }
 
     @Override

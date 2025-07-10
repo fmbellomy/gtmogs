@@ -64,10 +64,10 @@ public class PotionFluidHelper {
     }
 
     public static SizedFluidIngredient getPotionFluidIngredientFrom(Ingredient potion, int amount) {
-        if (potion.getCustomIngredient() instanceof DataComponentIngredient strict && strict.isStrict()) {
+        if (potion.getCustomIngredient() instanceof DataComponentIngredient component && component.isStrict()) {
             return new SizedFluidIngredient(DataComponentFluidIngredient.of(false,
                     DataComponents.POTION_CONTENTS,
-                    strict.getItems().findFirst().orElse(ItemStack.EMPTY)
+                    component.getItems().findFirst().orElse(ItemStack.EMPTY)
                             .getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY),
                     GTFluids.POTION.get()), amount);
         }

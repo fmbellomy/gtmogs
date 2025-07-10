@@ -7,6 +7,7 @@ import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.content.ContentModifier;
+import com.gregtechceu.gtceu.api.recipe.ingredient.EnergyStack;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -48,8 +49,14 @@ public class GTRecipe implements Recipe<RecipeInput> {
     public CompoundTag data;
     public int duration;
     public int parallels = 1;
+    public int batchParallels = 1;
     public int ocLevel = 0;
     public final GTRecipeCategory recipeCategory;
+    // Lazy fields, since we need the recipe EUt very often
+    @Getter(lazy = true)
+    private final @NotNull EnergyStack inputEUt = calculateEUt(tickInputs);
+    @Getter(lazy = true)
+    private final @NotNull EnergyStack outputEUt = calculateEUt(tickOutputs);
 
     public GTRecipe(GTRecipeType recipeType,
                     Map<RecipeCapability<?>, List<Content>> inputs,
@@ -217,6 +224,19 @@ public class GTRecipe implements Recipe<RecipeInput> {
             }
         }
         return ChanceLogic.OR;
+    }
+
+    // Technically should account for overflow but realistically not an issue.
+    protected @NotNull EnergyStack calculateEUt(Map<RecipeCapability<?>, List<Content>> contents) {
+        var outputs = contents.get(EURecipeCapability.CAP);
+        if (outputs == null) return EnergyStack.EMPTY;
+        long v = 0, a = 0;
+        for (var content : outputs) {
+            EnergyStack stack = EURecipeCapability.CAP.of(content.content);
+            v += stack.voltage();
+            a += stack.amperage();
+        }
+        return new EnergyStack(v, a);
     }
 
     // Just check id as there *should* only ever be 1 instance of a recipe with this id.

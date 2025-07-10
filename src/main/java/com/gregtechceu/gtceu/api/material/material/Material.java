@@ -81,6 +81,13 @@ public class Material {
      */
     private String chemicalFormula;
 
+    /**
+     * Material specific tags
+     */
+    @Setter
+    @Getter
+    private List<TagKey<Item>> itemTags = new ArrayList<>();
+
     private String calculateChemicalFormula() {
         if (chemicalFormula != null) return this.chemicalFormula;
         if (materialInfo.element != null) {
@@ -366,9 +373,9 @@ public class Material {
     }
 
     public int getLayerARGB(int layerIndex) {
-        // get 2nd digit as positive if emissive layer
+        // parse emissive layer value as -(layer + 101)
         if (layerIndex < -100) {
-            layerIndex = (Math.abs(layerIndex) % 100) / 10;
+            layerIndex = -layerIndex - 101;
         }
         if (layerIndex > materialInfo.colors.size() - 1 || layerIndex < 0) return -1;
         int layerColor = getMaterialARGB(layerIndex);
@@ -564,6 +571,8 @@ public class Material {
         private final MaterialFlags flags;
         private Set<TagPrefix> ignoredTagPrefixes = null;
 
+        private final List<TagKey<Item>> itemTags = new ArrayList<>();
+
         private String formula = null;
 
         /*
@@ -592,6 +601,11 @@ public class Material {
             materialInfo = new MaterialInfo(resourceLocation);
             properties = new MaterialProperties();
             flags = new MaterialFlags();
+        }
+
+        public Builder customTags(TagKey<Item> key) {
+            this.itemTags.add(key);
+            return this;
         }
 
         /*
@@ -1073,6 +1087,14 @@ public class Material {
             return this;
         }
 
+        /**
+         * Use {@link ArmorProperty.Builder} to create an Armor Property.
+         */
+        public Builder armorStats(ArmorProperty armorProperty) {
+            properties.setProperty(PropertyKey.ARMOR, armorProperty);
+            return this;
+        }
+
         public Builder rotorStats(int power, int efficiency, float damage, int durability) {
             properties.setProperty(PropertyKey.ROTOR, new RotorProperty(power, efficiency, damage, durability));
             return this;
@@ -1280,6 +1302,9 @@ public class Material {
             }
 
             var mat = new Material(materialInfo, properties, flags);
+            if (!itemTags.isEmpty()) {
+                mat.setItemTags(itemTags);
+            }
             if (formula != null) {
                 mat.setFormula(formula);
             }
@@ -1297,7 +1322,7 @@ public class Material {
      */
     @SuppressWarnings("UnusedReturnValue")
     @Accessors(chain = true)
-    private static class MaterialInfo {
+    public static class MaterialInfo {
 
         /**
          * The modid and unlocalized name of this Material.

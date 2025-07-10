@@ -23,12 +23,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -133,6 +136,18 @@ public abstract class GTExplosiveBlock extends Block {
                 level.removeBlock(pos, false);
             }
         }
+    }
+
+    @Override
+    public List<ItemStack> getDrops(BlockState state, LootParams.Builder params) {
+        if (explodeOnMine) {
+            Entity player = params.getOptionalParameter(LootContextParams.THIS_ENTITY);
+            if (player != null && !player.isShiftKeyDown()) {
+                return Collections.emptyList();
+            }
+        }
+
+        return super.getDrops(state, params);
     }
 
     @Override

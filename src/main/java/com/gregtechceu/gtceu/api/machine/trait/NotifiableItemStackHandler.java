@@ -47,6 +47,9 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
     @Persisted
     @DescSynced
     public final CustomItemStackHandler storage;
+    // Deprecated since circuits and other slots
+    // need to be passed to parallel checking.
+    @Deprecated(since = "7.0.0")
     @Accessors(fluent = true)
     @Getter
     @Setter
@@ -98,6 +101,12 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                                                      IO handlerIO, CustomItemStackHandler storage) {
         if (io != handlerIO) return left;
         if (io != IO.IN && io != IO.OUT) return left.isEmpty() ? null : left;
+
+        // Temporarily remove listener so that we can broadcast the entire set of transactions once
+        Runnable listener = storage.getOnContentsChanged();
+        storage.setOnContentsChanged(() -> {});
+        boolean changed = false;
+
         // Store the ItemStack in each slot after an operation
         // Necessary for simulation since we don't actually modify the slot's contents
         // Doesn't hurt for execution, and definitely cheaper than copying the entire storage
@@ -109,19 +118,48 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                 continue;
             }
 
-            if (io == IO.OUT &&
-                    ingredient.ingredient().getCustomIngredient() instanceof IntProviderIngredient provider) {
+            ItemStack[] items;
+            int amount;
+            if (io == IO.OUT && ingredient.getContainedCustom() instanceof IntProviderIngredient provider) {
                 provider.setItemStacks(null);
                 provider.setSampledCount(-1);
-            }
 
-            var items = ingredient.getItems();
-            if (items.length == 0 || items[0].isEmpty()) {
-                it.remove();
-                continue;
-            }
+                ItemStack output;
+                if (simulate) {
+                    output = provider.getMaxSizeStack();
+                    items = new ItemStack[] { output };
+                } else {
+                    items = provider.getItemStacks();
+                    if (items.length == 0 || items[0].isEmpty()) {
+                        it.remove();
+                        continue;
+                    }
+                    output = items[0];
+                }
 
-            int amount = ingredient.count();
+                int outputStorageLimit = 0;
+                for (int slot = 0; slot < storage.getSlots(); ++slot) {
+                    ItemStack stack = storage.getStackInSlot(slot);
+                    if (stack.isEmpty() || ItemStack.isSameItemSameComponents(stack, output)) {
+                        outputStorageLimit += storage.getSlotLimit(slot) - stack.getCount();
+                    }
+                }
+                if (provider.getCountProvider().getMinValue() > outputStorageLimit) {
+                    it.remove();
+                    continue;
+                } else if (simulate) {
+                    amount = provider.getCountProvider().getMaxValue();
+                } else {
+                    amount = Math.min(output.getCount(), outputStorageLimit);
+                }
+            } else {
+                items = ingredient.getItems();
+                if (items.length == 0 || items[0].isEmpty()) {
+                    it.remove();
+                    continue;
+                }
+                amount = ingredient.count();
+            }
 
             for (int slot = 0; slot < storage.getSlots(); ++slot) {
                 ItemStack current = visited[slot] == null ? storage.getStackInSlot(slot) : visited[slot];
@@ -133,6 +171,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                         var extracted = getActioned(storage, slot, recipe.ingredientActions);
                         if (extracted == null) extracted = storage.extractItem(slot, Math.min(count, amount), simulate);
                         if (!extracted.isEmpty()) {
+                            changed = true;
                             visited[slot] = extracted.copyWithCount(count - extracted.getCount());
                         }
                         amount -= extracted.getCount();
@@ -145,6 +184,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                             var remainder = getActioned(storage, slot, recipe.ingredientActions);
                             if (remainder == null) remainder = storage.insertItem(slot, output, simulate);
                             if (remainder.getCount() < amount) {
+                                changed = true;
                                 visited[slot] = output.copyWithCount(count + amount - remainder.getCount());
                             }
                             amount = remainder.getCount();
@@ -162,11 +202,14 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
                 it.set(ingredient.copyWithCount(amount));
             }
         }
+
+        storage.setOnContentsChanged(listener);
+        if (changed && !simulate) listener.run();
+
         return left.isEmpty() ? null : left;
     }
 
-    @Nullable
-    private static ItemStack getActioned(CustomItemStackHandler storage, int index, List<?> actions) {
+    private static @Nullable ItemStack getActioned(CustomItemStackHandler storage, int index, List<?> actions) {
         if (!GTCEu.Mods.isKubeJSLoaded()) return null;
         // noinspection unchecked
         var actioned = KJSCallWrapper.applyIngredientAction(storage, index, (List<IngredientActionHolder>) actions);
@@ -256,7 +299,7 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
     }
 
     @Override
-    public void setStackInSlot(int index, ItemStack stack) {
+    public void setStackInSlot(int index, @NotNull ItemStack stack) {
         storage.setStackInSlot(index, stack);
     }
 
@@ -301,7 +344,6 @@ public class NotifiableItemStackHandler extends NotifiableRecipeHandlerTrait<Siz
         public static ItemStack applyIngredientAction(CustomItemStackHandler storage, int index,
                                                       List<IngredientActionHolder> ingredientActions) {
             var stack = storage.getStackInSlot(index);
-
             if (stack.isEmpty()) {
                 return ItemStack.EMPTY;
             }

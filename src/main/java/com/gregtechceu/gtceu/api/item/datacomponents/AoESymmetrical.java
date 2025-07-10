@@ -30,70 +30,18 @@ public record AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column
             ByteBufCodecs.VAR_INT, AoESymmetrical::layer,
             AoESymmetrical::new);
 
-    private static final AoESymmetrical NONE = new AoESymmetrical(0, 0, 0, 0, 0, 0);
+    public static final AoESymmetrical ZERO = new AoESymmetrical(0, 0, 0, 0, 0, 0);
 
-    public boolean isNone() {
-        return this == NONE || (this.maxColumn == 0 && this.maxRow == 0 && this.maxLayer == 0);
-    }
-
-    public static AoESymmetrical none() {
-        return NONE;
+    public boolean isZero() {
+        return this == ZERO || (this.maxColumn == 0 && this.maxRow == 0 && this.maxLayer == 0);
     }
 
     public static AoESymmetrical of(int column, int row, int layer) {
         Preconditions.checkArgument(column >= 0, "Height cannot be negative.");
         Preconditions.checkArgument(row >= 0, "Width cannot be negative.");
         Preconditions.checkArgument(layer >= 0, "Depth cannot be negative.");
-        return column == 0 && row == 0 && layer == 0 ? NONE :
+        return column == 0 && row == 0 && layer == 0 ? ZERO :
                 new AoESymmetrical(column, row, layer, column, row, layer);
-    }
-
-    public static AoESymmetrical increaseColumn(AoESymmetrical aoe) {
-        int currentColumn = aoe.column;
-        if (currentColumn < aoe.maxColumn) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, currentColumn + 1, aoe.row, aoe.layer);
-        }
-        return aoe;
-    }
-
-    public static AoESymmetrical increaseRow(AoESymmetrical aoe) {
-        int currentRow = aoe.row;
-        if (currentRow < aoe.maxRow) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, aoe.column, currentRow + 1, aoe.layer);
-        }
-        return aoe;
-    }
-
-    public static AoESymmetrical increaseLayer(AoESymmetrical aoe) {
-        int currentLayer = aoe.layer;
-        if (currentLayer < aoe.maxLayer) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, aoe.column, aoe.row, currentLayer + 1);
-        }
-        return aoe;
-    }
-
-    public static AoESymmetrical decreaseColumn(AoESymmetrical aoe) {
-        int currentColumn = aoe.column;
-        if (currentColumn > 0) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, currentColumn - 1, aoe.row, aoe.layer);
-        }
-        return aoe;
-    }
-
-    public static AoESymmetrical decreaseRow(AoESymmetrical aoe) {
-        int currentRow = aoe.row;
-        if (currentRow > 0) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, aoe.column, currentRow - 1, aoe.layer);
-        }
-        return aoe;
-    }
-
-    public static AoESymmetrical decreaseLayer(AoESymmetrical aoe) {
-        int currentLayer = aoe.layer;
-        if (currentLayer > 0) {
-            aoe = new AoESymmetrical(aoe.maxColumn, aoe.maxRow, aoe.maxLayer, aoe.column, aoe.row, currentLayer - 1);
-        }
-        return aoe;
     }
 
     public Mutable toMutable() {
@@ -104,11 +52,13 @@ public record AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column
     public boolean equals(Object o) {
         if (this == o)
             return true;
-        if (!(o instanceof AoESymmetrical that))
+        // noinspection PatternVariableHidesField
+        if (!(o instanceof AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column, int row, int layer))) {
             return false;
+        }
 
-        return maxColumn == that.maxColumn && maxRow == that.maxRow && maxLayer == that.maxLayer &&
-                column == that.column && row == that.row && layer == that.layer;
+        return this.maxColumn == maxColumn && this.maxRow == maxRow && this.maxLayer == maxLayer &&
+                this.column == column && this.row == row && this.layer == layer;
     }
 
     @Override

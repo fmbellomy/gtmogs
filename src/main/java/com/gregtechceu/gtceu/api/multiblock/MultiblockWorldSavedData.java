@@ -44,8 +44,8 @@ public class MultiblockWorldSavedData extends SavedData {
         this();
     }
 
-    public MultiblockState[] getControllerInChunk(ChunkPos chunkPos) {
-        return chunkPosMapping.getOrDefault(chunkPos, Collections.emptySet()).toArray(MultiblockState[]::new);
+    public Set<MultiblockState> getControllersInChunk(ChunkPos chunkPos) {
+        return chunkPosMapping.getOrDefault(chunkPos, Collections.emptySet());
     }
 
     public void addMapping(MultiblockState state) {
@@ -53,7 +53,6 @@ public class MultiblockWorldSavedData extends SavedData {
         for (BlockPos blockPos : state.getCache()) {
             chunkPosMapping.computeIfAbsent(new ChunkPos(blockPos), c -> new HashSet<>()).add(state);
         }
-        setDirty(true);
     }
 
     public void removeMapping(MultiblockState state) {
@@ -61,7 +60,6 @@ public class MultiblockWorldSavedData extends SavedData {
         for (Set<MultiblockState> set : chunkPosMapping.values()) {
             set.remove(state);
         }
-        setDirty(true);
     }
 
     @NotNull

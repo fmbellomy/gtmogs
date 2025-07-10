@@ -2,62 +2,72 @@ package com.gregtechceu.gtceu.api.recipe;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.capability.recipe.*;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerGroup;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerGroupColor;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerGroupDistinctness;
+import com.gregtechceu.gtceu.api.machine.trait.RecipeHandlerList;
 import com.gregtechceu.gtceu.api.machine.trait.RecipeLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeConditionType;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
+import com.gregtechceu.gtceu.api.recipe.ingredient.EnergyStack;
+import com.gregtechceu.gtceu.api.recipe.ingredient.ExDataComponentFluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
+import com.gregtechceu.gtceu.api.tag.TagUtil;
 import com.gregtechceu.gtceu.common.recipe.builder.GTRecipeBuilder;
 import com.gregtechceu.gtceu.utils.GTUtil;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
+import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class RecipeHelper {
 
-    public static long getInputEUt(GTRecipe recipe) {
-        return recipe.getTickInputContents(EURecipeCapability.CAP).stream()
-                .map(Content::getContent)
-                .mapToLong(EURecipeCapability.CAP::of)
-                .sum();
+    public static EnergyStack getRealEUt(@NotNull GTRecipe recipe) {
+        EnergyStack stack = recipe.getInputEUt();
+        if (!stack.isEmpty()) return stack;
+        return recipe.getOutputEUt();
     }
 
-    public static long getOutputEUt(GTRecipe recipe) {
-        return recipe.getTickOutputContents(EURecipeCapability.CAP).stream()
-                .map(Content::getContent)
-                .mapToLong(EURecipeCapability.CAP::of)
-                .sum();
-    }
-
-    public static long getRealEUt(@NotNull GTRecipe recipe) {
-        long EUt = getInputEUt(recipe);
-        if (EUt > 0) return EUt;
-        return -getOutputEUt(recipe);
+    /**
+     * Get a pair of the absolute EU/t value this recipe inputs or outputs and if it's input or output
+     *
+     * @param recipe
+     * @return A pair of {@code (EnergyStack, isInput)}
+     */
+    public static EnergyStack.WithIO getRealEUtWithIO(@NotNull GTRecipe recipe) {
+        EnergyStack stack = recipe.getInputEUt();
+        if (!stack.isEmpty()) return new EnergyStack.WithIO(stack, IO.IN);
+        return new EnergyStack.WithIO(recipe.getOutputEUt(), IO.OUT);
     }
 
     public static int getRecipeEUtTier(GTRecipe recipe) {
-        long EUt = getInputEUt(recipe);
-        if (EUt == 0) {
-            EUt = getOutputEUt(recipe);
-        }
+        EnergyStack stack = getRealEUt(recipe);
+        long EUt = stack.voltage();
         if (recipe.parallels > 1) EUt /= recipe.parallels;
         return GTUtil.getTierByVoltage(EUt);
     }
 
     public static int getPreOCRecipeEuTier(GTRecipe recipe) {
-        long EUt = getInputEUt(recipe);
-        if (EUt == 0) EUt = getOutputEUt(recipe);
+        EnergyStack stack = getRealEUt(recipe);
+        long EUt = stack.getTotalEU();
         if (recipe.parallels > 1) EUt /= recipe.parallels;
         EUt >>= (recipe.ocLevel * 2);
         return GTUtil.getTierByVoltage(EUt);
@@ -237,38 +247,6 @@ public class RecipeHelper {
         return matchTickRecipe(holder, recipe);
     }
 
-    public static void preWorking(IRecipeCapabilityHolder holder, GTRecipe recipe) {
-        handlePre(holder, recipe, IO.IN);
-        handlePre(holder, recipe, IO.OUT);
-    }
-
-    public static void postWorking(IRecipeCapabilityHolder holder, GTRecipe recipe) {
-        handlePost(holder, recipe, IO.IN);
-        handlePost(holder, recipe, IO.OUT);
-    }
-
-    public static void handlePre(IRecipeCapabilityHolder holder, GTRecipe recipe, IO io) {
-        var map = io == IO.IN ? recipe.inputs : recipe.outputs;
-        for (var cap : map.keySet()) {
-            var handlers = holder.getCapabilitiesFlat(io, cap);
-            if (handlers.isEmpty()) handlers = holder.getCapabilitiesFlat(IO.BOTH, cap);
-            for (var handler : handlers) {
-                handler.preWorking(holder, io, recipe);
-            }
-        }
-    }
-
-    public static void handlePost(IRecipeCapabilityHolder holder, GTRecipe recipe, IO io) {
-        var map = io == IO.IN ? recipe.inputs : recipe.outputs;
-        for (var cap : map.keySet()) {
-            var handlers = holder.getCapabilitiesFlat(io, cap);
-            if (handlers.isEmpty()) handlers = holder.getCapabilitiesFlat(IO.BOTH, cap);
-            for (var handler : handlers) {
-                handler.postWorking(holder, io, recipe);
-            }
-        }
-    }
-
     /**
      * Check whether all conditions of a recipe are valid
      *
@@ -278,8 +256,8 @@ public class RecipeHelper {
      */
     public static ActionResult checkConditions(GTRecipe recipe, @NotNull RecipeLogic recipeLogic) {
         if (recipe.conditions.isEmpty()) return ActionResult.SUCCESS;
-        Map<RecipeConditionType<?>, List<RecipeCondition>> or = new Reference2ObjectArrayMap<>();
-        for (RecipeCondition condition : recipe.conditions) {
+        Map<RecipeConditionType<?>, List<RecipeCondition<?>>> or = new Reference2ObjectArrayMap<>();
+        for (RecipeCondition<?> condition : recipe.conditions) {
             if (condition.isOr()) {
                 or.computeIfAbsent(condition.getType(), type -> new ArrayList<>()).add(condition);
             } else if (!condition.check(recipe, recipeLogic)) {
@@ -289,11 +267,11 @@ public class RecipeHelper {
             }
         }
 
-        for (List<RecipeCondition> conditions : or.values()) {
+        for (List<RecipeCondition<?>> conditions : or.values()) {
             boolean passed = conditions.isEmpty();
             MutableComponent component = Component.translatable("gtceu.recipe_logic.condition_fails")
                     .append(": ");
-            for (RecipeCondition condition : conditions) {
+            for (RecipeCondition<?> condition : conditions) {
                 passed = condition.check(recipe, recipeLogic);
                 if (passed) break;
                 else component.append(condition.getTooltips());
@@ -374,5 +352,74 @@ public class RecipeHelper {
         }
 
         return outputs;
+    }
+
+    public static void addToRecipeHandlerMap(RecipeHandlerGroup key, RecipeHandlerList handler,
+                                             Map<RecipeHandlerGroup, List<RecipeHandlerList>> map) {
+        // Add undyed RHL's to every group that's not distinct, and also the undyed group itself.
+        if (key.equals(RecipeHandlerGroupColor.UNDYED)) {
+            for (var entry : map.entrySet()) {
+                if (entry.getKey().equals(RecipeHandlerGroupDistinctness.BUS_DISTINCT) ||
+                        entry.getKey().equals(RecipeHandlerGroupColor.UNDYED)) {
+                    continue;
+                }
+                entry.getValue().add(handler);
+            }
+        }
+        // Add other RHL's to their own group, or create it (using the undyed group as base) if it does not exist.
+        List<RecipeHandlerList> undyed = map.getOrDefault(RecipeHandlerGroupColor.UNDYED, Collections.emptyList());
+
+        map.computeIfAbsent(key, $ -> new ArrayList<>(undyed)).add(handler);
+    }
+
+    public static int getRatioForDistillery(SizedFluidIngredient fluidInput, SizedFluidIngredient fluidOutput,
+                                            @Nullable ItemStack output) {
+        int[] divisors = new int[] { 2, 5, 10, 25, 50 };
+        int ratio = -1;
+
+        for (int divisor : divisors) {
+
+            if (!isFluidStackDivisibleForDistillery(fluidInput, divisor))
+                continue;
+
+            if (!isFluidStackDivisibleForDistillery(fluidOutput, divisor))
+                continue;
+
+            if (output != null && output.getCount() % divisor != 0)
+                continue;
+
+            ratio = divisor;
+        }
+
+        return Math.max(1, ratio);
+    }
+
+    public static boolean isFluidStackDivisibleForDistillery(SizedFluidIngredient fluidStack, int divisor) {
+        return fluidStack.amount() % divisor == 0 && fluidStack.amount() / divisor >= 25;
+    }
+
+    public static SizedFluidIngredient makeSizedFluidIngredient(FluidStack stack) {
+        return new SizedFluidIngredient(makeFluidIngredient(stack), stack.getAmount());
+    }
+
+    public static FluidIngredient makeFluidIngredient(FluidStack stack) {
+        var tagKey = TagUtil.createFluidTag(BuiltInRegistries.FLUID.getKey(stack.getFluid()).getPath());
+        if (stack.isComponentsPatchEmpty()) {
+            return FluidIngredient.tag(tagKey);
+        } else {
+            return ExDataComponentFluidIngredient.of(true, stack.getComponents(), tagKey);
+        }
+    }
+
+    public static SizedIngredient makeSizedIngredient(ItemStack stack) {
+        return new SizedIngredient(makeItemIngredient(stack), stack.getCount());
+    }
+
+    public static Ingredient makeItemIngredient(ItemStack stack) {
+        if (stack.isComponentsPatchEmpty()) {
+            return Ingredient.of(stack);
+        } else {
+            return DataComponentIngredient.of(true, stack);
+        }
     }
 }

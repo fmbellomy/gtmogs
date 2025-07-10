@@ -3,15 +3,11 @@ package com.gregtechceu.gtceu.common.network.packets.prospecting;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import com.google.common.collect.Table;
 import org.jetbrains.annotations.NotNull;
 
 public class SPacketProspectBedrockOre extends SPacketProspect<ProspectorMode.OreInfo> {
@@ -19,10 +15,10 @@ public class SPacketProspectBedrockOre extends SPacketProspect<ProspectorMode.Or
     public static final ResourceLocation ID = GTCEu.id("prospect_bedrock_ore");
     public static final Type<SPacketProspectBedrockOre> TYPE = new Type<>(ID);
     public static final StreamCodec<RegistryFriendlyByteBuf, SPacketProspectBedrockOre> CODEC = StreamCodec
-            .ofMember(SPacketProspectBedrockOre::encode, SPacketProspectBedrockOre::decode);
+            .ofMember(SPacketProspectBedrockOre::encode, SPacketProspectBedrockOre::new);
 
-    public SPacketProspectBedrockOre(Table<ResourceKey<Level>, BlockPos, ProspectorMode.OreInfo> data) {
-        super(data);
+    public SPacketProspectBedrockOre(RegistryFriendlyByteBuf buf) {
+        super(buf);
     }
 
     @Override
@@ -30,12 +26,13 @@ public class SPacketProspectBedrockOre extends SPacketProspect<ProspectorMode.Or
         ProspectorMode.BEDROCK_ORE.serialize(data, buf);
     }
 
-    public static SPacketProspectBedrockOre decode(RegistryFriendlyByteBuf buf) {
-        return SPacketProspect.decode(buf, ProspectorMode.BEDROCK_ORE::deserialize, SPacketProspectBedrockOre::new);
+    @Override
+    public ProspectorMode.OreInfo decodeData(RegistryFriendlyByteBuf buf) {
+        return ProspectorMode.BEDROCK_ORE.deserialize(buf);
     }
 
     @Override
-    public void execute(IPayloadContext handler) {
+    public void execute(IPayloadContext context) {
         // todo: add cache for bedrock ore veins
     }
 

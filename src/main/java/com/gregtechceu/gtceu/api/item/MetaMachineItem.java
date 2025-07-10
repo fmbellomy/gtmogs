@@ -8,9 +8,6 @@ import com.gregtechceu.gtceu.api.machine.feature.IDropSaveMachine;
 import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.core.MixinHelpers;
 
-import com.lowdragmc.lowdraglib.client.renderer.IItemRendererProvider;
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -26,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.Nullable;
 
-public class MetaMachineItem extends BlockItem implements IItemRendererProvider {
+public class MetaMachineItem extends BlockItem {
 
     public MetaMachineItem(IMachineBlock block, Properties properties) {
         super(block.self(), properties);
@@ -34,12 +31,6 @@ public class MetaMachineItem extends BlockItem implements IItemRendererProvider 
 
     public MachineDefinition getDefinition() {
         return ((IMachineBlock) getBlock()).getDefinition();
-    }
-
-    @Nullable
-    @Override
-    public IRenderer getRenderer(ItemStack stack) {
-        return ((IMachineBlock) getBlock()).getDefinition().getRenderer();
     }
 
     @Override

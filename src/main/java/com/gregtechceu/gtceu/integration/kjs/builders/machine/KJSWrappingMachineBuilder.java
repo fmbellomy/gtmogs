@@ -5,6 +5,8 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import net.minecraft.resources.ResourceLocation;
 
 import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
+import dev.latvian.mods.kubejs.generator.KubeDataGenerator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
@@ -49,8 +51,17 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
     }
 
     @Override
+    public void generateData(KubeDataGenerator generator) {
+        tieredBuilder.generateData(generator);
+    }
+
+    @Override
+    public void generateAssets(KubeAssetGenerator generator) {
+        tieredBuilder.generateAssets(generator);
+    }
+
+    @Override
     public void generateLang(LangKubeEvent lang) {
-        super.generateLang(lang);
         tieredBuilder.generateLang(lang);
     }
 

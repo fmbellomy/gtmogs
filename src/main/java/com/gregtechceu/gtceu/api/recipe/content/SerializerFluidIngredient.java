@@ -46,6 +46,11 @@ public class SerializerFluidIngredient implements IContentSerializer<SizedFluidI
     }
 
     @Override
+    public Class<SizedFluidIngredient> contentClass() {
+        return SizedFluidIngredient.class;
+    }
+
+    @Override
     public Codec<SizedFluidIngredient> codec() {
         return SizedFluidIngredient.NESTED_CODEC;
     }

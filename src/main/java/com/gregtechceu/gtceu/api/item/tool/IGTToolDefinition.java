@@ -89,7 +89,7 @@ public interface IGTToolDefinition {
     }
 
     default AoESymmetrical getAoEDefinition() {
-        return AoESymmetrical.none();
+        return AoESymmetrical.ZERO;
     }
 
     /**

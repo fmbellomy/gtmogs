@@ -10,6 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -21,6 +22,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @AllArgsConstructor
@@ -29,7 +31,7 @@ public class SCPacketShareProspection implements CustomPacketPayload {
     public static final ResourceLocation ID = GTCEu.id("share_prospection");
     public static final Type<SCPacketShareProspection> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, SCPacketShareProspection> CODEC = StreamCodec
-            .ofMember(SCPacketShareProspection::encode, SCPacketShareProspection::decode);
+            .ofMember(SCPacketShareProspection::encode, SCPacketShareProspection::new);
 
     private UUID sender;
     private UUID receiver;
@@ -40,7 +42,16 @@ public class SCPacketShareProspection implements CustomPacketPayload {
     private CompoundTag data;
     private boolean first;
 
-    public SCPacketShareProspection() {}
+    public SCPacketShareProspection(FriendlyByteBuf buf) {
+        sender = buf.readUUID();
+        receiver = buf.readUUID();
+        cacheName = buf.readUtf();
+        key = buf.readUtf();
+        isDimCache = buf.readBoolean();
+        dimension = buf.readResourceKey(Registries.DIMENSION);
+        data = buf.readNbt();
+        first = buf.readBoolean();
+    }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeUUID(sender);
@@ -53,22 +64,11 @@ public class SCPacketShareProspection implements CustomPacketPayload {
         buf.writeBoolean(first);
     }
 
-    public static SCPacketShareProspection decode(FriendlyByteBuf buf) {
-        UUID sender = buf.readUUID();
-        UUID receiver = buf.readUUID();
-        String cacheName = buf.readUtf();
-        String key = buf.readUtf();
-        boolean isDimCache = buf.readBoolean();
-        ResourceKey<Level> dimension = buf.readResourceKey(Registries.DIMENSION);
-        CompoundTag data = buf.readNbt();
-        boolean first = buf.readBoolean();
-        return new SCPacketShareProspection(sender, receiver, cacheName, key, isDimCache, dimension, data, first);
-    }
-
     public void execute(IPayloadContext context) {
-        if (context.flow().isClientbound()) {
+        if (context.flow() == PacketFlow.CLIENTBOUND) {
             if (first) {
-                PlayerInfo senderInfo = Minecraft.getInstance().getConnection().getPlayerInfo(sender);
+                PlayerInfo senderInfo = Objects.requireNonNull(Minecraft.getInstance().getConnection())
+                        .getPlayerInfo(sender);
                 if (senderInfo == null) {
                     return;
                 }
@@ -76,6 +76,7 @@ public class SCPacketShareProspection implements CustomPacketPayload {
                 Component playerName = senderInfo.getTabListDisplayName() != null ? senderInfo.getTabListDisplayName() :
                         Component.literal(senderInfo.getProfile().getName());
 
+                assert Minecraft.getInstance().player != null;
                 Minecraft.getInstance().player.sendSystemMessage(Component
                         .translatable("command.gtceu.share_prospection_data.notification", playerName));
             }

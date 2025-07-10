@@ -264,7 +264,6 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
     private static boolean collect(List<IRecipeHandler<?>> itemHandlers, List<IRecipeHandler<?>> fluidHandlers,
                                    List<ItemStack> itemStacks, List<FluidStack> fluidStacks) {
         for (var handler : itemHandlers) {
-            if (!handler.shouldSearchContent()) continue;
             for (var content : handler.getContents()) {
                 if (content instanceof ItemStack stack && !stack.isEmpty()) {
                     itemStacks.add(stack);
@@ -273,7 +272,6 @@ public enum BreweryLogic implements GTRecipeType.ICustomRecipeLogic {
         }
 
         for (var handler : fluidHandlers) {
-            if (!handler.shouldSearchContent()) continue;
             for (var content : handler.getContents()) {
                 if (content instanceof FluidStack stack && !stack.isEmpty()) {
                     fluidStacks.add(stack);

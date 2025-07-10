@@ -21,9 +21,9 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
+import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.api.registry.registrate.MultiblockMachineBuilder;
-
-import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
+import com.gregtechceu.gtceu.api.registry.registrate.provider.GTBlockstateProvider;
 
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -40,6 +40,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import com.tterrag.registrate.builders.BlockBuilder;
 import com.tterrag.registrate.builders.ItemBuilder;
+import com.tterrag.registrate.providers.DataGenContext;
+import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
@@ -121,8 +123,13 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper renderer(@Nullable Supplier<IRenderer> renderer) {
-        internal.renderer(renderer);
+    public MultiblockMachineBuilderWrapper model(@Nullable MachineBuilder.ModelInitializer model) {
+        internal.model(model);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper blockModel(@Nullable NonNullBiConsumer<DataGenContext<Block, ? extends Block>, GTBlockstateProvider> blockModel) {
+        internal.blockModel(blockModel);
         return this;
     }
 
@@ -142,8 +149,8 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper hasTESR(boolean hasTESR) {
-        internal.hasTESR(hasTESR);
+    public MultiblockMachineBuilderWrapper hasBER(boolean hasBER) {
+        internal.hasBER(hasBER);
         return this;
     }
 
@@ -197,52 +204,84 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper modelRenderer(Supplier<ResourceLocation> model) {
-        internal.modelRenderer(model);
+    public MultiblockMachineBuilderWrapper simpleModel(ResourceLocation model) {
+        internal.simpleModel(model);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper defaultModelRenderer() {
-        internal.defaultModelRenderer();
+    public MultiblockMachineBuilderWrapper defaultModel() {
+        internal.defaultModel();
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper tieredHullRenderer(ResourceLocation model) {
-        internal.tieredHullRenderer(model);
+    public MultiblockMachineBuilderWrapper tieredHullModel(ResourceLocation model) {
+        internal.tieredHullModel(model);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper overlayTieredHullRenderer(String name) {
-        internal.overlayTieredHullRenderer(name);
+    public MultiblockMachineBuilderWrapper overlayTieredHullModel(ResourceLocation overlayModel) {
+        internal.overlayTieredHullModel(overlayModel);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableTieredHullRenderer(ResourceLocation workableModel) {
-        internal.workableTieredHullRenderer(workableModel);
+    public MultiblockMachineBuilderWrapper colorOverlayTieredHullModel(ResourceLocation overlay) {
+        internal.colorOverlayTieredHullModel(overlay);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing,
-                                                                  ResourceLocation overlayModel) {
-        internal.workableCasingRenderer(baseCasing, overlayModel);
+    public MultiblockMachineBuilderWrapper colorOverlayTieredHullModel(ResourceLocation overlay,
+                                                                       @Nullable ResourceLocation emissiveOverlay) {
+        internal.colorOverlayTieredHullModel(overlay, emissiveOverlay);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper workableCasingRenderer(ResourceLocation baseCasing,
-                                                                  ResourceLocation overlayModel,
-                                                                  boolean tint) {
-        internal.workableCasingRenderer(baseCasing, overlayModel, tint);
+    public MultiblockMachineBuilderWrapper workableTieredHullModel(ResourceLocation workableModel) {
+        internal.workableTieredHullModel(workableModel);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper sidedWorkableCasingRenderer(String basePath, ResourceLocation overlayModel,
-                                                                       boolean tint) {
-        internal.sidedWorkableCasingRenderer(basePath, overlayModel, tint);
+    public MultiblockMachineBuilderWrapper simpleGeneratorModel(ResourceLocation workableModel) {
+        internal.simpleGeneratorModel(workableModel);
         return this;
     }
 
-    public MultiblockMachineBuilderWrapper sidedWorkableCasingRenderer(String basePath, ResourceLocation overlayModel) {
-        internal.sidedWorkableCasingRenderer(basePath, overlayModel);
+    public MultiblockMachineBuilderWrapper workableCasingModel(ResourceLocation baseCasing,
+                                                               ResourceLocation overlayModel) {
+        internal.workableCasingModel(baseCasing, overlayModel);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper sidedOverlayCasingModel(ResourceLocation baseCasing,
+                                                                   ResourceLocation workableModel) {
+        internal.sidedOverlayCasingModel(baseCasing, workableModel);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper sidedWorkableCasingModel(ResourceLocation baseCasing,
+                                                                    ResourceLocation workableModel) {
+        internal.sidedWorkableCasingModel(baseCasing, workableModel);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper overlaySteamHullModel(ResourceLocation overlayModel) {
+        internal.overlaySteamHullModel(overlayModel);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper colorOverlaySteamHullModel(ResourceLocation overlay,
+                                                                      @Nullable ResourceLocation emissiveOverlay) {
+        internal.colorOverlaySteamHullModel(overlay, emissiveOverlay);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper colorOverlaySteamHullModel(ResourceLocation overlay) {
+        internal.colorOverlaySteamHullModel(overlay);
+        return this;
+    }
+
+    public MultiblockMachineBuilderWrapper workableSteamHullModel(boolean isHighPressure,
+                                                                  ResourceLocation workableModel) {
+        internal.workableSteamHullModel(isHighPressure, workableModel);
         return this;
     }
 
@@ -263,17 +302,6 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
 
     public MultiblockMachineBuilderWrapper langValue(@Nullable String langValue) {
         internal.langValue(langValue);
-        return this;
-    }
-
-    public MultiblockMachineBuilderWrapper overlaySteamHullRenderer(String name) {
-        internal.overlaySteamHullRenderer(name);
-        return this;
-    }
-
-    public MultiblockMachineBuilderWrapper workableSteamHullRenderer(boolean isHighPressure,
-                                                                     ResourceLocation workableModel) {
-        internal.workableSteamHullRenderer(isHighPressure, workableModel);
         return this;
     }
 
@@ -374,7 +402,6 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
         return this;
     }
 
-    @Override
     public MultiblockMachineDefinition createObject() {
         return internal.register();
     }
@@ -385,7 +412,7 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
                 WorkableElectricMultiblockMachine::new,
                 MetaMachineBlock::new,
                 MetaMachineItem::new,
-                MetaMachineBlockEntity::createBlockEntity);
+                MetaMachineBlockEntity::new);
         return new MultiblockMachineBuilderWrapper(id, baseBuilder);
     }
 
@@ -396,7 +423,7 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
                 machine::create,
                 MetaMachineBlock::new,
                 MetaMachineItem::new,
-                MetaMachineBlockEntity::createBlockEntity);
+                MetaMachineBlockEntity::new);
         return new MultiblockMachineBuilderWrapper(id, baseBuilder);
     }
 }

@@ -8,17 +8,33 @@ import com.gregtechceu.gtceu.api.addon.IGTAddon;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.capability.GTCapability;
 import com.gregtechceu.gtceu.api.capability.compat.GTEnergyWrapper;
+import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
+import com.gregtechceu.gtceu.api.capability.recipe.ItemRecipeCapability;
 import com.gregtechceu.gtceu.api.gui.factory.CoverUIFactory;
 import com.gregtechceu.gtceu.api.gui.factory.GTUIEditorFactory;
 import com.gregtechceu.gtceu.api.gui.factory.MachineUIFactory;
 import com.gregtechceu.gtceu.api.item.GTBucketItem;
 import com.gregtechceu.gtceu.api.item.IComponentItem;
 import com.gregtechceu.gtceu.api.item.IGTTool;
+import com.gregtechceu.gtceu.api.item.MetaMachineItem;
+import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.event.PostMaterialEvent;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
+import com.gregtechceu.gtceu.api.material.material.registry.MaterialRegistry;
+import com.gregtechceu.gtceu.api.misc.forge.QuantumFluidHandlerItemStack;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
+import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderFluidIngredient;
+import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.AbstractMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.IntersectionMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.MapIngredientTypeManager;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid.CustomFluidMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid.FluidDataComponentMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid.FluidStackMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.fluid.FluidTagMapIngredient;
+import com.gregtechceu.gtceu.api.recipe.lookup.ingredient.item.*;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
@@ -35,6 +51,7 @@ import com.gregtechceu.gtceu.common.item.DrumMachineItem;
 import com.gregtechceu.gtceu.common.item.tool.rotation.CustomBlockRotations;
 import com.gregtechceu.gtceu.common.machine.multiblock.electric.FusionReactorMachine;
 import com.gregtechceu.gtceu.common.machine.owner.MachineOwner;
+import com.gregtechceu.gtceu.common.machine.storage.QuantumTankMachine;
 import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 import com.gregtechceu.gtceu.common.pack.GTPackSource;
@@ -69,6 +86,7 @@ import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
 import com.gregtechceu.gtceu.data.tools.GTToolBehaviors;
 import com.gregtechceu.gtceu.data.tools.GTToolTiers;
 import com.gregtechceu.gtceu.data.worldgen.GTFeatures;
+import com.gregtechceu.gtceu.integration.cctweaked.CCTweakedPlugin;
 import com.gregtechceu.gtceu.integration.kjs.GTCEuStartupEvents;
 import com.gregtechceu.gtceu.integration.kjs.events.MaterialModificationKubeEvent;
 import com.gregtechceu.gtceu.integration.map.WaypointManager;
@@ -82,8 +100,10 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.EventPriority;
@@ -99,10 +119,15 @@ import net.neoforged.fml.event.lifecycle.InterModProcessEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.Capabilities.FluidHandler;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.common.crafting.DataComponentIngredient;
+import net.neoforged.neoforge.common.crafting.IntersectionIngredient;
+import net.neoforged.neoforge.common.crafting.SizedIngredient;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.wrappers.FluidBucketWrapper;
+import net.neoforged.neoforge.fluids.crafting.*;
 import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -114,11 +139,14 @@ import com.tterrag.registrate.providers.ProviderType;
 import com.tterrag.registrate.providers.RegistrateLangProvider;
 import com.tterrag.registrate.providers.RegistrateProvider;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import mcjty.theoneprobe.api.ITheOneProbe;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
 
@@ -133,6 +161,9 @@ public class CommonInit {
         UIFactory.register(MachineUIFactory.INSTANCE);
         UIFactory.register(CoverUIFactory.INSTANCE);
         UIFactory.register(GTUIEditorFactory.INSTANCE);
+
+        // Initialize the model generator before any content is loaded so machine models can use the generated data
+        GTRegistrateDatagen.initPre();
 
         GTRegistries.init(modBus);
         GTCreativeModeTabs.init();
@@ -194,7 +225,7 @@ public class CommonInit {
         GTMobEffects.MOB_EFFECTS.register(modBus);
         GTParticleTypes.PARTICLE_TYPES.register(modBus);
 
-        GTRegistrateDatagen.init();
+        GTRegistrateDatagen.initPost();
         GTValueProviderTypes.register(modBus);
         GTFeatures.register(modBus);
         WorldGenLayers.registerAll();
@@ -213,7 +244,7 @@ public class CommonInit {
     public static void initMaterials() {
         GTCEu.LOGGER.info("Registering GTCEu Materials");
         GTMaterials.init();
-        GTRegistries.MATERIALS.setFallbackMaterial(GTCEu.MOD_ID, GTMaterials.Aluminium);
+        GTCEuAPI.materialManager.setFallbackMaterial(GTCEu.MOD_ID, GTMaterials.Aluminium);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -222,7 +253,7 @@ public class CommonInit {
         if (event.getRegistryKey() == GTRegistries.MATERIAL_REGISTRY) {
             // Fire Post-Material event, intended for when Materials need to be iterated over in-full before freezing
             // Block entirely new Materials from being added in the Post event
-            GTRegistries.MATERIALS.close();
+            ((MaterialRegistry) GTRegistries.MATERIALS).close();
             ModLoader.postEventWrapContainerInModOrder(new PostMaterialEvent());
             if (GTCEu.Mods.isKubeJSLoaded()) {
                 KJSEventWrapper.materialModification();
@@ -250,6 +281,7 @@ public class CommonInit {
             // Material Items & Tools
             GTMaterialItems.generateMaterialItems();
             GTMaterialItems.generateTools();
+            GTMaterialItems.generateArmors();
             // --spacer--
         } else if (event.getRegistryKey() == Registries.BLOCK_ENTITY_TYPE) {
             GTBlockEntities.init();
@@ -292,12 +324,77 @@ public class CommonInit {
 
     @SubscribeEvent
     public static void modifyRegistries(ModifyRegistriesEvent event) {
-        // noinspection UnstableApiUsage
         GTRegistries.MATERIALS.addCallback((BakeCallback<Material>) registry -> postInitMaterials());
+        GTRegistries.MACHINES.addCallback((BakeCallback<MachineDefinition>) GTMachines::bakeRenderStates);
     }
 
     @SubscribeEvent
-    public static void commonSetup(FMLCommonSetupEvent event) {}
+    public static void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            // register the map ingredient converters for all of our ingredients
+            // spotless:off
+            MapIngredientTypeManager.registerMapIngredient(SizedFluidIngredient.class, (ingredient) -> {
+                FluidIngredient inner = ingredient.ingredient();
+                return MapIngredientTypeManager.getFrom(inner, FluidRecipeCapability.CAP);
+            });
+            MapIngredientTypeManager.registerMapIngredient(IntProviderFluidIngredient.class, (ingredient) -> {
+                FluidIngredient inner = ingredient.getInner();
+                return MapIngredientTypeManager.getFrom(inner, FluidRecipeCapability.CAP);
+            });
+            MapIngredientTypeManager.registerMapIngredient(CompoundFluidIngredient.class, (ingredient) -> {
+                List<AbstractMapIngredient> list = new ObjectArrayList<>();
+                for (FluidIngredient child : ingredient.children()) {
+                    list.addAll(MapIngredientTypeManager.getFrom(child, FluidRecipeCapability.CAP));
+                }
+                return list;
+            });
+
+            MapIngredientTypeManager.registerMapIngredient(DataComponentFluidIngredient.class, FluidDataComponentMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(FluidIngredient.class, FluidTagMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(SingleFluidIngredient.class, FluidStackMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(SingleFluidIngredient.class, FluidStackMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(IntersectionFluidIngredient.class, IntersectionMapIngredient::from);
+
+            MapIngredientTypeManager.registerMapIngredient(FluidStack.class, FluidTagMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(FluidStack.class, FluidStackMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(FluidStack.class, FluidDataComponentMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(FluidStack.class, CustomFluidMapIngredient::from);
+
+            MapIngredientTypeManager.registerMapIngredient(SizedIngredient.class, (ingredient) -> {
+                Ingredient inner = ingredient.ingredient();
+                if (inner.isCustom()) {
+                    return MapIngredientTypeManager.getFrom(inner.getCustomIngredient(), ItemRecipeCapability.CAP);
+                } else {
+                    return MapIngredientTypeManager.getFrom(inner, ItemRecipeCapability.CAP);
+                }
+            });
+            MapIngredientTypeManager.registerMapIngredient(IntProviderIngredient.class, (ingredient) -> {
+                Ingredient inner = ingredient.getInner();
+                if (inner.isCustom()) {
+                    return MapIngredientTypeManager.getFrom(inner.getCustomIngredient(), ItemRecipeCapability.CAP);
+                } else {
+                    return MapIngredientTypeManager.getFrom(inner, ItemRecipeCapability.CAP);
+                }
+            });
+
+            MapIngredientTypeManager.registerMapIngredient(DataComponentIngredient.class, ItemDataComponentMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(Ingredient.class, ItemTagMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(Ingredient.class, ItemStackMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(IntersectionIngredient.class, IntersectionMapIngredient::from);
+
+            MapIngredientTypeManager.registerMapIngredient(ItemStack.class, ItemStackMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(ItemStack.class, ItemTagMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(ItemStack.class, ItemDataComponentMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(ItemStack.class, IntersectionMapIngredient::from);
+            MapIngredientTypeManager.registerMapIngredient(ItemStack.class, CustomItemMapIngredient::from);
+            // spotless:on
+
+            if (GTCEu.Mods.isCCTweakedLoaded()) {
+                GTCEu.LOGGER.info("CC: Tweaked found. Enabling integration...");
+                CCTweakedPlugin.init();
+            }
+        });
+    }
 
     @SubscribeEvent
     public static void loadComplete(FMLLoadCompleteEvent event) {}
@@ -311,6 +408,20 @@ public class CommonInit {
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerItem(FluidHandler.ITEM, BottleItemFluidHandler::new, Items.GLASS_BOTTLE);
+
+        Stream<MachineDefinition> quantumTanks = Stream.of(GTMachines.SUPER_TANK, GTMachines.QUANTUM_TANK)
+                .flatMap(Arrays::stream);
+        quantumTanks = Stream.concat(quantumTanks, Stream.of(GTMachines.CREATIVE_FLUID));
+        event.registerItem(FluidHandler.ITEM, (stack, ctx) -> {
+            if (!(stack.getItem() instanceof MetaMachineItem machineItem)) {
+                return null;
+            }
+            long capacity = QuantumTankMachine.TANK_CAPACITY.getLong(machineItem.getDefinition());
+            if (capacity == -1) {
+                return null;
+            }
+            return new QuantumFluidHandlerItemStack(stack, capacity);
+        }, quantumTanks.map(MachineDefinition::getItem).toArray(Item[]::new));
 
         for (Block block : BuiltInRegistries.BLOCK) {
             if (ConfigHolder.INSTANCE.compat.energy.nativeEUToFE &&

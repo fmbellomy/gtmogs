@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import com.google.common.collect.Table;
 import org.jetbrains.annotations.NotNull;
 
 public class SPacketProspectBedrockFluid extends SPacketProspect<ProspectorMode.FluidInfo> {
@@ -20,10 +19,10 @@ public class SPacketProspectBedrockFluid extends SPacketProspect<ProspectorMode.
     public static final ResourceLocation ID = GTCEu.id("prospect_bedrock_fluid");
     public static final Type<SPacketProspectBedrockFluid> TYPE = new Type<>(ID);
     public static final StreamCodec<RegistryFriendlyByteBuf, SPacketProspectBedrockFluid> CODEC = StreamCodec
-            .ofMember(SPacketProspectBedrockFluid::encode, SPacketProspectBedrockFluid::decode);
+            .ofMember(SPacketProspectBedrockFluid::encode, SPacketProspectBedrockFluid::new);
 
-    public SPacketProspectBedrockFluid(Table<ResourceKey<Level>, BlockPos, ProspectorMode.FluidInfo> data) {
-        super(data);
+    public SPacketProspectBedrockFluid(RegistryFriendlyByteBuf buf) {
+        super(buf);
     }
 
     public SPacketProspectBedrockFluid(ResourceKey<Level> key, BlockPos pos, ProspectorMode.FluidInfo vein) {
@@ -35,12 +34,13 @@ public class SPacketProspectBedrockFluid extends SPacketProspect<ProspectorMode.
         ProspectorMode.FLUID.serialize(data, buf);
     }
 
-    public static SPacketProspectBedrockFluid decode(RegistryFriendlyByteBuf buf) {
-        return SPacketProspect.decode(buf, ProspectorMode.FLUID::deserialize, SPacketProspectBedrockFluid::new);
+    @Override
+    public ProspectorMode.FluidInfo decodeData(RegistryFriendlyByteBuf buf) {
+        return ProspectorMode.FLUID.deserialize(buf);
     }
 
     @Override
-    public void execute(IPayloadContext handler) {
+    public void execute(IPayloadContext context) {
         data.rowMap().forEach((level, fluids) -> fluids
                 .forEach((blockPos, fluid) -> GTClientCache.instance.addFluid(level,
                         blockPos.getX() >> 4, blockPos.getZ() >> 4, fluid)));

@@ -79,9 +79,11 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
 
     // Stats tracked for UI display
     private long netInLastSec;
-    private long averageInLastSec;
+    @Getter
+    private long inputPerSec;
     private long netOutLastSec;
-    private long averageOutLastSec;
+    @Getter
+    private long outputPerSec;
 
     protected ConditionalSubscriptionHandler tickSubscription;
 
@@ -113,9 +115,9 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
                         .map(IEnergyContainer.class::cast)
                         .toList();
 
-                if (handlerList.getHandlerIO() == IO.IN) {
+                if (handlerList.getHandlerIO().support(IO.IN)) {
                     inputs.addAll(containers);
-                } else if (handlerList.getHandlerIO() == IO.OUT) {
+                } else if (handlerList.getHandlerIO().support(IO.OUT)) {
                     outputs.addAll(containers);
                 }
 
@@ -157,9 +159,9 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
         outputHatches = null;
         passiveDrain = 0;
         netInLastSec = 0;
-        averageInLastSec = 0;
+        inputPerSec = 0;
         netOutLastSec = 0;
-        averageOutLastSec = 0;
+        outputPerSec = 0;
         super.onStructureInvalid();
     }
 
@@ -169,8 +171,8 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
                 // active here is just used for rendering
                 getRecipeLogic()
                         .setStatus(energyBank.hasEnergy() ? RecipeLogic.Status.WORKING : RecipeLogic.Status.IDLE);
-                averageInLastSec = netInLastSec / 20;
-                averageOutLastSec = netOutLastSec / 20;
+                inputPerSec = netInLastSec;
+                outputPerSec = netOutLastSec;
                 netInLastSec = 0;
                 netOutLastSec = 0;
             }
@@ -239,30 +241,30 @@ public class PowerSubstationMachine extends WorkableMultiblockMachine
                 textList.add(Component.translatable("gtceu.multiblock.power_substation.passive_drain",
                         passiveDrainComponent.setStyle(STYLE_DARK_RED)));
 
-                var avgInComponent = Component.literal(FormattingUtil.formatNumbers(averageInLastSec));
+                var avgInComponent = Component.literal(FormattingUtil.formatNumbers(inputPerSec / 20));
                 textList.add(Component
                         .translatable("gtceu.multiblock.power_substation.average_in",
                                 avgInComponent.setStyle(STYLE_GREEN))
                         .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 Component.translatable("gtceu.multiblock.power_substation.average_in_hover")))));
 
-                var avgOutComponent = Component.literal(FormattingUtil.formatNumbers(Math.abs(averageOutLastSec)));
+                var avgOutComponent = Component.literal(FormattingUtil.formatNumbers(Math.abs(outputPerSec / 20)));
                 textList.add(Component
                         .translatable("gtceu.multiblock.power_substation.average_out",
                                 avgOutComponent.setStyle(STYLE_RED))
                         .withStyle(Style.EMPTY.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
                                 Component.translatable("gtceu.multiblock.power_substation.average_out_hover")))));
 
-                if (averageInLastSec > averageOutLastSec) {
+                if (inputPerSec > outputPerSec) {
                     BigInteger timeToFillSeconds = energyCapacity.subtract(energyStored)
                             .divide(BigInteger.valueOf(Mth.floor(
-                                    (averageInLastSec - averageOutLastSec) * getLevel().tickRateManager().tickrate())));
+                                    (inputPerSec - outputPerSec) / 20.0f * getLevel().tickRateManager().tickrate())));
                     textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_fill",
                             getTimeToFillDrainText(timeToFillSeconds).setStyle(STYLE_GREEN)));
-                } else if (averageInLastSec < averageOutLastSec) {
+                } else if (inputPerSec < outputPerSec) {
                     BigInteger timeToDrainSeconds = energyStored
                             .divide(BigInteger.valueOf(Mth.floor(
-                                    (averageOutLastSec - averageInLastSec) * getLevel().tickRateManager().tickrate())));
+                                    (outputPerSec - inputPerSec) / 20.0f * getLevel().tickRateManager().tickrate())));
                     textList.add(Component.translatable("gtceu.multiblock.power_substation.time_to_drain",
                             getTimeToFillDrainText(timeToDrainSeconds).setStyle(STYLE_RED)));
                 }

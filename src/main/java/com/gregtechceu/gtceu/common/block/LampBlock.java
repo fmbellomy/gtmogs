@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.common.block;
 
+import com.gregtechceu.gtceu.api.block.property.GTBlockStateProperties;
 import com.gregtechceu.gtceu.api.item.LampBlockItem;
 import com.gregtechceu.gtceu.client.renderer.block.LampRenderer;
 import com.gregtechceu.gtceu.data.item.GTDataComponents;
@@ -35,9 +36,9 @@ import java.util.Map;
 
 public class LampBlock extends Block implements IBlockRendererProvider {
 
-    public static final BooleanProperty BLOOM = BooleanProperty.create("bloom");
+    public static final BooleanProperty BLOOM = GTBlockStateProperties.BLOOM;
     public static final BooleanProperty LIGHT = BlockStateProperties.LIT;
-    public static final BooleanProperty INVERTED = BooleanProperty.create("inverted");
+    public static final BooleanProperty INVERTED = GTBlockStateProperties.INVERTED;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 
     public static final int BLOOM_FLAG = 1;
@@ -54,7 +55,7 @@ public class LampBlock extends Block implements IBlockRendererProvider {
         this.color = color;
         this.bordered = bordered;
         registerDefaultState(defaultBlockState()
-                .setValue(BLOOM, true)
+                .setValue(GTBlockStateProperties.BLOOM, true)
                 .setValue(LIGHT, true)
                 .setValue(INVERTED, false)
                 .setValue(POWERED, false));
@@ -76,7 +77,7 @@ public class LampBlock extends Block implements IBlockRendererProvider {
     }
 
     public static boolean isBloomEnabled(BlockState state) {
-        return state.getValue(BLOOM);
+        return state.getValue(GTBlockStateProperties.BLOOM);
     }
 
     public LampBlockItem.LampData getDataFromState(BlockState state) {
@@ -94,7 +95,7 @@ public class LampBlock extends Block implements IBlockRendererProvider {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        super.createBlockStateDefinition(builder.add(INVERTED, BLOOM, LIGHT, POWERED));
+        super.createBlockStateDefinition(builder.add(INVERTED, GTBlockStateProperties.BLOOM, LIGHT, POWERED));
     }
 
     @Override

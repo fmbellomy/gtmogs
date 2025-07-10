@@ -30,4 +30,7 @@ public class GTIngredientTypes {
 
     public static final DeferredHolder<FluidIngredientType<?>, FluidIngredientType<ExDataComponentFluidIngredient>> DATA_COMPONENT_FLUID_INGREDIENT = FLUID_INGREDIENT_TYPES
             .register("components", () -> new FluidIngredientType<>(ExDataComponentFluidIngredient.CODEC));
+
+    public static final DeferredHolder<FluidIngredientType<?>, FluidIngredientType<IntProviderFluidIngredient>> INT_PROVIDER_FLUID_INGREDIENT = FLUID_INGREDIENT_TYPES
+            .register("int_provider", () -> new FluidIngredientType<>(IntProviderFluidIngredient.CODEC));
 }

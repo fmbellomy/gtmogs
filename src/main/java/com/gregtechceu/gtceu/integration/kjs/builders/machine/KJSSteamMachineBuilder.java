@@ -5,8 +5,8 @@ import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.steam.SimpleSteamMachine;
+import com.gregtechceu.gtceu.api.multiblock.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
-import com.gregtechceu.gtceu.client.renderer.machine.WorkableSteamMachineRenderer;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.utils.FormattingUtil;
 
@@ -42,7 +42,8 @@ public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
         lowPressureBuilder.langValue("Low Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
                 .tier(0)
                 .recipeModifier(SimpleSteamMachine::recipeModifier)
-                .renderer(() -> new WorkableSteamMachineRenderer(false, id.withPrefix("block/machines/")));
+                .modelProperty(SimpleSteamMachine.VENT_DIRECTION_PROPERTY, RelativeDirection.BACK)
+                .workableSteamHullModel(false, id.withPrefix("block/machines/"));
         definition.apply(false, lowPressureBuilder);
         var lowPressure = lowPressureBuilder.register();
 
@@ -53,7 +54,8 @@ public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
             highPressureBuilder.langValue("High Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
                     .tier(1)
                     .recipeModifier(SimpleSteamMachine::recipeModifier)
-                    .renderer(() -> new WorkableSteamMachineRenderer(true, id.withPrefix("block/machines/")));
+                    .modelProperty(SimpleSteamMachine.VENT_DIRECTION_PROPERTY, RelativeDirection.BACK)
+                    .workableSteamHullModel(true, id.withPrefix("block/machines/"));
             definition.apply(true, highPressureBuilder);
             hp = highPressureBuilder.register();
         }

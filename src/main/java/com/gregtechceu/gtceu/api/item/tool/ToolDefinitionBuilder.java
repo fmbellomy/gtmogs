@@ -54,7 +54,7 @@ public class ToolDefinitionBuilder {
     @Setter
     private Supplier<ItemStack> brokenStack = () -> ItemStack.EMPTY;
     @Setter
-    private AoESymmetrical aoe = AoESymmetrical.none();
+    private AoESymmetrical aoe = AoESymmetrical.ZERO;
     private final Object2IntMap<ResourceKey<Enchantment>> defaultEnchantments = new Object2IntArrayMap<>();
 
     public ToolDefinitionBuilder behaviors(IToolBehavior<?>... behaviours) {

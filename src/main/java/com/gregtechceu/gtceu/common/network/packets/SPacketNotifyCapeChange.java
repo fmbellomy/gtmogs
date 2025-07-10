@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.cosmetics.CapeRegistry;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -20,10 +21,15 @@ public class SPacketNotifyCapeChange implements CustomPacketPayload {
     public static final ResourceLocation ID = GTCEu.id("cape_changed");
     public static final Type<SPacketNotifyCapeChange> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, SPacketNotifyCapeChange> CODEC = StreamCodec
-            .ofMember(SPacketNotifyCapeChange::encode, SPacketNotifyCapeChange::decode);
+            .ofMember(SPacketNotifyCapeChange::encode, SPacketNotifyCapeChange::new);
 
     private final UUID uuid;
     private final ResourceLocation cape;
+
+    public SPacketNotifyCapeChange(FriendlyByteBuf buf) {
+        uuid = buf.readUUID();
+        cape = buf.readBoolean() ? buf.readResourceLocation() : null;
+    }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeUUID(this.uuid);
@@ -33,14 +39,8 @@ public class SPacketNotifyCapeChange implements CustomPacketPayload {
         }
     }
 
-    public static SPacketNotifyCapeChange decode(FriendlyByteBuf buf) {
-        UUID uuid = buf.readUUID();
-        ResourceLocation cape = buf.readBoolean() ? buf.readResourceLocation() : null;
-        return new SPacketNotifyCapeChange(uuid, cape);
-    }
-
-    public void execute(IPayloadContext handler) {
-        if (handler.flow().isClientbound()) {
+    public void execute(IPayloadContext context) {
+        if (context.flow() == PacketFlow.CLIENTBOUND) {
             CapeRegistry.giveRawCape(uuid, cape);
         }
     }

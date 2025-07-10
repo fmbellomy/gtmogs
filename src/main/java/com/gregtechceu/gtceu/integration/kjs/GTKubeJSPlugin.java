@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTCEuAPI;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
+import com.gregtechceu.gtceu.api.cosmetics.CapeRegistry;
 import com.gregtechceu.gtceu.api.fluid.FluidBuilder;
 import com.gregtechceu.gtceu.api.fluid.FluidState;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
@@ -22,6 +23,7 @@ import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialFlags;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconSet;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
+import com.gregtechceu.gtceu.api.material.material.properties.ArmorProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
@@ -37,6 +39,7 @@ import com.gregtechceu.gtceu.api.recipe.OverclockingLogic;
 import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.component.CraftingComponent;
+import com.gregtechceu.gtceu.api.recipe.ingredient.EnergyStack;
 import com.gregtechceu.gtceu.api.recipe.modifier.ModifierFunction;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
@@ -45,9 +48,13 @@ import com.gregtechceu.gtceu.api.worldgen.bedrockfluid.BedrockFluidDefinition;
 import com.gregtechceu.gtceu.api.worldgen.bedrockore.BedrockOreDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
+import com.gregtechceu.gtceu.api.worldgen.generator.indicators.NoopIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator.IndicatorPlacement;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.DikeVeinGenerator;
+import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
+import com.gregtechceu.gtceu.common.cosmetics.GTCapes;
 import com.gregtechceu.gtceu.common.machine.multiblock.primitive.PrimitiveFancyUIWorkableMachine;
+import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.data.block.GCYMBlocks;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
@@ -60,6 +67,8 @@ import com.gregtechceu.gtceu.data.machine.GTMultiMachines;
 import com.gregtechceu.gtceu.data.material.GTElements;
 import com.gregtechceu.gtceu.data.material.GTMaterials;
 import com.gregtechceu.gtceu.data.medicalcondition.GTMedicalConditions;
+import com.gregtechceu.gtceu.data.model.GTMachineModels;
+import com.gregtechceu.gtceu.data.model.GTModels;
 import com.gregtechceu.gtceu.data.recipe.GTCraftingComponents;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeCategories;
 import com.gregtechceu.gtceu.data.recipe.GTRecipeModifiers;
@@ -85,23 +94,25 @@ import com.gregtechceu.gtceu.integration.kjs.helpers.MachineModifiers;
 import com.gregtechceu.gtceu.integration.kjs.helpers.MaterialStackWrapper;
 import com.gregtechceu.gtceu.integration.kjs.recipe.GTRecipeSchema;
 import com.gregtechceu.gtceu.integration.kjs.recipe.GTShapedRecipeSchema;
+import com.gregtechceu.gtceu.integration.kjs.recipe.KJSHelpers;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.CapabilityMapComponent;
 import com.gregtechceu.gtceu.integration.kjs.recipe.components.GTRecipeComponents;
+import com.gregtechceu.gtceu.utils.data.RuntimeBlockStateProvider;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 
-import com.mojang.serialization.DataResult;
+import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
-import dev.latvian.mods.kubejs.plugin.builtin.wrapper.NBTWrapper;
 import dev.latvian.mods.kubejs.recipe.component.RecipeComponentTypeRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaRegistry;
 import dev.latvian.mods.kubejs.registry.BuilderTypeRegistry;
@@ -110,8 +121,6 @@ import dev.latvian.mods.kubejs.script.BindingRegistry;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.kubejs.util.ID;
 import dev.latvian.mods.rhino.Wrapper;
-
-import java.util.*;
 
 public class GTKubeJSPlugin implements KubeJSPlugin {
 
@@ -182,10 +191,33 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         registry.register(GTCEuServerEvents.GROUP);
     }
 
+    // Fake a data provider for the GT model builders so we don't need to handle this ourselves in any way :3
+    public static RuntimeBlockStateProvider RUNTIME_BLOCKSTATE_PROVIDER = null;
+
+    public static void initRuntimeProvider(final KubeAssetGenerator generator) {
+        if (RUNTIME_BLOCKSTATE_PROVIDER == null) {
+            RUNTIME_BLOCKSTATE_PROVIDER = new RuntimeBlockStateProvider(GTRegistration.REGISTRATE,
+                    new PackOutput(KubeJSPaths.DIRECTORY),
+                    (loc, json) -> {
+                        if (loc.getPath().endsWith(".json")) {
+                            loc = loc.withPath(p -> p.substring(0, p.length() - 5));
+                        }
+                        generator.json(loc, json);
+                    });
+        }
+    }
+
+    @Override
+    public void generateAssets(KubeAssetGenerator generator) {
+        RUNTIME_BLOCKSTATE_PROVIDER = null;
+    }
+
     @Override
     public void registerClasses(ClassFilter filter) {
         // allow user to access all gtceu classes by importing them.
         filter.allow("com.gregtechceu.gtceu");
+        filter.deny("com.gregtechceu.gtceu.core");
+        filter.deny("com.gregtechceu.gtceu.common.network");
     }
 
     @Override
@@ -236,17 +268,25 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         event.add("ChemicalHelper", ChemicalHelper.class);
         event.add("PropertyKey", PropertyKey.class);
         event.add("ToolProperty", ToolProperty.class);
+        event.add("ArmorProperty", ArmorProperty.class);
         event.add("GTToolType", GTToolType.class);
         // Block/Item related
         event.add("GTBlocks", GTBlocks.class);
         event.add("GTMaterialBlocks", GTMaterialBlocks.class);
         event.add("GCYMBlocks", GCYMBlocks.class);
+        event.add("GTItems", GTItems.class);
+        event.add("GTMaterialItems", GTMaterialItems.class);
+        // Machine related
         event.add("GTMachines", GTMachines.class);
         event.add("GTMultiMachines", GTMultiMachines.class);
         event.add("GTMachineUtils", GTMachineUtils.class);
         event.add("GCYMMachines", GCYMMachines.class);
-        event.add("GTItems", GTItems.class);
-        event.add("GTMaterialItems", GTMaterialItems.class);
+        // Multiblock related
+        event.add("RotationState", RotationState.class);
+        event.add("FactoryBlockPattern", FactoryBlockPattern.class);
+        event.add("MultiblockShapeInfo", MultiblockShapeInfo.class);
+        event.add("Predicates", Predicates.class);
+        event.add("PartAbility", PartAbility.class);
         // Recipe related
         event.add("GTRecipeTypes", GTRecipeTypes.class);
         event.add("GTRecipeCategories", GTRecipeCategories.class);
@@ -261,17 +301,16 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         event.add("CleanroomType", CleanroomType.class);
         event.add("CraftingComponent", CraftingComponent.class);
         event.add("GTCraftingComponents", GTCraftingComponents.class);
+        event.add("EnergyStack", EnergyStack.class);
+        event.add("IOEnergyStack", EnergyStack.WithIO.class);
         // Sound related
         event.add("GTSoundEntries", GTSoundEntries.class);
         event.add("SoundType", SoundType.class);
         // GUI related
         event.add("GuiTextures", GuiTextures.class);
-        // Multiblock related
-        event.add("RotationState", RotationState.class);
-        event.add("FactoryBlockPattern", FactoryBlockPattern.class);
-        event.add("MultiblockShapeInfo", MultiblockShapeInfo.class);
-        event.add("Predicates", Predicates.class);
-        event.add("PartAbility", PartAbility.class);
+        // Client/Server data related
+        event.add("GTModels", GTModels.class);
+        event.add("GTMachineModels", GTMachineModels.class);
 
         // Hazard Related
         event.add("HazardProperty", HazardProperty.class);
@@ -279,57 +318,64 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         event.add("Symptom", Symptom.class);
         // World Gen Related
         event.add("GTOreVein", OreVeinDefinition.class);
+        event.add("OreVeinDefinition", OreVeinDefinition.class);
         event.add("GTLayerPattern", GTLayerPattern.class);
         event.add("GTDikeBlockDefinition", DikeVeinGenerator.DikeBlockDefinition.class);
         event.add("GTOres", GTOreVeins.class);
+        event.add("GTOreVeins", GTOreVeins.class);
         event.add("GTWorldGenLayers", WorldGenLayers.class);
-        // MaterialColor stuff, for TagPrefix
+        // Cape related
+        event.add("GTCapes", GTCapes.class);
+        event.add("CapeRegistry", CapeRegistry.class);
     }
 
     @Override
     public void registerTypeWrappers(TypeWrapperRegistry registry) {
         registry.register(GTResourceLocation.class, GTResourceLocation::wrap);
         registry.register(GTRecipeType.class, o -> {
-            if (o instanceof Wrapper w) {
-                o = w.unwrap();
-            }
+            o = Wrapper.unwrapped(o);
             if (o instanceof GTRecipeType recipeType) return recipeType;
             if (o instanceof CharSequence chars) return GTRecipeTypes.get(chars.toString());
             return null;
         });
         registry.register(GTRecipeCategory.class, o -> {
-            if (o instanceof Wrapper w) {
-                o = w.unwrap();
-            }
+            o = Wrapper.unwrapped(o);
             if (o instanceof GTRecipeCategory recipeCategory) return recipeCategory;
             if (o instanceof CharSequence chars) return GTRecipeCategories.get(chars.toString());
             return null;
         });
 
         registry.register(Element.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof Element element) return element;
             if (o instanceof CharSequence chars) return GTElements.get(chars.toString());
             return null;
         });
         registry.register(Material.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof Material material) return material;
             if (o instanceof CharSequence chars) return GTMaterials.get(chars.toString());
             return null;
         });
         registry.register(MachineDefinition.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof MachineDefinition definition) return definition;
             if (o instanceof CharSequence chars) return GTMachines.get(chars.toString());
             return null;
         });
 
         registry.register(TagPrefix.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof TagPrefix tagPrefix) return tagPrefix;
             if (o instanceof ResourceLocation resLoc) return GTRegistries.TAG_PREFIXES.get(resLoc);
-            return GTRegistries.TAG_PREFIXES.get(GTResourceLocation.wrap(o).wrapped());
+            GTResourceLocation wrapper = GTResourceLocation.wrap(o);
+            if (wrapper == null) return null;
+            return GTRegistries.TAG_PREFIXES.get(wrapper.wrapped());
         });
         registry.register(MaterialEntry.class, MaterialEntry::of);
 
         registry.register(RecipeCapability.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof RecipeCapability<?> capability) return capability;
             if (o instanceof ResourceLocation id) return GTRegistries.RECIPE_CAPABILITIES.get(id);
             GTResourceLocation wrapper = GTResourceLocation.wrap(o);
@@ -337,6 +383,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
             return GTRegistries.RECIPE_CAPABILITIES.get(wrapper.wrapped());
         });
         registry.register(ChanceLogic.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof ChanceLogic capability) return capability;
             if (o instanceof ResourceLocation id) return GTRegistries.CHANCE_LOGICS.get(id);
             GTResourceLocation wrapper = GTResourceLocation.wrap(o);
@@ -345,17 +392,20 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         });
 
         registry.register(MaterialIconSet.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof MaterialIconSet iconSet) return iconSet;
             if (o instanceof CharSequence chars) return MaterialIconSet.getByName(chars.toString());
             return null;
         });
         registry.register(MaterialStack.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof MaterialStack stack) return stack;
             if (o instanceof Material material) return new MaterialStack(material, 1);
             if (o instanceof CharSequence chars) return MaterialStack.fromString(chars);
             return null;
         });
         registry.register(MaterialStackWrapper.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof MaterialStackWrapper wrapper) return wrapper;
             if (o instanceof MaterialStack stack) return new MaterialStackWrapper(stack::material, stack.amount());
             if (o instanceof Material material) return new MaterialStackWrapper(() -> material, 1);
@@ -364,49 +414,18 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
         });
 
         registry.register(IWorldGenLayer.class, o -> {
+            o = Wrapper.unwrapped(o);
             if (o instanceof IWorldGenLayer layer) return layer;
             if (o instanceof CharSequence chars) return WorldGenLayers.getByName(chars.toString());
             return null;
         });
-        registry.register(HeightRangePlacement.class, (cx, o, t) -> {
-            if (o instanceof HeightRangePlacement placement) return placement;
-            return Optional.ofNullable(NBTWrapper.wrapCompound(cx, o))
-                    .map(tag -> HeightRangePlacement.CODEC.codec().parse(NbtOps.INSTANCE, tag))
-                    .flatMap(DataResult::result)
-                    .orElse(null);
-        });
-        registry.register(BiomeWeightModifier.class, (cx, o, t) -> {
-            if (o instanceof BiomeWeightModifier modifier) return modifier;
-            return Optional.ofNullable(NBTWrapper.wrapCompound(cx, o))
-                    .map(tag -> BiomeWeightModifier.CODEC.parse(NbtOps.INSTANCE, tag))
-                    .flatMap(DataResult::result)
-                    .orElse(null);
-        });
-        registry.register(VeinGenerator.class, (cx, o, t) -> {
-            if (o instanceof VeinGenerator generator) return generator;
-            return Optional.ofNullable(NBTWrapper.wrapCompound(cx, o))
-                    .map(tag -> VeinGenerator.DIRECT_CODEC.parse(NbtOps.INSTANCE, tag))
-                    .flatMap(DataResult::result)
-                    .orElse(null);
-        });
-        registry.register(IndicatorGenerator.class, (cx, o, t) -> {
-            if (o instanceof IndicatorGenerator generator) return generator;
-            return Optional.ofNullable(NBTWrapper.wrapCompound(cx, o))
-                    .map(tag -> IndicatorGenerator.DIRECT_CODEC.parse(NbtOps.INSTANCE, tag))
-                    .flatMap(DataResult::result)
-                    .orElse(null);
-        });
-        registry.register(IndicatorPlacement.class, o -> {
-            if (o instanceof IndicatorPlacement placement) return placement;
-            if (o instanceof CharSequence str) return IndicatorPlacement.getByName(str.toString());
-            return null;
-        });
-        registry.register(MedicalCondition.class, o -> {
-            if (o instanceof MedicalCondition condition) return condition;
-            if (o instanceof CharSequence str) return MedicalCondition.CONDITIONS.get(str.toString());
-            return null;
-        });
-        // jank because Rhino doesn't agree that it's an interface
+        registry.registerMapCodec(HeightRangePlacement.class, HeightRangePlacement.CODEC);
+        registry.registerCodec(BiomeWeightModifier.class, BiomeWeightModifier.CODEC, BiomeWeightModifier.EMPTY);
+        registry.registerCodec(VeinGenerator.class, VeinGenerator.DIRECT_CODEC, NoopVeinGenerator.INSTANCE);
+        registry.registerCodec(IndicatorGenerator.class, IndicatorGenerator.DIRECT_CODEC,
+                NoopIndicatorGenerator.INSTANCE);
+        registry.registerCodec(IndicatorPlacement.class, IndicatorPlacement.CODEC, IndicatorPlacement.SURFACE);
+
         registry.register(IWorldGenLayer.RuleTestSupplier.class, (cx, o, t) -> {
             if (o instanceof IWorldGenLayer.RuleTestSupplier supplier) return supplier;
             return () -> BlockStatePredicate.wrapRuleTest(cx, o);
@@ -416,5 +435,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
             if (o instanceof CharSequence str) return CraftingComponent.ALL_COMPONENTS.get(str.toString());
             return null;
         });
+        registry.register(EnergyStack.class, KJSHelpers::parseEnergyStack);
+        registry.register(EnergyStack.WithIO.class, KJSHelpers::parseIOEnergyStack);
     }
 }

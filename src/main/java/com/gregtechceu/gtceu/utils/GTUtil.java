@@ -10,6 +10,7 @@ import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.config.ConfigHolder;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,6 +36,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
@@ -51,6 +53,16 @@ import static com.gregtechceu.gtceu.api.material.material.properties.PropertyKey
 public class GTUtil {
 
     public static final Direction[] DIRECTIONS = Direction.values();
+
+    @SuppressWarnings("UnstableApiUsage")
+    public static final ImmutableList<BlockPos> NON_CORNER_NEIGHBOURS = Util.make(() -> {
+        var builder = ImmutableList.<BlockPos>builderWithExpectedSize(18);
+        BlockPos.betweenClosedStream(-1, -1, -1, 1, 1, 1)
+                .filter((pos) -> (pos.getX() == 0 || pos.getY() == 0 || pos.getZ() == 0) && !pos.equals(BlockPos.ZERO))
+                .map(BlockPos::immutable)
+                .forEach(builder::add);
+        return builder.build();
+    });
 
     private static final Object2IntMap<String> RVN = new Object2IntArrayMap<>(GTValues.VN, GTValues.ALL_TIERS);
 

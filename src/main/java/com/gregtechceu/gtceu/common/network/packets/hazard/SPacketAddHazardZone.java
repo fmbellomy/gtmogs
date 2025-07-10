@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.common.capability.EnvironmentalHazardSavedData;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
@@ -20,24 +21,25 @@ public class SPacketAddHazardZone implements CustomPacketPayload {
     public static final ResourceLocation ID = GTCEu.id("add_hazard_zone");
     public static final Type<SPacketAddHazardZone> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, SPacketAddHazardZone> CODEC = StreamCodec
-            .ofMember(SPacketAddHazardZone::encode, SPacketAddHazardZone::decode);
+            .ofMember(SPacketAddHazardZone::encode, SPacketAddHazardZone::new);
 
     private ChunkPos pos;
     private EnvironmentalHazardSavedData.HazardZone zone;
+
+    public SPacketAddHazardZone(FriendlyByteBuf buf) {
+        pos = buf.readChunkPos();
+        zone = EnvironmentalHazardSavedData.HazardZone.fromNetwork(buf);
+    }
 
     public void encode(FriendlyByteBuf buf) {
         buf.writeChunkPos(pos);
         zone.toNetwork(buf);
     }
 
-    public static SPacketAddHazardZone decode(FriendlyByteBuf buf) {
-        ChunkPos pos = buf.readChunkPos();
-        var zone = EnvironmentalHazardSavedData.HazardZone.fromNetwork(buf);
-        return new SPacketAddHazardZone(pos, zone);
-    }
-
-    public void execute(IPayloadContext handler) {
-        EnvironmentalHazardClientHandler.INSTANCE.addHazardZone(this.pos, this.zone);
+    public void execute(IPayloadContext context) {
+        if (context.flow() == PacketFlow.CLIENTBOUND) {
+            EnvironmentalHazardClientHandler.INSTANCE.addHazardZone(this.pos, this.zone);
+        }
     }
 
     @Override

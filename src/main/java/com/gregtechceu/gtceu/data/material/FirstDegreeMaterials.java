@@ -6,6 +6,7 @@ import com.gregtechceu.gtceu.api.fluid.FluidState;
 import com.gregtechceu.gtceu.api.fluid.attribute.FluidAttributes;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.ArmorProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.BlastProperty.GasTier;
 import com.gregtechceu.gtceu.api.material.material.properties.HazardProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
@@ -105,6 +106,8 @@ public class FirstDegreeMaterials {
                 .components(Tin, 1, Copper, 3)
                 .toolStats(ToolProperty.Builder.of(3.0F, 2.0F, 192, 2)
                         .enchantability(18).addTypes(GTToolType.MORTAR).build())
+                .armorStats(ArmorProperty.Builder.of(17, new int[] { 3, 7, 6, 2 })
+                        .enchantability(8).build())
                 .rotorStats(115, 105, 2.5f, 192)
                 .fluidPipeProperties(1696, 20, true)
                 .buildAndRegister();
@@ -627,6 +630,8 @@ public class FirstDegreeMaterials {
                 .components(Iron, 1)
                 .toolStats(ToolProperty.Builder.of(5.0F, 3.0F, 512, 3)
                         .addTypes(GTToolType.MORTAR)
+                        .enchantability(14).build())
+                .armorStats(ArmorProperty.Builder.of(19, new int[] { 3, 7, 5, 2 })
                         .enchantability(14).build())
                 .rotorStats(130, 105, 3.0f, 512)
                 .fluidPipeProperties(1855, 50, true)

@@ -4,8 +4,15 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.client.model.machine.MachineRenderState;
 
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.syncdata.IManaged;
+import com.lowdragmc.lowdraglib.syncdata.annotation.DescSynced;
+import com.lowdragmc.lowdraglib.syncdata.annotation.Persisted;
+import com.lowdragmc.lowdraglib.syncdata.annotation.RequireRerender;
+import com.lowdragmc.lowdraglib.syncdata.field.FieldManagedStorage;
+import com.lowdragmc.lowdraglib.syncdata.field.ManagedFieldHolder;
 import com.lowdragmc.lowdraglib.syncdata.managed.MultiManagedStorage;
 
 import net.minecraft.core.BlockPos;
@@ -24,28 +31,47 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlockEntity {
+public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlockEntity, IManaged {
+
+    protected static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(
+            MetaMachineBlockEntity.class);
 
     public final MultiManagedStorage managedStorage = new MultiManagedStorage();
     @Getter
+    private final FieldManagedStorage syncStorage = new FieldManagedStorage(this);
+    @Getter
     public final MetaMachine metaMachine;
+    @Getter
+    @Persisted
+    @DescSynced
+    @RequireRerender
+    private MachineRenderState renderState;
     private final long offset = GTValues.RNG.nextInt(20);
 
-    protected MetaMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
+    public MetaMachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState blockState) {
         super(type, pos, blockState);
+        this.renderState = getDefinition().defaultRenderState();
         this.metaMachine = getDefinition().createMetaMachine(this);
-    }
 
-    public static MetaMachineBlockEntity createBlockEntity(BlockEntityType<?> type, BlockPos pos,
-                                                           BlockState blockState) {
-        return new MetaMachineBlockEntity(type, pos, blockState);
+        this.getRootStorage().attach(getSyncStorage());
     }
-
-    public static void onBlockEntityRegister(BlockEntityType<BlockEntity> type) {}
 
     @Override
     public MultiManagedStorage getRootStorage() {
         return managedStorage;
+    }
+
+    @Override
+    public ManagedFieldHolder getFieldHolder() {
+        return MANAGED_FIELD_HOLDER;
+    }
+
+    @Override
+    public void onChanged() {
+        var level = getLevel();
+        if (level != null && !level.isClientSide && level.getServer() != null) {
+            level.getServer().execute(this::setChanged);
+        }
     }
 
     @Override
@@ -87,6 +113,12 @@ public class MetaMachineBlockEntity extends BlockEntity implements IMachineBlock
     public void removeComponentsFromTag(CompoundTag tag) {
         super.removeComponentsFromTag(tag);
         metaMachine.removeItemComponentsFromTag(tag);
+    }
+
+    @Override
+    public void setRenderState(MachineRenderState state) {
+        this.renderState = state;
+        scheduleRenderUpdate();
     }
 
     @Override

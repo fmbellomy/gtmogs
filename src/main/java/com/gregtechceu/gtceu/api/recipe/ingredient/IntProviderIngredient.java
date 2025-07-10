@@ -1,14 +1,10 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
-import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.data.tag.GTIngredientTypes;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.IntProvider;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
@@ -25,9 +21,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+import static com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderFluidIngredient.intProviderEqual;
+
 public class IntProviderIngredient implements ICustomIngredient {
 
-    public static final ResourceLocation TYPE = GTCEu.id("int_provider");
     public static final MapCodec<IntProviderIngredient> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             Ingredient.CODEC.fieldOf("inner").forGetter(IntProviderIngredient::getInner),
             IntProvider.CODEC.fieldOf("count_provider").forGetter(IntProviderIngredient::getCountProvider))
@@ -40,15 +37,11 @@ public class IntProviderIngredient implements ICustomIngredient {
     @Getter
     protected final Ingredient inner;
     @Setter
-    protected ItemStack[] itemStacks = null;
+    protected @NotNull ItemStack @Nullable [] itemStacks = null;
 
     protected IntProviderIngredient(Ingredient inner, IntProvider countProvider) {
         this.inner = inner;
         this.countProvider = countProvider;
-    }
-
-    public static Ingredient ofTag(@NotNull TagKey<Item> tag, IntProvider countProvider) {
-        return of(Ingredient.of(tag), countProvider);
     }
 
     public static Ingredient of(Ingredient inner, IntProvider countProvider) {
@@ -62,13 +55,19 @@ public class IntProviderIngredient implements ICustomIngredient {
         return inner.test(stack);
     }
 
+    public ItemStack[] getItemStacks() {
+        if (itemStacks == null) {
+            itemStacks = inner.getItems();
+            for (int i = 0; i < itemStacks.length; i++) {
+                itemStacks[i] = itemStacks[i].copyWithCount(getSampledCount(GTValues.RNG));
+            }
+        }
+        return itemStacks;
+    }
+
     @Override
     public Stream<ItemStack> getItems() {
-        if (itemStacks == null)
-            itemStacks = Arrays.stream(inner.getItems())
-                    .map(i -> i.copyWithCount(getSampledCount(GTValues.RNG)))
-                    .toArray(ItemStack[]::new);
-        return Arrays.stream(itemStacks);
+        return Arrays.stream(getItemStacks());
     }
 
     @Override
@@ -77,8 +76,28 @@ public class IntProviderIngredient implements ICustomIngredient {
     }
 
     @Override
+    public int hashCode() {
+        return this.inner.hashCode() * 31 * this.countProvider.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof IntProviderIngredient other)) {
+            return false;
+        }
+
+        return this.inner.equals(other.inner) && intProviderEqual(this.countProvider, other.countProvider);
+    }
+
+    @Override
     public IngredientType<?> getType() {
         return GTIngredientTypes.INT_PROVIDER_INGREDIENT.get();
+    }
+
+    public @NotNull ItemStack getMaxSizeStack() {
+        if (inner.getItems().length == 0) return ItemStack.EMPTY;
+        else return inner.getItems()[0].copyWithCount(countProvider.getMaxValue());
     }
 
     public int getSampledCount(@NotNull RandomSource random) {

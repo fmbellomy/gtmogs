@@ -4,7 +4,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.integration.map.cache.client.GTClientCache;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
@@ -12,7 +11,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-import com.google.common.collect.Table;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -22,10 +20,10 @@ public class SPacketProspectOre extends SPacketProspect<GeneratedVeinMetadata> {
     public static final ResourceLocation ID = GTCEu.id("prospect_ore");
     public static final Type<SPacketProspectOre> TYPE = new Type<>(ID);
     public static final StreamCodec<RegistryFriendlyByteBuf, SPacketProspectOre> CODEC = StreamCodec
-            .ofMember(SPacketProspectOre::encode, SPacketProspectOre::decode);
+            .ofMember(SPacketProspectOre::encode, SPacketProspectOre::new);
 
-    public SPacketProspectOre(Table<ResourceKey<Level>, BlockPos, GeneratedVeinMetadata> data) {
-        super(data);
+    public SPacketProspectOre(RegistryFriendlyByteBuf buf) {
+        super(buf);
     }
 
     public SPacketProspectOre(ResourceKey<Level> key, Collection<GeneratedVeinMetadata> veins) {
@@ -37,12 +35,13 @@ public class SPacketProspectOre extends SPacketProspect<GeneratedVeinMetadata> {
         data.writeToPacket(buf);
     }
 
-    public static SPacketProspectOre decode(RegistryFriendlyByteBuf buf) {
-        return SPacketProspect.decode(buf, GeneratedVeinMetadata::readFromPacket, SPacketProspectOre::new);
+    @Override
+    public GeneratedVeinMetadata decodeData(RegistryFriendlyByteBuf buf) {
+        return GeneratedVeinMetadata.readFromPacket(buf);
     }
 
     @Override
-    public void execute(IPayloadContext handler) {
+    public void execute(IPayloadContext context) {
         data.rowMap().forEach((level, ores) -> ores
                 .forEach((blockPos, vein) -> GTClientCache.instance.addVein(level,
                         blockPos.getX() >> 4, blockPos.getZ() >> 4, vein)));

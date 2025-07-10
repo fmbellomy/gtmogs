@@ -34,10 +34,7 @@ import net.minecraft.data.loot.packs.VanillaBlockLoot;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagEntry;
-import net.minecraft.tags.TagKey;
-import net.minecraft.tags.TagLoader;
+import net.minecraft.tags.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -59,6 +56,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.common.Tags;
 
 import com.tterrag.registrate.util.entry.BlockEntry;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -101,8 +99,11 @@ public class MixinHelpers {
                         .map(MixinHelpers::makeItemEntry)
                         .collect(toArrayList());
 
-                var materialTags = entry.tagPrefix().getAllItemTags(material);
-                for (TagKey<Item> materialTag : materialTags) {
+                var prefixTagKeys = entry.tagPrefix().getAllItemTags(material);
+                for (TagKey<Item> prefixTag : prefixTagKeys) {
+                    tagMap.computeIfAbsent(prefixTag.location(), path -> new ArrayList<>()).addAll(entries);
+                }
+                for (TagKey<Item> materialTag : material.getItemTags()) {
                     tagMap.computeIfAbsent(materialTag.location(), path -> new ArrayList<>()).addAll(entries);
                 }
 
@@ -124,6 +125,31 @@ public class MixinHelpers {
                     var entry = makeItemEntry(item);
                     for (TagKey<Item> tag : item.get().getToolType().itemTags) {
                         tagMap.computeIfAbsent(tag.location(), path -> new ArrayList<>()).add(entry);
+                    }
+                });
+            });
+
+            GTMaterialItems.ARMOR_ITEMS.rowMap().forEach((material, map) -> {
+                map.forEach((type, item) -> {
+                    if (item != null) {
+                        var entry = new TagLoader.EntryWithSource(TagEntry.element(item.getId()),
+                                GTValues.CUSTOM_TAG_SOURCE);
+                        tagMap.computeIfAbsent(ItemTags.TRIMMABLE_ARMOR.location(), $ -> new ArrayList<>())
+                                .add(entry);
+                        tagMap.computeIfAbsent(switch (type) {
+                            case HELMET -> ItemTags.HEAD_ARMOR.location();
+                            case CHESTPLATE -> ItemTags.CHEST_ARMOR.location();
+                            case LEGGINGS -> ItemTags.LEG_ARMOR.location();
+                            case BOOTS -> ItemTags.FOOT_ARMOR.location();
+                            case BODY -> Tags.Items.ARMORS.location();
+                        }, $ -> new ArrayList<>()).add(entry);
+                        tagMap.computeIfAbsent(switch (type) {
+                            case HELMET -> ItemTags.HEAD_ARMOR_ENCHANTABLE.location();
+                            case CHESTPLATE -> ItemTags.CHEST_ARMOR_ENCHANTABLE.location();
+                            case LEGGINGS -> ItemTags.LEG_ARMOR_ENCHANTABLE.location();
+                            case BOOTS -> ItemTags.FOOT_ARMOR_ENCHANTABLE.location();
+                            case BODY -> Tags.Items.ENCHANTABLES.location();
+                        }, $ -> new ArrayList<>()).add(entry);
                     }
                 });
             });

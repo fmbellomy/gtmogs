@@ -8,6 +8,7 @@ import net.minecraft.core.component.DataComponentPredicate;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.HolderSetCodec;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -92,6 +93,13 @@ public class ExDataComponentIngredient extends DataComponentIngredient {
      */
     public static @NotNull Ingredient of(boolean strict, DataComponentMap map, HolderSet<Item> items) {
         return of(strict, DataComponentPredicate.allOf(map), items);
+    }
+
+    /**
+     * Creates a new ingredient matching any item in the tag, containing the given components
+     */
+    public static @NotNull Ingredient of(boolean strict, DataComponentPredicate predicate, TagKey<Item> tag) {
+        return of(strict, predicate, BuiltInRegistries.ITEM.getOrCreateTag(tag));
     }
 
     /**

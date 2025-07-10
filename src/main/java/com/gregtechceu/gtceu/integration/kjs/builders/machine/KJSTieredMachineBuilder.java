@@ -10,11 +10,15 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
+import com.gregtechceu.gtceu.data.model.GTMachineModels;
+import com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin;
 
 import net.minecraft.resources.ResourceLocation;
 
 import com.google.common.base.Preconditions;
+import com.tterrag.registrate.providers.DataGenContext;
 import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Setter;
@@ -22,14 +26,17 @@ import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Locale;
+import java.util.*;
 import java.util.function.BiFunction;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
+import static com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin.RUNTIME_BLOCKSTATE_PROVIDER;
 import static com.gregtechceu.gtceu.utils.FormattingUtil.toEnglishName;
 
 @Accessors(fluent = true, chain = true)
 public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefinition @NotNull []> {
+
+    private final MachineBuilder<?>[] builders = new MachineBuilder[TIER_COUNT];
 
     @Setter
     public volatile int[] tiers = GTMachineUtils.ELECTRIC_TIERS;
@@ -58,10 +65,36 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
     }
 
     @Override
+    public void generateAssets(KubeAssetGenerator generator) {
+        GTKubeJSPlugin.initRuntimeProvider(generator);
+
+        super.generateAssets(generator);
+        for (int tier : this.tiers) {
+            MachineBuilder<?> builder = this.builders[tier];
+            MachineDefinition definition = this.object[tier];
+            if (builder == null || definition == null) {
+                continue;
+            }
+            if (builder.model() == null && builder.blockModel() == null) return;
+
+            final ResourceLocation id = definition.getId();
+            // Fake a data provider for the GT model builders
+            var context = new DataGenContext<>(definition::getBlock, definition.getName(), id);
+            if (builder.blockModel() != null) {
+                builder.blockModel().accept(context, RUNTIME_BLOCKSTATE_PROVIDER);
+            } else {
+                GTMachineModels.createMachineModel(builder.model()).accept(context, RUNTIME_BLOCKSTATE_PROVIDER);
+            }
+
+            generator.itemModel(id, gen -> gen.parent(id.withPrefix("block/machine/")));
+        }
+    }
+
+    @Override
     public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
-        for (int tier : tiers) {
-            MachineDefinition def = object[tier];
+        for (int tier : this.tiers) {
+            MachineDefinition def = this.object[tier];
             if (def != null && def.getLangValue() != null) {
                 lang.add(GTCEu.MOD_ID, def.getDescriptionId(), def.getLangValue());
             }
@@ -80,15 +113,16 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
         @Nullable
         MachineDefinition @NotNull [] definitions = new MachineDefinition[TIER_COUNT];
         for (final int tier : tiers) {
-            String tierName = GTValues.VN[tier].toLowerCase(Locale.ROOT);
-            final Int2IntFunction tankFunction = tankScalingFunction != null ?
-                    tankScalingFunction : GTMachineUtils.defaultTankSizeFunction;
+            String tierName = VN[tier].toLowerCase(Locale.ROOT);
+            final Int2IntFunction tankFunction = Objects.requireNonNullElse(tankScalingFunction,
+                    GTMachineUtils.defaultTankSizeFunction);
+
             MachineBuilder<?> builder = GTRegistration.REGISTRATE.machine(
                     String.format("%s_%s", tierName, this.id.getPath()),
                     holder -> machine.create(holder, tier, tankFunction));
 
             builder.langValue("%s %s %s".formatted(VLVH[tier], toEnglishName(this.id.getPath()), VLVT[tier]))
-                    .workableTieredHullRenderer(id.withPrefix("block/machines/"))
+                    .workableTieredHullModel(id.withPrefix("block/machines/"))
                     .tier(tier);
             this.definition.apply(tier, builder);
             if (builder.recipeTypes() != null && builder.recipeTypes().length > 0) {
@@ -102,6 +136,7 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
                                     tankScalingFunction.applyAsInt(tier), true));
                 }
             }
+            this.builders[tier] = builder;
             definitions[tier] = builder.register();
         }
         return definitions;

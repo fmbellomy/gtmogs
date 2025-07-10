@@ -12,7 +12,6 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 
 import java.util.Collection;
-import java.util.function.Function;
 
 public abstract class SPacketProspect<T> implements CustomPacketPayload {
 
@@ -20,21 +19,6 @@ public abstract class SPacketProspect<T> implements CustomPacketPayload {
 
     protected SPacketProspect() {
         data = HashBasedTable.create();
-    }
-
-    protected SPacketProspect(Table<ResourceKey<Level>, BlockPos, T> data) {
-        this.data = data;
-    }
-
-    protected SPacketProspect(Collection<ResourceKey<Level>> keys, Collection<BlockPos> positions,
-                              Collection<T> prospected) {
-        this();
-        var keyIterator = keys.iterator();
-        var posIterator = positions.iterator();
-        var prospectedIterator = prospected.iterator();
-        while (keyIterator.hasNext()) {
-            data.put(keyIterator.next(), posIterator.next(), prospectedIterator.next());
-        }
     }
 
     protected SPacketProspect(ResourceKey<Level> key, Collection<BlockPos> positions, Collection<T> prospected) {
@@ -51,7 +35,23 @@ public abstract class SPacketProspect<T> implements CustomPacketPayload {
         data.put(key, position, prospected);
     }
 
+    public SPacketProspect(RegistryFriendlyByteBuf buf) {
+        this();
+        var rowCount = buf.readInt();
+        for (int i = 0; i < rowCount; i++) {
+            var rowKey = buf.readResourceKey(Registries.DIMENSION);
+            var entryCount = buf.readInt();
+            for (int j = 0; j < entryCount; j++) {
+                var blockPos = buf.readBlockPos();
+                var t = decodeData(buf);
+                data.put(rowKey, blockPos, t);
+            }
+        }
+    }
+
     public abstract void encodeData(RegistryFriendlyByteBuf buf, T data);
+
+    public abstract T decodeData(RegistryFriendlyByteBuf buf);
 
     public void encode(RegistryFriendlyByteBuf buf) {
         buf.writeInt(data.rowKeySet().size());
@@ -65,23 +65,5 @@ public abstract class SPacketProspect<T> implements CustomPacketPayload {
         });
     }
 
-    public static <T, V extends SPacketProspect<T>> V decode(RegistryFriendlyByteBuf buf,
-                                                             Function<RegistryFriendlyByteBuf, T> decodeFunction,
-                                                             Function<Table<ResourceKey<Level>, BlockPos, T>, V> createFunction) {
-        Table<ResourceKey<Level>, BlockPos, T> data = HashBasedTable.create();
-
-        var rowCount = buf.readInt();
-        for (int i = 0; i < rowCount; i++) {
-            var rowKey = buf.readResourceKey(Registries.DIMENSION);
-            var entryCount = buf.readInt();
-            for (int j = 0; j < entryCount; j++) {
-                var blockPos = buf.readBlockPos();
-                var t = decodeFunction.apply(buf);
-                data.put(rowKey, blockPos, t);
-            }
-        }
-        return createFunction.apply(data);
-    }
-
-    public abstract void execute(IPayloadContext handler);
+    public abstract void execute(IPayloadContext context);
 }

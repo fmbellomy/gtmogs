@@ -38,6 +38,7 @@ import com.gregtechceu.gtceu.utils.GTUtil;
 import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.item.ItemPropertyFunction;
 import net.minecraft.core.cauldron.CauldronInteraction;
@@ -48,6 +49,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.Item;
@@ -56,6 +59,7 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -66,25 +70,21 @@ import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 
 import com.google.common.base.Preconditions;
 import com.tterrag.registrate.builders.ItemBuilder;
-import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.providers.ProviderType;
-import com.tterrag.registrate.providers.RegistrateLangProvider;
 import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullFunction;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
-import static com.gregtechceu.gtceu.data.datagen.client.GTModels.createTextureModel;
-import static com.gregtechceu.gtceu.data.datagen.client.GTModels.overrideModel;
 import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.ITEM;
 import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.TOOL;
+import static com.gregtechceu.gtceu.data.model.GTModels.createTextureModel;
+import static com.gregtechceu.gtceu.data.model.GTModels.overrideModel;
 import static com.gregtechceu.gtceu.utils.FormattingUtil.toEnglishName;
 
 public class GTItems {
@@ -126,6 +126,7 @@ public class GTItems {
             .onRegister(materialInfo(new ItemMaterialInfo(new MaterialStack(GTMaterials.Steel, GTValues.M * 4))))
             .register();
 
+    @SuppressWarnings("unchecked")
     public static final ItemEntry<Item>[] SHAPE_MOLDS = new ItemEntry[13];
     public static final ItemEntry<Item> SHAPE_MOLD_PLATE;
     public static final ItemEntry<Item> SHAPE_MOLD_GEAR;
@@ -2250,6 +2251,7 @@ public class GTItems {
                                             Math.pow(1, ConfigHolder.INSTANCE.tools.voltageTierNightVision - 1)),
                                     ConfigHolder.INSTANCE.tools.voltageTierNightVision, ArmorItem.Type.HELMET)))
             .lang("Nightvision Goggles")
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.HEAD_ARMOR)
             .register();
 
@@ -2263,6 +2265,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierNanoSuit)))
             .lang("NanoMuscle™ Suite Chestplate")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .register();
     public static ItemEntry<ArmorComponentItem> NANO_LEGGINGS = REGISTRATE
@@ -2275,6 +2278,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierNanoSuit)))
             .lang("NanoMuscle™ Suite Leggings")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.LEG_ARMOR)
             .register();
     public static ItemEntry<ArmorComponentItem> NANO_BOOTS = REGISTRATE
@@ -2297,8 +2301,9 @@ public class GTItems {
                                     Math.pow(4, ConfigHolder.INSTANCE.tools.voltageTierNanoSuit - 3)),
                             ConfigHolder.INSTANCE.tools.voltageTierNanoSuit)))
             .lang("NanoMuscle™ Suite Helmet")
-            .tag(ItemTags.HEAD_ARMOR)
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
+            .tag(ItemTags.HEAD_ARMOR)
             .register();
 
     public static ItemEntry<ArmorComponentItem> FACE_MASK = REGISTRATE
@@ -2306,6 +2311,7 @@ public class GTItems {
                     (p) -> new ArmorComponentItem(GTArmorMaterials.BAD_PPE_EQUIPMENT, ArmorItem.Type.HELMET, p)
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.HELMET, "bad_hazmat")))
             .lang("Face Mask")
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.HEAD_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .onRegister(attach(new TooltipBehavior(tooltips -> {
@@ -2318,6 +2324,7 @@ public class GTItems {
                     (p) -> new ArmorComponentItem(GTArmorMaterials.BAD_PPE_EQUIPMENT, ArmorItem.Type.HELMET, p)
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.CHESTPLATE, "bad_hazmat")))
             .lang("Rubber Gloves")
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .onRegister(attach(new TooltipBehavior(tooltips -> {
@@ -2331,6 +2338,7 @@ public class GTItems {
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.CHESTPLATE, "hazmat")))
             .lang("Hazardous Materials Suit Chestpiece")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2340,6 +2348,7 @@ public class GTItems {
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.LEGGINGS, "hazmat")))
             .lang("Hazardous Materials Suit Leggings")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.LEG_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2349,6 +2358,7 @@ public class GTItems {
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.BOOTS, "hazmat")))
             .lang("Hazardous Materials Suit Boots")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.FOOT_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2358,6 +2368,7 @@ public class GTItems {
                             .setArmorLogic(new HazmatSuit(ArmorItem.Type.HELMET, "hazmat")))
             .lang("Hazardous Materials Suit Headpiece")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.HEAD_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2372,6 +2383,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierQuarkTech)))
             .lang("QuarkTech™ Suite Chestplate")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .tag(ItemTags.FREEZE_IMMUNE_WEARABLES)
             .tag(CustomTags.PPE_ARMOR)
@@ -2386,6 +2398,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierQuarkTech)))
             .lang("QuarkTech™ Suite Leggings")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.LEG_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2398,6 +2411,7 @@ public class GTItems {
                             ConfigHolder.INSTANCE.tools.voltageTierQuarkTech)))
             .lang("QuarkTech™ Suite Boots")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.FOOT_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .tag(CustomTags.STEP_BOOTS)
@@ -2411,6 +2425,7 @@ public class GTItems {
                             ConfigHolder.INSTANCE.tools.voltageTierQuarkTech)))
             .lang("QuarkTech™ Suite Helmet")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.HEAD_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2420,6 +2435,7 @@ public class GTItems {
                     (p) -> new ArmorComponentItem(GTArmorMaterials.JETPACK, ArmorItem.Type.CHESTPLATE, p)
                             .setArmorLogic(new PowerlessJetpack()))
             .lang("Liquid Fuel Jetpack")
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .setData(ProviderType.ITEM_MODEL, NonNullBiConsumer.noop())
             .register();
@@ -2432,6 +2448,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierImpeller)))
             .lang("Electric Jetpack")
             .properties(p -> p.rarity(Rarity.UNCOMMON))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .model(overrideModel(GTCEu.id("electric_jetpack"), 8))
             .onRegister(modelPredicate(GTCEu.id("electric_jetpack"), ElectricStats::getStoredPredicate))
@@ -2446,6 +2463,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierAdvImpeller)))
             .lang("Advanced Electric Jetpack")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .register();
     public static ItemEntry<ArmorComponentItem> NANO_CHESTPLATE_ADVANCED = REGISTRATE
@@ -2457,6 +2475,7 @@ public class GTItems {
                                     ConfigHolder.INSTANCE.tools.voltageTierAdvNanoSuit)))
             .lang("Advanced NanoMuscle™ Suite Chestplate")
             .properties(p -> p.rarity(Rarity.RARE))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .tag(CustomTags.PPE_ARMOR)
             .register();
@@ -2470,6 +2489,7 @@ public class GTItems {
                             ConfigHolder.INSTANCE.tools.voltageTierAdvQuarkTech)))
             .lang("Advanced QuarkTech™ Suite Chestplate")
             .properties(p -> p.rarity(Rarity.EPIC))
+            .transform(addArmorClientExtensions())
             .tag(ItemTags.CHEST_ARMOR)
             .tag(ItemTags.FREEZE_IMMUNE_WEARABLES)
             .tag(CustomTags.PPE_ARMOR)
@@ -2598,13 +2618,20 @@ public class GTItems {
         };
     }
 
-    @NotNull
-    private static <
-            T extends Item> NonNullBiConsumer<DataGenContext<Item, T>, RegistrateLangProvider> reverseLangValue() {
-        return (ctx, prov) -> {
-            var names = Arrays.stream(ctx.getName().split("/.")).collect(Collectors.toList());
-            Collections.reverse(names);
-            prov.add(ctx.get(), names.stream().map(StringUtils::capitalize).collect(Collectors.joining(" ")));
+    @SuppressWarnings("removal")
+    public static <P,
+            S2 extends ItemBuilder<ArmorComponentItem, P>> NonNullFunction<S2, S2> addArmorClientExtensions() {
+        return builder -> {
+            builder.clientExtension(item -> () -> () -> new IClientItemExtensions() {
+
+                @Override
+                public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack,
+                                                                       EquipmentSlot equipmentSlot,
+                                                                       HumanoidModel<?> original) {
+                    return item.getArmorLogic().getArmorModel(livingEntity, itemStack, equipmentSlot, original);
+                }
+            });
+            return builder;
         };
     }
 

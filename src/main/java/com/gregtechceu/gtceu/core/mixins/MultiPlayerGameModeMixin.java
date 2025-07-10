@@ -29,8 +29,8 @@ public class MultiPlayerGameModeMixin {
             return;
         }
         ItemStack mainHandItem = minecraft.player.getMainHandItem();
-        if (!ToolHelper.hasBehaviorsComponent((mainHandItem)) ||
-                ToolHelper.getAoEDefinition(mainHandItem).isNone() ||
+        if (!ToolHelper.hasBehaviorsComponent(mainHandItem) ||
+                ToolHelper.getAoEDefinition(mainHandItem).isZero() ||
                 !mainHandItem.isCorrectToolForDrops(minecraft.level.getBlockState(pos))) {
             return;
         }

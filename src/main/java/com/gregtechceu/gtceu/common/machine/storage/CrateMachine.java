@@ -32,6 +32,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 
 import lombok.Getter;
@@ -42,6 +43,8 @@ public class CrateMachine extends MetaMachine implements IUIMachine, IMachineLif
 
     public static final ManagedFieldHolder MANAGED_FIELD_HOLDER = new ManagedFieldHolder(CrateMachine.class,
             MetaMachine.MANAGED_FIELD_HOLDER);
+
+    public static final BooleanProperty TAPED_PROPERTY = BooleanProperty.create("taped");
 
     @Override
     public @NotNull ManagedFieldHolder getFieldHolder() {
@@ -102,7 +105,8 @@ public class CrateMachine extends MetaMachine implements IUIMachine, IMachineLif
                     stack.shrink(1);
                 }
                 isTaped = true;
-                return ItemInteractionResult.SUCCESS;
+                setRenderState(getRenderState().setValue(TAPED_PROPERTY, isTaped));
+                return ItemInteractionResult.sidedSuccess(world.isClientSide);
             }
         }
         return IInteractedMachine.super.onUseWithItem(stack, state, world, pos, player, hand, hit);
@@ -111,9 +115,10 @@ public class CrateMachine extends MetaMachine implements IUIMachine, IMachineLif
     @Override
     public void applyImplicitComponents(MetaMachineBlockEntity.@NotNull ExDataComponentInput componentInput) {
         super.applyImplicitComponents(componentInput);
-        if (componentInput.get(GTDataComponents.TAPED) != null) {
+        if (componentInput.get(DataComponents.CONTAINER) != null) {
             var contents = componentInput.getOrDefault(DataComponents.CONTAINER, ItemContainerContents.EMPTY);
             contents.copyInto(inventory.storage.getStacks());
+            setRenderState(getRenderState().setValue(TAPED_PROPERTY, false));
         }
     }
 

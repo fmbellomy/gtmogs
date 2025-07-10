@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.api.worldgen.bedrockfluid;
 
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.config.ConfigHolder;
+import com.gregtechceu.gtceu.utils.memoization.GTMemoizer;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -14,12 +15,12 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.function.Supplier;
+
 public class FluidVeinWorldEntry {
 
-    @Nullable
-    @Getter
     @Setter
-    private Holder<BedrockFluidDefinition> definition;
+    private Supplier<@Nullable Holder<BedrockFluidDefinition>> definition;
     @Getter
     private int fluidYield;
     @Getter
@@ -27,12 +28,17 @@ public class FluidVeinWorldEntry {
 
     public FluidVeinWorldEntry(@Nullable Holder<BedrockFluidDefinition> definition, int fluidYield,
                                int operationsRemaining) {
-        this.definition = definition;
+        this.definition = () -> definition;
         this.fluidYield = fluidYield;
         this.operationsRemaining = operationsRemaining;
     }
 
     private FluidVeinWorldEntry() {}
+
+    @Nullable
+    public Holder<BedrockFluidDefinition> getDefinition() {
+        return this.definition.get();
+    }
 
     @SuppressWarnings("unused")
     public void setOperationsRemaining(int amount) {
@@ -48,8 +54,10 @@ public class FluidVeinWorldEntry {
         var tag = new CompoundTag();
         tag.putInt("fluidYield", fluidYield);
         tag.putInt("operationsRemaining", operationsRemaining);
-        if (definition != null && definition.unwrapKey().isPresent()) {
-            tag.putString("vein", definition.unwrapKey().get().location().toString());
+
+        Holder<BedrockFluidDefinition> def = getDefinition();
+        if (def != null && def.unwrapKey().isPresent()) {
+            tag.putString("vein", def.unwrapKey().get().location().toString());
         }
         return tag;
     }
@@ -62,9 +70,11 @@ public class FluidVeinWorldEntry {
 
         if (tag.contains("vein")) {
             ResourceLocation id = ResourceLocation.parse(tag.getString("vein"));
-            var maybeDef = provider.lookup(GTRegistries.BEDROCK_FLUID_REGISTRY).get()
-                    .get(ResourceKey.create(GTRegistries.BEDROCK_FLUID_REGISTRY, id));
-            maybeDef.ifPresent(info::setDefinition);
+            info.setDefinition(GTMemoizer.memoize(() -> {
+                return provider.lookup(GTRegistries.BEDROCK_FLUID_REGISTRY)
+                        .flatMap(reg -> reg.get(ResourceKey.create(GTRegistries.BEDROCK_FLUID_REGISTRY, id)))
+                        .orElse(null);
+            }));
         }
         return info;
     }

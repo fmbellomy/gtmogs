@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.api.registry.registrate;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.block.MetaMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
@@ -12,7 +11,6 @@ import com.gregtechceu.gtceu.api.machine.MetaMachine;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.MultiblockControllerMachine;
 import com.gregtechceu.gtceu.core.mixins.AbstractRegistrateAccessor;
-import com.gregtechceu.gtceu.utils.FormattingUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -23,6 +21,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,7 +36,6 @@ import net.neoforged.neoforge.registries.RegisterEvent;
 
 import com.tterrag.registrate.AbstractRegistrate;
 import com.tterrag.registrate.builders.Builder;
-import com.tterrag.registrate.builders.ItemBuilder;
 import com.tterrag.registrate.builders.NoConfigBuilder;
 import com.tterrag.registrate.util.OneTimeEventReceiver;
 import com.tterrag.registrate.util.entry.ItemEntry;
@@ -47,7 +45,6 @@ import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -55,7 +52,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
 
 public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
 
@@ -65,6 +61,10 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
 
     protected GTRegistrate(String modId) {
         super(modId);
+    }
+
+    public ResourceLocation makeResourceLocation(String path) {
+        return ResourceLocation.fromNamespaceAndPath(this.getModid(), path);
     }
 
     /**
@@ -157,23 +157,14 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
                                                                                      BiFunction<BlockBehaviour.Properties, DEFINITION, IMachineBlock> blockFactory,
                                                                                      BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
                                                                                      TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        return new MachineBuilder<>(this, name, definitionFactory, metaMachine, blockFactory, itemFactory,
-                blockEntityFactory);
+        return new MachineBuilder<>(this, name, definitionFactory, metaMachine,
+                blockFactory, itemFactory, blockEntityFactory);
     }
 
     public MachineBuilder<MachineDefinition> machine(String name,
                                                      Function<IMachineBlockEntity, MetaMachine> metaMachine) {
-        return new MachineBuilder<>(this, name, MachineDefinition::createDefinition, metaMachine,
-                MetaMachineBlock::new, MetaMachineItem::new, MetaMachineBlockEntity::createBlockEntity);
-    }
-
-    public Stream<MachineBuilder<MachineDefinition>> machine(String name,
-                                                             BiFunction<IMachineBlockEntity, Integer, MetaMachine> metaMachine,
-                                                             int... tiers) {
-        return Arrays.stream(tiers)
-                .mapToObj(tier -> new MachineBuilder<>(this, name + "." + GTValues.VN[tier].toLowerCase(Locale.ROOT),
-                        MachineDefinition::createDefinition, holder -> metaMachine.apply(holder, tier),
-                        MetaMachineBlock::new, MetaMachineItem::new, MetaMachineBlockEntity::createBlockEntity));
+        return new MachineBuilder<>(this, name, MachineDefinition::new, metaMachine,
+                MetaMachineBlock::new, MetaMachineItem::new, MetaMachineBlockEntity::new);
     }
 
     public MultiblockMachineBuilder multiblock(String name,
@@ -181,14 +172,14 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
                                                BiFunction<BlockBehaviour.Properties, MultiblockMachineDefinition, IMachineBlock> blockFactory,
                                                BiFunction<IMachineBlock, Item.Properties, MetaMachineItem> itemFactory,
                                                TriFunction<BlockEntityType<?>, BlockPos, BlockState, IMachineBlockEntity> blockEntityFactory) {
-        return new MultiblockMachineBuilder(this, name, metaMachine, blockFactory, itemFactory,
-                blockEntityFactory);
+        return new MultiblockMachineBuilder(this, name, metaMachine,
+                blockFactory, itemFactory, blockEntityFactory);
     }
 
     public MultiblockMachineBuilder multiblock(String name,
                                                Function<IMachineBlockEntity, ? extends MultiblockControllerMachine> metaMachine) {
-        return new MultiblockMachineBuilder(this, name, metaMachine, MetaMachineBlock::new,
-                MetaMachineItem::new, MetaMachineBlockEntity::createBlockEntity);
+        return new MultiblockMachineBuilder(this, name, metaMachine,
+                MetaMachineBlock::new, MetaMachineItem::new, MetaMachineBlockEntity::new);
     }
 
     public SoundEntryBuilder sound(String name) {
@@ -199,10 +190,29 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
         return new SoundEntryBuilder(name);
     }
 
+    // Blocks
     @Override
-    public <T extends Item> @NotNull ItemBuilder<T, GTRegistrate> item(String name,
-                                                                       NonNullFunction<Item.Properties, T> factory) {
-        return super.item(name, factory).lang(FormattingUtil.toEnglishName(name.replaceAll("\\.", "_")));
+    public <T extends Block> GTBlockBuilder<T, GTRegistrate> block(NonNullFunction<BlockBehaviour.Properties, T> factory) {
+        return block(this, factory);
+    }
+
+    @Override
+    public <T extends Block> GTBlockBuilder<T, GTRegistrate> block(String name,
+                                                                   NonNullFunction<BlockBehaviour.Properties, T> factory) {
+        return block(this, name, factory);
+    }
+
+    @Override
+    public <T extends Block, P> GTBlockBuilder<T, P> block(P parent,
+                                                           NonNullFunction<BlockBehaviour.Properties, T> factory) {
+        return block(parent, currentName(), factory);
+    }
+
+    @Override
+    public <T extends Block, P> GTBlockBuilder<T, P> block(P parent, String name,
+                                                           NonNullFunction<BlockBehaviour.Properties, T> factory) {
+        return (GTBlockBuilder<T, P>) entry(name,
+                callback -> GTBlockBuilder.create(this, parent, name, callback, factory));
     }
 
     @Nullable

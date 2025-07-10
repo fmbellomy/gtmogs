@@ -47,6 +47,11 @@ public class SerializerIngredient implements IContentSerializer<SizedIngredient>
     }
 
     @Override
+    public Class<SizedIngredient> contentClass() {
+        return SizedIngredient.class;
+    }
+
+    @Override
     public Codec<SizedIngredient> codec() {
         return SizedIngredient.NESTED_CODEC;
     }

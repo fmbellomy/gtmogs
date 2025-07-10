@@ -5,6 +5,8 @@ import com.gregtechceu.gtceu.api.gui.misc.PacketProspecting;
 import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
+import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
+import com.lowdragmc.lowdraglib.gui.texture.TransformTexture;
 import com.lowdragmc.lowdraglib.gui.util.DrawerHelper;
 import com.lowdragmc.lowdraglib.utils.ColorUtils;
 
@@ -23,16 +25,20 @@ import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import lombok.Getter;
+import org.joml.Matrix4f;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
 
 import static com.mojang.blaze3d.vertex.DefaultVertexFormat.POSITION_TEX_COLOR;
 
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @OnlyIn(Dist.CLIENT)
 public class ProspectingTexture extends AbstractTexture {
 
     public static final String SELECTED_ALL = "[all]";
+    private static final ResourceTexture ARROW = GuiTextures.UP.copy().setColor(ColorPattern.RED.color);
+
     @Getter
     private String selected = SELECTED_ALL;
     private boolean darkMode;
@@ -104,13 +110,13 @@ public class ProspectingTexture extends AbstractTexture {
         NativeImage image = new NativeImage(wh, wh, false);
         for (int i = 0; i < wh; i++) {
             for (int j = 0; j < wh; j++) {
-                var items = this.data[i * mode.cellSize / 16][j * mode.cellSize / 16];
+                Object[] items = this.data[i * mode.cellSize / 16][j * mode.cellSize / 16];
                 // draw bg
                 image.setPixelRGBA(i, j, (darkMode ? ColorPattern.GRAY.color : ColorPattern.WHITE.color));
                 // draw items
-                for (var item : items) {
+                for (Object item : items) {
                     if (!selected.equals(SELECTED_ALL) && !selected.equals(mode.getUniqueID(item))) continue;
-                    var color = mode.getItemColor(item);
+                    int color = mode.getItemColor(item);
                     image.setPixelRGBA(i, j,
                             combine(255, ColorUtils.blueI(color), ColorUtils.greenI(color), ColorUtils.redI(color)));
                     break;
@@ -145,7 +151,8 @@ public class ProspectingTexture extends AbstractTexture {
         Tesselator tesselator = Tesselator.getInstance();
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
         RenderSystem.setShaderTexture(0, this.getId());
-        var matrix4f = graphics.pose().last().pose();
+        Matrix4f matrix4f = graphics.pose().last().pose();
+
         BufferBuilder bufferbuilder = tesselator.begin(VertexFormat.Mode.QUADS, POSITION_TEX_COLOR);
         bufferbuilder.addVertex(matrix4f, x, y + imageHeight, 0).setUv(0, 1).setColor(-1);
         bufferbuilder.addVertex(matrix4f, x + imageWidth, y + imageHeight, 0).setUv(1, 1).setColor(-1);
@@ -162,9 +169,8 @@ public class ProspectingTexture extends AbstractTexture {
                 }
             }
         }
-
-        GuiTextures.UP.copy().setColor(ColorPattern.RED.color).rotate(direction / 2).draw(graphics, 0, 0,
-                x + playerXGui - 20, y + playerYGui - 20, 40, 40);
+        TransformTexture arrow = ARROW.rotate(this.direction / 2);
+        arrow.draw(graphics, 0, 0, x + playerXGui - 20, y + playerYGui - 20, 40, 40);
 
         // draw red vertical line
         if (playerXGui % 16 > 7 || playerXGui % 16 == 0) {

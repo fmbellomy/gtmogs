@@ -18,6 +18,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -35,37 +36,46 @@ public class FacadeCoverRecipe extends CustomRecipe {
 
     @Override
     public boolean matches(CraftingInput container, @NotNull Level level) {
-        int plateSize = 0;
+        int platesCount = 0;
         boolean foundBlockItem = false;
         for (int i = 0; i < container.size(); i++) {
             var item = container.getItem(i);
             if (item.isEmpty()) continue;
             if (FacadeItemBehaviour.isValidFacade(item)) {
+                if (foundBlockItem) {
+                    return false;
+                }
                 foundBlockItem = true;
-                continue;
+            } else if (item.is(IRON_PLATE_TAG)) {
+                if (++platesCount > 3) {
+                    return false;
+                }
+            } else {
+                return false;
             }
-            if (item.is(IRON_PLATE_TAG)) {
-                plateSize++;
-                continue;
-            }
-            return false;
         }
-        return foundBlockItem && plateSize == 3;
+        return foundBlockItem && platesCount == 3;
     }
 
     @Override
     public @NotNull ItemStack assemble(CraftingInput container, HolderLookup.@NotNull Provider provider) {
-        ItemStack itemStack = GTItems.COVER_FACADE.asStack(3);
+        ItemStack itemStack = GTItems.COVER_FACADE.asStack();
+        BlockState facadeState = null;
+
         for (int i = 0; i < container.size(); i++) {
             var item = container.getItem(i);
             if (item.isEmpty()) continue;
             if (FacadeItemBehaviour.isValidFacade(item)) {
-                FacadeItemBehaviour.setFacadeStack(itemStack, item);
-                itemStack.setCount(6);
+                facadeState = FacadeItemBehaviour.getFacadeState(item);
                 break;
             }
         }
-        return itemStack;
+        if (facadeState != null) {
+            FacadeItemBehaviour.setFacadeState(itemStack, facadeState);
+            itemStack.setCount(6);
+            return itemStack;
+        }
+        return ItemStack.EMPTY;
     }
 
     @Override
@@ -79,13 +89,13 @@ public class FacadeCoverRecipe extends CustomRecipe {
 
     @Override
     public boolean canCraftInDimensions(int width, int height) {
-        return false;
+        return width * height >= 4;
     }
 
     @Override
     public @NotNull ItemStack getResultItem(HolderLookup.@NotNull Provider provider) {
         var result = GTItems.COVER_FACADE.asStack();
-        FacadeItemBehaviour.setFacadeStack(GTItems.COVER_FACADE.asStack(), new ItemStack(Blocks.STONE));
+        FacadeItemBehaviour.setFacadeState(GTItems.COVER_FACADE.asStack(), Blocks.STONE.defaultBlockState());
         return result;
     }
 

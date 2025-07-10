@@ -23,7 +23,7 @@ public class CPacketKeysPressed implements CustomPacketPayload {
     public static final ResourceLocation ID = GTCEu.id("keys_pressed");
     public static final Type<CPacketKeysPressed> TYPE = new Type<>(ID);
     public static final StreamCodec<FriendlyByteBuf, CPacketKeysPressed> CODEC = StreamCodec
-            .ofMember(CPacketKeysPressed::encode, CPacketKeysPressed::decode);
+            .ofMember(CPacketKeysPressed::encode, CPacketKeysPressed::new);
 
     private Object updateKeys;
 
@@ -31,7 +31,12 @@ public class CPacketKeysPressed implements CustomPacketPayload {
         this.updateKeys = updateKeys;
     }
 
-    public CPacketKeysPressed(BooleanBooleanPair[] updateKeys) {
+    public CPacketKeysPressed(FriendlyByteBuf buf) {
+        BooleanBooleanPair[] updateKeys = new BooleanBooleanPair[KeyBind.VALUES.length];
+        int size = buf.readVarInt();
+        for (int i = 0; i < size; i++) {
+            updateKeys[buf.readVarInt()] = BooleanBooleanPair.of(buf.readBoolean(), buf.readBoolean());
+        }
         this.updateKeys = updateKeys;
     }
 
@@ -44,15 +49,6 @@ public class CPacketKeysPressed implements CustomPacketPayload {
             buf.writeBoolean(keyBind.isPressed());
             buf.writeBoolean(keyBind.isKeyDown());
         }
-    }
-
-    public static CPacketKeysPressed decode(FriendlyByteBuf buf) {
-        BooleanBooleanPair[] updateKeys = new BooleanBooleanPair[KeyBind.VALUES.length];
-        int size = buf.readVarInt();
-        for (int i = 0; i < size; i++) {
-            updateKeys[buf.readVarInt()] = BooleanBooleanPair.of(buf.readBoolean(), buf.readBoolean());
-        }
-        return new CPacketKeysPressed(updateKeys);
     }
 
     public void execute(IPayloadContext context) {

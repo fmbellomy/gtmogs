@@ -15,11 +15,10 @@ import com.gregtechceu.gtceu.api.misc.EnergyContainerList;
 import com.gregtechceu.gtceu.api.misc.EnergyInfoProviderList;
 import com.gregtechceu.gtceu.api.misc.LaserContainerList;
 
-import com.lowdragmc.lowdraglib.client.renderer.IBlockRendererProvider;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockAndTintGetter;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.energy.IEnergyStorage;
@@ -40,9 +38,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
-
-    DirectionProperty UPWARDS_FACING_PROPERTY = DirectionProperty.create("upwards_facing", Direction.Plane.HORIZONTAL);
+public interface IMachineBlock extends EntityBlock {
 
     default Block self() {
         return (Block) this;
@@ -50,7 +46,18 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
 
     MachineDefinition getDefinition();
 
-    RotationState getRotationState();
+    default RotationState getRotationState() {
+        return getDefinition().getRotationState();
+    }
+
+    default Direction getFrontFacing(BlockState state) {
+        return getRotationState() == RotationState.NONE ? Direction.NORTH : state.getValue(getRotationState().property);
+    }
+
+    @Nullable
+    default MetaMachine getMachine(BlockGetter level, BlockPos pos) {
+        return MetaMachine.getMachine(level, pos);
+    }
 
     static int colorTinted(BlockState blockState, @Nullable BlockAndTintGetter level, @Nullable BlockPos pos,
                            int index) {
@@ -89,6 +96,10 @@ public interface IMachineBlock extends IBlockRendererProvider, EntityBlock {
             }
         }
         return null;
+    }
+
+    default boolean canConnectRedstone(BlockGetter level, BlockPos pos, Direction side) {
+        return getMachine(level, pos).canConnectRedstone(side);
     }
 
     default void attachCapabilities(RegisterCapabilitiesEvent event) {

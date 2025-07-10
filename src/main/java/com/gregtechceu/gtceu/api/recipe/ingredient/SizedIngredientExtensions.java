@@ -1,12 +1,12 @@
 package com.gregtechceu.gtceu.api.recipe.ingredient;
 
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
-import java.util.Arrays;
+import org.jetbrains.annotations.Nullable;
 
 public class SizedIngredientExtensions {
 
@@ -15,14 +15,18 @@ public class SizedIngredientExtensions {
     }
 
     public static SizedFluidIngredient copy(SizedFluidIngredient self) {
-        return new SizedFluidIngredient(self.ingredient(), self.amount());
+        FluidIngredient ingredient = self.ingredient();
+        if (ingredient instanceof IntProviderFluidIngredient intProv) {
+            ingredient = intProv.copy();
+        }
+        return new SizedFluidIngredient(ingredient, self.amount());
     }
 
     public static SizedFluidIngredient copyWithAmount(SizedFluidIngredient self, int amount) {
         return new SizedFluidIngredient(self.ingredient(), amount);
     }
 
-    public static ICustomIngredient getContainedCustom(SizedIngredient self) {
+    public static @Nullable ICustomIngredient getContainedCustom(SizedIngredient self) {
         return self.ingredient().getCustomIngredient();
     }
 
@@ -31,9 +35,9 @@ public class SizedIngredientExtensions {
     }
 
     public static SizedIngredient copy(SizedIngredient self) {
-        if (self.ingredient().getCustomIngredient() instanceof IntCircuitIngredient) {
+        if (getContainedCustom(self) instanceof IntCircuitIngredient) {
             return new SizedIngredient(self.ingredient(), self.count());
-        } else if (self.ingredient().getCustomIngredient() instanceof IntProviderIngredient intProviderIngredient) {
+        } else if (getContainedCustom(self) instanceof IntProviderIngredient intProviderIngredient) {
             return new SizedIngredient(copyIntProvider(intProviderIngredient), self.count());
         }
         return new SizedIngredient(self.ingredient(), self.count());
@@ -50,13 +54,8 @@ public class SizedIngredientExtensions {
 
     private static Ingredient copyIntProvider(IntProviderIngredient toCopy) {
         var copied = new IntProviderIngredient(toCopy.inner, toCopy.countProvider);
-        if (toCopy.itemStacks != null) {
-            copied.itemStacks = Arrays.stream(toCopy.itemStacks).map(ItemStack::copy)
-                    .toArray(ItemStack[]::new);
-        }
-        if (toCopy.sampledCount != -1) {
-            copied.sampledCount = toCopy.sampledCount;
-        }
+        copied.itemStacks = toCopy.itemStacks;
+        copied.sampledCount = toCopy.sampledCount;
         return copied.toVanilla();
     }
 }

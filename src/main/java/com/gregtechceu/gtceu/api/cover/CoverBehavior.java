@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.gui.fancy.IFancyConfigurator;
 import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IToolGridHighLight;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.transfer.fluid.IFluidHandlerModifiable;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverRenderer;
 
@@ -37,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Represents cover instance attached on the specific side of meta tile entity
@@ -95,8 +95,9 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     @MustBeInvokedByOverriders
     public boolean canAttach() {
         var machine = MetaMachine.getMachine(coverHolder.getLevel(), coverHolder.getPos());
-        return machine == null || !machine.hasFrontFacing() || coverHolder.getFrontFacing() != attachedSide ||
-                machine instanceof IMultiController;
+        return machine == null ||
+                (machine.getDefinition().isAllowCoverOnFront() || !machine.hasFrontFacing() ||
+                        coverHolder.getFrontFacing() != attachedSide);
     }
 
     /**
@@ -169,6 +170,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
     //////////////////////////////////////
     // ******* Rendering ********//
     //////////////////////////////////////
+
     /**
      * @return If the pipe this is placed on and a pipe on the other side should be able to connect
      */
@@ -180,7 +182,7 @@ public abstract class CoverBehavior implements IEnhancedManaged, IToolGridHighLi
         return true;
     }
 
-    public ICoverRenderer getCoverRenderer() {
+    public @Nullable Supplier<ICoverRenderer> getCoverRenderer() {
         return coverDefinition.getCoverRenderer();
     }
 

@@ -51,7 +51,7 @@ public class GCYMRecipeTypes {
                 }
                 return "";
             })
-            .setMaxTooltips(4)
+            .setMaxTooltips(5)
             .setUiBuilder((recipe, widgetGroup) -> {
                 int temp = recipe.data.getInt("ebf_temp");
                 List<List<ItemStack>> items = new ArrayList<>();

@@ -7,10 +7,8 @@ import com.gregtechceu.gtceu.api.material.ChemicalHelper;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialStack;
 import com.gregtechceu.gtceu.api.medicalcondition.MedicalCondition;
-import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.RecipeUtil;
-import com.gregtechceu.gtceu.api.recipe.ResearchData;
-import com.gregtechceu.gtceu.api.recipe.ResearchRecipeBuilder;
+import com.gregtechceu.gtceu.api.recipe.*;
+import com.gregtechceu.gtceu.api.recipe.category.GTRecipeCategory;
 import com.gregtechceu.gtceu.api.recipe.chance.logic.ChanceLogic;
 import com.gregtechceu.gtceu.api.recipe.condition.RecipeCondition;
 import com.gregtechceu.gtceu.api.recipe.content.Content;
@@ -31,6 +29,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.valueproviders.IntProvider;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -38,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.crafting.SizedIngredient;
+import net.neoforged.neoforge.fluids.crafting.FluidIngredient;
 import net.neoforged.neoforge.fluids.crafting.SizedFluidIngredient;
 
 import dev.ftb.mods.ftbquests.quest.QuestObjectBase;
@@ -45,19 +45,17 @@ import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.kubejs.recipe.KubeRecipe;
 import dev.latvian.mods.kubejs.recipe.RecipeKey;
 import dev.latvian.mods.kubejs.recipe.component.ComponentRole;
-import dev.latvian.mods.kubejs.recipe.component.ListRecipeComponent;
-import dev.latvian.mods.kubejs.recipe.component.RecipeComponent;
 import dev.latvian.mods.kubejs.recipe.component.TimeComponent;
-import dev.latvian.mods.kubejs.recipe.schema.KubeRecipeFactory;
+import dev.latvian.mods.kubejs.recipe.schema.RecipeConstructor;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchema;
 import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.util.KubeResourceLocation;
 import dev.latvian.mods.kubejs.util.TickDuration;
-import dev.latvian.mods.rhino.type.TypeInfo;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -95,12 +93,12 @@ public interface GTRecipeSchema {
         @HideFromJS
         @Override
         public GTKubeRecipe id(KubeResourceLocation _id) {
-            this.idWithoutType = ResourceLocation.fromNamespaceAndPath(
-                    _id.wrapped().getNamespace().equals("kubejs") ? this.type.id.getNamespace() :
-                            _id.wrapped().getNamespace(),
-                    _id.wrapped().getPath());
-            this.id = ResourceLocation.fromNamespaceAndPath(idWithoutType.getNamespace(),
-                    "%s/%s".formatted(this.type.id.getPath(), idWithoutType.getPath()));
+            String namespace = _id.wrapped().getNamespace();
+            if (namespace.equals("kubejs")) {
+                namespace = this.type.id.getNamespace();
+            }
+            this.idWithoutType = ResourceLocation.fromNamespaceAndPath(namespace, _id.wrapped().getPath());
+            this.id = idWithoutType.withPrefix(this.type.id.getPath() + "/");
             return this;
         }
 
@@ -140,27 +138,49 @@ public interface GTRecipeSchema {
             return this;
         }
 
-        public GTKubeRecipe inputEU(long eu) {
+        public GTKubeRecipe category(GTRecipeCategory category) {
+            setValue(CATEGORY, category.registryKey);
+            save();
+            return this;
+        }
+
+        public GTKubeRecipe inputEU(EnergyStack eu) {
             return input(EURecipeCapability.CAP, eu);
         }
 
-        public GTKubeRecipe EUt(long eu) {
-            if (eu == 0) {
+        public GTKubeRecipe inputEU(long voltage, long amperage) {
+            return inputEU(new EnergyStack(voltage, amperage));
+        }
+
+        @SuppressWarnings("ConstantValue")
+        public GTKubeRecipe EUt(EnergyStack.WithIO eu) {
+            if (eu.isEmpty()) {
                 throw new KubeRuntimeException(String.format("EUt can't be explicitly set to 0, id: %s", id));
+            }
+            if (eu.amperage() < 1) {
+                throw new KubeRuntimeException(String.format("Amperage must be a positive integer, id: %s", id));
             }
             var lastPerTick = perTick;
             perTick = true;
-            if (eu > 0) {
-                inputEU(eu);
-            } else if (eu < 0) {
-                outputEU(-eu);
+            if (eu.isInput()) {
+                inputEU(eu.stack());
+            } else if (eu.isOutput()) {
+                outputEU(eu.stack());
             }
             perTick = lastPerTick;
             return this;
         }
 
-        public GTKubeRecipe outputEU(long eu) {
+        public GTKubeRecipe EUt(long voltage, long amperage) {
+            return EUt(EnergyStack.WithIO.fromVA(voltage, amperage));
+        }
+
+        public GTKubeRecipe outputEU(EnergyStack eu) {
             return output(EURecipeCapability.CAP, eu);
+        }
+
+        public GTKubeRecipe outputEU(long voltage, long amperage) {
+            return outputEU(new EnergyStack(voltage, amperage));
         }
 
         public GTKubeRecipe inputCWU(int cwu) {
@@ -176,7 +196,7 @@ public interface GTRecipeSchema {
             if (cwu > 0) {
                 inputCWU(cwu);
             } else if (cwu < 0) {
-                outputCWU(cwu);
+                outputCWU(-cwu);
             }
             perTick = lastPerTick;
             return this;
@@ -194,10 +214,23 @@ public interface GTRecipeSchema {
         }
 
         public GTKubeRecipe inputItems(SizedIngredient... inputs) {
+            for (var stack : inputs) {
+                var matInfo = ChemicalHelper.getMaterialInfo(stack.ingredient());
+                if (matInfo != null && chance == maxChance && chance != 0) {
+                    for (var matStack : matInfo.getMaterials()) {
+                        itemMaterialStacks.add(matStack.multiply(stack.count()));
+                    }
+                }
+            }
             return input(ItemRecipeCapability.CAP, (Object[]) inputs);
         }
 
         public GTKubeRecipe outputItems(SizedIngredient... outputs) {
+            for (SizedIngredient itemStack : outputs) {
+                if (itemStack.ingredient().isEmpty()) {
+                    throw new KubeRuntimeException(String.format("Output items is empty, id: %s", id));
+                }
+            }
             return output(ItemRecipeCapability.CAP, (Object[]) outputs);
         }
 
@@ -212,7 +245,7 @@ public interface GTRecipeSchema {
 
         @HideFromJS
         public GTKubeRecipe outputItemsRanged(ItemStack stack, int min, int max) {
-            return outputItemsRanged(RecipeUtil.makeItemIngredient(stack), min, max);
+            return outputItemsRanged(RecipeHelper.makeItemIngredient(stack), min, max);
         }
 
         public GTKubeRecipe outputItemsRanged(TagPrefix orePrefix, Material material, int min, int max) {
@@ -292,8 +325,7 @@ public interface GTRecipeSchema {
         }
 
         public GTKubeRecipe chancedOutput(TagPrefix tag, Material mat, int chance, int tierChanceBoost) {
-            return chancedOutput(SizedIngredient.of(ChemicalHelper.get(tag, mat).getItem(), 1),
-                    chance, tierChanceBoost);
+            return chancedOutput(tag, mat, 1, chance, tierChanceBoost);
         }
 
         public GTKubeRecipe chancedOutput(TagPrefix tag, Material mat, int count, int chance, int tierChanceBoost) {
@@ -502,6 +534,15 @@ public interface GTRecipeSchema {
             return output(FluidRecipeCapability.CAP, (Object[]) outputs);
         }
 
+        public GTKubeRecipe outputFluidsRanged(FluidIngredient output, int min, int max) {
+            return outputFluidsRanged(output, UniformInt.of(min, max));
+        }
+
+        public GTKubeRecipe outputFluidsRanged(FluidIngredient output, IntProvider range) {
+            IntProviderFluidIngredient ing = IntProviderFluidIngredient.of(output, range);
+            return output(FluidRecipeCapability.CAP, new SizedFluidIngredient(ing, 1));
+        }
+
         //////////////////////////////////////
         // ********** DATA ***********//
         //////////////////////////////////////
@@ -562,11 +603,11 @@ public interface GTRecipeSchema {
         }
 
         public GTKubeRecipe explosivesAmount(int explosivesAmount) {
-            return inputItems(RecipeUtil.makeSizedIngredient(new ItemStack(Blocks.TNT, explosivesAmount)));
+            return inputItems(RecipeHelper.makeSizedIngredient(new ItemStack(Blocks.TNT, explosivesAmount)));
         }
 
         public GTKubeRecipe explosivesType(ItemStack explosivesType) {
-            return inputItems(RecipeUtil.makeSizedIngredient(explosivesType));
+            return inputItems(RecipeHelper.makeSizedIngredient(explosivesType));
         }
 
         public GTKubeRecipe solderMultiplier(int multiplier) {
@@ -703,13 +744,13 @@ public interface GTRecipeSchema {
         private boolean applyResearchProperty(ResearchData.ResearchEntry researchEntry) {
             if (!ConfigHolder.INSTANCE.machines.enableResearch) return false;
             if (researchEntry == null) {
-                throw new KubeRuntimeException(
-                        "Assembly Line Research Entry cannot be empty.", new IllegalArgumentException());
+                throw new KubeRuntimeException("Assembly Line Research Entry cannot be empty.",
+                        new IllegalArgumentException());
             }
 
             if (!generatingRecipes) {
-                throw new KubeRuntimeException(
-                        "Cannot generate recipes when using researchWithoutRecipe()", new IllegalArgumentException());
+                throw new KubeRuntimeException("Cannot generate recipes when using researchWithoutRecipe()",
+                        new IllegalStateException());
             }
 
             ResearchCondition condition = this.getValue(CONDITIONS).stream()
@@ -804,6 +845,17 @@ public interface GTRecipeSchema {
          */
 
         @Override
+        public ResourceLocation getOrCreateId() {
+            boolean wasNull = id == null;
+
+            super.getOrCreateId();
+            if (wasNull) {
+                idWithoutType = id.withPath(p -> StringUtils.substringAfter(p, '/'));
+            }
+            return id;
+        }
+
+        @Override
         public KubeRecipe serializeChanges() {
             if (onSave != null) {
                 onSave.accept(this);
@@ -816,7 +868,7 @@ public interface GTRecipeSchema {
     RecipeKey<ResourceLocation> ID = GTRecipeComponents.RESOURCE_LOCATION.key("id", ComponentRole.OTHER);
     RecipeKey<TickDuration> DURATION = TimeComponent.TICKS.key("duration", ComponentRole.OTHER).optional(new TickDuration(100));
     RecipeKey<CompoundTag> DATA = GTRecipeComponents.TAG.key("data", ComponentRole.OTHER).optional(new CompoundTag());
-    RecipeKey<List<RecipeCondition<?>>> CONDITIONS = createList(GTRecipeComponents.RECIPE_CONDITION).key("recipeConditions", ComponentRole.OTHER).optional(new ArrayList<>());
+    RecipeKey<List<RecipeCondition<?>>> CONDITIONS = GTRecipeComponents.RECIPE_CONDITION.asList().key("recipeConditions", ComponentRole.OTHER).optional(new ArrayList<>());
     RecipeKey<ResourceLocation> CATEGORY = GTRecipeComponents.RESOURCE_LOCATION.key("category", ComponentRole.OTHER).defaultOptional();
 
     RecipeKey<CapabilityMap> ALL_INPUTS = CapabilityMapComponent.INSTANCE.key("inputs", ComponentRole.INPUT).optional(new CapabilityMap());
@@ -836,14 +888,10 @@ public interface GTRecipeSchema {
 
     RecipeSchema SCHEMA = new RecipeSchema(DURATION, DATA, CONDITIONS,
             ALL_INPUTS, ALL_TICK_INPUTS, ALL_OUTPUTS, ALL_TICK_OUTPUTS,
-            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS)
-            .factory(new KubeRecipeFactory(GTCEu.id("recipe"), GTKubeRecipe.class, GTKubeRecipe::new))
-            .constructor(new IDRecipeConstructor());
+            INPUT_CHANCE_LOGICS, OUTPUT_CHANCE_LOGICS, TICK_INPUT_CHANCE_LOGICS, TICK_OUTPUT_CHANCE_LOGICS, CATEGORY)
+            .constructor(new IDRecipeConstructor())
+            .constructor(new RecipeConstructor())
+            .constructor(DURATION, CONDITIONS, ALL_INPUTS, ALL_OUTPUTS, ALL_TICK_INPUTS, ALL_TICK_OUTPUTS)
+            .uniqueIds(List.of(ALL_OUTPUTS, ALL_TICK_OUTPUTS));
     // spotless:on
-
-    static <L> ListRecipeComponent<L> createList(RecipeComponent<L> component) {
-        var typeInfo = TypeInfo.RAW_LIST.withParams(component.typeInfo());
-        var codec = component.codec().listOf();
-        return new ListRecipeComponent<>(component, false, typeInfo, codec, false, true);
-    }
 }

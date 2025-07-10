@@ -4,6 +4,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.FluidRecipeCapability;
 import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gregtechceu.gtceu.api.recipe.ingredient.IntProviderFluidIngredient;
 import com.gregtechceu.gtceu.api.recipe.ingredient.SizedIngredientExtensions;
 import com.gregtechceu.gtceu.api.recipe.kind.GTRecipe;
 import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
@@ -83,7 +84,6 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
         this(machine, storages, io, io);
     }
 
-    // TODO Kross: See if this can be decoupled from CustomFluidTank
     public void onContentsChanged() {
         isEmpty = null;
         notifyListeners();
@@ -100,6 +100,14 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
         if (io != handlerIO) return left;
         if (io != IO.IN && io != IO.OUT) return left.isEmpty() ? null : left;
 
+        // Temporarily remove listeners so that we can broadcast the entire set of transactions once
+        Runnable[] listeners = new Runnable[storages.length];
+        for (int i = 0; i < storages.length; i++) {
+            listeners[i] = storages[i].getOnContentsChanged();
+            storages[i].setOnContentsChanged(() -> {});
+        }
+        boolean changed = false;
+
         FluidAction action = simulate ? FluidAction.SIMULATE : FluidAction.EXECUTE;
         // Store the FluidStack in each slot after an operation
         // Necessary for simulation since we don't actually modify the slot's contents
@@ -112,13 +120,32 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
                 continue;
             }
 
-            var fluids = ingredient.getFluids();
-            if (fluids.length == 0 || fluids[0].isEmpty()) {
-                it.remove();
-                continue;
-            }
+            FluidStack[] fluids;
+            int amount;
 
-            int amount = ingredient.amount();
+            if (io == IO.OUT && ingredient.ingredient() instanceof IntProviderFluidIngredient provider) {
+                provider.setFluidStacks(null);
+                provider.setSampledCount(-1);
+
+                if (simulate) {
+                    fluids = new FluidStack[] { provider.getMaxSizeStack() };
+                    amount = provider.getCountProvider().getMaxValue();
+                } else {
+                    fluids = provider.getStacks();
+                    if (fluids.length == 0 || fluids[0].isEmpty()) {
+                        it.remove();
+                        continue;
+                    }
+                    amount = fluids[0].getAmount();
+                }
+            } else {
+                fluids = ingredient.getFluids();
+                if (fluids.length == 0 || fluids[0].isEmpty()) {
+                    it.remove();
+                    continue;
+                }
+                amount = ingredient.amount();
+            }
 
             if (io == IO.OUT && !allowSameFluids) {
                 CustomFluidTank existing = null;
@@ -138,6 +165,7 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
                     if (filled > 0) {
                         // shortcut for oldAmount + filled (wow what an idea)
                         visited[tank] = output.copyWithAmount(existing.getFluidAmount());
+                        changed = true;
                     }
                     amount -= filled;
 
@@ -158,6 +186,7 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
                         var drained = storages[tank].drain(Math.min(count, amount), action);
                         if (!drained.isEmpty()) {
                             visited[tank] = drained.copyWithAmount(count - drained.getAmount());
+                            changed = true;
                         }
                         amount -= drained.getAmount();
                     }
@@ -168,8 +197,14 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
                             int filled = storages[tank].fill(output, action);
                             if (filled > 0) {
                                 visited[tank] = output.copyWithAmount(count + filled);
+                                changed = true;
+                                amount -= filled;
+
+                                if (!allowSameFluids) {
+                                    if (amount <= 0) it.remove();
+                                    break;
+                                }
                             }
-                            amount -= filled;
                         }
                     }
                 }
@@ -184,6 +219,12 @@ public class NotifiableFluidTank extends NotifiableRecipeHandlerTrait<SizedFluid
                 it.set(ingredient.copyWithAmount(amount));
             }
         }
+
+        for (int i = 0; i < storages.length; i++) {
+            storages[i].setOnContentsChanged(listeners[i]);
+            if (changed && action.execute()) listeners[i].run();
+        }
+
         return left.isEmpty() ? null : left;
     }
 

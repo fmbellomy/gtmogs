@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = FTBChunksClient.class)
+@Mixin(value = FTBChunksClient.class, remap = false)
 public class FTBChunksClientMixin {
 
     @Unique

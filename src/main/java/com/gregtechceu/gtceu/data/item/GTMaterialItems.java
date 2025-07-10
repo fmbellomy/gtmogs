@@ -8,26 +8,29 @@ import com.gregtechceu.gtceu.api.item.tool.GTToolType;
 import com.gregtechceu.gtceu.api.item.tool.IGTToolDefinition;
 import com.gregtechceu.gtceu.api.item.tool.MaterialToolTier;
 import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.api.material.material.properties.ArmorProperty;
 import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.material.material.properties.ToolProperty;
 import com.gregtechceu.gtceu.api.material.material.stack.MaterialEntry;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
+import com.gregtechceu.gtceu.common.item.armor.GTArmorItem;
 
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import com.google.common.collect.ArrayTable;
 import com.google.common.collect.ImmutableTable;
@@ -37,10 +40,7 @@ import com.tterrag.registrate.util.entry.ItemEntry;
 import com.tterrag.registrate.util.entry.ItemProviderEntry;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 import static com.gregtechceu.gtceu.common.registry.GTRegistration.REGISTRATE;
@@ -49,9 +49,10 @@ import static com.gregtechceu.gtceu.data.misc.GTCreativeModeTabs.TOOL;
 
 public class GTMaterialItems {
 
+    // spotless:off
+
     // Reference Table Builders
-    static ImmutableTable.Builder<TagPrefix, Material, ItemEntry<? extends Item>> MATERIAL_ITEMS_BUILDER = ImmutableTable
-            .builder();
+    static ImmutableTable.Builder<TagPrefix, Material, ItemEntry<? extends Item>> MATERIAL_ITEMS_BUILDER = ImmutableTable.builder();
 
     // Reference Maps
     public static final Map<MaterialEntry, Supplier<? extends ItemLike>> toUnify = new HashMap<>();
@@ -64,12 +65,16 @@ public class GTMaterialItems {
 
     // Reference Tables
     public static Table<TagPrefix, Material, ItemEntry<? extends Item>> MATERIAL_ITEMS;
-    public final static Table<Material, GTToolType, ItemProviderEntry<Item, ? extends IGTTool>> TOOL_ITEMS = ArrayTable
-            .create(
-                    GTCEuAPI.materialManager.stream()
-                            .filter(mat -> mat.hasProperty(PropertyKey.TOOL))
-                            .toList(),
-                    GTToolType.getTypes().values().stream().toList());
+
+    public final static Table<Material, GTToolType, ItemProviderEntry<Item, ? extends IGTTool>> TOOL_ITEMS = ArrayTable.create(
+            GTCEuAPI.materialManager.stream().filter(mat -> mat.hasProperty(PropertyKey.TOOL)).toList(),
+            GTToolType.getTypes().values().stream().toList());
+
+    public static final Table<Material, ArmorItem.Type, ItemEntry<? extends ArmorItem>> ARMOR_ITEMS = ArrayTable.create(
+            GTCEuAPI.materialManager.stream().filter(mat -> mat.hasProperty(PropertyKey.ARMOR)).toList(),
+            Arrays.asList(ArmorItem.Type.values()));
+
+    // spotless:on
 
     // Material Items
     public static void generateMaterialItems() {
@@ -123,7 +128,7 @@ public class GTMaterialItems {
         TOOL_ITEMS.put(material, toolType, (ItemProviderEntry<Item, ? extends IGTTool>) (ItemProviderEntry<Item, ?>) registrate
                 .item(toolType.idFormat.formatted(tier.material.getName()), p -> toolType.constructor.create(toolType, tier, material, toolType.toolDefinition, p).asItem())
                 .properties(p -> {
-                    if (!toolType.toolDefinition.getAoEDefinition().isNone()) {
+                    if (!toolType.toolDefinition.getAoEDefinition().isZero()) {
                         p.component(GTDataComponents.AOE, toolType.toolDefinition.getAoEDefinition());
                     }
                     return p.craftRemainder(Items.AIR);
@@ -201,5 +206,43 @@ public class GTMaterialItems {
                 .color(() -> IGTTool::tintColor)
                 .register());
         // spotless:on
+    }
+
+    // Material Armors
+    public static void generateArmors() {
+        REGISTRATE.creativeModeTab(TOOL);
+        for (ArmorItem.Type type : ArmorItem.Type.values()) {
+            for (Material material : GTCEuAPI.materialManager) {
+                GTRegistrate registrate = GTRegistrate.createIgnoringListenerErrors(material.getModid());
+                if (material.hasProperty(PropertyKey.ARMOR)) {
+                    generateArmor(material, type, registrate);
+                }
+            }
+        }
+    }
+
+    private static void generateArmor(final Material material, final ArmorItem.Type type, GTRegistrate registrate) {
+        final ArmorProperty property = material.getProperty(PropertyKey.ARMOR);
+        String id = "%s_%s".formatted(material.getName(), type.getName());
+        ARMOR_ITEMS.put(material, type, registrate
+                .item(id, p -> new GTArmorItem(type, p, material, property))
+                .properties(p -> p.durability(type.getDurability(property.getDurabilityMultiplier())))
+                .setData(ProviderType.LANG, NonNullBiConsumer.noop())
+                .model(NonNullBiConsumer.noop())
+                .clientExtension(() -> () -> new IClientItemExtensions() {
+
+                    @Override
+                    public int getArmorLayerTintColor(ItemStack stack, LivingEntity entity,
+                                                      ArmorMaterial.Layer layer, int layerIdx, int fallbackColor) {
+                        int maxColors = material.getMaterialInfo().getColors().size();
+                        if (layerIdx >= 0 && layerIdx < maxColors) {
+                            return material.getLayerARGB(layerIdx);
+                        }
+                        return IClientItemExtensions.super.getArmorLayerTintColor(stack, entity, layer, layerIdx,
+                                fallbackColor);
+                    }
+                })
+                .color(() -> () -> TagPrefixItem.tintColor(material))
+                .register());
     }
 }
