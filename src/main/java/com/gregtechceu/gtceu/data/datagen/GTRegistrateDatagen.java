@@ -2,7 +2,7 @@ package com.gregtechceu.gtceu.data.datagen;
 
 import com.gregtechceu.gtceu.api.registry.registrate.provider.GTBlockstateProvider;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
-import com.gregtechceu.gtceu.core.mixins.RegistrateDataProviderAccessor;
+import com.gregtechceu.gtceu.core.mixins.registrate.RegistrateDataProviderAccessor;
 import com.gregtechceu.gtceu.data.datagen.datamap.DataMapsHandler;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.data.datagen.model.BlockstateModelLoader;

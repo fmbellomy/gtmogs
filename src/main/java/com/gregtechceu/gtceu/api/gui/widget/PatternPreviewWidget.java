@@ -43,6 +43,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.data.ModelDataManager;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -236,7 +237,6 @@ public class PatternPreviewWidget extends WidgetGroup {
             }
             LEVEL = new TrackedDummyWorld() {
 
-                @SuppressWarnings("UnstableApiUsage")
                 @Override
                 public @Nullable ModelDataManager getModelDataManager() {
                     return getLevel().getModelDataManager();

@@ -5,6 +5,7 @@ import com.gregtechceu.gtceu.api.capability.recipe.IO;
 import com.gregtechceu.gtceu.api.cover.CoverBehavior;
 import com.gregtechceu.gtceu.api.cover.IIOCover;
 import com.gregtechceu.gtceu.client.util.ModelUtils;
+import com.gregtechceu.gtceu.client.util.StaticFaceBakery;
 
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 
@@ -82,10 +83,10 @@ public class IOCoverRenderer implements ICoverRenderer {
             }
             if (isInverted && invertedEmissiveOverlaySprite != null) {
                 quads.add(FaceQuad.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
-                        invertedEmissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15));
+                        invertedEmissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15, true, false));
             } else if (emissiveOverlaySprite != null) {
                 quads.add(FaceQuad.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
-                        emissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15));
+                        emissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15, true, false));
             }
         }
     }

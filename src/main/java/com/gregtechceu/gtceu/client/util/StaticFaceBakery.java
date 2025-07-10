@@ -2,6 +2,7 @@ package com.gregtechceu.gtceu.client.util;
 
 import com.lowdragmc.lowdraglib.client.bakedpipeline.FaceQuad;
 
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.core.Direction;

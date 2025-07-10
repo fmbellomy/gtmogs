@@ -56,7 +56,7 @@ import com.gregtechceu.gtceu.common.pack.GTDynamicDataPack;
 import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 import com.gregtechceu.gtceu.common.pack.GTPackSource;
 import com.gregtechceu.gtceu.config.ConfigHolder;
-import com.gregtechceu.gtceu.core.mixins.AbstractRegistrateAccessor;
+import com.gregtechceu.gtceu.core.mixins.registrate.AbstractRegistrateAccessor;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
 import com.gregtechceu.gtceu.data.blockentity.GTBlockEntities;
