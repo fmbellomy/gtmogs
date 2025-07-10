@@ -27,7 +27,7 @@ public class ActiveBlock extends AppearanceBlock {
     }
 
     /**
-     * @deprecated Use {@link BlockState#setValue(Property, Comparable)}
+     * Use {@link BlockState#setValue(Property, Comparable)}
      */
     @ApiStatus.Obsolete(since = "7.0.0")
     public BlockState changeActive(BlockState state, boolean active) {
@@ -38,7 +38,7 @@ public class ActiveBlock extends AppearanceBlock {
     }
 
     /**
-     * @deprecated Use {@link BlockState#getValue(Property)}
+     * Use {@link BlockState#getValue(Property)}
      */
     @ApiStatus.Obsolete(since = "7.0.0")
     public boolean isActive(BlockState state) {

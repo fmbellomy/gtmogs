@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.data.datagen.datamap.DataMapsHandler;
 import com.gregtechceu.gtceu.data.datagen.lang.LangHandler;
 import com.gregtechceu.gtceu.data.datagen.model.BlockstateModelLoader;
 import com.gregtechceu.gtceu.data.datagen.tag.*;
-import com.gregtechceu.gtceu.data.datagen.tag.BlockTagLoader;
 
 import net.minecraft.data.DataProvider;
 

@@ -25,18 +25,16 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.TextureAtlasStitchedEvent;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
-import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ModelUtils {
 
     private ModelUtils() {}
 
-    private static final Set<AssetEventListener<?>> EVENT_LISTENERS = new ReferenceOpenHashSet<>();
+    private static final List<AssetEventListener<?>> EVENT_LISTENERS = new ArrayList<>();
 
     public static List<BakedQuad> getBakedModelQuads(BakedModel model, BlockAndTintGetter level, BlockPos pos,
                                                      BlockState state, Direction side, RandomSource rand) {

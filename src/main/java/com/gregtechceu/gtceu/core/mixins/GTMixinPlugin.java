@@ -1,12 +1,15 @@
 package com.gregtechceu.gtceu.core.mixins;
 
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.LoadingModList;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class GTMixinPlugin implements IMixinConfigPlugin {
@@ -19,24 +22,25 @@ public class GTMixinPlugin implements IMixinConfigPlugin {
         return null;
     }
 
+    private static final String MIXIN_PACKAGE = "com.gregtechceu.gtceu.core.mixins.";
+    private static final Map<String, String> MOD_COMPAT_MIXINS = new HashMap<>();
+
+    static {
+        MOD_COMPAT_MIXINS.put("roughlyenoughitems", MIXIN_PACKAGE + "rei");
+        addModCompatMixin("emi");
+        addModCompatMixin("jei");
+        addModCompatMixin("top");
+        addModCompatMixin("ftbchunks");
+        addModCompatMixin("xaerominimap");
+        addModCompatMixin("xaeroworldmap");
+    }
+
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.rei")) {
-            return LoadingModList.get().getModFileById("roughlyenoughitems") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.top")) {
-            return LoadingModList.get().getModFileById("theoneprobe") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.jei")) {
-            return LoadingModList.get().getModFileById("jei") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.emi")) {
-            return LoadingModList.get().getModFileById("emi") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.ftbchunks")) {
-            return LoadingModList.get().getModFileById("ftbchunks") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.theoneprobe")) {
-            return LoadingModList.get().getModFileById("ftbchunks") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.xaerominimap")) {
-            return LoadingModList.get().getModFileById("xaerominimap") != null;
-        } else if (mixinClassName.startsWith("com.gregtechceu.gtceu.core.mixins.xaeroworldmap")) {
-            return LoadingModList.get().getModFileById("xaeroworldmap") != null;
+        for (var compatMod : MOD_COMPAT_MIXINS.entrySet()) {
+            if (mixinClassName.startsWith(compatMod.getValue())) {
+                return isModLoaded(compatMod.getKey());
+            }
         }
         return true;
     }
@@ -54,4 +58,15 @@ public class GTMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {}
+
+    private static void addModCompatMixin(String modId) {
+        MOD_COMPAT_MIXINS.put(modId, MIXIN_PACKAGE + modId);
+    }
+
+    private static boolean isModLoaded(String modId) {
+        if (ModList.get() == null) {
+            return LoadingModList.get().getModFileById(modId) != null;
+        }
+        return ModList.get().isLoaded(modId);
+    }
 }

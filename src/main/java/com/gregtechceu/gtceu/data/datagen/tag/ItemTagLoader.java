@@ -25,6 +25,10 @@ import static com.gregtechceu.gtceu.data.material.GTMaterials.*;
 public class ItemTagLoader {
 
     public static void init(RegistrateItemTagsProvider provider) {
+        provider.addTag(CustomTags.DOUGHS).addTag(CustomTags.WHEAT_DOUGHS);
+        provider.addTag(CustomTags.WHEAT_GRAINS).add(GTMaterialItems.MATERIAL_ITEMS.get(dust, Wheat).get());
+        provider.addTag(CustomTags.GRAINS).addTag(CustomTags.WHEAT_GRAINS);<
+
         // spotless:off
         // the coral blocks: alive, dead, both
         provider.addTag(CustomTags.ALIVE_CORAL_BLOCK_ITEMS)

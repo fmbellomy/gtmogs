@@ -196,15 +196,6 @@ public class GTRecipeType implements RecipeType<GTRecipe> {
         return registryName.toString();
     }
 
-    @Nullable
-    public GTRecipe getRecipe(RecipeManager recipeManager, ResourceLocation id) {
-        var holder = recipeManager.byKey(id);
-        if (holder.isPresent() && holder.get().value() instanceof GTRecipe recipe) {
-            return recipe;
-        }
-        return null;
-    }
-
     public @NotNull Iterator<GTRecipe> searchRecipe(IRecipeCapabilityHolder holder, Predicate<GTRecipe> canHandle) {
         if (!holder.hasCapabilityProxies()) return Collections.emptyIterator();
         var iterator = getLookup().getRecipeIterator(holder, canHandle);

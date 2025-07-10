@@ -74,16 +74,18 @@ public class IOCoverRenderer implements ICoverRenderer {
             boolean isInverted = ioCover.getIo() != IO.OUT;
 
             if (isInverted && invertedOverlaySprite != null) {
-                quads.add(FaceQuad.bakeFace(coverBehavior.attachedSide, invertedOverlaySprite));
+                quads.add(StaticFaceBakery.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
+                        invertedOverlaySprite));
             } else if (overlaySprite != null) {
-                quads.add(FaceQuad.bakeFace(coverBehavior.attachedSide, overlaySprite));
+                quads.add(StaticFaceBakery.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
+                        overlaySprite));
             }
             if (isInverted && invertedEmissiveOverlaySprite != null) {
-                quads.add(FaceQuad.bakeFace(coverBehavior.attachedSide, invertedEmissiveOverlaySprite,
-                        BlockModelRotation.X0_Y0, -101, 15));
+                quads.add(FaceQuad.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
+                        invertedEmissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15));
             } else if (emissiveOverlaySprite != null) {
-                quads.add(FaceQuad.bakeFace(coverBehavior.attachedSide, emissiveOverlaySprite,
-                        BlockModelRotation.X0_Y0, -101, 15));
+                quads.add(FaceQuad.bakeFace(StaticFaceBakery.COVER_OVERLAY, coverBehavior.attachedSide,
+                        emissiveOverlaySprite, BlockModelRotation.X0_Y0, -101, 15));
             }
         }
     }
