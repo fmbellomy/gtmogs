@@ -106,21 +106,21 @@ public record AoESymmetrical(int maxColumn, int maxRow, int maxLayer, int column
 
         public Mutable decreaseColumn() {
             if (column > 0) {
-                column++;
+                column--;
             }
             return this;
         }
 
         public Mutable decreaseRow() {
             if (row > 0) {
-                row++;
+                row--;
             }
             return this;
         }
 
         public Mutable decreaseLayer() {
             if (layer > 0) {
-                layer++;
+                layer--;
             }
             return this;
         }
