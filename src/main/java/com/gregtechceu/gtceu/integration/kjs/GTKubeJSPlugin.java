@@ -107,9 +107,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
-import net.neoforged.bus.api.EventPriority;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
 import dev.latvian.mods.kubejs.DevProperties;
@@ -128,11 +125,9 @@ import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.Wrapper;
 
-@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class GTKubeJSPlugin implements KubeJSPlugin {
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    private static void registerKJSMachines(RegisterEvent event) {
+    public static void registerKJSMachines(RegisterEvent event) {
         if (event.getRegistryKey() != GTRegistries.MACHINE_REGISTRY) {
             return;
         }
