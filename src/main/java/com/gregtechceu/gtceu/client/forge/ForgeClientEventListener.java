@@ -11,6 +11,7 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.client.EnvironmentalHazardClientHandler;
 import com.gregtechceu.gtceu.client.renderer.BlockHighlightRenderer;
 import com.gregtechceu.gtceu.client.renderer.MultiblockInWorldPreviewRenderer;
+import com.gregtechceu.gtceu.client.renderer.cover.FacadeCoverRenderer;
 import com.gregtechceu.gtceu.client.util.TooltipHelper;
 import com.gregtechceu.gtceu.core.mixins.client.AbstractClientPlayerAccessor;
 import com.gregtechceu.gtceu.core.mixins.client.PlayerSkinAccessor;
@@ -37,6 +38,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.entity.player.PlayerHeartTypeEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -101,6 +103,11 @@ public class ForgeClientEventListener {
         MultiblockInWorldPreviewRenderer.onClientTick();
         EnvironmentalHazardClientHandler.INSTANCE.onClientTick();
         GTValues.CLIENT_TIME++;
+    }
+
+    @SubscribeEvent
+    public static void onLevelUnloadEvent(LevelEvent.Unload event) {
+        FacadeCoverRenderer.clearItemModelCache();
     }
 
     private static final String BLOCK_INFO_LINE_START = ChatFormatting.UNDERLINE + "Targeted Block: ";

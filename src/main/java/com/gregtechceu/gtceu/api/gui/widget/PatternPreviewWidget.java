@@ -43,7 +43,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.model.data.ModelDataManager;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -53,7 +52,6 @@ import it.unimi.dsi.fastutil.longs.LongSets;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.shedaniel.rei.impl.client.gui.screen.AbstractDisplayViewingScreen;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -217,16 +215,11 @@ public class PatternPreviewWidget extends WidgetGroup {
         if (pattern.controllerBase.isFormed()) {
             LongSet set = pattern.controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask",
                     LongSets.EMPTY_SET);
-            Set<BlockPos> modelDisabled = set.stream().map(BlockPos::of).collect(Collectors.toSet());
-            if (!modelDisabled.isEmpty()) {
-                sceneWidget.setRenderedCore(
-                        stream.filter(pos -> !modelDisabled.contains(pos)).collect(Collectors.toList()), null);
-            } else {
-                sceneWidget.setRenderedCore(stream.toList(), null);
+            if (!set.isEmpty()) {
+                stream = stream.filter(pos -> !set.contains(pos.asLong()));
             }
-        } else {
-            sceneWidget.setRenderedCore(stream.toList(), null);
         }
+        sceneWidget.setRenderedCore(stream.toList(), null);
     }
 
     public static PatternPreviewWidget getPatternWidget(MultiblockMachineDefinition controllerDefinition) {
@@ -235,13 +228,7 @@ public class PatternPreviewWidget extends WidgetGroup {
                 GTCEu.LOGGER.error("Try to init pattern previews before level load");
                 throw new IllegalStateException();
             }
-            LEVEL = new TrackedDummyWorld() {
-
-                @Override
-                public @Nullable ModelDataManager getModelDataManager() {
-                    return getLevel().getModelDataManager();
-                }
-            };
+            LEVEL = new TrackedDummyWorld();
         }
         return new PatternPreviewWidget(controllerDefinition);
     }
@@ -392,7 +379,7 @@ public class PatternPreviewWidget extends WidgetGroup {
                 controllerBase);
     }
 
-    private void loadControllerFormed(Collection<BlockPos> poses, IMultiController controllerBase) {
+    private void loadControllerFormed(Collection<BlockPos> positions, IMultiController controllerBase) {
         BlockPattern pattern = controllerBase.getPattern();
         if (pattern != null && pattern.checkPatternAt(controllerBase.getMultiblockState(), true)) {
             controllerBase.onStructureFormed();
@@ -400,13 +387,11 @@ public class PatternPreviewWidget extends WidgetGroup {
         if (controllerBase.isFormed()) {
             LongSet set = controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask",
                     LongSets.EMPTY_SET);
-            Set<BlockPos> modelDisabled = set.stream().map(BlockPos::of).collect(Collectors.toSet());
-            if (!modelDisabled.isEmpty()) {
-                sceneWidget.setRenderedCore(
-                        poses.stream().filter(pos -> !modelDisabled.contains(pos)).collect(Collectors.toList()), null);
-            } else {
-                sceneWidget.setRenderedCore(poses, null);
+            if (!set.isEmpty()) {
+                positions = new HashSet<>(positions);
+                positions.removeIf(pos -> set.contains(pos.asLong()));
             }
+            sceneWidget.setRenderedCore(positions, null);
         } else {
             GTCEu.LOGGER.warn("Pattern formed checking failed: {}", controllerBase.self().getDefinition());
         }
@@ -416,7 +401,7 @@ public class PatternPreviewWidget extends WidgetGroup {
         Map<ItemStackKey, PartInfo> partsMap = new Object2ObjectOpenHashMap<>();
         for (Map.Entry<BlockPos, BlockInfo> entry : blocks.entrySet()) {
             BlockPos pos = entry.getKey();
-            BlockState blockState = ((Level) PatternPreviewWidget.LEVEL).getBlockState(pos);
+            BlockState blockState = PatternPreviewWidget.LEVEL.getBlockState(pos);
             ItemStack itemStack = blockState.getBlock().getCloneItemStack(PatternPreviewWidget.LEVEL, pos, blockState);
 
             if (itemStack.isEmpty() && !blockState.getFluidState().isEmpty()) {

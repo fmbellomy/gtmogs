@@ -54,6 +54,7 @@ import com.gregtechceu.gtceu.api.worldgen.generator.veins.DikeVeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.NoopVeinGenerator;
 import com.gregtechceu.gtceu.common.cosmetics.GTCapes;
 import com.gregtechceu.gtceu.common.machine.multiblock.primitive.PrimitiveFancyUIWorkableMachine;
+import com.gregtechceu.gtceu.common.pack.GTDynamicResourcePack;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.data.block.GCYMBlocks;
 import com.gregtechceu.gtceu.data.block.GTBlocks;
@@ -106,26 +107,55 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.neoforged.bus.api.EventPriority;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.registries.RegisterEvent;
 
+import dev.latvian.mods.kubejs.DevProperties;
 import dev.latvian.mods.kubejs.KubeJSPaths;
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
-import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
 import dev.latvian.mods.kubejs.plugin.KubeJSPlugin;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeComponentFactoryRegistry;
 import dev.latvian.mods.kubejs.recipe.schema.RecipeSchemaRegistry;
 import dev.latvian.mods.kubejs.registry.BuilderTypeRegistry;
+import dev.latvian.mods.kubejs.registry.RegistryObjectStorage;
 import dev.latvian.mods.kubejs.registry.ServerRegistryRegistry;
 import dev.latvian.mods.kubejs.script.BindingRegistry;
+import dev.latvian.mods.kubejs.script.ConsoleJS;
 import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.Wrapper;
 
+@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class GTKubeJSPlugin implements KubeJSPlugin {
 
-    @Override
-    public void initStartup() {
-        KubeJSPlugin.super.initStartup();
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    private static void registerKJSMachines(RegisterEvent event) {
+        if (event.getRegistryKey() != GTRegistries.MACHINE_REGISTRY) {
+            return;
+        }
+        var objStorage = RegistryObjectStorage.of(GTRegistries.MACHINE_REGISTRY);
+        ResourceLocation registryLoc = GTRegistries.MACHINE_REGISTRY.location();
+
+        int added = 0;
+
+        for (var builder : objStorage) {
+            if (builder.dummyBuilder) {
+                // don't actually register it here, the machine builders register themselves with Registrate
+                builder.createTransformedObject();
+
+                if (DevProperties.get().logRegistryEventObjects) {
+                    ConsoleJS.STARTUP.info("+ " + registryLoc + " | " + builder.id);
+                }
+                added++;
+            }
+        }
+
+        if (!objStorage.objects.isEmpty() && DevProperties.get().logRegistryEventObjects) {
+            GTCEu.LOGGER.info("Registered {}/{} objects of {}", added, objStorage.objects.size(), registryLoc);
+        }
     }
 
     @Override
@@ -191,24 +221,24 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
     }
 
     // Fake a data provider for the GT model builders so we don't need to handle this ourselves in any way :3
-    public static RuntimeBlockStateProvider RUNTIME_BLOCKSTATE_PROVIDER = null;
+    public static RuntimeBlockStateProvider RUNTIME_BLOCKSTATE_PROVIDER = new RuntimeBlockStateProvider(
+            GTRegistration.REGISTRATE, new PackOutput(KubeJSPaths.DIRECTORY),
+            (loc, json) -> {
+                if (!loc.getPath().endsWith(".json")) {
+                    loc = loc.withSuffix(".json");
+                }
+                GTDynamicResourcePack.addResource(loc, json);
+            });
 
-    public static void initRuntimeProvider(final KubeAssetGenerator generator) {
-        if (RUNTIME_BLOCKSTATE_PROVIDER == null) {
-            RUNTIME_BLOCKSTATE_PROVIDER = new RuntimeBlockStateProvider(GTRegistration.REGISTRATE,
-                    new PackOutput(KubeJSPaths.DIRECTORY),
-                    (loc, json) -> {
-                        if (loc.getPath().endsWith(".json")) {
-                            loc = loc.withPath(p -> p.substring(0, p.length() - 5));
-                        }
-                        generator.json(loc, json);
-                    });
-        }
-    }
-
-    @Override
-    public void generateAssets(KubeAssetGenerator generator) {
-        RUNTIME_BLOCKSTATE_PROVIDER = null;
+    public static void generateMachineBlockModels() {
+        RegistryObjectStorage.of(GTRegistries.MACHINE_REGISTRY).forEach(builder -> {
+            if (builder instanceof IMachineBuilderKJS machineBuilder) {
+                try {
+                    machineBuilder.generateMachineModels();
+                } catch (IllegalStateException ignored) {}
+            }
+        });
+        GTKubeJSPlugin.RUNTIME_BLOCKSTATE_PROVIDER.run();
     }
 
     @Override

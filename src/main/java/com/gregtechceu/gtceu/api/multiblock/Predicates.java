@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 
 import com.tterrag.registrate.util.entry.RegistryEntry;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.*;
@@ -60,6 +61,7 @@ public class Predicates {
         return new TraceabilityPredicate(new PredicateBlocks(blocks));
     }
 
+    @HideFromJS
     public static TraceabilityPredicate blocks(IMachineBlock... blocks) {
         return new TraceabilityPredicate(
                 new PredicateBlocks(Arrays.stream(blocks).map(IMachineBlock::self).toArray(Block[]::new)));

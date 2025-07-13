@@ -5,7 +5,6 @@ import com.gregtechceu.gtceu.GTCEu;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,11 +31,10 @@ public class VirtualEnderRegistry extends SavedData {
 
     public static VirtualEnderRegistry getInstance() {
         if (data == null) {
-            var server = ServerLifecycleHooks.getCurrentServer();
+            var server = GTCEu.getMinecraftServer();
             if (server != null) {
-                data = server.overworld().getDataStorage()
-                        .computeIfAbsent(new SavedData.Factory<>(VirtualEnderRegistry::new, VirtualEnderRegistry::new),
-                                DATA_ID);
+                data = server.overworld().getDataStorage().computeIfAbsent(
+                        new SavedData.Factory<>(VirtualEnderRegistry::new, VirtualEnderRegistry::new), DATA_ID);
             }
         }
 
@@ -98,8 +96,7 @@ public class VirtualEnderRegistry extends SavedData {
     }
 
     private VirtualRegistryMap getRegistry(UUID owner) {
-        if (data == null) getInstance();
-        return data.VIRTUAL_REGISTRIES.computeIfAbsent(owner, key -> new VirtualRegistryMap());
+        return getInstance().VIRTUAL_REGISTRIES.computeIfAbsent(owner, key -> new VirtualRegistryMap());
     }
 
     public final void readFromNBT(HolderLookup.@NotNull Provider registries, CompoundTag nbt) {

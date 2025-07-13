@@ -41,7 +41,7 @@ public class TheOneProbePlugin {
         probe.registerProvider(new RecipeLogicInfoProvider());
         probe.registerProvider(new ParallelProvider());
         probe.registerProvider(new RecipeOutputProvider());
-        probe.registerProvider(new MulitblockStructureProvider());
+        probe.registerProvider(new MultiblockStructureProvider());
         probe.registerProvider(new MaintenanceInfoProvider());
         probe.registerProvider(new ExhaustVentInfoProvider());
         probe.registerProvider(new SteamBoilerInfoProvider());

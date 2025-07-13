@@ -60,7 +60,7 @@ public class MultiPartBakedModel implements IDynamicBakedModel {
     @SuppressWarnings("deprecation")
     public MultiPartBakedModel(List<Pair<Predicate<MachineRenderState>, BakedModel>> selectors) {
         this.selectors = selectors;
-        BakedModel defaultModel = selectors.iterator().next().getRight();
+        BakedModel defaultModel = selectors.getFirst().getRight();
         this.defaultModel = defaultModel;
         this.hasAmbientOcclusion = defaultModel.useAmbientOcclusion();
         this.isGui3d = defaultModel.isGui3d();
@@ -99,7 +99,7 @@ public class MultiPartBakedModel implements IDynamicBakedModel {
         if (blockState == null) blockState = definition.defaultBlockState();
 
         BitSet bitset = getSelectors(renderState);
-        List<BakedQuad> quads = new ArrayList<>();
+        List<BakedQuad> quads = new LinkedList<>();
         long k = random.nextLong();
 
         for (int j = 0; j < bitset.length(); ++j) {

@@ -8,6 +8,7 @@ import com.gregtechceu.gtceu.client.renderer.item.ArmorItemRenderer;
 import com.gregtechceu.gtceu.client.renderer.item.TagPrefixItemRenderer;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 import com.gregtechceu.gtceu.data.model.GTModels;
+import com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin;
 
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -45,6 +46,10 @@ public abstract class ModelManagerMixin {
         ArmorItemRenderer.reinitModels();
         SurfaceRockRenderer.reinitModels();
         GTModels.registerMaterialFluidModels();
+
+        if (GTCEu.Mods.isKubeJSLoaded()) {
+            GTKubeJSPlugin.generateMachineBlockModels();
+        }
         GTCEu.LOGGER.info("GregTech Model loading took {}ms", System.currentTimeMillis() - startTime);
     }
 }

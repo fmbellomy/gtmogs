@@ -383,14 +383,19 @@ public class GTRecipeBuilder {
             return this;
         } else {
             var matInfo = ItemMaterialData.getMaterialInfo(input.getItem());
+            var unresolvedMatInfo = ItemMaterialData.UNRESOLVED_ITEM_MATERIAL_INFO.get(input);
             if (chance == maxChance && chance != 0) {
+                if (unresolvedMatInfo != null) {
+                    tempItemStacks.add(input);
+                }
                 if (matInfo != null) {
                     for (var matStack : matInfo.getMaterials()) {
                         tempItemMaterialStacks.add(matStack.multiply(input.getCount()));
                     }
-                } else {
+                } else if (unresolvedMatInfo == null) {
                     tempItemStacks.add(input);
                 }
+
             }
         }
         return input(ItemRecipeCapability.CAP, RecipeHelper.makeSizedIngredient(input));

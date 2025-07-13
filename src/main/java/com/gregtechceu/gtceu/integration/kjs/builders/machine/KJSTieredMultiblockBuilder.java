@@ -8,13 +8,10 @@ import com.gregtechceu.gtceu.api.registry.registrate.MachineBuilder;
 import com.gregtechceu.gtceu.api.registry.registrate.MultiblockMachineBuilder;
 import com.gregtechceu.gtceu.common.registry.GTRegistration;
 import com.gregtechceu.gtceu.data.machine.GTMachineUtils;
-import com.gregtechceu.gtceu.data.model.GTMachineModels;
-import com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin;
 
 import net.minecraft.resources.ResourceLocation;
 
 import com.google.common.base.Preconditions;
-import com.tterrag.registrate.providers.DataGenContext;
 import dev.latvian.mods.kubejs.client.LangKubeEvent;
 import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
@@ -26,19 +23,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Locale;
 
 import static com.gregtechceu.gtceu.api.GTValues.*;
-import static com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin.RUNTIME_BLOCKSTATE_PROVIDER;
 
 @Accessors(fluent = true, chain = true)
-public class KJSTieredMultiblockBuilder extends BuilderBase<@Nullable MultiblockMachineDefinition @NotNull []> {
+public class KJSTieredMultiblockBuilder extends BuilderBase<@Nullable MultiblockMachineDefinition @NotNull []>
+                                        implements IMachineBuilderKJS {
 
     private final MultiblockMachineBuilder[] builders = new MultiblockMachineBuilder[TIER_COUNT];
 
     @Setter
-    public volatile int[] tiers = GTMachineUtils.ELECTRIC_TIERS;
+    public transient int[] tiers = GTMachineUtils.ELECTRIC_TIERS;
     @Setter
-    public volatile TieredCreationFunction machine;
+    public transient TieredCreationFunction machine;
     @Setter
-    public volatile DefinitionFunction definition = (tier, def) -> def.tier(tier);
+    public transient DefinitionFunction definition = (tier, def) -> def.tier(tier);
 
     public KJSTieredMultiblockBuilder(ResourceLocation id) {
         super(id);
@@ -47,30 +44,23 @@ public class KJSTieredMultiblockBuilder extends BuilderBase<@Nullable Multiblock
     public KJSTieredMultiblockBuilder(ResourceLocation id, TieredCreationFunction machine) {
         super(id);
         this.machine = machine;
+        this.dummyBuilder = true;
+    }
+
+    @Override
+    public void generateMachineModels() {
+        for (int tier : this.tiers) {
+            generateMachineModel(this.builders[tier], this.object[tier]);
+        }
     }
 
     @Override
     public void generateAssets(KubeAssetGenerator generator) {
-        GTKubeJSPlugin.initRuntimeProvider(generator);
-
-        super.generateAssets(generator);
         for (int tier : this.tiers) {
-            MachineBuilder<?> builder = this.builders[tier];
             MachineDefinition definition = this.object[tier];
-            if (builder == null || definition == null) {
-                continue;
-            }
-            if (builder.model() == null && builder.blockModel() == null) return;
+            if (definition == null) continue;
 
             final ResourceLocation id = definition.getId();
-            // Fake a data provider for the GT model builders
-            var context = new DataGenContext<>(definition::getBlock, definition.getName(), id);
-            if (builder.blockModel() != null) {
-                builder.blockModel().accept(context, RUNTIME_BLOCKSTATE_PROVIDER);
-            } else {
-                GTMachineModels.createMachineModel(builder.model()).accept(context, RUNTIME_BLOCKSTATE_PROVIDER);
-            }
-
             generator.itemModel(id, gen -> gen.parent(id.withPrefix("block/machine/")));
         }
     }

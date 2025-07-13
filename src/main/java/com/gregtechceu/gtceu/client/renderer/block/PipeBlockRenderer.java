@@ -5,11 +5,14 @@ import com.gregtechceu.gtceu.api.pipenet.IPipeNode;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.client.model.PipeModel;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverableRenderer;
+import com.gregtechceu.gtceu.client.util.GTQuadTransformers;
 import com.gregtechceu.gtceu.data.block.GTMaterialBlocks;
+import com.gregtechceu.gtceu.utils.GTUtil;
 
 import com.lowdragmc.lowdraglib.client.renderer.IRenderer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -33,10 +36,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
+
+import static com.lowdragmc.lowdraglib.client.model.forge.LDLRendererModel.RendererBakedModel.*;
 
 public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
 
@@ -75,38 +79,56 @@ public class PipeBlockRenderer implements IRenderer, ICoverableRenderer {
     @Override
     @OnlyIn(Dist.CLIENT)
     public List<BakedQuad> renderModel(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction side,
-                                       @NotNull RandomSource rand, @NotNull ModelData data, RenderType renderType) {
+                                       @NotNull RandomSource rand, @NotNull ModelData modelData,
+                                       RenderType renderType) {
         if (level == null) {
             return pipeModel.bakeQuads(side, PipeModel.ITEM_CONNECTIONS, 0);
-        } else if (level.getBlockEntity(pos) instanceof IPipeNode<?, ?> pipeNode) {
-            var quads = new LinkedList<>(
-                    pipeModel.bakeQuads(side, pipeNode.getVisualConnections(), pipeNode.getBlockedConnections()));
+        }
+        if (!(level.getBlockEntity(pos) instanceof IPipeNode<?, ?> pipeNode)) {
+            return pipeModel.bakeQuads(side, 0, 0);
+        }
 
-            ICoverableRenderer.super.renderCovers(quads, pipeNode.getCoverContainer(), pos, level, side, rand,
-                    ModelData.EMPTY, null);
-            if (!pipeNode.getFrameMaterial().isNull()) {
-                BlockState blockState = GTMaterialBlocks.MATERIAL_BLOCKS
-                        .get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
-                        .getDefaultState();
-                var frameModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(blockState);
-                for (Direction face : Direction.values()) {
-                    if ((pipeNode.getConnections() & 1 << (12 + face.get3DDataValue())) == 0) {
-                        var frameTintedFaces = frameModel.getQuads(state, face, rand)
-                                .stream()
-                                .map(quad -> new BakedQuad(quad.getVertices(),
-                                        quad.getTintIndex() + (quad.isTinted() ? 3 : 0),
-                                        quad.getDirection(),
-                                        quad.getSprite(),
-                                        quad.isShade(),
-                                        quad.hasAmbientOcclusion()))
-                                .toList();
-                        quads.addAll(frameTintedFaces);
-                    }
-                }
-            }
+        List<BakedQuad> quads = new LinkedList<>();
+
+        if (renderType == null || renderType == RenderType.cutoutMipped()) {
+            quads.addAll(pipeModel.bakeQuads(side, pipeNode.getVisualConnections(), pipeNode.getBlockedConnections()));
+        }
+        ICoverableRenderer.super.renderCovers(quads, pipeNode.getCoverContainer(), pos, level, side, rand,
+                modelData, renderType);
+
+        if (pipeNode.getFrameMaterial().isNull() || (renderType != null && renderType != RenderType.translucent())) {
             return quads;
         }
-        return Collections.emptyList();
+
+        BlockState frameState = GTMaterialBlocks.MATERIAL_BLOCKS.get(TagPrefix.frameGt, pipeNode.getFrameMaterial())
+                .getDefaultState();
+        BakedModel frameModel = Minecraft.getInstance().getBlockRenderer().getBlockModel(frameState);
+
+        modelData = frameModel.getModelData(level, pos, frameState, modelData);
+
+        List<BakedQuad> frameQuads = new LinkedList<>();
+        if (side == null || pipeNode.getCoverContainer().getCoverAtSide(side) == null) {
+            frameQuads.addAll(frameModel.getQuads(state, side, rand, modelData, renderType));
+        }
+        if (side == null) {
+            for (Direction face : GTUtil.DIRECTIONS) {
+                if (pipeNode.getCoverContainer().getCoverAtSide(face) != null) {
+                    continue;
+                }
+                frameQuads.addAll(frameModel.getQuads(state, face, rand, modelData, renderType));
+            }
+        }
+
+        // bake all the quads' tint colors into the vertices
+        BlockColors blockColors = Minecraft.getInstance().getBlockColors();
+        for (BakedQuad frameQuad : frameQuads) {
+            if (frameQuad.isTinted()) {
+                int color = blockColors.getColor(frameState, level, pos, frameQuad.getTintIndex());
+                frameQuad = GTQuadTransformers.setColor(frameQuad, color, true);
+            }
+            quads.add(frameQuad);
+        }
+        return quads;
     }
 
     @NotNull

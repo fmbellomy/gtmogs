@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.prefix;
 
+import com.gregtechceu.gtceu.api.block.OreBlock;
 import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.material.material.info.MaterialIconType;
 import com.gregtechceu.gtceu.api.tag.TagPrefix;
@@ -47,6 +48,7 @@ public class OreTagPrefixBuilder extends TagPrefixBuilder {
                 .unformattedTagPath("ores")
                 .materialIconType(MaterialIconType.ore)
                 .unificationEnabled(true)
+                .blockConstructor(OreBlock::new)
                 .generationCondition(hasOreProperty);
     }
 

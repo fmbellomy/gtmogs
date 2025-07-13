@@ -5,10 +5,7 @@ import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.capability.recipe.RecipeCapability;
 import com.gregtechceu.gtceu.api.gui.editor.EditableMachineUI;
 import com.gregtechceu.gtceu.api.item.MetaMachineItem;
-import com.gregtechceu.gtceu.api.machine.IMachineBlockEntity;
-import com.gregtechceu.gtceu.api.machine.MetaMachine;
-import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
-import com.gregtechceu.gtceu.api.machine.RotationState;
+import com.gregtechceu.gtceu.api.machine.*;
 import com.gregtechceu.gtceu.api.machine.feature.IRecipeLogicMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
@@ -44,6 +41,8 @@ import com.tterrag.registrate.providers.DataGenContext;
 import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
+import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.apache.commons.lang3.function.TriFunction;
@@ -54,13 +53,15 @@ import java.util.List;
 import java.util.function.*;
 
 @SuppressWarnings("unused")
-public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachineDefinition> {
+public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachineDefinition>
+                                             implements IMachineBuilderKJS {
 
     private final MultiblockMachineBuilder internal;
 
     public MultiblockMachineBuilderWrapper(ResourceLocation id, MultiblockMachineBuilder internal) {
         super(id);
         this.internal = internal;
+        this.dummyBuilder = true;
     }
 
     public MultiblockMachineBuilderWrapper generator(boolean generator) {
@@ -230,8 +231,9 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
     }
 
     public MultiblockMachineBuilderWrapper colorOverlayTieredHullModel(ResourceLocation overlay,
+                                                                       @Nullable ResourceLocation pipeOverlay,
                                                                        @Nullable ResourceLocation emissiveOverlay) {
-        internal.colorOverlayTieredHullModel(overlay, emissiveOverlay);
+        internal.colorOverlayTieredHullModel(overlay, pipeOverlay, emissiveOverlay);
         return this;
     }
 
@@ -269,8 +271,9 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
     }
 
     public MultiblockMachineBuilderWrapper colorOverlaySteamHullModel(ResourceLocation overlay,
+                                                                      @Nullable ResourceLocation pipeOverlay,
                                                                       @Nullable ResourceLocation emissiveOverlay) {
-        internal.colorOverlaySteamHullModel(overlay, emissiveOverlay);
+        internal.colorOverlaySteamHullModel(overlay, pipeOverlay, emissiveOverlay);
         return this;
     }
 
@@ -400,6 +403,25 @@ public class MultiblockMachineBuilderWrapper extends BuilderBase<MultiblockMachi
     public MultiblockMachineBuilderWrapper allowExtendedFacing(boolean allowExtendedFacing) {
         internal.allowExtendedFacing(allowExtendedFacing);
         return this;
+    }
+
+    @Override
+    public void generateMachineModels() {
+        generateMachineModel(internal, object);
+    }
+
+    @Override
+    public void generateAssets(KubeAssetGenerator generator) {
+        final ResourceLocation id = this.id;
+        generator.itemModel(id, gen -> gen.parent(id.withPrefix("block/machine/")));
+    }
+
+    @Override
+    public void generateLang(LangKubeEvent lang) {
+        super.generateLang(lang);
+        if (object != null && object.getLangValue() != null) {
+            lang.add(id.getNamespace(), object.getDescriptionId(), object.getLangValue());
+        }
     }
 
     public MultiblockMachineDefinition createObject() {

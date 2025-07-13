@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ReferenceLinkedOpenHashSet;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
@@ -71,12 +72,6 @@ public class MultiblockPartMachine extends MetaMachine implements IMultiPart {
             if (MetaMachine.getMachine(getLevel(), blockPos) instanceof IMultiController controller) {
                 controllers.add(controller);
             }
-        }
-        MachineRenderState renderState = getRenderState();
-        if (renderState.hasProperty(IMultiController.IS_FORMED_PROPERTY)) {
-            setRenderState(renderState.setValue(IMultiController.IS_FORMED_PROPERTY, !controllers.isEmpty()));
-        } else {
-            scheduleRenderUpdate();
         }
     }
 
@@ -135,15 +130,29 @@ public class MultiblockPartMachine extends MetaMachine implements IMultiPart {
     // *** Multiblock LifeCycle ***//
     //////////////////////////////////////
 
+    @MustBeInvokedByOverriders
     @Override
     public void removedFromController(IMultiController controller) {
         controllerPositions.remove(controller.self().getPos());
         controllers.remove(controller);
+
+        if (controllers.isEmpty()) {
+            MachineRenderState renderState = getRenderState();
+            if (renderState.hasProperty(IMultiController.IS_FORMED_PROPERTY)) {
+                setRenderState(renderState.setValue(IMultiController.IS_FORMED_PROPERTY, false));
+            }
+        }
     }
 
+    @MustBeInvokedByOverriders
     @Override
     public void addedToController(IMultiController controller) {
         controllerPositions.add(controller.self().getPos());
         controllers.add(controller);
+
+        MachineRenderState renderState = getRenderState();
+        if (renderState.hasProperty(IMultiController.IS_FORMED_PROPERTY)) {
+            setRenderState(renderState.setValue(IMultiController.IS_FORMED_PROPERTY, true));
+        }
     }
 }

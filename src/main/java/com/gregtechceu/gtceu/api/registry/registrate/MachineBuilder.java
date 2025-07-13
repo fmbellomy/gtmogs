@@ -233,25 +233,29 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     }
 
     public MachineBuilder<DEFINITION> colorOverlayTieredHullModel(String overlay) {
-        return colorOverlayTieredHullModel(overlay, null);
+        return colorOverlayTieredHullModel(overlay, null, null);
     }
 
     public MachineBuilder<DEFINITION> colorOverlayTieredHullModel(String overlay,
+                                                                  @Nullable String pipeOverlay,
                                                                   @Nullable String emissiveOverlay) {
         ResourceLocation overlayTex = registrate.makeResourceLocation("block/overlay/machine/" + overlay);
+        ResourceLocation pipeOverlayTex = pipeOverlay == null ? null :
+                registrate.makeResourceLocation("block/overlay/machine/" + pipeOverlay);
         ResourceLocation emissiveOverlayTex = emissiveOverlay == null ? null :
                 registrate.makeResourceLocation("block/overlay/machine/" + emissiveOverlay);
-        return colorOverlayTieredHullModel(overlayTex, emissiveOverlayTex);
+        return colorOverlayTieredHullModel(overlayTex, pipeOverlayTex, emissiveOverlayTex);
     }
 
     public MachineBuilder<DEFINITION> colorOverlayTieredHullModel(ResourceLocation overlay) {
-        return colorOverlayTieredHullModel(overlay, null);
+        return colorOverlayTieredHullModel(overlay, null, null);
     }
 
     public MachineBuilder<DEFINITION> colorOverlayTieredHullModel(ResourceLocation overlay,
+                                                                  @Nullable ResourceLocation pipeOverlay,
                                                                   @Nullable ResourceLocation emissiveOverlay) {
         modelProperty(IPaintable.IS_PAINTED_PROPERTY, false);
-        return model(createColorOverlayTieredHullMachineModel(overlay, emissiveOverlay));
+        return model(createColorOverlayTieredHullMachineModel(overlay, pipeOverlay, emissiveOverlay));
     }
 
     public MachineBuilder<DEFINITION> overlaySteamHullModel(String name) {
@@ -264,25 +268,29 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     }
 
     public MachineBuilder<DEFINITION> colorOverlaySteamHullModel(String overlay) {
-        return colorOverlaySteamHullModel(overlay, null);
+        return colorOverlaySteamHullModel(overlay, null, null);
     }
 
     public MachineBuilder<DEFINITION> colorOverlaySteamHullModel(String overlay,
+                                                                 @Nullable ResourceLocation pipeOverlay,
                                                                  @Nullable String emissiveOverlay) {
         ResourceLocation overlayTex = registrate.makeResourceLocation("block/overlay/machine/" + overlay);
+        ResourceLocation pipeOverlayTex = pipeOverlay == null ? null :
+                registrate.makeResourceLocation("block/overlay/machine/" + pipeOverlay);
         ResourceLocation emissiveOverlayTex = emissiveOverlay == null ? null :
                 registrate.makeResourceLocation("block/overlay/machine/" + emissiveOverlay);
-        return colorOverlaySteamHullModel(overlayTex, emissiveOverlayTex);
+        return colorOverlaySteamHullModel(overlayTex, pipeOverlayTex, emissiveOverlayTex);
     }
 
     public MachineBuilder<DEFINITION> colorOverlaySteamHullModel(ResourceLocation overlay) {
-        return colorOverlaySteamHullModel(overlay, null);
+        return colorOverlaySteamHullModel(overlay, null, null);
     }
 
     public MachineBuilder<DEFINITION> colorOverlaySteamHullModel(ResourceLocation overlay,
+                                                                 @Nullable ResourceLocation pipeOverlay,
                                                                  @Nullable ResourceLocation emissiveOverlay) {
         modelProperty(IPaintable.IS_PAINTED_PROPERTY, false);
-        return model(createColorOverlaySteamHullMachineModel(overlay, emissiveOverlay));
+        return model(createColorOverlaySteamHullMachineModel(overlay, pipeOverlay, emissiveOverlay));
     }
 
     public MachineBuilder<DEFINITION> workableTieredHullModel(ResourceLocation workableModel) {
@@ -570,7 +578,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
                     .color(() -> () -> IMachineBlock::colorTinted)
                     .initialProperties(() -> Blocks.DISPENSER)
                     .properties(BlockBehaviour.Properties::noLootTable)
-                    .addLayer(() -> RenderType::cutoutMipped)
+                    .addLayer(() -> RenderType::cutout)
                     .exBlockstate(builder.blockModel != null ? builder.blockModel : createMachineModel(builder.model))
                     .properties(builder.blockProp)
                     .onRegister(b -> Arrays.stream(builder.abilities).forEach(a -> a.register(builder.tier, b)));

@@ -201,16 +201,25 @@ public class GTMachineUtils {
         return Pair.of(lowTier, highTier);
     }
 
-    public static MachineDefinition[] registerFluidHatches(String name, String displayname, String overlayTexture,
-                                                           String tooltip, IO io, int initialCapacity, int slots,
+    public static MachineDefinition[] registerFluidHatches(String name, String displayName, String tooltip,
+                                                           IO io, int initialCapacity, int slots,
                                                            int[] tiers, PartAbility... abilities) {
+        final String pipeOverlay;
+        if (slots >= 9) {
+            pipeOverlay = "overlay_pipe_9x";
+        } else if (slots >= 4) {
+            pipeOverlay = "overlay_pipe_4x";
+        } else {
+            pipeOverlay = null;
+        }
+        final String ioOverlay = io == IO.OUT ? "overlay_pipe_out_emissive" : "overlay_pipe_in_emissive";
         final String emissiveOverlay = slots > 4 ? OVERLAY_FLUID_HATCH_HALF_PX_TEX : OVERLAY_FLUID_HATCH_TEX;
         return registerTieredMachines(name,
                 (holder, tier) -> new FluidHatchPartMachine(holder, tier, io, initialCapacity, slots),
                 (tier, builder) -> {
-                    builder.langValue(VNF[tier] + ' ' + displayname)
+                    builder.langValue(VNF[tier] + ' ' + displayName)
                             .rotationState(RotationState.ALL)
-                            .colorOverlayTieredHullModel(overlayTexture, emissiveOverlay)
+                            .colorOverlayTieredHullModel(ioOverlay, pipeOverlay, emissiveOverlay)
                             .abilities(abilities)
                             .tooltips(Component.translatable("gtceu.machine." + tooltip + ".tooltip"))
                             .allowCoverOnFront(true);
@@ -444,7 +453,7 @@ public class GTMachineUtils {
                     .rotationState(RotationState.ALL)
                     .allowExtendedFacing(true)
                     .model(createTieredHullMachineModel(GTCEu.id("block/machine/template/quantum/quantum_tank"))
-                            .andThen(b -> b.addDynamicRenderer(() -> DynamicRenderHelper::createQuantumTankRender)))
+                            .andThen(b -> b.addDynamicRenderer(DynamicRenderHelper::createQuantumTankRender)))
                     .hasBER(true)
                     .tooltipBuilder(TANK_TOOLTIPS)
                     .tooltips(Component.translatable("gtceu.machine.quantum_tank.tooltip"),
@@ -468,7 +477,7 @@ public class GTMachineUtils {
                         .allowExtendedFacing(true)
                         .model(createTieredHullMachineModel(GTCEu.id("block/machine/template/quantum/quantum_chest"))
                                 .andThen(
-                                        b -> b.addDynamicRenderer(() -> DynamicRenderHelper::createQuantumChestRender)))
+                                        b -> b.addDynamicRenderer(DynamicRenderHelper::createQuantumChestRender)))
                         .hasBER(true)
                         .tooltipBuilder(CHEST_TOOLTIPS)
                         .tooltips(Component.translatable("gtceu.machine.quantum_chest.tooltip"),
@@ -586,7 +595,7 @@ public class GTMachineUtils {
                 .modelProperty(RecipeLogic.STATUS_PROPERTY, RecipeLogic.Status.IDLE)
                 .model(createWorkableCasingMachineModel(texture,
                         GTCEu.id("block/multiblock/generator/large_%s_boiler".formatted(name)))
-                        .andThen(b -> b.addDynamicRenderer(() -> () -> DynamicRenderHelper.makeBoilerPartRender(firebox, casing))))
+                        .andThen(b -> b.addDynamicRenderer(() -> DynamicRenderHelper.makeBoilerPartRender(firebox, casing))))
                 .tooltips(
                         Component.translatable("gtceu.multiblock.large_boiler.max_temperature", maxTemperature + 274,
                                 maxTemperature),

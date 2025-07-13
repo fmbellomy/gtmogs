@@ -14,7 +14,8 @@ import lombok.Getter;
 
 import java.util.Arrays;
 
-public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
+@SuppressWarnings("unused")
+public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> implements IMachineBuilderKJS {
 
     @HideFromJS
     @Getter
@@ -23,6 +24,7 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
     public KJSWrappingMachineBuilder(ResourceLocation id, KJSTieredMachineBuilder tieredBuilder) {
         super(id);
         this.tieredBuilder = tieredBuilder;
+        this.dummyBuilder = true;
     }
 
     public KJSWrappingMachineBuilder tiers(int... tiers) {
@@ -56,6 +58,11 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
     }
 
     @Override
+    public void generateMachineModels() {
+        tieredBuilder.generateMachineModels();
+    }
+
+    @Override
     public void generateAssets(KubeAssetGenerator generator) {
         tieredBuilder.generateAssets(generator);
     }
@@ -67,8 +74,7 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
 
     @Override
     public MachineDefinition createObject() {
-        tieredBuilder.createObject();
-        for (var def : tieredBuilder.get()) {
+        for (var def : tieredBuilder.createTransformedObject()) {
             if (def != null) {
                 return def;
             }

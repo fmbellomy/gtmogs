@@ -73,7 +73,7 @@ public class GTCEu {
 
         int i = path.indexOf(':');
         if (i > 0) {
-            return ResourceLocation.parse(path);
+            return ResourceLocation.tryParse(path);
         } else if (i == 0) {
             path = path.substring(i + 1);
         }

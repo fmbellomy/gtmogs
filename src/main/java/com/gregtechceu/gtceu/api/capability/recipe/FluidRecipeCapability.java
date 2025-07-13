@@ -195,21 +195,35 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
         var inputs = (tick ? recipe.tickInputs : recipe.inputs).get(this);
         if (inputs == null || inputs.isEmpty()) return limit;
 
+        // Find all the fluids in the combined Fluid Input inventories and create oversized FluidStacks
         List<Object2IntMap<FluidStack>> inventoryGroups = getInputContents(holder);
         if (inventoryGroups.isEmpty()) return 0;
 
+        // map the recipe ingredients to account for duplicated and notConsumable ingredients.
+        // notConsumable ingredients are not counted towards the max ratio
         var nonConsumables = new Object2IntOpenHashMap<SizedFluidIngredient>();
         var consumables = new Object2IntOpenHashMap<SizedFluidIngredient>();
         for (Content content : inputs) {
-            SizedFluidIngredient ingredient = of(content.content);
-            if (content.chance == 0) nonConsumables.addTo(ingredient, ingredient.amount());
-            else consumables.addTo(ingredient, ingredient.amount());
+            SizedFluidIngredient ing = of(content.content);
+
+            int amount;
+            if (ing.ingredient() instanceof IntProviderFluidIngredient provider) {
+                amount = provider.getCountProvider().getMaxValue();
+            } else {
+                amount = ing.amount();
+            }
+
+            if (content.chance == 0) nonConsumables.addTo(ing, amount);
+            else consumables.addTo(ing, amount);
         }
 
+        // is this even possible
         if (consumables.isEmpty() && nonConsumables.isEmpty()) return limit;
 
         int maxMultiplier = 0;
+        // Check every inventory group
         for (var group : inventoryGroups) {
+            // Check for enough NC in inventory group
             boolean satisfied = true;
             for (var ncEntry : Object2IntMaps.fastIterable(nonConsumables)) {
                 SizedFluidIngredient ingredient = ncEntry.getKey();
@@ -236,9 +250,9 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
 
             int invMultiplier = Integer.MAX_VALUE;
             // Loop over all consumables
-            for (var inputEntry : Object2IntMaps.fastIterable(consumables)) {
-                SizedFluidIngredient ingredient = inputEntry.getKey();
-                final int needed = inputEntry.getIntValue();
+            for (var cEntry : Object2IntMaps.fastIterable(consumables)) {
+                SizedFluidIngredient ingredient = cEntry.getKey();
+                final int needed = cEntry.getIntValue();
                 final int maxNeeded = needed * limit;
                 int available = 0;
                 // Search stacks in our inventory group, summing them up
@@ -280,24 +294,26 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
         // Handle distinct groups first, adding an inventory based on their contents individually.
         for (RecipeHandlerList handlerList : distinctHandlerLists) {
             var handlers = handlerList.getCapability(FluidRecipeCapability.CAP);
+            Object2IntOpenHashMap<FluidStack> distinctInv = new Object2IntOpenHashMap<>();
+
             for (IRecipeHandler<?> handler : handlers) {
-                Object2IntOpenHashMap<FluidStack> distinctInv = new Object2IntOpenHashMap<>();
                 for (var content : handler.getContents()) {
                     if (content instanceof FluidStack stack && !stack.isEmpty()) {
                         distinctInv.addTo(stack, stack.getAmount());
                     }
                 }
-                if (!distinctInv.isEmpty()) invs.add(distinctInv);
             }
+            if (!distinctInv.isEmpty()) invs.add(distinctInv);
         }
 
-        // Then handle other groups. The logic of undyed busses belonging to
+        // Then handle other groups. The logic of undyed hatches belonging to
         // everything has already been taken care of by addToRecipeMap()
         for (Map.Entry<RecipeHandlerGroup, List<RecipeHandlerList>> handlerListEntry : handlerGroups.entrySet()) {
-            if (RecipeHandlerGroupDistinctness.BUS_DISTINCT == handlerListEntry.getKey()) continue;
+            if (handlerListEntry.getKey() == RecipeHandlerGroupDistinctness.BUS_DISTINCT) continue;
+
+            Object2IntOpenHashMap<FluidStack> inventory = new Object2IntOpenHashMap<>();
             for (RecipeHandlerList handlerList : handlerListEntry.getValue()) {
                 var handlers = handlerList.getCapability(FluidRecipeCapability.CAP);
-                Object2IntOpenHashMap<FluidStack> inventory = new Object2IntOpenHashMap<>();
                 for (var handler : handlers) {
                     for (var content : handler.getContents()) {
                         if (content instanceof FluidStack stack && !stack.isEmpty()) {
@@ -305,8 +321,8 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
                         }
                     }
                 }
-                if (!inventory.isEmpty()) invs.add(inventory);
             }
+            if (!inventory.isEmpty()) invs.add(inventory);
         }
 
         return invs;

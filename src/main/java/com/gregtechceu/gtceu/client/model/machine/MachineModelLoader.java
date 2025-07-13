@@ -9,11 +9,9 @@ import com.gregtechceu.gtceu.client.model.machine.multipart.MultiPartUnbakedMode
 import com.gregtechceu.gtceu.client.model.machine.variant.MultiVariantModel;
 import com.gregtechceu.gtceu.client.model.machine.variant.VariantState;
 import com.gregtechceu.gtceu.client.renderer.machine.DynamicRender;
-import com.gregtechceu.gtceu.client.renderer.machine.DynamicRenderManager;
 
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -21,10 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.ExtendedBlockModelDeserializer;
 import net.neoforged.neoforge.client.model.geometry.IGeometryLoader;
 import net.neoforged.neoforge.common.util.TransformationHelper;
@@ -44,7 +38,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-@EventBusSubscriber(modid = GTCEu.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class MachineModelLoader implements IGeometryLoader<UnbakedMachineModel> {
 
     public static final MachineModelLoader INSTANCE = new MachineModelLoader();
@@ -69,25 +62,7 @@ public class MachineModelLoader implements IGeometryLoader<UnbakedMachineModel> 
     private static final Splitter EQUAL_SPLITTER = Splitter.on('=').limit(2);
     private static final UnbakedModel MISSING_MARKER = new BasicUnbakedModel();
 
-    private static final Map<ResourceLocation, List<DynamicRender<?, ?>>> DYNAMIC_RENDERERS = new HashMap<>();
-
     private MachineModelLoader() {}
-
-    @SubscribeEvent
-    public static void loadDynamicModels(ModelEvent.ModifyBakingResult event) {
-        if (DYNAMIC_RENDERERS.isEmpty()) return;
-
-        Map<ModelResourceLocation, BakedModel> models = event.getModels();
-        for (var entry : DYNAMIC_RENDERERS.entrySet()) {
-            ResourceLocation machineId = entry.getKey();
-            for (DynamicRender<?, ?> renderer : entry.getValue()) {
-                String rendererName = renderer.getType().getId().getPath();
-
-                String fakeModelPath = DynamicRenderManager.MODEL_ID_FORMATTER.apply(machineId.getPath());
-                models.put(new ModelResourceLocation(machineId.withPath(fakeModelPath), rendererName), renderer);
-            }
-        }
-    }
 
     @SuppressWarnings("NullableProblems")
     @Override
@@ -169,7 +144,6 @@ public class MachineModelLoader implements IGeometryLoader<UnbakedMachineModel> 
                         .getOrThrow();
                 dynamicRenders.add(render);
             }
-            DYNAMIC_RENDERERS.put(machineId, dynamicRenders);
         }
 
         // CTM info etc.

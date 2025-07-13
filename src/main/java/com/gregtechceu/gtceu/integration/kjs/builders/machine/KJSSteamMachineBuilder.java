@@ -13,63 +13,96 @@ import com.gregtechceu.gtceu.utils.FormattingUtil;
 import net.minecraft.resources.ResourceLocation;
 
 import dev.latvian.mods.kubejs.client.LangKubeEvent;
+import dev.latvian.mods.kubejs.generator.KubeAssetGenerator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
+import dev.latvian.mods.rhino.util.HideFromJS;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 @Accessors(fluent = true, chain = true)
-public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> {
+public class KJSSteamMachineBuilder extends BuilderBase<MachineDefinition> implements IMachineBuilderKJS {
 
     @Setter
-    public volatile boolean hasHighPressure = true;
+    public transient boolean hasLowPressure = true, hasHighPressure = true;
     @Setter
-    public volatile SteamCreationFunction machine = SimpleSteamMachine::new;
+    public transient SteamCreationFunction machine = SimpleSteamMachine::new;
     @Setter
-    public volatile SteamDefinitionFunction definition = (isHP, def) -> def.tier(isHP ? 1 : 0);
+    public transient SteamDefinitionFunction definition = (isHP, def) -> def.tier(isHP ? 1 : 0);
+
+    @HideFromJS
     @Nullable
-    private volatile MachineDefinition hp = null;
+    private MachineBuilder<?> lowPressureBuilder = null, highPressureBuilder = null;
+    @HideFromJS
+    @Nullable
+    private MachineDefinition lpObject = null, hpObject = null;
 
     public KJSSteamMachineBuilder(ResourceLocation id) {
         super(id);
+        this.dummyBuilder = true;
     }
 
     @Override
     public MachineDefinition createObject() {
-        MachineBuilder<?> lowPressureBuilder = GTRegistration.REGISTRATE.machine(
-                String.format("lp_%s", this.id.getPath()),
-                holder -> machine.create(holder, false));
-        lowPressureBuilder.langValue("Low Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
-                .tier(0)
-                .recipeModifier(SimpleSteamMachine::recipeModifier)
-                .modelProperty(SimpleSteamMachine.VENT_DIRECTION_PROPERTY, RelativeDirection.BACK)
-                .workableSteamHullModel(false, id.withPrefix("block/machines/"));
-        definition.apply(false, lowPressureBuilder);
-        var lowPressure = lowPressureBuilder.register();
+        MachineDefinition value = null;
+        if (hasLowPressure) {
+            this.lowPressureBuilder = GTRegistration.REGISTRATE.machine(
+                    String.format("lp_%s", this.id.getPath()),
+                    holder -> machine.create(holder, false))
+                    .langValue("Low Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
+                    .tier(0)
+                    .recipeModifier(SimpleSteamMachine::recipeModifier)
+                    .modelProperty(SimpleSteamMachine.VENT_DIRECTION_PROPERTY, RelativeDirection.BACK)
+                    .workableSteamHullModel(false, id.withPrefix("block/machines/"));
+
+            definition.apply(false, lowPressureBuilder);
+            this.lpObject = lowPressureBuilder.register();
+            value = lpObject;
+        }
 
         if (hasHighPressure) {
-            MachineBuilder<?> highPressureBuilder = GTRegistration.REGISTRATE.machine(
+            this.highPressureBuilder = GTRegistration.REGISTRATE.machine(
                     String.format("hp_%s", this.id.getPath()),
-                    holder -> machine.create(holder, true));
-            highPressureBuilder.langValue("High Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
+                    holder -> machine.create(holder, true))
+                    .langValue("High Pressure " + FormattingUtil.toEnglishName(this.id.getPath()))
                     .tier(1)
                     .recipeModifier(SimpleSteamMachine::recipeModifier)
                     .modelProperty(SimpleSteamMachine.VENT_DIRECTION_PROPERTY, RelativeDirection.BACK)
                     .workableSteamHullModel(true, id.withPrefix("block/machines/"));
+
             definition.apply(true, highPressureBuilder);
-            hp = highPressureBuilder.register();
+            this.hpObject = highPressureBuilder.register();
+            if (value == null) value = hpObject;
         }
 
-        return lowPressure;
+        return value;
+    }
+
+    @Override
+    public void generateMachineModels() {
+        generateMachineModel(lowPressureBuilder, lpObject);
+        generateMachineModel(highPressureBuilder, hpObject);
+    }
+
+    @Override
+    public void generateAssets(KubeAssetGenerator generator) {
+        if (this.lowPressureBuilder != null) {
+            generator.itemModel(id, gen -> gen.parent(id.withPrefix("block/machine/")));
+        }
+        if (this.highPressureBuilder != null) {
+            generator.itemModel(id, gen -> gen.parent(id.withPrefix("block/machine/")));
+        }
     }
 
     @SuppressWarnings("DataFlowIssue")
     @Override
     public void generateLang(LangKubeEvent lang) {
         super.generateLang(lang);
-        lang.add(GTCEu.MOD_ID, get().getDescriptionId(), get().getLangValue());
-        if (hp != null) {
-            lang.add(GTCEu.MOD_ID, hp.getDescriptionId(), hp.getLangValue());
+        if (lpObject != null) {
+            lang.add(GTCEu.MOD_ID, lpObject.getDescriptionId(), lpObject.getLangValue());
+        }
+        if (hpObject != null) {
+            lang.add(GTCEu.MOD_ID, hpObject.getDescriptionId(), hpObject.getLangValue());
         }
     }
 

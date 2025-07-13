@@ -33,8 +33,10 @@ neoForge {
         // define mod <-> source bindings
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(sourceSets.client)
             sourceSet(sourceSets.test)
             sourceSet(sourceSets.extra)
+            sourceSet(sourceSets.clientExtra)
         }
     }
 
@@ -43,7 +45,7 @@ neoForge {
     runs {
         client {
             client()
-            sourceSet = sourceSets.extra
+            sourceSet = sourceSets.clientExtra
             ideName = "Client 1"
 
             systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
@@ -51,7 +53,7 @@ neoForge {
 
         client2 {
             client()
-            sourceSet = sourceSets.extra
+            sourceSet = sourceSets.clientExtra
             ideName = "Client 2"
 
             programArguments.addAll('--username', 'YoungOnion', '--uuid', '3a27782d-6864-4814-a9fe-7c6931f29a8a')
@@ -71,13 +73,13 @@ neoForge {
         // Client with GTM + Jade, EMI, AE2
         cleanClient {
             client()
-            sourceSet = sourceSets.main
+            sourceSet = sourceSets.client
             ideName = "Clean Client"
 
             systemProperty('neoforge.enabledGameTestNamespaces', project.mod_id)
         }
 
-        server {
+        cleanServer {
             server()
             sourceSet = sourceSets.main
             ideName = "Clean Server"
