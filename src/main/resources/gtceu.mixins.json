@@ -7,6 +7,8 @@
     "plugin": "com.gregtechceu.gtceu.core.mixins.GTMixinPlugin",
     "client": [
         "client.AbstractClientPlayerAccessor",
+        "client.FaceBakeryMixin",
+        "client.BakedQuadMixin",
         "client.BiomeColorsMixin",
         "client.BlockModelMixin",
         "client.ClientLevelAccessor",
@@ -60,6 +62,7 @@
         "forge.ConfiguredModelBuilderAccessor",
         "forge.ConfiguredModelListAccessor",
         "forge.IntersectionIngredientAccessor",
+        "forge.ModelBuilderAccessor",
         "forge.PartialNBTIngredientAccessor",
         "forge.StrictNBTIngredientAccessor",
         "jei.FluidHelperMixin",
