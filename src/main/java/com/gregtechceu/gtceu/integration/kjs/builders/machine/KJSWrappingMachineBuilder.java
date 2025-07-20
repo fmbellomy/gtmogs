@@ -57,6 +57,11 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> {
         return this;
     }
 
+    public KJSWrappingMachineBuilder isGenerator(boolean isGenerator) {
+        tieredBuilder.isGenerator(isGenerator);
+        return this;
+    }
+
     @Override
     public void generateDataJsons(DataJsonGenerator generator) {
         tieredBuilder.generateDataJsons(generator);

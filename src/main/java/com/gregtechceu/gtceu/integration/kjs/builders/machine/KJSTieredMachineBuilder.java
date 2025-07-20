@@ -45,6 +45,8 @@ public class KJSTieredMachineBuilder extends BuilderBase<MachineDefinition[]> {
     public volatile boolean addDefaultTooltips = true;
     @Setter
     public volatile boolean addDefaultModel = true;
+    @Setter
+    public volatile boolean isGenerator = false;
 
     public volatile BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI;
 
@@ -55,10 +57,12 @@ public class KJSTieredMachineBuilder extends BuilderBase<MachineDefinition[]> {
     }
 
     public KJSTieredMachineBuilder(ResourceLocation id, TieredCreationFunction machine,
-                                   BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI) {
+                                   BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI,
+                                   boolean isGenerator) {
         super(id);
         this.machine = machine;
         this.editableUI = editableUI;
+        this.isGenerator = isGenerator;
     }
 
     @Override
@@ -113,7 +117,7 @@ public class KJSTieredMachineBuilder extends BuilderBase<MachineDefinition[]> {
                 if (tankScalingFunction != null && addDefaultTooltips) {
                     builder.tooltips(
                             GTMachineUtils.workableTiered(tier, GTValues.V[tier], GTValues.V[tier] * 64, recipeType,
-                                    tankScalingFunction.applyAsInt(tier), true));
+                                    tankScalingFunction.applyAsInt(tier), !isGenerator));
                 }
             }
 
