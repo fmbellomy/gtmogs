@@ -26,6 +26,7 @@ import com.gregtechceu.gtceu.integration.xei.entry.fluid.FluidStackList;
 import com.gregtechceu.gtceu.integration.xei.entry.fluid.FluidTagList;
 import com.gregtechceu.gtceu.integration.xei.handlers.fluid.CycleFluidEntryHandler;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTRecipeWidget;
+import com.gregtechceu.gtceu.utils.FluidStackHashStrategy;
 
 import com.lowdragmc.lowdraglib.gui.texture.ProgressTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
@@ -423,6 +424,11 @@ public class FluidRecipeCapability extends RecipeCapability<SizedFluidIngredient
             return mapIntersection(intersection, amount);
         } else if (ingredient.ingredient() instanceof TagFluidIngredient tag) {
             return FluidTagList.of(tag.tag(), amount, DataComponentPatch.EMPTY);
+        } else if (ingredient.ingredient() instanceof DataComponentFluidIngredient component) {
+            var key = component.fluids().unwrapKey();
+            if (key.isPresent()) {
+                return FluidTagList.of(key.get(), amount, component.components().asPatch());
+            }
         }
         return FluidStackList.of(Arrays.asList(ingredient.getFluids()));
     }

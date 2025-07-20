@@ -46,19 +46,28 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
     public transient Int2IntFunction tankScalingFunction = GTMachineUtils.defaultTankSizeFunction;
     @Setter
     public transient boolean addDefaultTooltips = true;
+    @Setter
+    public transient boolean addDefaultModel = true;
+    @Setter
+    public transient boolean isGenerator = false;
 
     @Nullable
     public transient BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI;
 
     public KJSTieredMachineBuilder(ResourceLocation id) {
         super(id);
+        this.addDefaultTooltips = false;
+        this.addDefaultModel = false;
+        this.dummyBuilder = true;
     }
 
     public KJSTieredMachineBuilder(ResourceLocation id, TieredCreationFunction machine,
-                                   BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI) {
+                                   BiFunction<ResourceLocation, GTRecipeType, EditableMachineUI> editableUI,
+                                   boolean isGenerator) {
         super(id);
         this.machine = machine;
         this.editableUI = editableUI;
+        this.isGenerator = isGenerator;
         this.dummyBuilder = true;
     }
 
@@ -91,7 +100,6 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
         }
     }
 
-    @SuppressWarnings("DataFlowIssue")
     @Override
     public @Nullable MachineDefinition @NotNull [] createObject() {
         Preconditions.checkNotNull(tiers, "Tiers can't be null!");
@@ -112,10 +120,13 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
                     holder -> machine.create(holder, tier, tankFunction));
 
             builder.langValue("%s %s %s".formatted(VLVH[tier], toEnglishName(this.id.getPath()), VLVT[tier]))
-                    .workableTieredHullModel(id.withPrefix("block/machines/"))
                     .tier(tier);
+            if (this.addDefaultModel) {
+                builder.workableTieredHullModel(id.withPrefix("block/machines/"));
+            }
             this.definition.apply(tier, builder);
-            if (builder.recipeTypes() != null && builder.recipeTypes().length > 0) {
+
+            if (builder.recipeTypes().length > 0) {
                 GTRecipeType recipeType = builder.recipeTypes()[0];
                 if (this.editableUI != null && builder.editableUI() == null) {
                     builder.editableUI(this.editableUI.apply(this.id, recipeType));
@@ -123,9 +134,10 @@ public class KJSTieredMachineBuilder extends BuilderBase<@Nullable MachineDefini
                 if (tankScalingFunction != null && addDefaultTooltips) {
                     builder.tooltips(
                             GTMachineUtils.workableTiered(tier, GTValues.V[tier], GTValues.V[tier] * 64, recipeType,
-                                    tankScalingFunction.applyAsInt(tier), true));
+                                    tankScalingFunction.applyAsInt(tier), !isGenerator));
                 }
             }
+
             this.builders[tier] = builder;
             definitions[tier] = builder.register();
         }

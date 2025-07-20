@@ -39,6 +39,7 @@ public class KJSTieredMultiblockBuilder extends BuilderBase<@Nullable Multiblock
 
     public KJSTieredMultiblockBuilder(ResourceLocation id) {
         super(id);
+        this.dummyBuilder = true;
     }
 
     public KJSTieredMultiblockBuilder(ResourceLocation id, TieredCreationFunction machine) {

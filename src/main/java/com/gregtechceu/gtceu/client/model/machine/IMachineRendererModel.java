@@ -63,7 +63,7 @@ public interface IMachineRendererModel<T extends IMachineFeature> {
         return AABB.encapsulatingFullBlocks(pos.offset(-1, -1, -1), pos.offset(1, 1, 1));
     }
 
-    default boolean isCustomRenderer() {
+    default boolean isBlockEntityRenderer() {
         return false;
     }
 }

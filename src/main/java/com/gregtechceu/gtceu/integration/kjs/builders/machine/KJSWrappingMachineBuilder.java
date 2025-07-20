@@ -11,6 +11,7 @@ import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import lombok.Getter;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
@@ -49,6 +50,16 @@ public class KJSWrappingMachineBuilder extends BuilderBase<MachineDefinition> im
 
     public KJSWrappingMachineBuilder addDefaultTooltips(boolean addDefaultTooltips) {
         tieredBuilder.addDefaultTooltips(addDefaultTooltips);
+        return this;
+    }
+
+    public KJSWrappingMachineBuilder addDefaultModel(boolean addDefaultModel) {
+        tieredBuilder.addDefaultModel(addDefaultModel);
+        return this;
+    }
+
+    public KJSWrappingMachineBuilder isGenerator(boolean isGenerator) {
+        tieredBuilder.isGenerator(isGenerator);
         return this;
     }
 

@@ -6,6 +6,8 @@
     "plugin": "com.gregtechceu.gtceu.core.mixins.GTMixinPlugin",
     "client": [
         "client.AbstractClientPlayerAccessor",
+        "client.FaceBakeryMixin",
+        "client.BakedQuadMixin",
         "client.BiomeColorsMixin",
         "client.BlockModelMixin",
         "client.ClientLevelAccessor",
@@ -72,7 +74,6 @@
         "neoforge.ConfiguredModelBuilderAccessor",
         "neoforge.ConfiguredModelListAccessor",
         "neoforge.GameDataMixin",
-        "neoforge.ModelBuilderAccessor",
         "registrate.AbstractRegistrateAccessor",
         "registrate.RegistrateDataProviderAccessor",
         "rei.InputSlotCrafterMixin",

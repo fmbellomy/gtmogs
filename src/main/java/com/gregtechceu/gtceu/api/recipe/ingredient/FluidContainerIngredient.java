@@ -38,12 +38,6 @@ public class FluidContainerIngredient implements ICustomIngredient {
         this.fluid = fluid;
     }
 
-    public FluidContainerIngredient(FluidStack fluidStack) {
-        this(SizedFluidIngredient.of(
-                TagUtil.createFluidTag(BuiltInRegistries.FLUID.getKey(fluidStack.getFluid()).getPath()),
-                fluidStack.getAmount()));
-    }
-
     public FluidContainerIngredient(TagKey<Fluid> tag, int amount) {
         this(SizedFluidIngredient.of(tag, amount));
     }

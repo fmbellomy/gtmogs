@@ -33,6 +33,7 @@ dependencies {
     compileOnly(forge.shimmer)
     compileOnly(forge.sodium)
     compileOnly(forge.iris)
+    compileOnly(forge.modernfix)
 
     // Teams
     compileOnly(forge.ftblibrary)
@@ -60,6 +61,7 @@ dependencies {
     localRuntime(forge.jade)
     localRuntime(forge.ae2)
     localRuntime(forge.spark)
+    localRuntime(forge.modernfix)
 
     // Runtime Recipe Viewers - uncomment whichever one you want to use //
     localRuntime(forge.emi)

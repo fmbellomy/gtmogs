@@ -1,5 +1,6 @@
 package com.gregtechceu.gtceu.api.registry.registrate;
 
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.block.IMachineBlock;
 import com.gregtechceu.gtceu.api.blockentity.IPaintable;
@@ -58,6 +59,7 @@ import com.tterrag.registrate.util.nullness.NonNullBiConsumer;
 import com.tterrag.registrate.util.nullness.NonNullConsumer;
 import com.tterrag.registrate.util.nullness.NonNullUnaryOperator;
 import dev.latvian.mods.rhino.util.HideFromJS;
+import dev.latvian.mods.rhino.util.RemapPrefixForJS;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import lombok.Getter;
@@ -74,6 +76,8 @@ import java.util.function.*;
 
 import static com.gregtechceu.gtceu.data.model.GTMachineModels.*;
 
+@SuppressWarnings("unused")
+@RemapPrefixForJS("kjs$")
 @Accessors(chain = true, fluent = true)
 public class MachineBuilder<DEFINITION extends MachineDefinition> {
 
@@ -123,7 +127,7 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     @Setter
     private NonNullConsumer<BlockEntityType<BlockEntity>> onBlockEntityRegister = NonNullConsumer.noop();
     @Getter // getter for KJS
-    private @Nullable GTRecipeType @Nullable [] recipeTypes = null;
+    private @NotNull GTRecipeType @NotNull [] recipeTypes = new GTRecipeType[0];
     @Getter
     @Setter // getter for KJS
     private int tier;
@@ -191,6 +195,13 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
     }
 
     public MachineBuilder<DEFINITION> recipeType(GTRecipeType type) {
+        // noinspection ConstantValue
+        if (type == null) {
+            GTCEu.LOGGER.error(
+                    "Tried to set null recipe type on machine {}. Did you create the recipe type before this machine?",
+                    this.registrate.makeResourceLocation(this.name));
+            return this;
+        }
         this.recipeTypes = ArrayUtils.add(this.recipeTypes, type);
         initRecipeMachineModelProperties(type);
         return this;
@@ -198,16 +209,29 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
 
     @Tolerate
     public MachineBuilder<DEFINITION> recipeTypes(GTRecipeType... types) {
-        for (GTRecipeType type : types) {
-            this.recipeTypes = ArrayUtils.add(this.recipeTypes, type);
+        List<GTRecipeType> typeList = new ArrayList<>();
+        Collections.addAll(typeList, this.recipeTypes);
+
+        for (int i = 0; i < types.length; i++) {
+            GTRecipeType type = types[i];
+            if (type != null) {
+                initRecipeMachineModelProperties(type);
+                typeList.add(type);
+            } else {
+                GTCEu.LOGGER.error(
+                        "Tried to set null recipe type on machine {} (index {}). Did you create the recipe type before this machine?",
+                        this.registrate.makeResourceLocation(this.name), i);
+            }
         }
-        initRecipeMachineModelProperties(types);
+        this.recipeTypes = typeList.toArray(GTRecipeType[]::new);
         return this;
     }
 
-    protected void initRecipeMachineModelProperties(GTRecipeType... types) {
-        if (types.length > 0 &&
-                Arrays.stream(types).noneMatch(type -> type == GTRecipeTypes.DUMMY_RECIPES)) {
+    protected void initRecipeMachineModelProperties(GTRecipeType type) {
+        if (type == GTRecipeTypes.DUMMY_RECIPES) {
+            return;
+        }
+        if (!modelProperties.containsKey(RecipeLogic.STATUS_PROPERTY)) {
             modelProperty(RecipeLogic.STATUS_PROPERTY, RecipeLogic.Status.IDLE);
         }
     }
@@ -363,6 +387,22 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
         return this;
     }
 
+    // KJS helpers for model property defaults
+    // These don't need to be copied to the multiblock builder because KJS doesn't care about the return type downgrade
+
+    public MachineBuilder<DEFINITION> kjs$modelPropertyBool(Property<Boolean> property, boolean defaultValue) {
+        return modelProperty(property, defaultValue);
+    }
+
+    public MachineBuilder<DEFINITION> kjs$modelPropertyInt(Property<Integer> property, int defaultValue) {
+        return modelProperty(property, defaultValue);
+    }
+
+    public <T extends Enum<T> & Comparable<T>> MachineBuilder<DEFINITION> kjs$modelPropertyEnum(Property<T> property,
+                                                                                                T defaultValue) {
+        return modelProperty(property, defaultValue);
+    }
+
     @Tolerate
     public MachineBuilder<DEFINITION> modelProperties(Property<?>... properties) {
         return this.modelProperties(List.of(properties));
@@ -505,13 +545,9 @@ public class MachineBuilder<DEFINITION extends MachineDefinition> {
         definition.setRegressWhenWaiting(this.regressWhenWaiting);
         definition.setAllowCoverOnFront(this.allowCoverOnFront);
 
-        if (recipeTypes != null) {
-            for (GTRecipeType type : recipeTypes) {
-                Objects.requireNonNull(type, "Cannot use null recipe type for machine %s:%s"
-                        .formatted(registrate.getModid(), this.name));
-                if (type.getIconSupplier() == null) {
-                    type.setIconSupplier(definition::asStack);
-                }
+        for (GTRecipeType type : recipeTypes) {
+            if (type.getIconSupplier() == null) {
+                type.setIconSupplier(definition::asStack);
             }
         }
         if (appearance == null) {

@@ -42,9 +42,7 @@ import java.util.*;
 
 public final class GTRegistries {
 
-    public static final ResourceLocation ROOT_GT_REGISTRY_NAME = GTCEu.id("root");
     // spotless:off
-    public static final ResourceKey<Registry<Registry<?>>> ROOT_REGISTRY = makeRegistryKey(ROOT_GT_REGISTRY_NAME);
     private static final LinkedHashMap<ResourceLocation, Registry<?>> LOAD_ORDER = new LinkedHashMap<>();
 
     public static final ResourceKey<Registry<OreVeinDefinition>> ORE_VEIN_REGISTRY = makeRegistryKey(GTCEu.id("ore_vein"));

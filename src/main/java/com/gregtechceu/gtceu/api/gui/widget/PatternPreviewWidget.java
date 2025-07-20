@@ -31,6 +31,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -64,7 +65,8 @@ public class PatternPreviewWidget extends WidgetGroup {
 
     private boolean isLoaded;
     private static TrackedDummyWorld LEVEL;
-    private static BlockPos LAST_POS = new BlockPos(0, 50, 0);
+    private static final int REGION_SIZE = 512;
+    private static int LAST_OFFSET_INDEX = 0;
     private static final Map<MultiblockMachineDefinition, MBPattern[]> CACHE = new HashMap<>();
     private final SceneWidget sceneWidget;
     private final DraggableScrollableWidgetGroup scrollableWidgetGroup;
@@ -213,10 +215,11 @@ public class PatternPreviewWidget extends WidgetGroup {
         Stream<BlockPos> stream = pattern.blockMap.keySet().stream()
                 .filter(pos -> layer == -1 || layer + pattern.minY == pos.getY());
         if (pattern.controllerBase.isFormed()) {
-            LongSet set = pattern.controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask",
+            LongSet modelDisabled = pattern.controllerBase.getMultiblockState().getMatchContext().getOrDefault(
+                    "renderMask",
                     LongSets.EMPTY_SET);
-            if (!set.isEmpty()) {
-                stream = stream.filter(pos -> !set.contains(pos.asLong()));
+            if (!modelDisabled.isEmpty()) {
+                stream = stream.filter(pos -> !modelDisabled.contains(pos.asLong()));
             }
         }
         sceneWidget.setRenderedCore(stream.toList(), null);
@@ -303,10 +306,43 @@ public class PatternPreviewWidget extends WidgetGroup {
         }
     }
 
-    public static BlockPos locateNextRegion(int range) {
-        BlockPos pos = LAST_POS;
-        LAST_POS = LAST_POS.offset(range, 0, range);
-        return pos;
+    /**
+     * Finds the next section of the dummy preview level to place a multiblock at in a spiral pattern.
+     * <p>
+     * This results in positions that are considerably closer to the world origin than
+     * the one it replaces, which did {@code prevPos.offset(500, 0, 500)},
+     * which results in absurdly high offsets for the later multiblocks.
+     * </p>
+     * The regions being closer to {@code (0,0)} means that Z-fighting should be less likely,
+     * since floating point inaccuracies won't be as large of a factor.
+     *
+     * @return the area to place the current multiblock at
+     */
+    public static BlockPos locateNextRegion() {
+        int currentIndex = LAST_OFFSET_INDEX++;
+
+        // Origin coordinates scaled back to the offset value, from global
+        int x = 0, z = 0;
+        if (currentIndex > 0) {
+            int v = (int) (Mth.sqrt(currentIndex + 0.25f) - 0.5f);
+            int nextV = v + 1;
+            int spiralBaseIndex = v * nextV;
+            // this is 1 or -1 depending on if v is odd or even
+            int flipFlop = (v & 1) * 2 - 1;
+
+            int offset = flipFlop * nextV / 2;
+            x += offset;
+            z += offset;
+
+            int cornerIndex = spiralBaseIndex + nextV;
+            if (currentIndex < cornerIndex) {
+                x -= flipFlop * (currentIndex - spiralBaseIndex + 1);
+            } else {
+                x -= flipFlop * nextV;
+                z -= flipFlop * (currentIndex - cornerIndex + 1);
+            }
+        }
+        return new BlockPos(x * REGION_SIZE, 50, z * REGION_SIZE);
     }
 
     @Override
@@ -333,7 +369,7 @@ public class PatternPreviewWidget extends WidgetGroup {
         Map<BlockPos, BlockInfo> blockMap = new HashMap<>();
         IMultiController controllerBase = null;
         Set<BlockEntity> blockEntitiesToAdd = new HashSet<>();
-        BlockPos multiPos = locateNextRegion(500);
+        BlockPos multiPos = locateNextRegion();
 
         BlockInfo[][][] blocks = shapeInfo.getBlocks();
         for (int x = 0; x < blocks.length; x++) {
@@ -385,11 +421,11 @@ public class PatternPreviewWidget extends WidgetGroup {
             controllerBase.onStructureFormed();
         }
         if (controllerBase.isFormed()) {
-            LongSet set = controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask",
+            LongSet modelDisabled = controllerBase.getMultiblockState().getMatchContext().getOrDefault("renderMask",
                     LongSets.EMPTY_SET);
-            if (!set.isEmpty()) {
+            if (!modelDisabled.isEmpty()) {
                 positions = new HashSet<>(positions);
-                positions.removeIf(pos -> set.contains(pos.asLong()));
+                positions.removeIf(pos -> modelDisabled.contains(pos.asLong()));
             }
             sceneWidget.setRenderedCore(positions, null);
         } else {
@@ -444,7 +480,7 @@ public class PatternPreviewWidget extends WidgetGroup {
         }
     }
 
-    private static class MBPattern {
+    public static class MBPattern {
 
         @NotNull
         final List<List<ItemStack>> parts;

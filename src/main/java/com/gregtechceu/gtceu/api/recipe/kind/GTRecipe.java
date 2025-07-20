@@ -149,6 +149,7 @@ public class GTRecipe implements Recipe<RecipeInput> {
         }
         copied.ocLevel = ocLevel;
         copied.parallels = parallels;
+        copied.batchParallels = batchParallels;
         return copied;
     }
 

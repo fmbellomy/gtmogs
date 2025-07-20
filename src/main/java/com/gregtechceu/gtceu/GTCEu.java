@@ -219,6 +219,10 @@ public class GTCEu {
             return isModLoaded(GTValues.MODID_SHIMMER);
         }
 
+        public static boolean isModernFixLoaded() {
+            return isModLoaded(GTValues.MODID_MODERNFIX);
+        }
+
         public static boolean isFTBTeamsLoaded() {
             return isModLoaded(GTValues.MODID_FTB_TEAMS);
         }

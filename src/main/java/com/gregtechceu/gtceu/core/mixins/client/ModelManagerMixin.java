@@ -9,6 +9,7 @@ import com.gregtechceu.gtceu.client.renderer.item.TagPrefixItemRenderer;
 import com.gregtechceu.gtceu.client.renderer.item.ToolItemRenderer;
 import com.gregtechceu.gtceu.data.model.GTModels;
 import com.gregtechceu.gtceu.integration.kjs.GTKubeJSPlugin;
+import com.gregtechceu.gtceu.integration.modernfix.GTModernFixIntegration;
 
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -49,6 +50,9 @@ public abstract class ModelManagerMixin {
 
         if (GTCEu.Mods.isKubeJSLoaded()) {
             GTKubeJSPlugin.generateMachineBlockModels();
+        }
+        if (GTCEu.Mods.isModernFixLoaded()) {
+            GTModernFixIntegration.setAsLast();
         }
         GTCEu.LOGGER.info("GregTech Model loading took {}ms", System.currentTimeMillis() - startTime);
     }

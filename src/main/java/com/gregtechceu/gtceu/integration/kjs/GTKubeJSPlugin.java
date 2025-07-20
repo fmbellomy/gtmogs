@@ -173,7 +173,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
             reg.addDefault(KJSWrappingMachineBuilder.class,
                     (id) -> new KJSWrappingMachineBuilder(id,
                             new KJSTieredMachineBuilder(id, SimpleTieredMachine::new,
-                                    SimpleTieredMachine.EDITABLE_UI_CREATOR)));
+                                    SimpleTieredMachine.EDITABLE_UI_CREATOR, false)));
 
             reg.add("custom", KJSWrappingMachineBuilder.class,
                     (id) -> new KJSWrappingMachineBuilder(id, new KJSTieredMachineBuilder(id)));
@@ -181,7 +181,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
             reg.add("generator", KJSWrappingMachineBuilder.class,
                     (id) -> new KJSWrappingMachineBuilder(id,
                             new KJSTieredMachineBuilder(id, SimpleGeneratorMachine::new,
-                                    SimpleGeneratorMachine.EDITABLE_UI_CREATOR)));
+                                    SimpleGeneratorMachine.EDITABLE_UI_CREATOR, true)));
 
             reg.add("multiblock", MultiblockMachineBuilderWrapper.class,
                     MultiblockMachineBuilderWrapper::createKJSMulti);
