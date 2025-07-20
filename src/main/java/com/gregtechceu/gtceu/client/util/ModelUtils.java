@@ -3,8 +3,8 @@ package com.gregtechceu.gtceu.client.util;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.client.model.machine.MachineModel;
 import com.gregtechceu.gtceu.client.renderer.cover.ICoverableRenderer;
-import com.gregtechceu.gtceu.integration.modernfix.GTModernFixIntegration;
 import com.gregtechceu.gtceu.core.mixins.neoforge.BakedModelWrapperAccessor;
+import com.gregtechceu.gtceu.integration.modernfix.GTModernFixIntegration;
 
 import com.lowdragmc.lowdraglib.client.model.custommodel.CustomBakedModel;
 
