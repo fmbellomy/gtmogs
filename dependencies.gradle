@@ -16,7 +16,6 @@ dependencies {
     compileOnly(forge.emi)
 
     // WAILA-likes
-    compileOnly(forge.theoneprobe)
     compileOnly(forge.jade)
 
     // KJS
@@ -39,7 +38,6 @@ dependencies {
 
     // Standard runtime mods //
     localRuntime(forge.jade)
-    localRuntime(forge.ae2)
     localRuntime(forge.spark)
     localRuntime(forge.modernfix)
 
@@ -55,12 +53,6 @@ dependencies {
     //////////////////////////////////////////////////////
     // Runtime mods for dev testing with unclean client //
     //////////////////////////////////////////////////////
-    extraLocalRuntime(forge.javd)
-    extraLocalRuntime(forge.trenzalore)
-    extraLocalRuntime(forge.curios)
-//    extraLocalRuntime(forge.worldstripper)
-    extraLocalRuntime(forge.cc.tweaked.forge.impl)
-
     extraLocalRuntime(forge.bundles.kjs)
 
     extraLocalRuntime(forge.ftblibrary)
@@ -75,7 +67,6 @@ dependencies {
     extraLocalRuntime(forge.journeymap.forge)
     extraLocalRuntime(forge.ftbchunks)
 
-//    extraLocalRuntime(forge.gamestages)
     extraLocalRuntime(forge.bookshelf) {
         transitive = false
     }
