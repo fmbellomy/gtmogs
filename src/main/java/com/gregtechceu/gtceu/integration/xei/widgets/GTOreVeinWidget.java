@@ -122,12 +122,6 @@ public class GTOreVeinWidget extends WidgetGroup {
                         yPosition + 18 * row,
                         false, false).setIngredientIO(IngredientIO.CATALYST);
                 handler.setStackInSlot(i, icon);
-                if (ConfigHolder.INSTANCE.compat.showDimensionTier) {
-                    dimSlot.setOverlay(
-                            new TextTexture("T" + (dimMarker.tier >= DimensionMarker.MAX_TIER ? "?" : dimMarker.tier))
-                                    .scale(0.75F)
-                                    .transform(-3F, 5F));
-                }
                 addWidget(dimSlot.setBackgroundTexture(IGuiTexture.EMPTY));
             }
         } else {

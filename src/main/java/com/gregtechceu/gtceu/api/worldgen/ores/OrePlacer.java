@@ -81,10 +81,4 @@ public class OrePlacer {
                         Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
 
-    private void placeIndicators(ChunkAccess chunk, BulkSectionAccess access, GeneratedIndicators generatedVein) {
-        if (!ConfigHolder.INSTANCE.worldgen.oreVeins.oreIndicators) return;
-        generatedVein.consumeIndicators(chunk.getPos()).forEach(placer -> {
-            placer.placeIndicators(access);
-        });
-    }
 }

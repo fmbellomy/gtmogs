@@ -92,8 +92,8 @@ dependencies {
 
 //    extraLocalRuntime(forge.xaerosminimap)
 //    extraLocalRuntime(forge.xaerosworldmap)
-//    extraLocalRuntime(forge.journeymap.forge)
-//    extraLocalRuntime(forge.ftbchunks)
+    extraLocalRuntime(forge.journeymap.forge)
+    extraLocalRuntime(forge.ftbchunks)
 
 //    extraLocalRuntime(forge.gamestages)
     extraLocalRuntime(forge.bookshelf) {

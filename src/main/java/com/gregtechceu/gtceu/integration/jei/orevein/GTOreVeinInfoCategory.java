@@ -54,15 +54,12 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
                 .<Holder<OreVeinDefinition>>map(Function.identity())
                 .toList());
     }
-
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, Holder<OreVeinDefinition> definition, IFocusGroup focuses) {
         super.setRecipe(builder, definition, focuses);
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
                 .addItemStacks(GTOreVeinWidget.getContainedOresAndBlocks(definition.value()));
     }
-
-
     @NotNull
     @Override
     public RecipeType<Holder<OreVeinDefinition>> getRecipeType() {

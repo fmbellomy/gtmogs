@@ -75,18 +75,14 @@ public class GTDynamicDataPack implements PackResources {
                 .getOrThrow();
         byte[] recipeBytes = recipeJson.toString().getBytes(StandardCharsets.UTF_8);
         Path parent = GTCEu.getGameDir().resolve("gtceu/dumped/data");
-        if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
-            writeJson(recipeId, "recipe", parent, recipeBytes);
-        }
+
         addToData(getRecipeLocation(recipeId), recipeBytes);
         if (advancement != null) {
             JsonElement advancementJson = Advancement.CODEC
                     .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), advancement.value())
                     .getOrThrow();
             byte[] advancementBytes = advancementJson.toString().getBytes(StandardCharsets.UTF_8);
-            if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
-                writeJson(advancement.id(), "advancement", parent, advancementBytes);
-            }
+
             addToData(getAdvancementLocation(advancement.id()), advancementBytes);
         }
     }
@@ -96,9 +92,7 @@ public class GTDynamicDataPack implements PackResources {
                 .encodeStart(provider.createSerializationContext(JsonOps.INSTANCE), table).getOrThrow();
         byte[] lootTableBytes = lootTableJson.toString().getBytes(StandardCharsets.UTF_8);
         Path parent = Platform.getGamePath().resolve("gtceu/dumped/data");
-        if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
-            writeJson(lootTableId, "loot_table", parent, lootTableBytes);
-        }
+
         if (CONTENTS.getResource(lootTableId) != null) {
             GTCEu.LOGGER.error("duplicate loot table: {}", lootTableId);
         }
@@ -114,9 +108,7 @@ public class GTDynamicDataPack implements PackResources {
                 .getOrThrow();
         byte[] dataMapBytes = dataMapJson.toString().getBytes(StandardCharsets.UTF_8);
         Path parent = Platform.getGamePath().resolve("gtceu/dumped/data");
-        if (ConfigHolder.INSTANCE.dev.dumpRecipes) {
-            writeJson(dataMapId, null, parent, dataMapBytes);
-        }
+
         addToData(dataMapId, dataMapBytes);
     }
 

@@ -53,11 +53,6 @@ public class GTCEu {
 
         // must be set here because of KubeJS compat
         // trying to read this before the pre-init stage
-
-        if (GTCEu.isDev()) {
-            ConfigHolder.INSTANCE.recipes.generateLowQualityGems = true;
-            ConfigHolder.INSTANCE.compat.energy.enableFEConverters = true;
-        }
         CommonInit.init(modBus);
 
         modBus.addListener(GTNetwork::registerPayloads);

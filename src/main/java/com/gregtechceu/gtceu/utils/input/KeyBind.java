@@ -1,7 +1,6 @@
 package com.gregtechceu.gtceu.utils.input;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.common.network.packets.CPacketKeysPressed;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -67,13 +66,7 @@ public enum KeyBind {
                 updating.add(keybind);
             }
         }
-        if (!updating.isEmpty()) {
-            try {
-                PacketDistributor.sendToServer(new CPacketKeysPressed(updating));
-            } catch (NullPointerException exception) {
-                GTCEu.LOGGER.error("Keys pressed packet failed to send with an exception", exception);
-            }
-        }
+
     }
 
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {
