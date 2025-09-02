@@ -1,18 +1,19 @@
 package com.quantumgarbage.gtmogs.integration.map;
 
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksWaypointHandler;
+import com.quantumgarbage.gtmogs.integration.map.journeymap.JourneyMapWaypointHandler;
+import com.quantumgarbage.gtmogs.integration.map.xaeros.XaeroWaypointHandler;
 import com.quantumgarbage.gtmogs.utils.GTMath;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import lombok.Getter;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,16 +27,16 @@ public class WaypointManager {
 
     public static void init() {
         var toggle = ConfigHolder.INSTANCE.compat.minimap.toggle;
-        /*
-         * if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
-         * WaypointManager.registerWaypointHandler(new XaeroWaypointHandler());
-         * active = true;
-         * }
-         * if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
-         * WaypointManager.registerWaypointHandler(new JourneymapWaypointHandler());
-         * active = true;
-         * }
-         */
+
+        if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
+            WaypointManager.registerWaypointHandler(new XaeroWaypointHandler());
+            active = true;
+        }
+        if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
+            WaypointManager.registerWaypointHandler(new JourneyMapWaypointHandler());
+            active = true;
+        }
+
         if (toggle.ftbChunksIntegration && GTMOGS.isModLoaded(GTValues.MODID_FTB_CHUNKS)) {
             WaypointManager.registerWaypointHandler(new FTBChunksWaypointHandler());
             active = true;

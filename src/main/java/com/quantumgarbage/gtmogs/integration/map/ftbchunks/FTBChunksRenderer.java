@@ -23,11 +23,6 @@ public class FTBChunksRenderer extends GenericMapRenderer {
     private static final Map<String, Widget> markers = new Object2ObjectOpenHashMap<>();
 
     @Override
-    public boolean addMarker(String name, String id, ResourceKey<Level> dim, ChunkPos pos) {
-        return false;
-    }
-
-    @Override
     public boolean addMarker(String name, ResourceKey<Level> dim, GeneratedVeinMetadata vein, String id) {
         oreElements.put(dim, id, new OreVeinIcon(vein));
         return true;

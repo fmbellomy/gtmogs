@@ -2,12 +2,19 @@ package com.quantumgarbage.gtmogs.integration.map.ftbchunks.veins.ore;
 
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.integration.map.MapIntegrationUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.phys.Vec3;
 
 import com.mojang.blaze3d.platform.InputConstants;
@@ -154,14 +161,8 @@ public class OreVeinIcon implements MapIcon {
         var color = firstOreBlock.getBlock().defaultMapColor().col;
         var colors = DrawUtil.floats(color);
         RenderSystem.setShaderColor(1, 1, 1, 1);
-
-        var oreTexture = ResourceLocation.parse(new ItemStackTexture(new ItemStack(firstOreBlock.getBlock())).name());
-        if (oreTexture != null) {
-            var oreSprite = Minecraft.getInstance()
-                    .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-                    .apply(oreTexture);
-            graphics.blit(x, y, 0, w, h, oreSprite, colors[0], colors[1], colors[2], 1);
-        }
+        var oreSprite = MapIntegrationUtils.getFirstBlockFace(firstOreBlock.getBlock());
+        graphics.blit(x, y, 0, w, h, oreSprite, colors[0], colors[1], colors[2], 1);
         RenderSystem.setShaderColor(1, 1, 1, 1);
         var borderColor = ConfigHolder.INSTANCE.compat.minimap.getBorderColor(color | 0xFF000000);
         if ((borderColor & 0xFF000000) != 0) {

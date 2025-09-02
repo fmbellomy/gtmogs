@@ -15,12 +15,10 @@ public class FTBChunksOptions {
     private static final SNBTConfig CONFIG = SNBTConfig.create("gtmogs");
     private static final SNBTConfig LAYERS = CONFIG.addGroup("journeymap.options.layers");
     private static final BooleanValue ORE_LAYER = LAYERS.addBoolean("ore_veins", false);
-    private static final BooleanValue FLUID_LAYER = LAYERS.addBoolean("bedrock_fluids", false);
     private static final BooleanValue HIDE_DEPLETED = LAYERS.addBoolean("hide_depleted", false);
 
     static {
         layerOptions.put(ORE_LAYER.key, ORE_LAYER);
-        layerOptions.put(FLUID_LAYER.key, FLUID_LAYER);
         layerOptions.put(HIDE_DEPLETED.key, HIDE_DEPLETED);
 
         loadConfig();

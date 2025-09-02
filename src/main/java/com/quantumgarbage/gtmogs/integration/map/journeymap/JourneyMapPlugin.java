@@ -1,16 +1,14 @@
 package com.quantumgarbage.gtmogs.integration.map.journeymap;
 
 import com.quantumgarbage.gtmogs.GTMOGS;
-import journeymap.client.api.ClientPlugin;
-import journeymap.client.api.IClientAPI;
-import journeymap.client.api.IClientPlugin;
-import journeymap.client.api.event.ClientEvent;
-import journeymap.client.api.event.RegistryEvent;
+import journeymap.api.v2.client.IClientAPI;
+import journeymap.api.v2.client.IClientPlugin;
+import journeymap.api.v2.client.event.RegistryEvent;
+import journeymap.api.v2.common.event.ClientEventRegistry;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.EnumSet;
-
-@ClientPlugin
+@journeymap.api.v2.client.JourneyMapPlugin(apiVersion = IClientAPI.API_VERSION)
 public class JourneyMapPlugin implements IClientPlugin {
 
     @Getter
@@ -20,14 +18,14 @@ public class JourneyMapPlugin implements IClientPlugin {
     private static IClientAPI jmApi;
 
     @Getter
-    private static JourneymapOptions options;
+    private static JourneyMapOptions options;
 
     @Override
-    public void initialize(IClientAPI jmClientApi) {
+    public void initialize(@NotNull IClientAPI jmClientApi) {
         active = true;
         jmApi = jmClientApi;
-        jmClientApi.subscribe(GTMOGS.MOD_ID, EnumSet.of(ClientEvent.Type.REGISTRY));
-        JourneymapEventListener.init();
+        JourneyMapEventListener.init();
+        ClientEventRegistry.OPTIONS_REGISTRY_EVENT.subscribe(GTMOGS.MOD_ID, JourneyMapPlugin::onOptionsRegistry);
     }
 
     @Override
@@ -35,13 +33,7 @@ public class JourneyMapPlugin implements IClientPlugin {
         return GTMOGS.MOD_ID;
     }
 
-    @Override
-    public void onEvent(ClientEvent event) {
-        if (event.type == ClientEvent.Type.REGISTRY) {
-            RegistryEvent registryEvent = (RegistryEvent) event;
-            if (registryEvent.getRegistryType() == RegistryEvent.RegistryType.OPTIONS) {
-                options = new JourneymapOptions();
-            }
-        }
+    protected static void onOptionsRegistry(RegistryEvent.OptionsRegistryEvent event) {
+        options = new JourneyMapOptions();
     }
 }

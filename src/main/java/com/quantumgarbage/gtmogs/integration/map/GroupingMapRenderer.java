@@ -1,15 +1,15 @@
 package com.quantumgarbage.gtmogs.integration.map;
 
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksRenderer;
+import com.quantumgarbage.gtmogs.integration.map.journeymap.JourneyMapRenderer;
+import com.quantumgarbage.gtmogs.integration.map.xaeros.XaerosRenderer;
 import lombok.Getter;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,14 +25,13 @@ public class GroupingMapRenderer extends GenericMapRenderer {
     static {
         Map<String, GenericMapRenderer> renderers = new HashMap<>();
         var toggle = ConfigHolder.INSTANCE.compat.minimap.toggle;
-        /*
-         * if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
-         * renderers.put(GTValues.MODID_JOURNEYMAP, new JourneymapRenderer());
-         * }
-         * if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
-         * renderers.put(GTValues.MODID_XAEROS_MINIMAP, new XaerosRenderer());
-         * }
-         */
+
+        if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
+            renderers.put(GTValues.MODID_JOURNEYMAP, new JourneyMapRenderer());
+        }
+        if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
+            renderers.put(GTValues.MODID_XAEROS_MINIMAP, new XaerosRenderer());
+        }
         if (toggle.ftbChunksIntegration && GTMOGS.isModLoaded(GTValues.MODID_FTB_CHUNKS)) {
             renderers.put(GTValues.MODID_FTB_CHUNKS, new FTBChunksRenderer());
         }
@@ -50,14 +49,6 @@ public class GroupingMapRenderer extends GenericMapRenderer {
         this.rendererList = renderers.values().toArray(GenericMapRenderer[]::new);
     }
 
-    @Override
-    public boolean addMarker(String name, String id, ResourceKey<Level> dim, ChunkPos pos) {
-        boolean value = false;
-        for (GenericMapRenderer renderer : rendererList) {
-            value |= renderer.addMarker(name, id, dim, pos);
-        }
-        return value;
-    }
 
     @Override
     public boolean addMarker(String name, ResourceKey<Level> dim, GeneratedVeinMetadata vein, String id) {
