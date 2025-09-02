@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -13,7 +12,6 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.common.Tags;
@@ -23,9 +21,6 @@ import net.neoforged.neoforge.fluids.FluidType;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.GTValues;
-import it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
@@ -47,17 +42,6 @@ public class GTUtil {
                 .forEach(builder::add);
         return builder.build();
     });
-
-    private static final Object2IntMap<String> RVN = new Object2IntArrayMap<>(GTValues.VN, GTValues.ALL_TIERS);
-
-    /**
-     * Convenience method to get from VN -> Tier
-     *
-     * @return the voltage tier by name, -1 if the tier name isn't valid
-     */
-    public static int getTierByName(String name) {
-        return RVN.getOrDefault(name, -1);
-    }
 
     @Nullable
     public static Direction determineWrenchingSide(Direction facing, float x, float y, float z) {
@@ -139,10 +123,6 @@ public class GTUtil {
         return null;
     }
 
-    public static float getExplosionPower(long voltage) {
-        return getTierByVoltage(voltage) + 1;
-    }
-
     /**
      * @param array Array sorted with natural order
      * @param value Value to search for
@@ -181,42 +161,6 @@ public class GTUtil {
                 high = median - 1;
             }
         }
-    }
-
-    /**
-     * @return Lowest tier of the voltage that can handle {@code voltage}; that is,
-     *         a voltage with value greater than equal than {@code voltage}. If there's no
-     *         tier that can handle it, {@code MAX} is returned.
-     */
-    public static byte getTierByVoltage(long voltage) {
-        if (voltage > Integer.MAX_VALUE) {
-            return GTValues.MAX;
-        }
-        return getOCTierByVoltage(voltage);
-    }
-
-    public static byte getOCTierByVoltage(long voltage) {
-        if (voltage <= GTValues.V[GTValues.ULV]) {
-            return GTValues.ULV;
-        }
-        return (byte) ((62 - Long.numberOfLeadingZeros(voltage - 1)) >> 1);
-    }
-
-    /**
-     * Ex: This method turns both 1024 and 512 into HV.
-     *
-     * @return the highest voltage tier with value below or equal to {@code voltage}, or
-     *         {@code ULV} if there's no tier below
-     */
-    public static byte getFloorTierByVoltage(long voltage) {
-        if (voltage < GTValues.V[GTValues.LV]) {
-            return GTValues.ULV;
-        }
-        if (voltage == GTValues.VEX[GTValues.MAX_TRUE]) {
-            return GTValues.MAX_TRUE;
-        }
-
-        return (byte) ((60 - Long.numberOfLeadingZeros(voltage)) >> 1);
     }
 
     /**
@@ -388,28 +332,6 @@ public class GTUtil {
 
     public static int getFluidColor(FluidStack fluid) {
         return IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid);
-    }
-
-    public static boolean canSeeSunClearly(Level world, BlockPos blockPos) {
-        if (!world.canSeeSky(blockPos.above())) {
-            return false;
-        }
-
-        Holder<Biome> biome = world.getBiome(blockPos.above());
-        if (world.isRaining()) {
-            if (biome.value().warmEnoughToRain(blockPos.above()) || biome.value().coldEnoughToSnow(blockPos.above())) {
-                return false;
-            }
-        }
-
-        if (world.getBiome(blockPos.above()).is(BiomeTags.IS_END)) {
-            return false;
-        }
-
-        ResourceLocation javdVoidBiome = ResourceLocation.fromNamespaceAndPath(GTValues.MODID_JAVD, "void");
-        if (GTMOGS.isModLoaded(GTValues.MODID_JAVD) && biome.is(javdVoidBiome)) {
-            return !world.isDay();
-        } else return world.isDay();
     }
 
     /**

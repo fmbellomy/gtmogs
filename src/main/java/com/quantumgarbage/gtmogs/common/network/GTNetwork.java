@@ -3,8 +3,7 @@ package com.quantumgarbage.gtmogs.common.network;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-import com.quantumgarbage.gtmogs.api.GTCEuAPI;
-import com.quantumgarbage.gtmogs.common.network.packets.*;
+import com.quantumgarbage.gtmogs.api.GTMOGSAPI;
 import com.quantumgarbage.gtmogs.common.network.packets.SCPacketShareProspection;
 import com.quantumgarbage.gtmogs.common.network.packets.SPacketSendWorldID;
 import com.quantumgarbage.gtmogs.common.network.packets.prospecting.SPacketProspectOre;
@@ -12,7 +11,7 @@ import com.quantumgarbage.gtmogs.common.network.packets.prospecting.SPacketProsp
 public class GTNetwork {
 
     public static void registerPayloads(RegisterPayloadHandlersEvent event) {
-        PayloadRegistrar registrar = event.registrar(GTCEuAPI.NETWORK_VERSION);
+        PayloadRegistrar registrar = event.registrar(GTMOGSAPI.NETWORK_VERSION);
         // spotless:off
         registrar.playToClient(SPacketProspectOre.TYPE, SPacketProspectOre.CODEC, SPacketProspectOre::execute);
 

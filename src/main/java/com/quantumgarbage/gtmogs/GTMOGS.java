@@ -14,7 +14,7 @@ import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import com.mojang.serialization.Codec;
-import com.quantumgarbage.gtmogs.api.GTCEuAPI;
+import com.quantumgarbage.gtmogs.api.GTMOGSAPI;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.common.CommonInit;
 import com.quantumgarbage.gtmogs.common.network.GTNetwork;
@@ -44,7 +44,7 @@ public class GTMOGS {
     public static IEventBus gtModBus;
 
     public GTMOGS(IEventBus modBus, FMLModContainer container) {
-        GTCEuAPI.instance = this;
+        GTMOGSAPI.instance = this;
         GTMOGS.gtModBus = modBus;
         ConfigHolder.init();
 
@@ -188,30 +188,6 @@ public class GTMOGS {
             return isModLoaded(GTValues.MODID_KUBEJS);
         }
 
-        public static boolean isIrisLoaded() {
-            return isModLoaded(GTValues.MODID_IRIS);
-        }
-
-        public static boolean isSodiumLoaded() {
-            return isModLoaded(GTValues.MODID_SODIUM);
-        }
-
-        public static boolean isAE2Loaded() {
-            return isModLoaded(GTValues.MODID_APPENG);
-        }
-
-        public static boolean isCuriosLoaded() {
-            return isModLoaded(GTValues.MODID_CURIOS);
-        }
-
-        public static boolean isShimmerLoaded() {
-            return isModLoaded(GTValues.MODID_SHIMMER);
-        }
-
-        public static boolean isModernFixLoaded() {
-            return isModLoaded(GTValues.MODID_MODERNFIX);
-        }
-
         public static boolean isFTBTeamsLoaded() {
             return isModLoaded(GTValues.MODID_FTB_TEAMS);
         }
@@ -226,14 +202,6 @@ public class GTMOGS {
 
         public static boolean isArgonautsLoaded() {
             return isModLoaded(GTValues.MODID_ARGONAUTS);
-        }
-
-        public static boolean isGameStagesLoaded() {
-            return isModLoaded(GTValues.MODID_GAMESTAGES);
-        }
-
-        public static boolean isCCTweakedLoaded() {
-            return isModLoaded(GTValues.MODID_CCTWEAKED);
         }
     }
 }

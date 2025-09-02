@@ -3,7 +3,7 @@ package com.quantumgarbage.gtmogs.integration.kjs;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 
 import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.GTCEuAPI;
+import com.quantumgarbage.gtmogs.api.GTMOGSAPI;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.api.gui.GuiTextures;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
@@ -58,7 +58,7 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
     public void registerBindings(BindingRegistry event) {
         // Mod related
         event.add("GTMOGS", GTMOGS.class);
-        event.add("GTCEuAPI", GTCEuAPI.class);
+        event.add("GTMOGSAPI", GTMOGSAPI.class);
         event.add("GTRegistries", GTRegistries.class);
         event.add("GTValues", GTValues.class);
 
