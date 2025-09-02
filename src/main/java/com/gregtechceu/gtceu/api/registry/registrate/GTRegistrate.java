@@ -141,16 +141,6 @@ public class GTRegistrate extends AbstractRegistrate<GTRegistrate> {
         this.currentTab = currentTab;
     }
 
-    public boolean isInCreativeTab(RegistryEntry<?, ?> entry,
-                                   RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
-        return TAB_LOOKUP.get(entry) == tab;
-    }
-
-    public void setCreativeTab(RegistryEntry<?, ?> entry,
-                               @Nullable RegistryEntry<CreativeModeTab, ? extends CreativeModeTab> tab) {
-        TAB_LOOKUP.put(entry, tab);
-    }
-
     protected <R, T extends R> RegistryEntry<R, T> accept(String name, ResourceKey<? extends Registry<R>> type,
                                                           Builder<R, T, ?, ?> builder,
                                                           NonNullSupplier<? extends T> creator,

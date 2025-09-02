@@ -289,10 +289,6 @@ public class GTUtil {
         throw new IllegalArgumentException("Invalid weight");
     }
 
-    public static <T extends WeightedEntry> @Nullable T getRandomItem(List<T> randomList) {
-        return getRandomItem(GTValues.RNG, randomList);
-    }
-
     @SuppressWarnings("unchecked")
     public static <T, R> Class<T> getActualTypeParameter(Class<? extends R> thisClass, int index) {
         Type type = thisClass.getGenericSuperclass();

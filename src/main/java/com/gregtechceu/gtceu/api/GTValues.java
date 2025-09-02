@@ -34,8 +34,6 @@ public class GTValues {
      * Fluid per Material Unit (Prime Factors: 3 * 3 * 2 * 2 * 2 * 2)
      */
     public static final int L = 144;
-    public static final RandomSource RNG = RandomSource.createThreadSafe();
-
     /** Current time on the Client. Will always be zero on the server. */
     public static long CLIENT_TIME = 0;
 
