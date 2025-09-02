@@ -1,24 +1,14 @@
 package com.quantumgarbage.gtmogs.utils;
 
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.PlainTextContents;
-
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.math.BigInteger;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import static net.minecraft.ChatFormatting.YELLOW;
-
 @SuppressWarnings("UnnecessaryUnicodeEscape")
 public class FormattingUtil {
+
     /**
      * Does almost the same thing as {@code UPPER_CAMEL.to(LOWER_UNDERSCORE, string)},
      * but it also inserts underscores between words and numbers.
