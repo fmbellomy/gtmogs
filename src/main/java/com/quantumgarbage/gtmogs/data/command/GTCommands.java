@@ -54,11 +54,6 @@ public class GTCommands {
 
     private static int placeVein(CommandContext<CommandSourceStack> context,
                                  BlockPos sourcePos) throws CommandSyntaxException {
-        for (var registry : GTRegistries.getRegistries()) {
-            for (var item : registry) {
-                GTMOGS.LOGGER.debug(item);
-            }
-        }
         Holder.Reference<OreVeinDefinition> vein = ResourceKeyArgumentAccessor.callResolveKey(context, "vein",
                 GTRegistries.ORE_VEIN_REGISTRY, ERROR_INVALID_VEIN);
         ResourceLocation id = vein.key().location();

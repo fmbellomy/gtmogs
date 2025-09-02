@@ -10,6 +10,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -103,6 +104,7 @@ public record GTLayerPattern(List<Layer> layers) {
             }
 
             public Builder block(Supplier<? extends Block> block) {
+                GTOreVeins.addVeinOre(block.get());
                 return state(block.get().defaultBlockState());
             }
 

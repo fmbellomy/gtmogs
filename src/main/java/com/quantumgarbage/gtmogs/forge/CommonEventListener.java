@@ -1,10 +1,15 @@
 package com.quantumgarbage.gtmogs.forge;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
@@ -14,7 +19,9 @@ import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import com.quantumgarbage.gtmogs.common.capability.WorldIDSaveData;
 import com.quantumgarbage.gtmogs.common.data.loader.PostRegistryListener;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import com.quantumgarbage.gtmogs.data.command.GTCommands;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
 import com.quantumgarbage.gtmogs.integration.map.cache.server.ServerCache;
@@ -26,6 +33,22 @@ public class CommonEventListener {
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
         GTCommands.register(event.getDispatcher(), event.getBuildContext());
+    }
+
+    @SubscribeEvent
+    public static void onRightClick(PlayerInteractEvent.RightClickBlock event) {
+        Level level = event.getLevel();
+
+        if (!level.isClientSide) {
+            BlockPos pos = event.getHitVec().getBlockPos();
+            Block blockClicked = level.getBlockState(pos).getBlock();
+            if (GTOreVeins.getVeinOres().contains(blockClicked)) {
+                ServerCache.instance.prospectByOreMaterial(
+                        level.dimension(),
+                        pos,
+                        (ServerPlayer) event.getEntity(), ConfigHolder.INSTANCE.compat.minimap.oreBlockProspectRange);
+            }
+        }
     }
 
     @SubscribeEvent

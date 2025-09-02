@@ -24,6 +24,7 @@ import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.quantumgarbage.gtmogs.utils.GTUtil;
 import com.quantumgarbage.gtmogs.utils.WeightedEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -146,6 +147,7 @@ public class DikeVeinGenerator extends VeinGenerator {
     }
 
     public DikeVeinGenerator withBlock(BlockState blockState, int weight, int minY, int maxY) {
+        GTOreVeins.addVeinOre(blockState.getBlock());
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
         return this.withBlock(new DikeBlockDefinition(List.of(target), weight, minY, maxY));
     }

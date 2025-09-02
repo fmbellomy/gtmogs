@@ -23,6 +23,7 @@ import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
@@ -58,22 +59,30 @@ public class StandardVeinGenerator extends VeinGenerator {
     public List<OreConfiguration.TargetBlockState> blocks;
 
     public StandardVeinGenerator(Block block, Block deepBlock, Block netherBlock) {
+        GTOreVeins.addVeinOre(block);
+        GTOreVeins.addVeinOre(deepBlock);
+        GTOreVeins.addVeinOre(netherBlock);
         this.block = NonNullSupplier.of(() -> block);
         this.deepBlock = NonNullSupplier.of(() -> deepBlock);
         this.netherBlock = NonNullSupplier.of(() -> netherBlock);
     }
 
     public StandardVeinGenerator(List<OreConfiguration.TargetBlockState> blocks) {
+        for (var block : blocks) {
+            GTOreVeins.addVeinOre(block.state.getBlock());
+        }
         this.blocks = blocks;
     }
 
     public StandardVeinGenerator withBlock(NonNullSupplier<? extends Block> block) {
+        GTOreVeins.addVeinOre(block.get());
         this.block = block;
         this.deepBlock = block;
         return this;
     }
 
     public StandardVeinGenerator withNetherBlock(NonNullSupplier<? extends Block> block) {
+        GTOreVeins.addVeinOre(block.get());
         this.netherBlock = block;
         return this;
     }

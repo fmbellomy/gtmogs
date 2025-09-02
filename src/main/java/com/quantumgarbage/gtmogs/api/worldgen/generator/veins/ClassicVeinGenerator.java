@@ -22,6 +22,7 @@ import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -63,9 +64,21 @@ public class ClassicVeinGenerator extends VeinGenerator {
     private RuleTest[] rules;
 
     public ClassicVeinGenerator(Layer primary, Layer secondary, Layer between, Layer sporadic, int yRadius) {
+        for (Block b : primary.target.stream().map(entry -> entry.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.primary = primary;
+        for (Block b : secondary.target.stream().map(entry -> entry.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.secondary = secondary;
+        for (Block b : between.target.stream().map(entry -> entry.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.between = between;
+        for (Block b : sporadic.target.stream().map(entry -> entry.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.sporadic = sporadic;
         this.yRadius = yRadius;
     }
@@ -267,6 +280,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
             }
 
             public Layer.Builder block(Supplier<? extends Block> block) {
+                GTOreVeins.addVeinOre(block.get());
                 return state(block.get().defaultBlockState());
             }
 

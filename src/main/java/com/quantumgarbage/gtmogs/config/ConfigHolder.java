@@ -26,8 +26,6 @@ public class ConfigHolder {
     }
 
     @Configurable
-    public RecipeConfigs recipes = new RecipeConfigs();
-    @Configurable
     public WorldGenConfigs worldgen = new WorldGenConfigs();
 
     @Configurable
@@ -35,93 +33,6 @@ public class ConfigHolder {
     public CompatibilityConfigs compat = new CompatibilityConfigs();
     @Configurable
     public DeveloperConfigs dev = new DeveloperConfigs();
-
-    public static class RecipeConfigs {
-
-        @Configurable
-        @Configurable.Comment({ "Whether to generate Flawed and Chipped Gems for materials and recipes involving them.",
-                "Useful for mods like TerraFirmaCraft.", "Default: false" })
-        public boolean generateLowQualityGems = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to remove Block/Ingot compression and decompression in the Crafting Table.",
-                "Default: true" })
-        public boolean disableManualCompression = true; // default true
-        @Configurable
-        @Configurable.Comment({
-                "Change the recipe of Rods in the Lathe to 1 Rod and 2 Small Piles of Dust, instead of 2 Rods.",
-                "Default: false" })
-        public boolean harderRods = false; // default false
-        @Configurable
-        @Configurable.Comment({
-                "Whether to make crafting recipes for Bricks, Firebricks, Nether Bricks, and Coke Bricks harder.",
-                "Default: false" })
-        public boolean harderBrickRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to nerf Wood crafting to 2 Planks from 1 Log, and 2 Sticks from 2 Planks.",
-                "Default: false" })
-        public boolean nerfWoodCrafting = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to make Wood related recipes harder.", "Excludes sticks and planks.",
-                "Default: false" })
-        public boolean hardWoodRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Recipes for Buckets, Cauldrons, Hoppers, and Iron Bars" +
-                " require Iron Plates, Rods, and more.", "Default: true" })
-        public boolean hardIronRecipes = true; // default true
-        @Configurable
-        @Configurable.Comment({ "Whether to make Redstone related recipes harder.", "Default: false" })
-        public boolean hardRedstoneRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to make Vanilla Tools and Armor recipes harder.",
-                "Excludes Flint and Steel, and Buckets.", "Default: false" })
-        public boolean hardToolArmorRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to make miscellaneous recipes harder.", "Default: false" })
-        public boolean hardMiscRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to make Glass related recipes harder. Default: true" })
-        public boolean hardGlassRecipes = true; // default true
-        @Configurable
-        @Configurable.Comment({ "Whether to nerf the Paper crafting recipe.", "Default: true" })
-        public boolean nerfPaperCrafting = true; // default true
-        @Configurable
-        @Configurable.Comment({ "Recipes for items like Iron Doors, Trapdoors, Anvil" +
-                " require Iron Plates, Rods, and more.", "Default: false" })
-        public boolean hardAdvancedIronRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to make coloring blocks like Concrete or Glass harder.", "Default: false" })
-        public boolean hardDyeRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to remove charcoal smelting recipes from the vanilla furnace.",
-                "Default: true" })
-        public boolean harderCharcoalRecipe = true; // default true
-        @Configurable
-        @Configurable.Comment({ "Whether to make the Flint and Steel recipe require steel parts.", "Default: true." })
-        public boolean flintAndSteelRequireSteel = true; // default true
-        @Configurable
-        @Configurable.Comment({ "Whether to remove Vanilla Block Recipes from the Crafting Table.", "Default: false" })
-        public boolean removeVanillaBlockRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({ "Whether to remove Vanilla TNT Recipe from the Crafting Table.", "Default: true" })
-        public boolean removeVanillaTNTRecipe = true; // default true
-        @Configurable
-        @Configurable.Comment({ "How many Multiblock Casings to make per craft. Either 1, 2, or 3.", "Default: 2" })
-        @Configurable.Range(min = 1, max = 3)
-        public int casingsPerCraft = 2;
-        @Configurable
-        @Configurable.Comment({
-                "Whether to nerf the output amounts of the first circuit in a set to 1 (from 2) and SoC to 2 (from 4).",
-                "Default: false" })
-        public boolean harderCircuitRecipes = false;
-        @Configurable
-        @Configurable.Comment({ "Whether to nerf machine controller recipes.", "Default: false" })
-        public boolean hardMultiRecipes = false; // default false
-        @Configurable
-        @Configurable.Comment({
-                "Whether tools should have enchants or not. Like the flint sword getting fire aspect.",
-                "Default: true" })
-        public boolean enchantedTools = true;
-    }
 
     public static class CompatibilityConfigs {
 
@@ -136,11 +47,6 @@ public class ConfigHolder {
                     "Toggle specific map mod integration on/off (need to restart for this to take effect)" })
             public Toggle toggle = new Toggle();
 
-            @Configurable
-            @Configurable.Comment({ "The radius, in blocks, that picking up a surface rock will search for veins in.",
-                    "-1 to disable.", "Default: 24" })
-            @Configurable.Range(min = 1)
-            public int surfaceRockProspectRange = 24;
             @Configurable
             @Configurable.Comment({ "The radius, in blocks, that clicking an ore block will search for veins in.",
                     "-1 to disable", "Default: 24" })
@@ -187,7 +93,7 @@ public class ConfigHolder {
 
                 @Configurable
                 @Configurable.Comment({ "FTB Chunks integration enabled" })
-                public boolean ftbChunksIntegration = false;
+                public boolean ftbChunksIntegration = true;
 
                 @Configurable
                 @Configurable.Comment({ "Journey Map integration enabled" })

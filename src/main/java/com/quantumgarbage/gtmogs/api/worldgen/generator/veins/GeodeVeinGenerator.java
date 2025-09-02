@@ -21,10 +21,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.levelgen.GeodeCrackSettings;
-import net.minecraft.world.level.levelgen.GeodeLayerSettings;
-import net.minecraft.world.level.levelgen.LegacyRandomSource;
-import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.*;
 import net.minecraft.world.level.levelgen.feature.GeodeFeature;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
@@ -36,6 +33,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.quantumgarbage.gtmogs.utils.GTUtil;
 import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import lombok.AllArgsConstructor;
@@ -296,6 +294,33 @@ public class GeodeVeinGenerator extends VeinGenerator {
                                      BlockStateProvider outerLayerProvider,
                                      List<BlockState> innerPlacements, TagKey<Block> cannotReplace,
                                      TagKey<Block> invalidBlocks) {
+
+        public GeodeBlockSettings(BlockStateProvider fillingProvider,
+                                  BlockStateProvider innerLayerProvider,
+                                  BlockStateProvider alternateInnerLayerProvider,
+                                  BlockStateProvider middleLayerProvider,
+                                  BlockStateProvider outerLayerProvider,
+                                  List<BlockState> innerPlacements, TagKey<Block> cannotReplace,
+                                  TagKey<Block> invalidBlocks) {
+            RandomSource source = new LegacyRandomSource(0);
+
+            GTOreVeins.addVeinOre(fillingProvider.getState(source, BlockPos.ZERO).getBlock());
+            GTOreVeins.addVeinOre(innerLayerProvider.getState(source, BlockPos.ZERO).getBlock());
+            GTOreVeins.addVeinOre(alternateInnerLayerProvider.getState(source, BlockPos.ZERO).getBlock());
+            GTOreVeins.addVeinOre(middleLayerProvider.getState(source, BlockPos.ZERO).getBlock());
+            GTOreVeins.addVeinOre(outerLayerProvider.getState(source, BlockPos.ZERO).getBlock());
+            for (BlockState bState : innerPlacements) {
+                GTOreVeins.addVeinOre(bState.getBlock());
+            }
+            this.fillingProvider = fillingProvider;
+            this.innerLayerProvider = innerLayerProvider;
+            this.alternateInnerLayerProvider = alternateInnerLayerProvider;
+            this.middleLayerProvider = middleLayerProvider;
+            this.outerLayerProvider = outerLayerProvider;
+            this.innerPlacements = innerPlacements;
+            this.cannotReplace = cannotReplace;
+            this.invalidBlocks = invalidBlocks;
+        }
 
         // spotless:off
         public static final Codec<GeodeBlockSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(

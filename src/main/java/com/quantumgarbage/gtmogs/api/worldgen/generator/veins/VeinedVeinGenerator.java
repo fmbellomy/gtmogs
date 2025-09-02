@@ -8,6 +8,7 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
@@ -30,6 +31,7 @@ import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import com.quantumgarbage.gtmogs.data.worldgen.GTDensityFunctions;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.quantumgarbage.gtmogs.utils.GTUtil;
 import com.quantumgarbage.gtmogs.utils.WeightedEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -269,16 +271,23 @@ public class VeinedVeinGenerator extends VeinGenerator {
     }
 
     public VeinedVeinGenerator oreBlock(VeinBlockDefinition material) {
+        for (Block b : material.block().stream().map(vein -> vein.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.oreBlocks.add(material);
         return this;
     }
 
     public VeinedVeinGenerator rareBlock(BlockState blockState, int weight) {
+        GTOreVeins.addVeinOre(blockState.getBlock());
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
         return this.rareBlock(new VeinBlockDefinition(List.of(target), weight));
     }
 
     public VeinedVeinGenerator rareBlock(VeinBlockDefinition material) {
+        for (Block b : material.block().stream().map(vein -> vein.state.getBlock()).toList()) {
+            GTOreVeins.addVeinOre(b);
+        }
         this.rareBlocks.add(material);
         return this;
     }

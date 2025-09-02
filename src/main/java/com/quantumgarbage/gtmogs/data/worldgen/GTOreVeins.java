@@ -13,6 +13,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
@@ -30,6 +31,13 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class GTOreVeins {
+
+    @Getter
+    private static final HashSet<Block> veinOres = new HashSet<>();
+
+    public static void addVeinOre(Block b) {
+        veinOres.add(b);
+    }
 
     /**
      * The size of the largest registered vein.
