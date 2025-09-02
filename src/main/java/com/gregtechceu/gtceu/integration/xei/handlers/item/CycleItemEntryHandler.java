@@ -48,7 +48,7 @@ public class CycleItemEntryHandler implements IItemHandlerModifiable {
     @Nullable
     private static List<ItemStack> getStacksNullable(ItemEntryList list) {
         if (list == null) return null;
-        return list.getStacks();
+        return list.stacks();
     }
 
     public ItemEntryList getEntry(int index) {

@@ -6,7 +6,7 @@ import java.util.List;
 
 public sealed interface ItemEntryList permits ItemStackList, ItemTagList {
 
-    List<ItemStack> getStacks();
+    List<ItemStack> stacks();
 
     boolean isEmpty();
 }

@@ -39,7 +39,7 @@ public final class ItemTagList implements ItemEntryList {
     }
 
     @Override
-    public List<ItemStack> getStacks() {
+    public List<ItemStack> stacks() {
         return entries.stream()
                 .flatMap(ItemTagEntry::stacks)
                 .toList();

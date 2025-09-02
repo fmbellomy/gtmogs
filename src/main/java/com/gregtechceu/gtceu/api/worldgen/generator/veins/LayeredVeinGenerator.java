@@ -52,7 +52,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
     @Override
     public List<VeinEntry> getAllEntries() {
         return getLayerPatterns().stream()
-                .flatMap(pattern -> pattern.layers.stream())
+                .flatMap(pattern -> pattern.layers().stream())
                 .flatMap(GTLayerPattern.Layer::asVeinEntries)
                 .distinct()
                 .toList();
@@ -116,7 +116,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
                                 resolvedLayers.isEmpty() ? null : resolvedLayers.getLast(),
                                 random);
                         float offset = random.nextFloat() * .5f + .5f;
-                        for (int i = 0; i < next.minSize + random.nextInt(1 + next.maxSize - next.minSize); i++) {
+                        for (int i = 0; i < next.minSize() + random.nextInt(1 + next.maxSize() - next.minSize()); i++) {
                             resolvedLayers.add(next);
                             layerDiameterOffsets.add(offset);
                         }

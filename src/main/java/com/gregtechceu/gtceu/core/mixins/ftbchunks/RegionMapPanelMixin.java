@@ -32,6 +32,7 @@ public abstract class RegionMapPanelMixin extends Panel {
     @Inject(method = "addWidgets",
             at = @At(value = "INVOKE", target = "Ldev/ftb/mods/ftbchunks/client/gui/RegionMapPanel;alignWidgets()V"))
     private void gtceu$injectAddWidgets(CallbackInfo ci) {
-        if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) return;
+        if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) {
+        }
     }
 }

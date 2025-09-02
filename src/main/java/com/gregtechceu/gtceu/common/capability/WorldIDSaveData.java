@@ -14,7 +14,7 @@ public class WorldIDSaveData extends SavedData {
     private static WorldIDSaveData instance;
     private static final String DATA_NAME = "gtceu_world_id";
 
-    private String worldID;
+    private final String worldID;
 
     @SuppressWarnings("unused")
     public WorldIDSaveData(ServerLevel level) {

@@ -64,7 +64,7 @@ public abstract class NumberInputWidget<T extends Number> extends WidgetGroup {
     private final T ONE_NEGATIVE = getOne(false);
 
     @Getter
-    private Supplier<T> valueSupplier;
+    private final Supplier<T> valueSupplier;
     @Getter
     private T min = defaultMin();
     @Getter

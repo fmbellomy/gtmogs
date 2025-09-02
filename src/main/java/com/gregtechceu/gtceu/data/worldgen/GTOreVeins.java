@@ -44,7 +44,7 @@ public class GTOreVeins {
     private static int largestVeinSize = 0;
 
     @Getter
-    private static int largestIndicatorOffset = 0;
+    private static final int largestIndicatorOffset = 0;
 
     public static final Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
 

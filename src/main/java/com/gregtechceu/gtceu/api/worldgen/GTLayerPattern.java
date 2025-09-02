@@ -20,16 +20,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
-public class GTLayerPattern {
+public record GTLayerPattern(List<Layer> layers) {
 
     public static final Codec<GTLayerPattern> CODEC = Codec.list(Layer.CODEC)
             .xmap(GTLayerPattern::new, pattern -> pattern.layers);
-
-    public final List<Layer> layers;
-
-    public GTLayerPattern(List<Layer> layers) {
-        this.layers = layers;
-    }
 
     public Layer rollNext(@Nullable Layer previous, RandomSource random) {
         int totalWeight = 0;
@@ -73,7 +67,10 @@ public class GTLayerPattern {
         }
     }
 
-    public static class Layer {
+    /**
+     * @param targets spotless:on
+     */
+    public record Layer(List<List<TargetBlockState>> targets, int minSize, int maxSize, int weight) {
 
         // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
@@ -82,18 +79,6 @@ public class GTLayerPattern {
                 Codec.intRange(0, Integer.MAX_VALUE).fieldOf("max_size").forGetter(layer -> layer.maxSize),
                 Codec.intRange(0, Integer.MAX_VALUE).fieldOf("weight").forGetter(layer -> layer.weight)
         ).apply(instance, Layer::new));
-        // spotless:on
-        public final List<List<TargetBlockState>> targets;
-        public final int minSize;
-        public final int maxSize;
-        public final int weight;
-
-        public Layer(List<List<TargetBlockState>> targets, int minSize, int maxSize, int weight) {
-            this.targets = targets;
-            this.minSize = minSize;
-            this.maxSize = maxSize;
-            this.weight = weight;
-        }
 
         public Stream<VeinGenerator.VeinEntry> asVeinEntries() {
             return targets.stream()
@@ -118,25 +103,25 @@ public class GTLayerPattern {
                 this.rules = rules;
             }
 
-            public GTLayerPattern.Layer.Builder block(Supplier<? extends Block> block) {
+            public Builder block(Supplier<? extends Block> block) {
                 return state(block.get().defaultBlockState());
             }
 
-            public GTLayerPattern.Layer.Builder state(Supplier<? extends BlockState> state) {
+            public Builder state(Supplier<? extends BlockState> state) {
                 return state(state.get());
             }
 
-            public GTLayerPattern.Layer.Builder state(BlockState state) {
+            public Builder state(BlockState state) {
                 this.targets.add(Arrays.stream(this.rules).map(rule -> OreConfiguration.target(rule, state)).toList());
                 return this;
             }
 
-            public GTLayerPattern.Layer.Builder weight(int weight) {
+            public Builder weight(int weight) {
                 this.weight = weight;
                 return this;
             }
 
-            public GTLayerPattern.Layer.Builder size(int min, int max) {
+            public Builder size(int min, int max) {
                 this.minSize = min;
                 this.maxSize = max;
                 return this;

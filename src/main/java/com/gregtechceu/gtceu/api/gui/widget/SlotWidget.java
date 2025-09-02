@@ -336,7 +336,7 @@ public class SlotWidget extends com.lowdragmc.lowdraglib.gui.widget.SlotWidget {
 
         public static List<Object> getJEIIngredientsClickable(ItemEntryList list, Position pos, Size size,
                                                               UnaryOperator<ItemStack> realStack) {
-            return list.getStacks()
+            return list.stacks()
                     .stream()
                     .filter(stack -> !stack.isEmpty())
                     .map(realStack)
