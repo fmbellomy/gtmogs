@@ -19,7 +19,7 @@ body:
         - label: "I have checked that this occurs on the latest version."
           required: true
   - type: input
-    id: gtceu-version
+    id: gtmogs-version
     attributes:
       label: GregTech CEu Version
       description: The version of GregTech CEu you were using when this bug was encountered. If you do not know where to find this, look for the mod jar file in the mods folder, or in the mods viewer in-game.

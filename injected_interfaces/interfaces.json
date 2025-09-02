@@ -1,5 +1,0 @@
-{
-    "net/minecraft/core/MappedRegistry": [
-        "com/gregtechceu/gtceu/core/IMappedRegistryAccess<T>"
-    ]
-}

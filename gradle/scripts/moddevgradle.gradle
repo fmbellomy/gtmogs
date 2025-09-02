@@ -17,16 +17,7 @@ neoForge {
         from(file)
         publish(file)
     }
-    // I'd have it on but it just doesn't work :( (fails on some neoforge classes)
-    // validateAccessTransformers = true
-
-    interfaceInjectionData {
-        var file = project.file('injected_interfaces/interfaces.json')
-        from(file)
-        publish file
-    }
-
-    interfaceInjectionData = project.files('injected_interfaces/interfaces.json')
+    validateAccessTransformers = true
 
     addModdingDependenciesTo(sourceSets.test)
 //    addModdingDependenciesTo(sourceSets.extra)
@@ -125,7 +116,7 @@ neoForge {
             // "REGISTRYDUMP": For getting the contents of all registries.
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             // Enable assertions for our classes in dev environment
-            jvmArgument('-ea:com.gregtechceu.gtceu...')
+            jvmArgument('-ea:com.gregtechceu.gtmogs...')
 
             // Recommended logging level for the console
             // You can set various levels here.

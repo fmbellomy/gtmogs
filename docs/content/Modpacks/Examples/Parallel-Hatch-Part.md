@@ -10,7 +10,7 @@ title: "Custom Parallel Hatch"
 ```js title="extra_parallel_hatch.js"
 
 const $ParallelHatchPartMachine = Java.loadClass(
-	'com.gregtechceu.gtceu.common.machine.multiblock.part.ParallelHatchPartMachine'
+	'com.gregtechceu.gtmogs.common.machine.multiblock.part.ParallelHatchPartMachine'
 ) // (1)
 
 GTCEuStartupEvents.registry('gtceu:machine', event => { // (2)
