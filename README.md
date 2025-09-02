@@ -9,7 +9,7 @@ As such, you can safely refer to [GTCEu's official documentation](https://gregte
 
 ## Features:
 ### Absolutely zero veins by default.
-That's right. If you add this mod to a pack it will proceed to generate zero ores, coupled with the default behavior of disabling vanilla ore generation. After all, without GregTech's ore system, there's nothing to make veins out of to begin with.
+That's right. If you add this mod to a pack, it will then proceed to generate zero ores - *on top* of the default behavior of completely disabling vanilla ore generation. You will be oreless. After all, without GregTech's ore system, there's very little to make veins out of to begin with.
 
 The expected use case is that this mod will be used almost exclusively by modpacks willing to implement their own ore veins that suit their specific needs.
 
