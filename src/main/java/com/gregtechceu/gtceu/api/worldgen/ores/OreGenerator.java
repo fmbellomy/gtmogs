@@ -55,27 +55,6 @@ public class OreGenerator {
                 .toList();
     }
 
-    public List<GeneratedIndicators> generateIndicators(WorldGenLevel level, List<GeneratedVeinMetadata> metadata,
-                                                        ChunkPos chunkPos) {
-        return metadata.stream()
-                .map(data -> new VeinConfiguration(data,
-                        new XoroshiroRandomSource(level.getSeed() ^ chunkPos.toLong())))
-                .map(config -> generateIndicators(config, level, chunkPos))
-                .toList();
-    }
-
-    private GeneratedIndicators generateIndicators(VeinConfiguration config, WorldGenLevel level, ChunkPos chunkPos) {
-        OreVeinDefinition definition = config.data.definition().value();
-
-        Map<ChunkPos, List<OreIndicatorPlacer>> generatedIndicators = definition.indicatorGenerators().stream()
-                .flatMap(gen -> gen.generate(level, config.newRandom(), config.data).entrySet().stream())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey, entry -> List.of(entry.getValue()),
-                        (a, b) -> Stream.of(a, b).flatMap(List::stream).toList()));
-
-        return new GeneratedIndicators(chunkPos, generatedIndicators);
-    }
-
     /**
      * Generates the vein for the specified chunk metadata.<br>
      * If the chunk is not located on one of the ore vein grid's intersections, no vein will be generated.

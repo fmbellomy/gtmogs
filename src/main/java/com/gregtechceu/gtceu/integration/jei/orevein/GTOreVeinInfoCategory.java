@@ -1,18 +1,17 @@
 package com.gregtechceu.gtceu.integration.jei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
+
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
-import com.gregtechceu.gtceu.data.item.GTItems;
-import com.gregtechceu.gtceu.data.material.GTMaterials;
+
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 
 import lombok.Getter;
@@ -23,8 +22,9 @@ import mezz.jei.api.helpers.IJeiHelpers;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -43,7 +43,7 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
         IGuiHelper guiHelper = helpers.getGuiHelper();
         this.background = guiHelper.createBlankDrawable(GTOreVeinWidget.width, 120);
         this.icon = helpers.getGuiHelper()
-                .createDrawableItemStack(ChemicalHelper.get(TagPrefix.rawOre, GTMaterials.Iron));
+                .createDrawableItemStack(new ItemStack(BuiltInRegistries.BLOCK.get(ResourceLocation.parse("minecraft:raw_iron"))));
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
@@ -62,11 +62,6 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
                 .addItemStacks(GTOreVeinWidget.getContainedOresAndBlocks(definition.value()));
     }
 
-    public static void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
-        registration.addRecipeCatalyst(GTItems.PROSPECTOR_LV.asStack(), RECIPE_TYPE);
-        registration.addRecipeCatalyst(GTItems.PROSPECTOR_HV.asStack(), RECIPE_TYPE);
-        registration.addRecipeCatalyst(GTItems.PROSPECTOR_LuV.asStack(), RECIPE_TYPE);
-    }
 
     @NotNull
     @Override

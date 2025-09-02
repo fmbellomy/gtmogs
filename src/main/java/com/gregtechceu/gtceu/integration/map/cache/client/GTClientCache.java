@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.integration.map.GroupingMapRenderer;
 import com.gregtechceu.gtceu.integration.map.cache.DimensionCache;
 import com.gregtechceu.gtceu.integration.map.cache.GridCache;
 import com.gregtechceu.gtceu.integration.map.cache.WorldCache;
-import com.gregtechceu.gtceu.integration.map.cache.fluid.FluidCache;
+
 import com.gregtechceu.gtceu.integration.map.layer.builtin.OreRenderLayer;
 
 import net.minecraft.client.Minecraft;
@@ -25,8 +25,6 @@ public class GTClientCache extends WorldCache implements IClientCache {
 
     public static final GTClientCache instance = new GTClientCache();
 
-    private final FluidCache fluids = new FluidCache();
-
     public void notifyNewVeins(GeneratedVeinMetadata... veins) {
         if (veins.length == 0) return;
 
@@ -37,20 +35,8 @@ public class GTClientCache extends WorldCache implements IClientCache {
         for (var vein : veins) {
             var veinId = vein.definition().getKey().location();
             var name = Component.translatable(veinId.toLanguageKey("ore_vein"));
-            var material = OreRenderLayer.getMaterial(vein);
-
-            if (!material.isNull()) {
-                var center = vein.center();
-                name.setStyle(name.getStyle().withColor(material.getMaterialRGB()).withHoverEvent(new HoverEvent(
-                        HoverEvent.Action.SHOW_TEXT,
-                        Component.literal("(%d, %d, %d)".formatted(center.getX(), center.getY(), center.getZ())))));
-            }
             player.sendSystemMessage(Component.translatable("message.gtceu.new_veins.name", name));
         }
-    }
-
-    public void addFluid(ResourceKey<Level> dim, int chunkX, int chunkZ, ProspectorMode.FluidInfo fluid) {
-        fluids.addFluid(dim, chunkX, chunkZ, fluid);
     }
 
     @Override
@@ -79,7 +65,7 @@ public class GTClientCache extends WorldCache implements IClientCache {
 
     @Override
     public CompoundTag saveSingleFile(String name, HolderLookup.Provider registries) {
-        return fluids.toNbt();
+        return new CompoundTag();
     }
 
     @Override
@@ -102,7 +88,7 @@ public class GTClientCache extends WorldCache implements IClientCache {
 
     @Override
     public void readSingleFile(String name, CompoundTag data, HolderLookup.Provider registries) {
-        fluids.fromNbt(data);
+
     }
 
     @Override
@@ -114,6 +100,6 @@ public class GTClientCache extends WorldCache implements IClientCache {
     @Override
     public void clear() {
         super.clear();
-        fluids.clear();
+
     }
 }

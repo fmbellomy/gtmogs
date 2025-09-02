@@ -1,8 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -16,7 +13,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
@@ -28,7 +24,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -122,8 +117,8 @@ public class DikeVeinGenerator extends VeinGenerator {
         int z = SectionPos.sectionRelative(pos.getZ());
 
         if (pos.getY() >= blockDefinition.minY() && pos.getY() <= blockDefinition.maxY()) {
-            blockDefinition.block.ifLeft(blockStates -> {
-                for (TargetBlockState targetState : blockStates) {
+
+                for (TargetBlockState targetState : blockDefinition.block) {
                     if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, rand, entry, targetState,
                             pos.mutable()))
                         continue;
@@ -132,17 +127,7 @@ public class DikeVeinGenerator extends VeinGenerator {
                     section.setBlockState(x, y, z, targetState.state, false);
                     break;
                 }
-            }).ifRight(material -> {
-                if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, rand, entry, pos.mutable()))
-                    return;
-                BlockState currentState = level.getBlockState(pos);
-                var prefix = ChemicalHelper.getOrePrefix(currentState);
-                if (prefix.isEmpty()) return;
-                Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-                if (toPlace == null || toPlace.defaultBlockState().isAir())
-                    return;
-                section.setBlockState(x, y, z, toPlace.defaultBlockState(), false);
-            });
+
         }
     }
 
@@ -161,10 +146,6 @@ public class DikeVeinGenerator extends VeinGenerator {
         return CODEC;
     }
 
-    public DikeVeinGenerator withBlock(Material block, int weight, int minY, int maxY) {
-        return this.withBlock(new DikeBlockDefinition(block, weight, minY, maxY));
-    }
-
     public DikeVeinGenerator withBlock(BlockState blockState, int weight, int minY, int maxY) {
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
         return this.withBlock(new DikeBlockDefinition(List.of(target), weight, minY, maxY));
@@ -176,24 +157,16 @@ public class DikeVeinGenerator extends VeinGenerator {
         return this;
     }
 
-    public record DikeBlockDefinition(Either<List<TargetBlockState>, Material> block, int weight, int minY, int maxY)
+    public record DikeBlockDefinition(List<TargetBlockState> block, int weight, int minY, int maxY)
             implements WeightedEntry {
 
         // spotless:off
         public static final Codec<DikeBlockDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        Codec.either(TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("block").forGetter(x -> x.block),
+                        TargetBlockState.CODEC.listOf().fieldOf("block").forGetter(x -> x.block),
                         Codec.INT.fieldOf("weight").forGetter(x -> x.weight),
                         Codec.INT.fieldOf("min_y").orElse(320).forGetter(x -> x.minY),
                         Codec.INT.fieldOf("max_y").orElse(-64).forGetter(x -> x.maxY))
                 .apply(instance, DikeBlockDefinition::new));
 
-        // spotless:on
-        public DikeBlockDefinition(Material block, int weight, int minY, int maxY) {
-            this(Either.right(block), weight, minY, maxY);
-        }
-
-        public DikeBlockDefinition(List<TargetBlockState> block, int weight, int minY, int maxY) {
-            this(Either.left(block), weight, minY, maxY);
-        }
     }
 }

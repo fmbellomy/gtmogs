@@ -1,9 +1,4 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
-
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -39,7 +34,6 @@ import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvi
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import net.minecraft.world.level.material.FluidState;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -48,7 +42,6 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,16 +103,11 @@ public class GeodeVeinGenerator extends VeinGenerator {
     public List<VeinEntry> getAllEntries() {
         RandomSource source = new LegacyRandomSource(0);
         return List.of(
-                new VeinEntry(geodeBlockSettings.fillingProvider
-                        .mapLeft(provider -> provider.getState(source, BlockPos.ZERO)), 1),
-                new VeinEntry(geodeBlockSettings.innerLayerProvider
-                        .mapLeft(provider -> provider.getState(source, BlockPos.ZERO)), 1),
-                new VeinEntry(geodeBlockSettings.alternateInnerLayerProvider
-                        .mapLeft(provider -> provider.getState(source, BlockPos.ZERO)), 1),
-                new VeinEntry(geodeBlockSettings.middleLayerProvider
-                        .mapLeft(provider -> provider.getState(source, BlockPos.ZERO)), 1),
-                new VeinEntry(geodeBlockSettings.outerLayerProvider
-                        .mapLeft(provider -> provider.getState(source, BlockPos.ZERO)), 1));
+                new VeinEntry(geodeBlockSettings.fillingProvider.getState(source, BlockPos.ZERO), 1),
+                new VeinEntry(geodeBlockSettings.innerLayerProvider.getState(source, BlockPos.ZERO), 1),
+                new VeinEntry(geodeBlockSettings.alternateInnerLayerProvider.getState(source, BlockPos.ZERO), 1),
+                new VeinEntry(geodeBlockSettings.middleLayerProvider.getState(source, BlockPos.ZERO), 1),
+                new VeinEntry(geodeBlockSettings.outerLayerProvider.getState(source, BlockPos.ZERO), 1));
     }
 
     @Override
@@ -212,7 +200,7 @@ public class GeodeVeinGenerator extends VeinGenerator {
             }
             if (s >= fillingSize) {
                 this.safeSetBlock(access, section, pos,
-                        getStateFromEither(geodeBlockSettings.fillingProvider, geodeBlockSettings, random, pos),
+                        geodeBlockSettings.fillingProvider.getState(random, pos),
                         placementPredicate);
                 continue;
             }
@@ -220,12 +208,11 @@ public class GeodeVeinGenerator extends VeinGenerator {
                 boolean useAltLayer = (double) random.nextFloat() < this.useAlternateLayer0Chance;
                 if (useAltLayer) {
                     this.safeSetBlock(access, section, pos,
-                            getStateFromEither(geodeBlockSettings.alternateInnerLayerProvider, geodeBlockSettings,
-                                    random, pos),
+                            geodeBlockSettings.alternateInnerLayerProvider.getState(random, pos),
                             placementPredicate);
                 } else {
                     this.safeSetBlock(access, section, pos,
-                            getStateFromEither(geodeBlockSettings.innerLayerProvider, geodeBlockSettings, random, pos),
+                            geodeBlockSettings.innerLayerProvider.getState(random, pos),
                             placementPredicate);
                 }
                 if (this.placementsRequireLayer0Alternate && !useAltLayer ||
@@ -236,13 +223,13 @@ public class GeodeVeinGenerator extends VeinGenerator {
             }
             if (s >= middleSize) {
                 this.safeSetBlock(access, section, pos,
-                        getStateFromEither(geodeBlockSettings.middleLayerProvider, geodeBlockSettings, random, pos),
+                        geodeBlockSettings.middleLayerProvider.getState(random, pos),
                         placementPredicate);
                 continue;
             }
             if (!(s >= outerSize)) continue;
             this.safeSetBlock(access, section, pos,
-                    getStateFromEither(geodeBlockSettings.outerLayerProvider, geodeBlockSettings, random, pos),
+                    geodeBlockSettings.outerLayerProvider.getState(random, pos),
                     placementPredicate);
         }
         List<BlockState> innerPlacements = geodeBlockSettings.innerPlacements;
@@ -284,12 +271,6 @@ public class GeodeVeinGenerator extends VeinGenerator {
         }
     }
 
-    protected BlockState getStateFromEither(Either<BlockStateProvider, Material> either, GeodeBlockSettings settings,
-                                            RandomSource random, BlockPos pos) {
-        return either.map(provider -> provider.getState(random, pos),
-                material -> ChemicalHelper.getBlock(settings.providerMaterialPrefix, material).defaultBlockState());
-    }
-
     @Override
     public VeinGenerator build() {
         return this;
@@ -308,25 +289,25 @@ public class GeodeVeinGenerator extends VeinGenerator {
         return CODEC;
     }
 
-    public record GeodeBlockSettings(Either<BlockStateProvider, Material> fillingProvider,
-                                     Either<BlockStateProvider, Material> innerLayerProvider,
-                                     Either<BlockStateProvider, Material> alternateInnerLayerProvider,
-                                     Either<BlockStateProvider, Material> middleLayerProvider,
-                                     Either<BlockStateProvider, Material> outerLayerProvider,
+    public record GeodeBlockSettings(BlockStateProvider fillingProvider,
+                                     BlockStateProvider innerLayerProvider,
+                                     BlockStateProvider alternateInnerLayerProvider,
+                                     BlockStateProvider middleLayerProvider,
+                                     BlockStateProvider outerLayerProvider,
                                      List<BlockState> innerPlacements, TagKey<Block> cannotReplace,
-                                     TagKey<Block> invalidBlocks, @NotNull TagPrefix providerMaterialPrefix) {
+                                     TagKey<Block> invalidBlocks) {
 
         // spotless:off
         public static final Codec<GeodeBlockSettings> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("filling_provider").forGetter(config -> config.fillingProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("inner_layer_provider").forGetter(config -> config.innerLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("alternate_inner_layer_provider").forGetter(config -> config.alternateInnerLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("middle_layer_provider").forGetter(config -> config.middleLayerProvider),
-                        Codec.either(BlockStateProvider.CODEC, GTRegistries.MATERIALS.byNameCodec()).fieldOf("outer_layer_provider").forGetter(config -> config.outerLayerProvider),
+                        BlockStateProvider.CODEC.fieldOf("filling_provider").forGetter(config -> config.fillingProvider),
+                        BlockStateProvider.CODEC.fieldOf("inner_layer_provider").forGetter(config -> config.innerLayerProvider),
+                        BlockStateProvider.CODEC.fieldOf("alternate_inner_layer_provider").forGetter(config -> config.alternateInnerLayerProvider),
+                        BlockStateProvider.CODEC.fieldOf("middle_layer_provider").forGetter(config -> config.middleLayerProvider),
+                        BlockStateProvider.CODEC.fieldOf("outer_layer_provider").forGetter(config -> config.outerLayerProvider),
                         ExtraCodecs.nonEmptyList(BlockState.CODEC.listOf()).fieldOf("inner_placements").forGetter(config -> config.innerPlacements),
                         TagKey.hashedCodec(Registries.BLOCK).fieldOf("cannot_replace").forGetter(config -> config.cannotReplace),
-                        TagKey.hashedCodec(Registries.BLOCK).fieldOf("invalid_blocks").forGetter(config -> config.invalidBlocks),
-                        TagPrefix.CODEC.optionalFieldOf("provider_material_prefix", TagPrefix.block).forGetter(config -> config.providerMaterialPrefix))
+                        TagKey.hashedCodec(Registries.BLOCK).fieldOf("invalid_blocks").forGetter(config -> config.invalidBlocks)
+                      )
                 .apply(instance, GeodeBlockSettings::new));
         // spotless:on
     }

@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.integration.rei.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.data.item.GTItems;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTOreVeinWidget;
 
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
@@ -64,11 +63,5 @@ public class GTOreVeinDisplayCategory extends ModularUIDisplayCategory<GTOreVein
         fluids.holders()
                 .filter(ore -> ore.value().canGenerate())
                 .forEach(ore -> registry.add(new GTOreVeinDisplay(ore)));
-    }
-
-    public static void registerWorkstations(CategoryRegistry registry) {
-        registry.addWorkstations(GTOreVeinDisplayCategory.CATEGORY, EntryStacks.of(GTItems.PROSPECTOR_LV.asStack()));
-        registry.addWorkstations(GTOreVeinDisplayCategory.CATEGORY, EntryStacks.of(GTItems.PROSPECTOR_HV.asStack()));
-        registry.addWorkstations(GTOreVeinDisplayCategory.CATEGORY, EntryStacks.of(GTItems.PROSPECTOR_LuV.asStack()));
     }
 }

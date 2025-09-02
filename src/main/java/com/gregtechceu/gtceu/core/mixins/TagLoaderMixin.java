@@ -25,13 +25,6 @@ public class TagLoaderMixin implements IGTTagLoader {
     @Unique
     private Registry<?> gtceu$storedRegistry;
 
-    @Inject(method = "load", at = @At(value = "RETURN"))
-    public void gtceu$load(ResourceManager resourceManager,
-                           CallbackInfoReturnable<Map<ResourceLocation, List<TagLoader.EntryWithSource>>> cir) {
-        if (gtceu$storedRegistry == null) return;
-        MixinHelpers.generateGTDynamicTags(cir.getReturnValue(), gtceu$storedRegistry);
-    }
-
     @Override
     public void gtceu$setRegistry(Registry<?> registry) {
         this.gtceu$storedRegistry = registry;

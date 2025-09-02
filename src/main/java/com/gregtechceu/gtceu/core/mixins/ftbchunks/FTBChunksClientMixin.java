@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.core.mixins.ftbchunks;
 
-import com.gregtechceu.gtceu.integration.map.ftbchunks.veins.fluid.FluidVeinIcon;
-
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -58,7 +56,6 @@ public class FTBChunksClientMixin {
                                   @Local(name = "icon") MapIcon icon,
                                   @Local(ordinal = 6, name = "minimapRotation") float minimapRotation,
                                   @Local(ordinal = 1, name = "d") double d) {
-        gtceu$iconCheck = icon instanceof FluidVeinIcon;
         gtceu$d = d;
         gtceu$minimapRotation = minimapRotation;
     }

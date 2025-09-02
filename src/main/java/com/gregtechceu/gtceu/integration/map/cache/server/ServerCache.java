@@ -1,11 +1,9 @@
 package com.gregtechceu.gtceu.integration.map.cache.server;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
+import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.common.network.packets.prospecting.SPacketProspectOre;
-import com.gregtechceu.gtceu.config.ConfigHolder;
 import com.gregtechceu.gtceu.integration.map.cache.DimensionCache;
 import com.gregtechceu.gtceu.integration.map.cache.WorldCache;
 
@@ -56,42 +54,13 @@ public class ServerCache extends WorldCache {
         saveData.clear();
     }
 
-    public void prospectSurfaceRockMaterial(ResourceKey<Level> dim, Material material, BlockPos pos,
-                                            ServerPlayer player) {
-        prospectBySurfaceRockMaterial(dim, material, pos, player,
-                ConfigHolder.INSTANCE.compat.minimap.surfaceRockProspectRange);
-    }
-
-    public void prospectBySurfaceRockMaterial(ResourceKey<Level> dim, final Material material, BlockPos pos,
-                                              ServerPlayer player, int radius) {
-        if (radius < 0) return;
-        List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, pos, radius);
-        List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
-        for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
-            for (var gen : nearbyVein.definition().value().indicatorGenerators()) {
-                var block = gen.block();
-                if (block == null) continue;
-                boolean found = block.map(state -> {
-                    var ms = ChemicalHelper.getMaterialStack(state.getBlock().asItem());
-                    return !ms.isEmpty() && ms.material() == material;
-                }, mat -> mat == material);
-                if (found) {
-                    foundVeins.add(nearbyVein);
-                    break;
-                }
-            }
-        }
-
-        PacketDistributor.sendToPlayer(player, new SPacketProspectOre(dim, foundVeins));
-    }
-
-    public void prospectByOreMaterial(ResourceKey<Level> dim, Material material, BlockPos origin, ServerPlayer player,
+    public void prospectByOreMaterial(ResourceKey<Level> dim,  BlockPos origin, ServerPlayer player,
                                       int radius) {
         if (radius < 0) return;
         List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, origin, radius);
         List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
         for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
-            if (nearbyVein.definition().value().veinGenerator().getAllMaterials().contains(material)) {
+            if (nearbyVein.definition().value().veinGenerator().getAllBlocks().contains(Objects.requireNonNull(GTCEu.getMinecraftServer().getLevel(dim)).getBlockState(origin))) {
                 foundVeins.add(nearbyVein);
             }
         }

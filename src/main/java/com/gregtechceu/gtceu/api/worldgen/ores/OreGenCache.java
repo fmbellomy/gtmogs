@@ -94,21 +94,6 @@ public class OreGenCache {
      * <p>
      * The search radius depends on the largest registered indicator size, as well as the relevant config options.
      */
-    public List<GeneratedIndicators> consumeChunkIndicators(WorldGenLevel level, ChunkGenerator generator,
-                                                            ChunkAccess chunk) {
-        return getSurroundingChunks(chunk.getPos(), OreVeinUtil.getMaxIndicatorSearchDistance()).flatMap(chunkPos -> {
-            try {
-                return indicatorsByOrigin
-                        .get(chunkPos,
-                                () -> oreGenerator.generateIndicators(level,
-                                        getOrCreateVeinMetadata(level, generator, chunkPos), chunkPos))
-                        .stream();
-            } catch (ExecutionException e) {
-                GTCEu.LOGGER.error("Cannot create vein in chunk {}", chunkPos, e);
-                return Stream.empty();
-            }
-        }).filter(Objects::nonNull).toList();
-    }
 
     private Stream<ChunkPos> getSurroundingChunks(ChunkPos center, int searchDistance) {
         final int minX = center.x - searchDistance;

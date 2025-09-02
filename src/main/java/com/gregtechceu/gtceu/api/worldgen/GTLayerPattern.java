@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen;
 
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 
 import net.minecraft.util.RandomSource;
@@ -11,7 +9,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jetbrains.annotations.Nullable;
@@ -80,18 +77,18 @@ public class GTLayerPattern {
 
         // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.list(Codec.either(TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec())).fieldOf("targets").forGetter(layer -> layer.targets),
+                Codec.list(TargetBlockState.CODEC.listOf()).fieldOf("targets").forGetter(layer -> layer.targets),
                 Codec.intRange(0, Integer.MAX_VALUE).fieldOf("min_size").forGetter(layer -> layer.minSize),
                 Codec.intRange(0, Integer.MAX_VALUE).fieldOf("max_size").forGetter(layer -> layer.maxSize),
                 Codec.intRange(0, Integer.MAX_VALUE).fieldOf("weight").forGetter(layer -> layer.weight)
         ).apply(instance, Layer::new));
         // spotless:on
-        public final List<Either<List<TargetBlockState>, Material>> targets;
+        public final List<List<TargetBlockState>> targets;
         public final int minSize;
         public final int maxSize;
         public final int weight;
 
-        public Layer(List<Either<List<TargetBlockState>, Material>> targets, int minSize, int maxSize, int weight) {
+        public Layer(List<List<TargetBlockState>> targets, int minSize, int maxSize, int weight) {
             this.targets = targets;
             this.minSize = minSize;
             this.maxSize = maxSize;
@@ -103,7 +100,7 @@ public class GTLayerPattern {
                     .flatMap(target -> VeinGenerator.mapTarget(target, weight));
         }
 
-        public Either<List<TargetBlockState>, Material> rollBlock(RandomSource random) {
+        public List<TargetBlockState> rollBlock(RandomSource random) {
             if (targets.size() == 1)
                 return targets.get(0);
             return targets.get(random.nextInt(targets.size()));
@@ -111,7 +108,7 @@ public class GTLayerPattern {
 
         public static class Builder {
 
-            private final List<Either<List<TargetBlockState>, Material>> targets = new ArrayList<>();
+            private final List<List<TargetBlockState>> targets = new ArrayList<>();
             private int minSize = 1;
             private int maxSize = 1;
             private int weight = 1;
@@ -130,13 +127,7 @@ public class GTLayerPattern {
             }
 
             public GTLayerPattern.Layer.Builder state(BlockState state) {
-                this.targets.add(Either
-                        .left(Arrays.stream(this.rules).map(rule -> OreConfiguration.target(rule, state)).toList()));
-                return this;
-            }
-
-            public GTLayerPattern.Layer.Builder mat(Material material) {
-                this.targets.add(Either.right(material));
+                this.targets.add(Arrays.stream(this.rules).map(rule -> OreConfiguration.target(rule, state)).toList());
                 return this;
             }
 

@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.worldgen.GTLayerPattern;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
@@ -13,14 +11,12 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.MapCodec;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
@@ -131,7 +127,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
                         continue;
 
                     GTLayerPattern.Layer layer = resolvedLayers.get(layerIndex);
-                    Either<List<OreConfiguration.TargetBlockState>, Material> state = layer.rollBlock(random);
+                    List<OreConfiguration.TargetBlockState> state = layer.rollBlock(random);
 
                     int currentX = xMin + xOffset;
                     int currentY = yMin + yOffset;
@@ -151,7 +147,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
 
     private static void placeBlock(BulkSectionAccess access, LevelChunkSection section, long randomSeed,
                                    OreVeinDefinition entry, float density,
-                                   Either<List<OreConfiguration.TargetBlockState>, Material> state, BlockPos pos) {
+                                   List<OreConfiguration.TargetBlockState> state, BlockPos pos) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
         int x = SectionPos.sectionRelative(pos.getX());
         int y = SectionPos.sectionRelative(pos.getY());
@@ -161,8 +157,8 @@ public class LayeredVeinGenerator extends VeinGenerator {
         BlockPos.MutableBlockPos posCursor = pos.mutable();
 
         if (random.nextFloat() <= density) {
-            state.ifLeft(blockStates -> {
-                for (OreConfiguration.TargetBlockState targetState : blockStates) {
+
+                for (OreConfiguration.TargetBlockState targetState : state) {
                     if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, targetState,
                             posCursor))
                         continue;
@@ -171,17 +167,7 @@ public class LayeredVeinGenerator extends VeinGenerator {
                     section.setBlockState(x, y, z, targetState.state, false);
                     break;
                 }
-            }).ifRight(material -> {
-                if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, posCursor))
-                    return;
-                BlockState currentState = access.getBlockState(posCursor);
-                var prefix = ChemicalHelper.getOrePrefix(currentState);
-                if (prefix.isEmpty()) return;
-                Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-                if (toPlace == null || toPlace.defaultBlockState().isAir())
-                    return;
-                section.setBlockState(x, y, z, toPlace.defaultBlockState(), false);
-            });
+
         }
     }
 

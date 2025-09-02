@@ -1,9 +1,7 @@
 package com.gregtechceu.gtceu.integration.kjs.builders.worldgen;
 
 import com.gregtechceu.gtceu.api.worldgen.*;
-import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
-import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
 
 import net.minecraft.core.HolderSet;
@@ -56,8 +54,6 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     @Setter
     @Nullable
     private VeinGenerator veinGenerator;
-    @Setter
-    private List<IndicatorGenerator> indicatorGenerators;
 
     public OreVeinDefinitionBuilder(ResourceLocation id) {
         super(id);
@@ -180,28 +176,7 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
         return veinGenerator;
     }
 
-    public OreVeinDefinitionBuilder surfaceIndicatorGenerator(Consumer<SurfaceIndicatorGenerator> config) {
-        config.accept(getOrCreateIndicatorGenerator(SurfaceIndicatorGenerator.class, SurfaceIndicatorGenerator::new));
-        return this;
-    }
-
     @SuppressWarnings("SameParameterValue")
-    private <T extends IndicatorGenerator> T getOrCreateIndicatorGenerator(Class<T> indicatorClass,
-                                                                           Supplier<T> constructor) {
-        @Nullable
-        var existingGenerator = indicatorGenerators.stream()
-                .filter(indicatorClass::isInstance)
-                .map(indicatorClass::cast)
-                .findFirst()
-                .orElse(null);
-
-        if (existingGenerator != null)
-            return existingGenerator;
-
-        var generator = constructor.get();
-        indicatorGenerators.add(generator);
-        return generator;
-    }
 
     private static class InferredProperties {
 
@@ -215,7 +190,7 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     public OreVeinDefinition createObject() {
         return new OreVeinDefinition(clusterSize, density, weight, layer,
                 Set.copyOf(dimensionFilter), heightRange, discardChanceOnAirExposure,
-                biomes, biomeWeightModifier, veinGenerator, indicatorGenerators,
+                biomes, biomeWeightModifier, veinGenerator,
                 RegistryAccessContainer.current.access().lookupOrThrow(Registries.BIOME));
     }
 }

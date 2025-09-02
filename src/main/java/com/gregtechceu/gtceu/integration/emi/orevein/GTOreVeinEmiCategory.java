@@ -2,7 +2,6 @@ package com.gregtechceu.gtceu.integration.emi.orevein;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.data.item.GTItems;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -26,12 +25,6 @@ public class GTOreVeinEmiCategory extends EmiRecipeCategory {
         fluids.holders()
                 .filter(ore -> ore.value().canGenerate())
                 .forEach(ore -> registry.addRecipe(new GTEmiOreVein(ore)));
-    }
-
-    public static void registerWorkStations(EmiRegistry registry) {
-        registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_LV.asStack()));
-        registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_HV.asStack()));
-        registry.addWorkstation(CATEGORY, EmiStack.of(GTItems.PROSPECTOR_LuV.asStack()));
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.gregtechceu.gtceu.integration.map;
 
-import com.gregtechceu.gtceu.api.gui.misc.ProspectorMode;
 import com.gregtechceu.gtceu.api.worldgen.ores.GeneratedVeinMetadata;
 import com.gregtechceu.gtceu.integration.map.layer.Layers;
 import com.gregtechceu.gtceu.integration.map.layer.MapRenderLayer;
@@ -33,8 +32,7 @@ public abstract class GenericMapRenderer {
         }
     }
 
-    public abstract boolean addMarker(String name, String id, ResourceKey<Level> dim, ChunkPos pos,
-                                      ProspectorMode.FluidInfo fluid);
+    public abstract boolean addMarker(String name, String id, ResourceKey<Level> dim, ChunkPos pos);
 
     public abstract boolean addMarker(String name, ResourceKey<Level> dim, GeneratedVeinMetadata vein, String id);
 

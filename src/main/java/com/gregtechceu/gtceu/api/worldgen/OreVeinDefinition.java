@@ -2,9 +2,7 @@ package com.gregtechceu.gtceu.api.worldgen;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.api.worldgen.generator.IndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
-import com.gregtechceu.gtceu.api.worldgen.generator.indicators.SurfaceIndicatorGenerator;
 import com.gregtechceu.gtceu.api.worldgen.generator.veins.*;
 
 import net.minecraft.core.Holder;
@@ -38,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+
 
 @SuppressWarnings("UnusedReturnValue")
 @Accessors(chain = true, fluent = true)
@@ -55,8 +53,7 @@ public class OreVeinDefinition {
             Codec.floatRange(0.0F, 1.0F).fieldOf("discard_chance_on_air_exposure").forGetter(OreVeinDefinition::discardChanceOnAirExposure),
             RegistryCodecs.homogeneousList(Registries.BIOME).lenientOptionalFieldOf("biomes", HolderSet.empty()).forGetter(OreVeinDefinition::biomes),
             BiomeWeightModifier.CODEC.optionalFieldOf("weight_modifier", BiomeWeightModifier.EMPTY).forGetter(ext -> ext.biomeWeightModifier),
-            VeinGenerator.DIRECT_CODEC.fieldOf("generator").forGetter(ft -> ft.veinGenerator),
-            Codec.list(IndicatorGenerator.DIRECT_CODEC).fieldOf("indicators").forGetter(ft -> ft.indicatorGenerators)
+            VeinGenerator.DIRECT_CODEC.fieldOf("generator").forGetter(ft -> ft.veinGenerator)
     ).apply(instance, OreVeinDefinition::new));
 
     public static final Codec<Holder<OreVeinDefinition>> CODEC = RegistryFixedCodec.create(GTRegistries.ORE_VEIN_REGISTRY);
@@ -92,10 +89,6 @@ public class OreVeinDefinition {
     @Setter
     private VeinGenerator veinGenerator;
 
-    @Getter
-    @Setter
-    private List<IndicatorGenerator> indicatorGenerators;
-
     @ApiStatus.Internal
     @Nullable
     @Setter
@@ -104,26 +97,24 @@ public class OreVeinDefinition {
     public OreVeinDefinition(OreVeinDefinition other) {
         this(other.clusterSize, other.density, other.weight, other.layer,
                 Set.copyOf(other.dimensionFilter), other.heightRange, other.discardChanceOnAirExposure,
-                other.biomes, other.biomeWeightModifier, other.veinGenerator, List.copyOf(other.indicatorGenerators),
+                other.biomes, other.biomeWeightModifier, other.veinGenerator,
                 other.biomeLookup);
     }
 
     public OreVeinDefinition(IntProvider clusterSize, float density, int weight, IWorldGenLayer layer,
                              List<ResourceKey<Level>> dimensionFilter, HeightRangePlacement heightRange,
                              float discardChanceOnAirExposure, HolderSet<Biome> biomes,
-                             BiomeWeightModifier biomeWeightModifier, @Nullable VeinGenerator veinGenerator,
-                             @Nullable List<IndicatorGenerator> indicatorGenerators) {
+                             BiomeWeightModifier biomeWeightModifier, @Nullable VeinGenerator veinGenerator) {
         this(clusterSize, density, weight,
                 layer, new HashSet<>(dimensionFilter), heightRange, discardChanceOnAirExposure, biomes,
                 biomeWeightModifier,
-                veinGenerator, indicatorGenerators, null);
+                veinGenerator, null);
     }
 
     public OreVeinDefinition(IntProvider clusterSize, float density, int weight, IWorldGenLayer layer,
                              Set<ResourceKey<Level>> dimensionFilter, HeightRangePlacement heightRange,
                              float discardChanceOnAirExposure, HolderSet<Biome> biomes,
                              BiomeWeightModifier biomeWeightModifier, @Nullable VeinGenerator veinGenerator,
-                             @Nullable List<IndicatorGenerator> indicatorGenerators,
                              @Nullable HolderGetter<Biome> biomeLookup) {
         this.clusterSize = clusterSize;
         this.density = density;
@@ -135,7 +126,6 @@ public class OreVeinDefinition {
         this.biomes = biomes;
         this.biomeWeightModifier = biomeWeightModifier;
         this.veinGenerator = veinGenerator;
-        this.indicatorGenerators = Objects.requireNonNullElseGet(indicatorGenerators, ArrayList::new);
         this.biomeLookup = biomeLookup;
     }
 
@@ -300,26 +290,8 @@ public class OreVeinDefinition {
         return veinGenerator;
     }
 
-    public OreVeinDefinition surfaceIndicatorGenerator(Consumer<SurfaceIndicatorGenerator> config) {
-        config.accept(getOrCreateIndicatorGenerator(SurfaceIndicatorGenerator.class, SurfaceIndicatorGenerator::new));
-        return this;
-    }
 
     @SuppressWarnings("SameParameterValue")
-    private <T extends IndicatorGenerator> T getOrCreateIndicatorGenerator(Class<T> indicatorClass,
-                                                                           Supplier<T> constructor) {
-        var existingGenerator = indicatorGenerators.stream()
-                .filter(indicatorClass::isInstance)
-                .map(indicatorClass::cast)
-                .findFirst().orElse(null);
-
-        if (existingGenerator != null)
-            return existingGenerator;
-
-        var generator = constructor.get();
-        indicatorGenerators.add(generator);
-        return generator;
-    }
 
     public boolean canGenerate() {
         if (this.veinGenerator() instanceof NoopVeinGenerator) {

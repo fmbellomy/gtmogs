@@ -46,11 +46,9 @@ public class OrePlacer {
 
         var random = new XoroshiroRandomSource(level.getSeed() ^ chunk.getPos().toLong());
         var generatedVeins = oreGenCache.consumeChunkVeins(level, chunkGenerator, chunk);
-        var generatedIndicators = oreGenCache.consumeChunkIndicators(level, chunkGenerator, chunk);
 
         try (BulkSectionAccess access = new BulkSectionAccess(level)) {
             generatedVeins.forEach(generatedVein -> placeVein(chunk.getPos(), random, access, generatedVein, null));
-            generatedIndicators.forEach(generatedIndicator -> placeIndicators(chunk, access, generatedIndicator));
         }
     }
 

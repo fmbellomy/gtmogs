@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.addon;
 
-import com.gregtechceu.gtceu.api.addon.events.KJSRecipeKeyEvent;
-import com.gregtechceu.gtceu.api.addon.events.MaterialCasingCollectionEvent;
 import com.gregtechceu.gtceu.api.registry.registrate.GTRegistrate;
 
 import net.minecraft.data.recipes.RecipeOutput;
@@ -43,13 +41,6 @@ public interface IGTAddon {
     default void addRecipes(RecipeOutput provider) {}
 
     default void removeRecipes(Consumer<ResourceLocation> consumer) {}
-
-    /**
-     * Register Material -> Casing block mappings here
-     */
-    default void collectMaterialCasings(MaterialCasingCollectionEvent event) {}
-
-    default void registerRecipeKeys(KJSRecipeKeyEvent event) {}
 
     /**
      * Does this addon require high-tier content to be enabled?

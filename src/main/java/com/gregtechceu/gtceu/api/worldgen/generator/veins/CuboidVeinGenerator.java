@@ -1,7 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -233,7 +231,7 @@ public class CuboidVeinGenerator extends VeinGenerator {
     }
 
     public void placeOre(BulkSectionAccess access, LevelChunkSection section, BlockPos pos, long randomSeed,
-                         Either<List<OreConfiguration.TargetBlockState>, Material> ore, OreVeinDefinition entry) {
+                         List<OreConfiguration.TargetBlockState> ore, OreVeinDefinition entry) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
         int x = SectionPos.sectionRelative(pos.getX());
         int y = SectionPos.sectionRelative(pos.getY());
@@ -241,8 +239,8 @@ public class CuboidVeinGenerator extends VeinGenerator {
 
         BlockState existing = section.getBlockState(x, y, z);
 
-        ore.ifLeft(blockStates -> {
-            for (OreConfiguration.TargetBlockState targetState : blockStates) {
+
+            for (OreConfiguration.TargetBlockState targetState : ore) {
                 if (!OreVeinUtil.canPlaceOre(existing, access::getBlockState, random, entry, targetState, pos))
                     continue;
                 if (targetState.state.isAir())
@@ -250,17 +248,7 @@ public class CuboidVeinGenerator extends VeinGenerator {
                 section.setBlockState(x, y, z, targetState.state, false);
                 break;
             }
-        }).ifRight(material -> {
-            if (!OreVeinUtil.canPlaceOre(existing, access::getBlockState, random, entry, pos))
-                return;
-            BlockState currentState = access.getBlockState(pos);
-            var prefix = ChemicalHelper.getOrePrefix(currentState);
-            if (prefix.isEmpty()) return;
-            Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-            if (toPlace == null || toPlace.defaultBlockState().isAir())
-                return;
-            section.setBlockState(x, y, z, toPlace.defaultBlockState(), false);
-        });
+
     }
 
     @Override

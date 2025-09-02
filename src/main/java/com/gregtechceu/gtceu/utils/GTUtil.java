@@ -2,35 +2,27 @@ package com.gregtechceu.gtceu.utils;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
-import com.gregtechceu.gtceu.api.fluid.store.FluidStorageKeys;
-import com.gregtechceu.gtceu.api.item.tool.GTToolType;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.material.material.properties.PropertyKey;
-import com.gregtechceu.gtceu.api.tag.TagPrefix;
-import com.gregtechceu.gtceu.config.ConfigHolder;
 
-import net.minecraft.ChatFormatting;
+
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Tuple;
+
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.food.FoodProperties;
+
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.material.Fluid;
+
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -47,8 +39,6 @@ import org.lwjgl.glfw.GLFW;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-
-import static com.gregtechceu.gtceu.api.material.material.properties.PropertyKey.HAZARD;
 
 public class GTUtil {
 
@@ -406,18 +396,6 @@ public class GTUtil {
         return opacity << 24 | colorValue;
     }
 
-    /**
-     * @param material the material to use
-     * @return the correct "molten" fluid for a material
-     */
-    @Nullable
-    public static Fluid getMoltenFluid(@NotNull Material material) {
-        if (material.hasProperty(PropertyKey.ALLOY_BLAST))
-            return material.getProperty(PropertyKey.FLUID).getStorage().get(FluidStorageKeys.MOLTEN);
-        if (!TagPrefix.ingotHot.doGenerateItem(material) && material.hasProperty(PropertyKey.FLUID))
-            return material.getProperty(PropertyKey.FLUID).getStorage().get(FluidStorageKeys.LIQUID);
-        return null;
-    }
 
     public static int getFluidColor(FluidStack fluid) {
         return IClientFluidTypeExtensions.of(fluid.getFluid()).getTintColor(fluid);
@@ -445,56 +423,6 @@ public class GTUtil {
         } else return world.isDay();
     }
 
-    public static void appendHazardTooltips(Material material, List<Component> tooltipComponents) {
-        if (!ConfigHolder.INSTANCE.gameplay.hazardsEnabled || !material.hasProperty(HAZARD)) return;
-
-        if (GTUtil.isShiftDown()) {
-            tooltipComponents.add(Component.translatable("gtceu.medical_condition.description_shift"));
-            tooltipComponents.add(Component
-                    .translatable("gtceu.medical_condition." + material.getProperty(HAZARD).condition.name));
-            tooltipComponents.add(Component.translatable("gtceu.hazard_trigger.description"));
-            tooltipComponents.add(Component
-                    .translatable("gtceu.hazard_trigger." + material.getProperty(HAZARD).hazardTrigger.name()));
-            return;
-        }
-        tooltipComponents.add(Component.translatable("gtceu.medical_condition.description"));
-    }
-
-    public static Tuple<ItemStack, MutableComponent> getMaintenanceText(byte flag) {
-        return switch (flag) {
-            case 0 -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.WRENCH),
-                    Component.translatable("gtceu.top.maintenance.wrench"));
-            case 1 -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.SCREWDRIVER),
-                    Component.translatable("gtceu.top.maintenance.screwdriver"));
-            case 2 -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.SOFT_MALLET),
-                    Component.translatable("gtceu.top.maintenance.soft_mallet"));
-            case 3 -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.HARD_HAMMER),
-                    Component.translatable("gtceu.top.maintenance.hard_hammer"));
-            case 4 -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.WIRE_CUTTER),
-                    Component.translatable("gtceu.top.maintenance.wire_cutter"));
-            default -> new Tuple<>(ToolItemHelper.getToolItem(GTToolType.CROWBAR),
-                    Component.translatable("gtceu.top.maintenance.crowbar"));
-        };
-    }
-
-    public static void addPotionTooltip(List<FoodProperties.PossibleEffect> effects, List<Component> list) {
-        if (!effects.isEmpty()) {
-            list.add(Component.translatable("gtceu.tooltip.potion.header"));
-        }
-        effects.forEach(eff -> {
-            var effect = eff.effect();
-            float probability = eff.probability();
-            list.add(Component.translatable("gtceu.tooltip.potion.each",
-                    Component.translatable(effect.getDescriptionId())
-                            .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)),
-                    Component.translatable("enchantment.level." + (effect.getAmplifier() + 1))
-                            .setStyle(Style.EMPTY.withColor(ChatFormatting.YELLOW)),
-                    Component.literal(String.valueOf(effect.getDuration()))
-                            .setStyle(Style.EMPTY.withColor(ChatFormatting.RED)),
-                    Component.literal(String.valueOf(100 * probability))
-                            .setStyle(Style.EMPTY.withColor(ChatFormatting.GREEN))));
-        });
-    }
 
     /**
      * Returns the slot type based on the slot group and the index inside that group.

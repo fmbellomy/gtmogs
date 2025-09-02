@@ -1,9 +1,6 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
 import com.gregtechceu.gtceu.GTCEu;
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -20,7 +17,6 @@ import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.BulkSectionAccess;
@@ -34,7 +30,6 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTest;
 
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -55,8 +50,7 @@ import java.util.Map;
 @Accessors(fluent = true, chain = true)
 public class VeinedVeinGenerator extends VeinGenerator {
 
-    public static final Codec<Either<List<TargetBlockState>, Material>> BLOCK_ENTRY_CODEC = Codec
-            .either(TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec());
+    public static final Codec<List<TargetBlockState>> BLOCK_ENTRY_CODEC = TargetBlockState.CODEC.listOf();
     // spotless:off
     public static final MapCodec<VeinedVeinGenerator> CODEC = RecordCodecBuilder.mapCodec((instance) -> instance.group(
             VeinBlockDefinition.CODEC.listOf().fieldOf("ore_blocks").forGetter(it -> it.oreBlocks),
@@ -235,15 +229,15 @@ public class VeinedVeinGenerator extends VeinGenerator {
         }
     }
 
-    protected static void placeOre(Either<List<TargetBlockState>, Material> block, BlockState current,
+    protected static void placeOre(List<TargetBlockState> block, BlockState current,
                                    BulkSectionAccess level, LevelChunkSection section, RandomSource random,
                                    BlockPos.MutableBlockPos pos, OreVeinDefinition entry) {
         int x = SectionPos.sectionRelative(pos.getX());
         int y = SectionPos.sectionRelative(pos.getY());
         int z = SectionPos.sectionRelative(pos.getZ());
 
-        block.ifLeft(blockStates -> {
-            for (TargetBlockState targetState : blockStates) {
+
+            for (TargetBlockState targetState : block) {
                 if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, random, entry, targetState, pos))
                     continue;
                 if (targetState.state.isAir())
@@ -251,17 +245,7 @@ public class VeinedVeinGenerator extends VeinGenerator {
                 section.setBlockState(x, y, z, targetState.state, false);
                 break;
             }
-        }).ifRight(material -> {
-            if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, random, entry, pos))
-                return;
-            BlockState currentState = level.getBlockState(pos);
-            var prefix = ChemicalHelper.getOrePrefix(currentState);
-            if (prefix.isEmpty()) return;
-            Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-            if (toPlace == null || toPlace.defaultBlockState().isAir())
-                return;
-            section.setBlockState(x, y, z, toPlace.defaultBlockState(), false);
-        });
+
     }
 
     @Override
@@ -282,9 +266,6 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return CODEC;
     }
 
-    public VeinedVeinGenerator oreBlock(Material block, int weight) {
-        return this.oreBlock(new VeinBlockDefinition(block, weight));
-    }
 
     public VeinedVeinGenerator oreBlock(BlockState blockState, int weight) {
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
@@ -296,9 +277,6 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return this;
     }
 
-    public VeinedVeinGenerator rareBlock(Material block, int weight) {
-        return this.rareBlock(new VeinBlockDefinition(block, weight));
-    }
 
     public VeinedVeinGenerator rareBlock(BlockState blockState, int weight) {
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
@@ -310,21 +288,13 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return this;
     }
 
-    public record VeinBlockDefinition(Either<List<TargetBlockState>, Material> block, int weight)
+    public record VeinBlockDefinition(List<TargetBlockState> block, int weight)
             implements WeightedEntry {
 
         public static final Codec<VeinBlockDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 BLOCK_ENTRY_CODEC.fieldOf("block").forGetter(x -> x.block),
                 Codec.INT.fieldOf("weight").forGetter(x -> x.weight))
                 .apply(instance, VeinBlockDefinition::new));
-
-        public VeinBlockDefinition(Material block, int weight) {
-            this(Either.right(block), weight);
-        }
-
-        public VeinBlockDefinition(List<TargetBlockState> block, int weight) {
-            this(Either.left(block), weight);
-        }
     }
 
     private static DensityFunction mapToNoise(@Nullable DensityFunction function, RandomState randomState) {

@@ -1,8 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -48,7 +45,7 @@ public class StandardVeinGenerator extends VeinGenerator {
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("deep_block").forGetter(ext -> ext.deepBlock.get()),
                     BuiltInRegistries.BLOCK.byNameCodec().fieldOf("nether_block").forGetter(ext -> ext.netherBlock.get())
     ).apply(instance, StandardVeinGenerator::new));
-    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec())
+    public static final MapCodec<StandardVeinGenerator> CODEC_LIST = OreConfiguration.TargetBlockState.CODEC.listOf()
             .fieldOf("targets")
             .xmap(StandardVeinGenerator::new, StandardVeinGenerator::getBlocks);
     // spotless:on
@@ -60,7 +57,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     public NonNullSupplier<? extends Block> netherBlock;
 
     @Getter
-    public Either<List<OreConfiguration.TargetBlockState>, Material> blocks;
+    public List<OreConfiguration.TargetBlockState> blocks;
 
     public StandardVeinGenerator(Block block, Block deepBlock, Block netherBlock) {
         this.block = NonNullSupplier.of(() -> block);
@@ -68,7 +65,7 @@ public class StandardVeinGenerator extends VeinGenerator {
         this.netherBlock = NonNullSupplier.of(() -> netherBlock);
     }
 
-    public StandardVeinGenerator(Either<List<OreConfiguration.TargetBlockState>, Material> blocks) {
+    public StandardVeinGenerator(List<OreConfiguration.TargetBlockState> blocks) {
         this.blocks = blocks;
     }
 
@@ -83,10 +80,6 @@ public class StandardVeinGenerator extends VeinGenerator {
         return this;
     }
 
-    public StandardVeinGenerator withMaterial(Material material) {
-        this.blocks = Either.right(material);
-        return this;
-    }
 
     private List<VeinEntry> defaultEntries = null;
 
@@ -128,13 +121,13 @@ public class StandardVeinGenerator extends VeinGenerator {
                     this.netherBlock.get().defaultBlockState()));
         }
 
-        this.blocks = Either.left(targetStates);
+        this.blocks = targetStates;
         return this;
     }
 
     @Override
     public VeinGenerator copy() {
-        return new StandardVeinGenerator(this.blocks.mapBoth(ArrayList::new, Function.identity()));
+        return new StandardVeinGenerator(new ArrayList<>(blocks));
     }
 
     @Override
@@ -179,7 +172,7 @@ public class StandardVeinGenerator extends VeinGenerator {
 
     protected void doPlaceNormal(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
                                  OreVeinDefinition entry, BlockPos origin,
-                                 Either<List<OreConfiguration.TargetBlockState>, Material> targets,
+                                 List<OreConfiguration.TargetBlockState> targets,
                                  double pMinX, double pMaxX, double pMinZ, double pMaxZ, double pMinY, double pMaxY,
                                  int pX, int pY, int pZ, int pWidth, int pHeight) {
         MutableInt placedAmount = new MutableInt(1);
@@ -243,7 +236,7 @@ public class StandardVeinGenerator extends VeinGenerator {
 
     private static void generateShape(Map<BlockPos, OreBlockPlacer> generatedBlocks, RandomSource random,
                                       OreVeinDefinition entry, BlockPos origin,
-                                      Either<List<OreConfiguration.TargetBlockState>, Material> targets,
+                                      List<OreConfiguration.TargetBlockState> targets,
                                       int pX, int pY, int pZ, int pWidth, int pHeight, double[] shape,
                                       int shapeIdxOffset,
                                       BitSet placedBlocks, BlockPos.MutableBlockPos posCursor,
@@ -297,7 +290,7 @@ public class StandardVeinGenerator extends VeinGenerator {
     }
 
     private static void placeBlock(BulkSectionAccess access, long randomSeed, OreVeinDefinition entry,
-                                   Either<List<OreConfiguration.TargetBlockState>, Material> targets,
+                                   List<OreConfiguration.TargetBlockState> targets,
                                    BlockPos pos,
                                    float density, MutableInt placedAmount) {
         RandomSource random = new XoroshiroRandomSource(randomSeed);
@@ -314,26 +307,12 @@ public class StandardVeinGenerator extends VeinGenerator {
 
         if (!(random.nextFloat() <= density))
             return;
-
-        targets.ifLeft(blockStates -> {
-            for (OreConfiguration.TargetBlockState targetState : blockStates) {
+            for (OreConfiguration.TargetBlockState targetState : targets) {
                 if (OreVeinUtil.canPlaceOre(blockstate, access::getBlockState, random, entry, targetState, posCursor)) {
                     levelchunksection.setBlockState(sectionX, sectionY, sectionZ, targetState.state, false);
                     placedAmount.increment();
                     break;
                 }
-            }
-        }).ifRight(material -> {
-            if (!OreVeinUtil.canPlaceOre(blockstate, access::getBlockState, random, entry, posCursor))
-                return;
-            BlockState currentState = access.getBlockState(posCursor);
-            var prefix = ChemicalHelper.getOrePrefix(currentState);
-            if (prefix.isEmpty()) return;
-            Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-            if (toPlace == null || toPlace.defaultBlockState().isAir())
-                return;
-            levelchunksection.setBlockState(sectionX, sectionY, sectionZ, toPlace.defaultBlockState(), false);
-            placedAmount.increment();
-        });
+        }
     }
 }

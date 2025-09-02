@@ -1,8 +1,5 @@
 package com.gregtechceu.gtceu.api.worldgen.generator.veins;
 
-import com.gregtechceu.gtceu.api.material.ChemicalHelper;
-import com.gregtechceu.gtceu.api.material.material.Material;
-import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.api.worldgen.OreVeinDefinition;
 import com.gregtechceu.gtceu.api.worldgen.generator.VeinGenerator;
 import com.gregtechceu.gtceu.api.worldgen.ores.OreBlockPlacer;
@@ -23,7 +20,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTes
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
 import com.google.common.base.Preconditions;
-import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -38,7 +34,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Accessors(fluent = true, chain = true)
@@ -230,11 +225,11 @@ public class ClassicVeinGenerator extends VeinGenerator {
 
         // spotless:off
         public static final Codec<Layer> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Codec.either(OreConfiguration.TargetBlockState.CODEC.listOf(), GTRegistries.MATERIALS.byNameCodec()).fieldOf("targets").forGetter(layer -> layer.target),
+                OreConfiguration.TargetBlockState.CODEC.listOf().fieldOf("targets").forGetter(layer -> layer.target),
                 ExtraCodecs.intRange(-1, Integer.MAX_VALUE).optionalFieldOf("layers", -1).forGetter(layer -> layer.layers)
         ).apply(instance, Layer::new));
         // spotless:on
-        public final Either<List<OreConfiguration.TargetBlockState>, Material> target;
+        public final List<OreConfiguration.TargetBlockState> target;
         public int layers;
 
         public void place(BlockState blockState, BulkSectionAccess access, LevelChunkSection section, long randomSeed,
@@ -244,8 +239,8 @@ public class ClassicVeinGenerator extends VeinGenerator {
             int y = SectionPos.sectionRelative(pos.getY());
             int z = SectionPos.sectionRelative(pos.getZ());
 
-            target.ifLeft(blockStates -> {
-                for (OreConfiguration.TargetBlockState targetState : blockStates) {
+
+                for (OreConfiguration.TargetBlockState targetState : target) {
                     if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, targetState, pos))
                         continue;
                     if (targetState.state.isAir())
@@ -253,30 +248,20 @@ public class ClassicVeinGenerator extends VeinGenerator {
                     section.setBlockState(x, y, z, targetState.state, false);
                     break;
                 }
-            }).ifRight(material -> {
-                if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, pos))
-                    return;
-                BlockState currentState = access.getBlockState(pos);
-                var prefix = ChemicalHelper.getOrePrefix(currentState);
-                if (prefix.isEmpty()) return;
-                Block toPlace = ChemicalHelper.getBlock(prefix.get(), material);
-                if (toPlace == null || toPlace.defaultBlockState().isAir())
-                    return;
-                section.setBlockState(x, y, z, toPlace.defaultBlockState(), false);
-            });
+
         }
 
         public Layer copy() {
-            return new Layer(this.target.mapBoth(ArrayList::new, Function.identity()), layers);
+            return new Layer(new ArrayList<>(target), layers);
         }
 
         public int size() {
-            return target.left().isPresent() ? target.left().get().size() : 1;
+            return target.size();
         }
 
         public static class Builder {
 
-            private Either<List<OreConfiguration.TargetBlockState>, Material> target;
+            private List<OreConfiguration.TargetBlockState> target;
             private int size = -1;
             private final RuleTest[] rules;
 
@@ -293,13 +278,7 @@ public class ClassicVeinGenerator extends VeinGenerator {
             }
 
             public Layer.Builder state(BlockState state) {
-                this.target = Either
-                        .left(Arrays.stream(this.rules).map(rule -> OreConfiguration.target(rule, state)).toList());
-                return this;
-            }
-
-            public Layer.Builder mat(Material material) {
-                this.target = Either.right(material);
+                this.target = Arrays.stream(this.rules).map(rule -> OreConfiguration.target(rule, state)).toList();
                 return this;
             }
 
