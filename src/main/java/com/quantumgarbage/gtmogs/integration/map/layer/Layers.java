@@ -1,10 +1,9 @@
 package com.quantumgarbage.gtmogs.integration.map.layer;
 
-import com.quantumgarbage.gtmogs.integration.map.ButtonState;
-import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
-
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.quantumgarbage.gtmogs.integration.map.ButtonState;
+import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
 
 import java.util.*;
 import java.util.function.BiFunction;

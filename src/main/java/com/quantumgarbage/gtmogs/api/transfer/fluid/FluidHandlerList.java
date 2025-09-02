@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.api.transfer.fluid;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -9,6 +7,7 @@ import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 

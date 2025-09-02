@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.GTLayerPattern;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -18,6 +12,11 @@ import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 
 import com.mojang.serialization.MapCodec;
+import com.quantumgarbage.gtmogs.api.worldgen.GTLayerPattern;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatList;
@@ -158,15 +157,15 @@ public class LayeredVeinGenerator extends VeinGenerator {
 
         if (random.nextFloat() <= density) {
 
-                for (OreConfiguration.TargetBlockState targetState : state) {
-                    if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, targetState,
-                            posCursor))
-                        continue;
-                    if (targetState.state.isAir())
-                        continue;
-                    section.setBlockState(x, y, z, targetState.state, false);
-                    break;
-                }
+            for (OreConfiguration.TargetBlockState targetState : state) {
+                if (!OreVeinUtil.canPlaceOre(blockState, access::getBlockState, random, entry, targetState,
+                        posCursor))
+                    continue;
+                if (targetState.state.isAir())
+                    continue;
+                section.setBlockState(x, y, z, targetState.state, false);
+                break;
+            }
 
         }
     }

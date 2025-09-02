@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen;
 
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,6 +9,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;

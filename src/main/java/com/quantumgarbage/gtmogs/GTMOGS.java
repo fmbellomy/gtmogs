@@ -1,13 +1,5 @@
 package com.quantumgarbage.gtmogs;
 
-import com.quantumgarbage.gtmogs.api.GTCEuAPI;
-import com.quantumgarbage.gtmogs.api.GTValues;
-
-import com.quantumgarbage.gtmogs.common.CommonInit;
-import com.quantumgarbage.gtmogs.common.network.GTNetwork;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-import com.quantumgarbage.gtmogs.utils.FormattingUtil;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -22,6 +14,12 @@ import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import com.mojang.serialization.Codec;
+import com.quantumgarbage.gtmogs.api.GTCEuAPI;
+import com.quantumgarbage.gtmogs.api.GTValues;
+import com.quantumgarbage.gtmogs.common.CommonInit;
+import com.quantumgarbage.gtmogs.common.network.GTNetwork;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.utils.FormattingUtil;
 import dev.emi.emi.config.EmiConfig;
 import me.shedaniel.rei.api.client.REIRuntime;
 import org.apache.logging.log4j.LogManager;

@@ -1,9 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.rei.orevein;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
-
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
 import com.lowdragmc.lowdraglib.rei.IGui2Renderer;
 import com.lowdragmc.lowdraglib.rei.ModularUIDisplayCategory;
@@ -13,6 +9,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
 import lombok.Getter;
 import me.shedaniel.rei.api.client.gui.Renderer;
 import me.shedaniel.rei.api.client.registry.display.DisplayRegistry;

@@ -4,6 +4,7 @@ import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 
 @SuppressWarnings("unused")
 public class GuiTextures {
+
     // JEI
     public static final ResourceTexture INFO_ICON = new ResourceTexture("gtmogs:textures/gui/widget/information.png");
 

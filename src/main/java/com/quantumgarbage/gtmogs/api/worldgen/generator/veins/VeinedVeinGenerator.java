@@ -1,14 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
-import com.quantumgarbage.gtmogs.data.worldgen.GTDensityFunctions;
-import com.quantumgarbage.gtmogs.utils.GTUtil;
-import com.quantumgarbage.gtmogs.utils.WeightedEntry;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
@@ -33,6 +24,14 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.AlwaysTrueTes
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.data.worldgen.GTDensityFunctions;
+import com.quantumgarbage.gtmogs.utils.GTUtil;
+import com.quantumgarbage.gtmogs.utils.WeightedEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -236,16 +235,14 @@ public class VeinedVeinGenerator extends VeinGenerator {
         int y = SectionPos.sectionRelative(pos.getY());
         int z = SectionPos.sectionRelative(pos.getZ());
 
-
-            for (TargetBlockState targetState : block) {
-                if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, random, entry, targetState, pos))
-                    continue;
-                if (targetState.state.isAir())
-                    continue;
-                section.setBlockState(x, y, z, targetState.state, false);
-                break;
-            }
-
+        for (TargetBlockState targetState : block) {
+            if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, random, entry, targetState, pos))
+                continue;
+            if (targetState.state.isAir())
+                continue;
+            section.setBlockState(x, y, z, targetState.state, false);
+            break;
+        }
     }
 
     @Override
@@ -266,7 +263,6 @@ public class VeinedVeinGenerator extends VeinGenerator {
         return CODEC;
     }
 
-
     public VeinedVeinGenerator oreBlock(BlockState blockState, int weight) {
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);
         return this.oreBlock(new VeinBlockDefinition(List.of(target), weight));
@@ -276,7 +272,6 @@ public class VeinedVeinGenerator extends VeinGenerator {
         this.oreBlocks.add(material);
         return this;
     }
-
 
     public VeinedVeinGenerator rareBlock(BlockState blockState, int weight) {
         TargetBlockState target = OreConfiguration.target(AlwaysTrueTest.INSTANCE, blockState);

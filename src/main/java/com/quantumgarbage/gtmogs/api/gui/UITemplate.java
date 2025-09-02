@@ -1,11 +1,11 @@
 package com.quantumgarbage.gtmogs.api.gui;
 
-import com.quantumgarbage.gtmogs.api.gui.widget.SlotWidget;
-
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import net.minecraft.world.entity.player.Inventory;
+
+import com.quantumgarbage.gtmogs.api.gui.widget.SlotWidget;
 
 public class UITemplate {
 

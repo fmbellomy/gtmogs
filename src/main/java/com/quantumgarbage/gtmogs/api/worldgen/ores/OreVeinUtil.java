@@ -1,15 +1,15 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
+
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 
 import java.util.Optional;
 import java.util.function.Function;

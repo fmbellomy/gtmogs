@@ -1,9 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.modifier;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.BiomeWeightModifier;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.RandomSource;
@@ -12,6 +8,9 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import com.mojang.serialization.MapCodec;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.BiomeWeightModifier;
 
 import java.util.List;
 import java.util.stream.Stream;

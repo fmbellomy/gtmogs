@@ -1,26 +1,5 @@
 package com.quantumgarbage.gtmogs.common;
 
-import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
-import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
-
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.WorldGenLayers;
-
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerators;
-
-import com.quantumgarbage.gtmogs.common.pack.GTDynamicDataPack;
-import com.quantumgarbage.gtmogs.common.pack.GTDynamicResourcePack;
-import com.quantumgarbage.gtmogs.common.pack.GTPackSource;
-
-import com.quantumgarbage.gtmogs.data.command.GTCommandArguments;
-
-import com.quantumgarbage.gtmogs.data.misc.GTDimensionMarkers;
-
-import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
-
-import com.quantumgarbage.gtmogs.utils.input.KeyBind;
-
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.neoforged.bus.api.IEventBus;
@@ -31,6 +10,20 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
+import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
+import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.WorldGenLayers;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerators;
+import com.quantumgarbage.gtmogs.common.pack.GTDynamicDataPack;
+import com.quantumgarbage.gtmogs.common.pack.GTDynamicResourcePack;
+import com.quantumgarbage.gtmogs.common.pack.GTPackSource;
+import com.quantumgarbage.gtmogs.data.command.GTCommandArguments;
+import com.quantumgarbage.gtmogs.data.misc.GTDimensionMarkers;
+import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
+import com.quantumgarbage.gtmogs.utils.input.KeyBind;
+
 public class CommonInit {
 
     private static IEventBus modBus;
@@ -38,7 +31,6 @@ public class CommonInit {
     public static void init(final IEventBus modBus) {
         CommonInit.modBus = modBus;
         modBus.register(CommonInit.class);
-
 
         GTRegistries.init(modBus);
 
@@ -55,10 +47,7 @@ public class CommonInit {
         }
         didRunRegistration = true;
 
-
-
         GTDimensionMarkers.init();
-
 
         GTCommandArguments.COMMAND_ARGUMENT_TYPES.register(modBus);
         WorldGenLayers.registerAll();
@@ -66,10 +55,7 @@ public class CommonInit {
         WaypointManager.init();
 
         KeyBind.init();
-
     }
-
-
 
     @SubscribeEvent
     public static void registerRegistries(NewRegistryEvent event) {

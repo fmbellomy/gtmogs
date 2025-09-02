@@ -1,34 +1,28 @@
 package com.quantumgarbage.gtmogs.forge;
 
+import net.minecraft.server.level.ServerLevel;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-
 import com.quantumgarbage.gtmogs.common.capability.WorldIDSaveData;
 import com.quantumgarbage.gtmogs.common.data.loader.PostRegistryListener;
-
 import com.quantumgarbage.gtmogs.data.command.GTCommands;
-
 import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
 import com.quantumgarbage.gtmogs.integration.map.cache.server.ServerCache;
 import com.quantumgarbage.gtmogs.utils.TaskHandler;
 
-import net.minecraft.server.level.ServerLevel;
-
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.AddReloadListenerEvent;
-import net.neoforged.neoforge.event.RegisterCommandsEvent;
-
-import net.neoforged.neoforge.event.level.LevelEvent;
-import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import net.neoforged.neoforge.event.server.ServerStoppedEvent;
-
-import net.neoforged.neoforge.event.tick.LevelTickEvent;
-
-
 @EventBusSubscriber(modid = GTMOGS.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class CommonEventListener {
+
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
         GTCommands.register(event.getDispatcher(), event.getBuildContext());
@@ -76,5 +70,4 @@ public class CommonEventListener {
     public static void serverStopped(ServerStoppedEvent event) {
         ServerCache.instance.clear();
     }
-
 }

@@ -1,17 +1,7 @@
 package com.quantumgarbage.gtmogs.data.command;
 
-
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OrePlacer;
-import com.quantumgarbage.gtmogs.core.mixins.ResourceKeyArgumentAccessor;
-
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-
 import net.minecraft.commands.arguments.ResourceKeyArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
@@ -29,10 +19,18 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.Dynamic2CommandExceptionType;
 import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OrePlacer;
+import com.quantumgarbage.gtmogs.core.mixins.ResourceKeyArgumentAccessor;
 
 import static net.minecraft.commands.Commands.*;
 
 public class GTCommands {
+
     private static final Dynamic2CommandExceptionType VEIN_PLACE_FAILURE = new Dynamic2CommandExceptionType(
             (id, sourcePos) -> Component.translatable("command.gtmogs.place_vein.failure", id, sourcePos));
     private static final DynamicCommandExceptionType ERROR_INVALID_VEIN = new DynamicCommandExceptionType(
@@ -56,8 +54,8 @@ public class GTCommands {
 
     private static int placeVein(CommandContext<CommandSourceStack> context,
                                  BlockPos sourcePos) throws CommandSyntaxException {
-        for( var registry : GTRegistries.getRegistries()){
-            for(var item : registry){
+        for (var registry : GTRegistries.getRegistries()) {
+            for (var item : registry) {
                 GTMOGS.LOGGER.debug(item);
             }
         }

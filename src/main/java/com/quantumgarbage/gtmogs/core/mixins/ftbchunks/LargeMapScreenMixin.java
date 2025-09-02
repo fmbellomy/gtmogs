@@ -1,12 +1,11 @@
 package com.quantumgarbage.gtmogs.core.mixins.ftbchunks;
 
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-import com.quantumgarbage.gtmogs.integration.map.ButtonState;
-import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksOptions;
-
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Items;
 
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.integration.map.ButtonState;
+import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksOptions;
 import dev.ftb.mods.ftbchunks.client.gui.LargeMapScreen;
 import dev.ftb.mods.ftblibrary.icon.Icons;
 import dev.ftb.mods.ftblibrary.icon.ItemIcon;

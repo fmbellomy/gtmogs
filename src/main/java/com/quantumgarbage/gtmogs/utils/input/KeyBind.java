@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.utils.input;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,6 +14,7 @@ import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.common.NeoForge;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import com.quantumgarbage.gtmogs.GTMOGS;
 import it.unimi.dsi.fastutil.booleans.BooleanBooleanMutablePair;
 
 import java.util.*;
@@ -57,7 +56,6 @@ public enum KeyBind {
                 updating.add(keybind);
             }
         }
-
     }
 
     public static void onRegisterKeyBinds(RegisterKeyMappingsEvent event) {

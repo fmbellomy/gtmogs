@@ -1,7 +1,6 @@
 package com.quantumgarbage.gtmogs.core.mixins.ftbchunks;
 
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
-
 import dev.ftb.mods.ftbchunks.client.gui.LargeMapScreen;
 import dev.ftb.mods.ftbchunks.client.gui.RegionMapPanel;
 import dev.ftb.mods.ftblibrary.ui.Panel;
@@ -32,7 +31,6 @@ public abstract class RegionMapPanelMixin extends Panel {
     @Inject(method = "addWidgets",
             at = @At(value = "INVOKE", target = "Ldev/ftb/mods/ftbchunks/client/gui/RegionMapPanel;alignWidgets()V"))
     private void gtceu$injectAddWidgets(CallbackInfo ci) {
-        if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) {
-        }
+        if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) {}
     }
 }

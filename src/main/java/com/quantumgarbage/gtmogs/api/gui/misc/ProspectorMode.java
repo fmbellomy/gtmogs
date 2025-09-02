@@ -1,10 +1,7 @@
 package com.quantumgarbage.gtmogs.api.gui.misc;
 
-import com.quantumgarbage.gtmogs.api.gui.texture.ProspectingTexture;
-
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
-
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
@@ -16,12 +13,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.neoforged.neoforge.common.Tags;
+
+import com.quantumgarbage.gtmogs.api.gui.texture.ProspectingTexture;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.NotNull;
 

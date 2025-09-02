@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen;
 
-import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
-import com.quantumgarbage.gtmogs.integration.kjs.Validator;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
+import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
+import com.quantumgarbage.gtmogs.integration.kjs.Validator;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import lombok.Setter;
 import lombok.experimental.Accessors;

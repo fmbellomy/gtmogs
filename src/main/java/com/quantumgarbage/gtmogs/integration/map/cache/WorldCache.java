@@ -1,13 +1,13 @@
 package com.quantumgarbage.gtmogs.integration.map.cache;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
 
 import java.util.*;
 

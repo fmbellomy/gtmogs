@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen;
 
-import com.quantumgarbage.gtmogs.api.worldgen.*;
-import com.quantumgarbage.gtmogs.api.worldgen.*;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
-
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -18,6 +12,9 @@ import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 
 import com.mojang.datafixers.util.Pair;
+import com.quantumgarbage.gtmogs.api.worldgen.*;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
 import dev.latvian.mods.kubejs.registry.BuilderBase;
 import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import lombok.Setter;

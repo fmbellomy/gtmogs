@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.xei.widgets;
 
-import com.quantumgarbage.gtmogs.api.gui.widget.SlotWidget;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.transfer.item.CustomItemStackHandler;
-import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-
 import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TextTexture;
 import com.lowdragmc.lowdraglib.gui.widget.ImageWidget;
@@ -24,6 +18,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.heightproviders.HeightProvider;
 import net.minecraft.world.level.levelgen.heightproviders.UniformHeight;
 
+import com.quantumgarbage.gtmogs.api.gui.widget.SlotWidget;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.transfer.item.CustomItemStackHandler;
+import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import it.unimi.dsi.fastutil.ints.IntList;
 import lombok.Getter;
 
@@ -78,7 +77,6 @@ public class GTOreVeinWidget extends WidgetGroup {
         }
     }
 
-
     private void setupText(OreVeinDefinition ignored) {
         addWidget(new ImageWidget(5, 0, width - 10, 16,
                 new TextTexture(translationKey).setType(TextTexture.TextType.LEFT_ROLL)
@@ -93,7 +91,6 @@ public class GTOreVeinWidget extends WidgetGroup {
                 LocalizationUtils.format("gtmogs.jei.ore_vein_diagram.dimensions")));
         setupDimensionMarker(80);
     }
-
 
     private void setupDimensionMarker(int yPosition) {
         if (this.dimensionFilter != null) {
@@ -125,15 +122,15 @@ public class GTOreVeinWidget extends WidgetGroup {
     }
 
     public static List<ItemStack> getContainedOresAndBlocks(OreVeinDefinition oreDefinition) {
-    return getRawMaterialList(oreDefinition);    }
+        return getRawMaterialList(oreDefinition);
+    }
 
     public static List<ItemStack> getRawMaterialList(OreVeinDefinition oreDefinition) {
-        return oreDefinition.veinGenerator().getAllBlocks().stream().map(block -> block.getBlock().asItem().getDefaultInstance()).toList();
-
+        return oreDefinition.veinGenerator().getAllBlocks().stream()
+                .map(block -> block.getBlock().asItem().getDefaultInstance()).toList();
     }
 
     public static String getOreName(Holder<OreVeinDefinition> ore) {
         return ore.getKey().location().toLanguageKey("ore_vein");
     }
 }
-

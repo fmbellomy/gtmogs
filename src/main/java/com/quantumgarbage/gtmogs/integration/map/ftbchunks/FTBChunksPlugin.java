@@ -1,7 +1,6 @@
 package com.quantumgarbage.gtmogs.integration.map.ftbchunks;
 
 import com.quantumgarbage.gtmogs.integration.map.GroupingMapRenderer;
-
 import dev.ftb.mods.ftbchunks.api.client.event.MapIconEvent;
 import dev.ftb.mods.ftbchunks.client.map.MapManager;
 

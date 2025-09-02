@@ -1,14 +1,13 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 
 import com.mojang.serialization.MapCodec;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import lombok.NoArgsConstructor;
 
 import java.util.Collections;

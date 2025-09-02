@@ -1,7 +1,6 @@
 package com.quantumgarbage.gtmogs.integration.kjs;
 
 import com.quantumgarbage.gtmogs.integration.kjs.events.GTOreVeinKubeEvent;
-
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;
 

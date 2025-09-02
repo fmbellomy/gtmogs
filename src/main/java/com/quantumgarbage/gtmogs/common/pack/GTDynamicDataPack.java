@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.common.pack;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
-
 import com.lowdragmc.lowdraglib.Platform;
 
 import net.minecraft.SharedConstants;
@@ -27,6 +24,8 @@ import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
 import com.mojang.serialization.JsonOps;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.ObjectSet;
 import org.jetbrains.annotations.ApiStatus;

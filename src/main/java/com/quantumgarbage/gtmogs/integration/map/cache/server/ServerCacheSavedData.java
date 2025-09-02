@@ -1,12 +1,11 @@
 package com.quantumgarbage.gtmogs.integration.map.cache.server;
 
-import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 
+import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
 import org.jetbrains.annotations.NotNull;
 
 public class ServerCacheSavedData extends SavedData {

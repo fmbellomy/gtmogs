@@ -1,12 +1,11 @@
 package com.quantumgarbage.gtmogs.integration.map.cache;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
 import lombok.Getter;
 
 import java.util.ArrayList;

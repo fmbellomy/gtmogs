@@ -1,11 +1,11 @@
 package com.quantumgarbage.gtmogs.integration.kjs;
 
+import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.GTCEuAPI;
 import com.quantumgarbage.gtmogs.api.GTValues;
-
 import com.quantumgarbage.gtmogs.api.gui.GuiTextures;
-
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import com.quantumgarbage.gtmogs.api.worldgen.*;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
@@ -15,10 +15,6 @@ import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen.DimensionMarkerBuilder;
 import com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen.OreVeinDefinitionBuilder;
 import com.quantumgarbage.gtmogs.integration.kjs.helpers.GTResourceLocation;
-
-
-import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
-
 import dev.latvian.mods.kubejs.block.state.BlockStatePredicate;
 import dev.latvian.mods.kubejs.event.EventGroupRegistry;
 import dev.latvian.mods.kubejs.plugin.ClassFilter;
@@ -30,7 +26,6 @@ import dev.latvian.mods.kubejs.script.TypeWrapperRegistry;
 import dev.latvian.mods.rhino.Wrapper;
 
 public class GTKubeJSPlugin implements KubeJSPlugin {
-
 
     @Override
     public void registerBuilderTypes(BuilderTypeRegistry registry) {

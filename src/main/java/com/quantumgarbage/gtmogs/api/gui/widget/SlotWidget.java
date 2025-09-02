@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.api.gui.widget;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemEntryList;
-import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemStackList;
-import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemTagList;
-import com.quantumgarbage.gtmogs.integration.xei.handlers.item.CycleItemEntryHandler;
-
 import com.lowdragmc.lowdraglib.gui.editor.annotation.LDLRegister;
 import com.lowdragmc.lowdraglib.gui.editor.configurator.ConfiguratorGroup;
 import com.lowdragmc.lowdraglib.gui.editor.configurator.WrapperConfigurator;
@@ -26,6 +20,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemStackHandler;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemEntryList;
+import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemStackList;
+import com.quantumgarbage.gtmogs.integration.xei.entry.item.ItemTagList;
+import com.quantumgarbage.gtmogs.integration.xei.handlers.item.CycleItemEntryHandler;
 import dev.emi.emi.api.stack.EmiIngredient;
 import dev.emi.emi.api.stack.EmiStack;
 import lombok.Getter;

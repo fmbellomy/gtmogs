@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -10,6 +7,8 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import lombok.Getter;
 import org.apache.commons.lang3.mutable.MutableInt;
 

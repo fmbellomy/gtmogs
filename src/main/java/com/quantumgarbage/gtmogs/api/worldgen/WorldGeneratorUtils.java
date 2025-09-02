@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen;
 
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
-import com.quantumgarbage.gtmogs.data.tag.CustomTags;
-import com.quantumgarbage.gtmogs.utils.WeightedEntry;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +15,11 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
 import com.google.common.collect.HashBiMap;
 import com.mojang.serialization.MapCodec;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
+import com.quantumgarbage.gtmogs.data.tag.CustomTags;
+import com.quantumgarbage.gtmogs.utils.WeightedEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;

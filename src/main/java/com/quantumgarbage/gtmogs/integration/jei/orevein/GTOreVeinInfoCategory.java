@@ -1,19 +1,18 @@
 package com.quantumgarbage.gtmogs.integration.jei.orevein;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-
-import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
-
 import com.lowdragmc.lowdraglib.jei.ModularUIRecipeCategory;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
 import lombok.Getter;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
@@ -23,15 +22,14 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
 public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVeinDefinition>> {
 
-    public final static RecipeType<Holder<OreVeinDefinition>> RECIPE_TYPE = new RecipeType(GTMOGS.id("ore_vein_diagram"),
+    public final static RecipeType<Holder<OreVeinDefinition>> RECIPE_TYPE = new RecipeType(
+            GTMOGS.id("ore_vein_diagram"),
             Holder.class);
     @Getter
     private final IDrawable background;
@@ -43,7 +41,8 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
         IGuiHelper guiHelper = helpers.getGuiHelper();
         this.background = guiHelper.createBlankDrawable(GTOreVeinWidget.width, 120);
         this.icon = helpers.getGuiHelper()
-                .createDrawableItemStack(new ItemStack(BuiltInRegistries.BLOCK.get(ResourceLocation.parse("minecraft:raw_iron"))));
+                .createDrawableItemStack(
+                        new ItemStack(BuiltInRegistries.BLOCK.get(ResourceLocation.parse("minecraft:raw_iron"))));
     }
 
     public static void registerRecipes(IRecipeRegistration registry) {
@@ -54,12 +53,14 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
                 .<Holder<OreVeinDefinition>>map(Function.identity())
                 .toList());
     }
+
     @Override
     public void setRecipe(IRecipeLayoutBuilder builder, Holder<OreVeinDefinition> definition, IFocusGroup focuses) {
         super.setRecipe(builder, definition, focuses);
         builder.addInvisibleIngredients(RecipeIngredientRole.OUTPUT)
                 .addItemStacks(GTOreVeinWidget.getContainedOresAndBlocks(definition.value()));
     }
+
     @NotNull
     @Override
     public RecipeType<Holder<OreVeinDefinition>> getRecipeType() {

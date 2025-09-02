@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
-import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
-import com.quantumgarbage.gtmogs.integration.kjs.GTCEuStartupEvents;
-import com.quantumgarbage.gtmogs.integration.kjs.events.WorldGenLayerKubeEvent;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.StringRepresentable;
@@ -13,6 +7,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
+import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
+import com.quantumgarbage.gtmogs.integration.kjs.GTCEuStartupEvents;
+import com.quantumgarbage.gtmogs.integration.kjs.events.WorldGenLayerKubeEvent;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;

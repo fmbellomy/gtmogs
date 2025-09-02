@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
-
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
@@ -27,6 +21,10 @@ import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
 import it.unimi.dsi.fastutil.ints.IntIntPair;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +35,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Consumer;
-
 
 @SuppressWarnings("UnusedReturnValue")
 @Accessors(chain = true, fluent = true)
@@ -290,7 +287,6 @@ public class OreVeinDefinition {
         }
         return veinGenerator;
     }
-
 
     @SuppressWarnings("SameParameterValue")
 

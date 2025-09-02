@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.data.worldgen;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.api.worldgen.*;
-import com.quantumgarbage.gtmogs.api.worldgen.*;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
-
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -24,6 +18,10 @@ import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.api.worldgen.*;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import lombok.Getter;
 
@@ -90,10 +88,22 @@ public class GTOreVeins {
                 .heightRangeUniform(-55, 80)
                 .biomes(BiomeTags.IS_OVERWORLD)
                 .classicVeinGenerator(generator -> generator
-                                .primary(l -> l.block(() -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("minecraft", "slime_block"))).size(6))
-                                .secondary(l -> l.block(() -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("minecraft", "honey_block"))).size(4))
-                                .between(l -> l.block(() -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_block"))).size(2))
-                                .sporadic(l -> l.block(() -> BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath("minecraft", "monster_spawner"))).size(1))
-                                .build()));
+                        .primary(l -> l
+                                .block(() -> BuiltInRegistries.BLOCK
+                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "slime_block")))
+                                .size(6))
+                        .secondary(l -> l
+                                .block(() -> BuiltInRegistries.BLOCK
+                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "honey_block")))
+                                .size(4))
+                        .between(l -> l
+                                .block(() -> BuiltInRegistries.BLOCK
+                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_block")))
+                                .size(2))
+                        .sporadic(l -> l
+                                .block(() -> BuiltInRegistries.BLOCK
+                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "monster_spawner")))
+                                .size(1))
+                        .build()));
     }
 }

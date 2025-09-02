@@ -1,13 +1,12 @@
 package com.quantumgarbage.gtmogs.client.util;
 
-import com.quantumgarbage.gtmogs.core.mixins.client.GuiGraphicsAccessor;
-
 import com.lowdragmc.lowdraglib.utils.ColorUtils;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.RenderType;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.quantumgarbage.gtmogs.core.mixins.client.GuiGraphicsAccessor;
 import org.joml.Matrix4f;
 
 public class DrawUtil {

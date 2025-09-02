@@ -1,7 +1,6 @@
 package com.quantumgarbage.gtmogs.config;
 
 import com.quantumgarbage.gtmogs.GTMOGS;
-
 import dev.toma.configuration.Configuration;
 import dev.toma.configuration.config.Config;
 import dev.toma.configuration.config.Configurable;
@@ -125,10 +124,10 @@ public class ConfigHolder {
     }
 
     public static class CompatibilityConfigs {
+
         @Configurable
         @Configurable.Comment("Config options regarding GTMOGS compatibility with minimap mods")
         public MinimapCompatConfig minimap = new MinimapCompatConfig();
-
 
         public static class MinimapCompatConfig {
 
@@ -247,10 +246,12 @@ public class ConfigHolder {
     }
 
     public static class WorldGenConfigs {
+
         @Configurable
         public OreVeinConfigs oreVeins = new OreVeinConfigs();
 
         public static class OreVeinConfigs {
+
             @Configurable
             @Configurable.Range(min = 1, max = 32)
             @Configurable.Comment({
@@ -291,6 +292,7 @@ public class ConfigHolder {
     }
 
     public static class DeveloperConfigs {
+
         @Configurable
         @Configurable.Comment({ "Debug general events? (will print recipe conficts etc. to server's debug.log)",
                 "Default: false" })
@@ -306,5 +308,4 @@ public class ConfigHolder {
         @Configurable.Comment({ "Dump all registered GT models/blockstates/etc?", "Default: false" })
         public boolean dumpAssets = false;
     }
-
 }

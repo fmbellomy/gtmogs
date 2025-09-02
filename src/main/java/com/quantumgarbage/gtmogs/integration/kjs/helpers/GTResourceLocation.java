@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.kjs.helpers;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.ResourceLocationException;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -9,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.Codec;
+import com.quantumgarbage.gtmogs.GTMOGS;
 import dev.latvian.mods.kubejs.core.RegistryObjectKJS;
 import dev.latvian.mods.kubejs.error.KubeRuntimeException;
 import dev.latvian.mods.rhino.Wrapper;
@@ -17,7 +16,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.UnaryOperator;
 
 /**
- * Exists to indicate that a ResourceLocation would use gtmogs: namespace by default when written as plain string. Should
+ * Exists to indicate that a ResourceLocation would use gtmogs: namespace by default when written as plain string.
+ * Should
  * only be used as an argument in gt's registry methods
  */
 public record GTResourceLocation(ResourceLocation wrapped) {

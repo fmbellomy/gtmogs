@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.RandomSource;
@@ -15,6 +13,7 @@ import net.minecraft.world.level.levelgen.FlatLevelSource;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import lombok.Getter;
 
 import java.util.Map;
@@ -80,5 +79,4 @@ public class OrePlacer {
                         entry -> SectionPos.of(entry.getKey()),
                         Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
     }
-
 }

@@ -1,7 +1,6 @@
 package com.quantumgarbage.gtmogs.integration.kjs;
 
 import com.quantumgarbage.gtmogs.integration.kjs.events.*;
-
 import com.quantumgarbage.gtmogs.integration.kjs.events.WorldGenLayerKubeEvent;
 import dev.latvian.mods.kubejs.event.EventGroup;
 import dev.latvian.mods.kubejs.event.EventHandler;

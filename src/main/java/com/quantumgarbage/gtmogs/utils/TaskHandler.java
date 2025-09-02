@@ -1,10 +1,10 @@
 package com.quantumgarbage.gtmogs.utils;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+
+import com.quantumgarbage.gtmogs.GTMOGS;
 
 import java.util.ArrayList;
 import java.util.HashMap;

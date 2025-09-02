@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.data.worldgen;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
@@ -11,6 +9,8 @@ import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.DensityFunctions;
 import net.minecraft.world.level.levelgen.Noises;
 import net.minecraft.world.level.levelgen.synth.NormalNoise;
+
+import com.quantumgarbage.gtmogs.GTMOGS;
 
 public class GTDensityFunctions {
 

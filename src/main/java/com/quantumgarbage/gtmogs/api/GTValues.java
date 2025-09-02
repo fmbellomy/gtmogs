@@ -187,7 +187,7 @@ public class GTValues {
             DARK_GREEN.toString(),
             YELLOW.toString(),
             BLUE.toString() + BOLD,
-            RED.toString() + BOLD};
+            RED.toString() + BOLD };
 
     public static final String[] VLVH = new String[] {
             "Primitive", // not doing the gray color for these first two because it looks weird

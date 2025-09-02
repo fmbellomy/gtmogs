@@ -1,20 +1,17 @@
 package com.quantumgarbage.gtmogs.integration.map.layer.builtin;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-
-import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
-import com.quantumgarbage.gtmogs.integration.map.layer.MapRenderLayer;
-import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
+import com.quantumgarbage.gtmogs.integration.map.layer.MapRenderLayer;
+import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class OreRenderLayer extends MapRenderLayer {
 
@@ -35,7 +32,6 @@ public class OreRenderLayer extends MapRenderLayer {
         return Component.translatable(GTOreVeinWidget.getOreName(vein.definition()));
     }
 
-
     public static List<Component> getTooltip(String name, GeneratedVeinMetadata vein) {
         final List<Component> tooltip = new ArrayList<>();
         var title = Component.literal(name);
@@ -45,8 +41,8 @@ public class OreRenderLayer extends MapRenderLayer {
         tooltip.add(title);
 
         for (var filler : vein.definition().value().veinGenerator().getAllEntries()) {
-                tooltip.add(Component.literal(ConfigHolder.INSTANCE.compat.minimap.oreNamePrefix)
-                        .append(filler.vein().getBlock().getName()));
+            tooltip.add(Component.literal(ConfigHolder.INSTANCE.compat.minimap.oreNamePrefix)
+                    .append(filler.vein().getBlock().getName()));
         }
         return tooltip;
     }

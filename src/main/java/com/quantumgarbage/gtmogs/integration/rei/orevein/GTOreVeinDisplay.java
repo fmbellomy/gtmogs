@@ -1,14 +1,13 @@
 package com.quantumgarbage.gtmogs.integration.rei.orevein;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
-
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 import com.lowdragmc.lowdraglib.rei.ModularDisplay;
 
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.ItemStack;
 
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
 import me.shedaniel.rei.api.common.entry.EntryIngredient;
 import me.shedaniel.rei.api.common.util.EntryIngredients;
 

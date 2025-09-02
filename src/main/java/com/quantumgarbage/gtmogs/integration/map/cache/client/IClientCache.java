@@ -1,11 +1,11 @@
 package com.quantumgarbage.gtmogs.integration.map.cache.client;
 
-import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
-
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+
+import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 
 import java.util.Collection;
 

@@ -1,9 +1,9 @@
 package com.quantumgarbage.gtmogs.api.addon;
 
-import com.quantumgarbage.gtmogs.api.registry.registrate.GTRegistrate;
-
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.resources.ResourceLocation;
+
+import com.quantumgarbage.gtmogs.api.registry.registrate.GTRegistrate;
 
 import java.util.function.Consumer;
 

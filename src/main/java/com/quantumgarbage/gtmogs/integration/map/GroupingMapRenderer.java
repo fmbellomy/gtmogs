@@ -1,15 +1,14 @@
 package com.quantumgarbage.gtmogs.integration.map;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksRenderer;
-
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -26,12 +25,14 @@ public class GroupingMapRenderer extends GenericMapRenderer {
     static {
         Map<String, GenericMapRenderer> renderers = new HashMap<>();
         var toggle = ConfigHolder.INSTANCE.compat.minimap.toggle;
-        /*if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
-            renderers.put(GTValues.MODID_JOURNEYMAP, new JourneymapRenderer());
-        }
-        if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
-            renderers.put(GTValues.MODID_XAEROS_MINIMAP, new XaerosRenderer());
-        }*/
+        /*
+         * if (toggle.journeyMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_JOURNEYMAP)) {
+         * renderers.put(GTValues.MODID_JOURNEYMAP, new JourneymapRenderer());
+         * }
+         * if (toggle.xaerosMapIntegration && GTMOGS.isModLoaded(GTValues.MODID_XAEROS_MINIMAP)) {
+         * renderers.put(GTValues.MODID_XAEROS_MINIMAP, new XaerosRenderer());
+         * }
+         */
         if (toggle.ftbChunksIntegration && GTMOGS.isModLoaded(GTValues.MODID_FTB_CHUNKS)) {
             renderers.put(GTValues.MODID_FTB_CHUNKS, new FTBChunksRenderer());
         }

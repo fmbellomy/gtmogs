@@ -1,13 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-import com.quantumgarbage.gtmogs.integration.map.cache.server.ServerCache;
-import com.quantumgarbage.gtmogs.utils.GTUtil;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.QuartPos;
@@ -19,6 +11,13 @@ import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.level.levelgen.placement.PlacementContext;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.integration.map.cache.server.ServerCache;
+import com.quantumgarbage.gtmogs.utils.GTUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

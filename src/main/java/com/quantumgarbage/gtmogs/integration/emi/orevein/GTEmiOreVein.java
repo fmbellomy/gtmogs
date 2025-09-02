@@ -1,14 +1,13 @@
 package com.quantumgarbage.gtmogs.integration.emi.orevein;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
-
 import com.lowdragmc.lowdraglib.emi.ModularEmiRecipe;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
 
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.integration.xei.widgets.GTOreVeinWidget;
 import dev.emi.emi.api.recipe.EmiRecipeCategory;
 import dev.emi.emi.api.stack.EmiStack;
 import org.jetbrains.annotations.Nullable;

@@ -1,14 +1,14 @@
 package com.quantumgarbage.gtmogs.integration.map;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.integration.map.layer.Layers;
-import com.quantumgarbage.gtmogs.integration.map.layer.MapRenderLayer;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.integration.map.layer.Layers;
+import com.quantumgarbage.gtmogs.integration.map.layer.MapRenderLayer;
 
 import java.util.ArrayList;
 import java.util.List;

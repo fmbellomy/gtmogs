@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.api.gui.widget;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import com.lowdragmc.lowdraglib.gui.editor.annotation.ConfigSetter;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.Configurable;
 import com.lowdragmc.lowdraglib.gui.editor.annotation.LDLRegister;
@@ -24,6 +22,7 @@ import net.neoforged.neoforge.items.IItemHandlerModifiable;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.quantumgarbage.gtmogs.GTMOGS;
 import dev.emi.emi.api.stack.EmiStack;
 import mezz.jei.api.ingredients.ITypedIngredient;
 import org.jetbrains.annotations.NotNull;

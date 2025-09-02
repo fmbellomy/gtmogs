@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
-import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 
+import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
+import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
 import lombok.Getter;
 
 import java.util.Map;

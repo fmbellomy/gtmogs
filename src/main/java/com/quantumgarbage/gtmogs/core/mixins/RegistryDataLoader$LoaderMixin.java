@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.core.mixins;
 
-import com.quantumgarbage.gtmogs.core.MixinHelpers;
-
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.packs.resources.ResourceManager;
 
+import com.quantumgarbage.gtmogs.core.MixinHelpers;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;

@@ -1,13 +1,13 @@
 package com.quantumgarbage.gtmogs.common.network;
 
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
+
 import com.quantumgarbage.gtmogs.api.GTCEuAPI;
 import com.quantumgarbage.gtmogs.common.network.packets.*;
 import com.quantumgarbage.gtmogs.common.network.packets.SCPacketShareProspection;
 import com.quantumgarbage.gtmogs.common.network.packets.SPacketSendWorldID;
 import com.quantumgarbage.gtmogs.common.network.packets.prospecting.SPacketProspectOre;
-
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class GTNetwork {
 

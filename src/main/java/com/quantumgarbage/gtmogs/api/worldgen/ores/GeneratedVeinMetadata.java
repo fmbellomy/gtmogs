@@ -1,7 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.ores;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -9,6 +7,7 @@ import net.minecraft.world.level.ChunkPos;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

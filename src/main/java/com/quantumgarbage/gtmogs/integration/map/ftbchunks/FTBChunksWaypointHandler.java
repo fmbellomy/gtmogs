@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.integration.map.ftbchunks;
 
-import com.quantumgarbage.gtmogs.integration.map.IWaypointHandler;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
+import com.quantumgarbage.gtmogs.integration.map.IWaypointHandler;
 import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftbchunks.api.client.waypoint.Waypoint;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

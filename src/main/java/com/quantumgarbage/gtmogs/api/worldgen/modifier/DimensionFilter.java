@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.modifier;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryCodecs;
@@ -16,6 +13,8 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifierType;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 
 public class DimensionFilter extends PlacementFilter {
 

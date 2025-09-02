@@ -1,9 +1,5 @@
 package com.quantumgarbage.gtmogs.api.registry;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
-import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -20,6 +16,9 @@ import net.neoforged.neoforge.registries.RegistryBuilder;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.UnmodifiableView;
 

@@ -1,12 +1,7 @@
 package com.quantumgarbage.gtmogs.integration.map.ftbchunks.veins.ore;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.client.util.DrawUtil;
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksOptions;
-import com.quantumgarbage.gtmogs.integration.map.layer.builtin.OreRenderLayer;
-
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -17,6 +12,11 @@ import net.minecraft.world.phys.Vec3;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.client.util.DrawUtil;
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
+import com.quantumgarbage.gtmogs.integration.map.ftbchunks.FTBChunksOptions;
+import com.quantumgarbage.gtmogs.integration.map.layer.builtin.OreRenderLayer;
 import dev.ftb.mods.ftbchunks.api.FTBChunksAPI;
 import dev.ftb.mods.ftbchunks.api.client.icon.MapIcon;
 import dev.ftb.mods.ftbchunks.api.client.icon.MapType;
@@ -31,7 +31,6 @@ import dev.ftb.mods.ftblibrary.ui.ContextMenuItem;
 import dev.ftb.mods.ftblibrary.ui.input.Key;
 import dev.ftb.mods.ftblibrary.ui.input.MouseButton;
 import dev.ftb.mods.ftblibrary.util.TooltipList;
-
 
 import java.util.List;
 
@@ -58,7 +57,6 @@ public class OreVeinIcon implements MapIcon {
     public String getName() {
         return name == null ? name = OreRenderLayer.getName(veinMetadata).getString() : name;
     }
-
 
     @Override
     public Vec3 getPos(float v) {

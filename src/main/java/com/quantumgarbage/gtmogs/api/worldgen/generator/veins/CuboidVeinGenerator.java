@@ -1,10 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -21,6 +16,10 @@ import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -237,16 +236,14 @@ public class CuboidVeinGenerator extends VeinGenerator {
 
         BlockState existing = section.getBlockState(x, y, z);
 
-
-            for (OreConfiguration.TargetBlockState targetState : ore) {
-                if (!OreVeinUtil.canPlaceOre(existing, access::getBlockState, random, entry, targetState, pos))
-                    continue;
-                if (targetState.state.isAir())
-                    continue;
-                section.setBlockState(x, y, z, targetState.state, false);
-                break;
-            }
-
+        for (OreConfiguration.TargetBlockState targetState : ore) {
+            if (!OreVeinUtil.canPlaceOre(existing, access::getBlockState, random, entry, targetState, pos))
+                continue;
+            if (targetState.state.isAir())
+                continue;
+            section.setBlockState(x, y, z, targetState.state, false);
+            break;
+        }
     }
 
     @Override

@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.core.mixins.ldlib;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.core.MixinHelpers;
-
 import com.lowdragmc.lowdraglib.utils.DummyWorld;
 
 import net.minecraft.core.BlockPos;
@@ -12,6 +9,8 @@ import net.neoforged.neoforge.client.model.data.ModelDataManager;
 import net.neoforged.neoforge.common.extensions.IBlockGetterExtension;
 import net.neoforged.neoforge.common.extensions.ILevelExtension;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.core.MixinHelpers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;

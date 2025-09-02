@@ -1,7 +1,4 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -13,6 +10,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguratio
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import dev.latvian.mods.rhino.util.HideFromJS;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -47,7 +47,6 @@ public abstract class VeinGenerator {
     public IntList getAllChances() {
         return IntArrayList.toList(getAllEntries().stream().mapToInt(VeinEntry::chance));
     }
-
 
     /**
      * Generate a map of all ore placers (by block position), for each block in this ore vein.

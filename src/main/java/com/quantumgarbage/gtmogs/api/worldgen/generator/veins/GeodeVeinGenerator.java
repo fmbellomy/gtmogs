@@ -1,8 +1,4 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.utils.GTUtil;
 
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -37,6 +33,10 @@ import net.minecraft.world.level.material.FluidState;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.utils.GTUtil;
 import it.unimi.dsi.fastutil.objects.ObjectIntPair;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

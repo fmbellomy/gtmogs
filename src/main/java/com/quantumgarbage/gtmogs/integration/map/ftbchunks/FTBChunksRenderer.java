@@ -1,15 +1,14 @@
 package com.quantumgarbage.gtmogs.integration.map.ftbchunks;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
-import com.quantumgarbage.gtmogs.integration.map.ftbchunks.veins.ore.OreVeinIcon;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
+import com.quantumgarbage.gtmogs.integration.map.ftbchunks.veins.ore.OreVeinIcon;
 import dev.ftb.mods.ftblibrary.ui.Widget;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;

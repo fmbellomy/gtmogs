@@ -1,15 +1,13 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator;
 
+import net.minecraft.resources.ResourceLocation;
+
+import com.mojang.serialization.MapCodec;
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
 import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
 import com.quantumgarbage.gtmogs.api.worldgen.WorldGeneratorUtils;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
-
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
-import net.minecraft.resources.ResourceLocation;
-
-import com.mojang.serialization.MapCodec;
 
 import java.util.function.Supplier;
 

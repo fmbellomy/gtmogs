@@ -1,14 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.map.cache.client;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
-import com.quantumgarbage.gtmogs.integration.map.GroupingMapRenderer;
-import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
-import com.quantumgarbage.gtmogs.integration.map.cache.GridCache;
-import com.quantumgarbage.gtmogs.integration.map.cache.WorldCache;
-
-import com.quantumgarbage.gtmogs.integration.map.layer.builtin.OreRenderLayer;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.HolderLookup;
@@ -16,6 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
+import com.quantumgarbage.gtmogs.integration.map.GroupingMapRenderer;
+import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
+import com.quantumgarbage.gtmogs.integration.map.cache.GridCache;
+import com.quantumgarbage.gtmogs.integration.map.cache.WorldCache;
+import com.quantumgarbage.gtmogs.integration.map.layer.builtin.OreRenderLayer;
 
 import java.util.Collection;
 
@@ -85,9 +84,7 @@ public class GTClientCache extends WorldCache implements IClientCache {
     }
 
     @Override
-    public void readSingleFile(String name, CompoundTag data, HolderLookup.Provider registries) {
-
-    }
+    public void readSingleFile(String name, CompoundTag data, HolderLookup.Provider registries) {}
 
     @Override
     public void setupCacheFiles() {
@@ -98,6 +95,5 @@ public class GTClientCache extends WorldCache implements IClientCache {
     @Override
     public void clear() {
         super.clear();
-
     }
 }

@@ -1,14 +1,13 @@
 package com.quantumgarbage.gtmogs.data.misc;
 
-import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
-import com.quantumgarbage.gtmogs.utils.FormattingUtil;
-
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 
+import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
+import com.quantumgarbage.gtmogs.utils.FormattingUtil;
 import com.tterrag.registrate.util.entry.BlockEntry;
 import org.jetbrains.annotations.Nullable;
 

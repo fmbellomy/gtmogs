@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.core.mixins.neoforge;
 
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.GameData;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 

@@ -1,11 +1,5 @@
 package com.quantumgarbage.gtmogs.data.datagen;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.data.worldgen.*;
-
-import com.quantumgarbage.gtmogs.data.worldgen.GTDensityFunctions;
-import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
@@ -16,6 +10,11 @@ import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.data.worldgen.*;
+import com.quantumgarbage.gtmogs.data.worldgen.GTDensityFunctions;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 
 import java.util.Set;
 
@@ -32,8 +31,8 @@ public class GTVanillaDatagen {
             var set = Set.of(GTMOGS.MOD_ID);
             DatapackBuiltinEntriesProvider provider = generator.addProvider(true, new DatapackBuiltinEntriesProvider(
                     packOutput, registries, new RegistrySetBuilder()
-                    .add(Registries.DENSITY_FUNCTION, GTDensityFunctions::bootstrap)
-                    .add(GTRegistries.ORE_VEIN_REGISTRY, GTOreVeins::bootstrap),
+                            .add(Registries.DENSITY_FUNCTION, GTDensityFunctions::bootstrap)
+                            .add(GTRegistries.ORE_VEIN_REGISTRY, GTOreVeins::bootstrap),
                     set));
         }
     }

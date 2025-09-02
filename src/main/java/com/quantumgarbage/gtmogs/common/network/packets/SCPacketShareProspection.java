@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.common.network.packets;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.core.registries.Registries;
@@ -19,6 +16,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 import lombok.AllArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,15 +1,14 @@
 package com.quantumgarbage.gtmogs.common.network.packets;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.common.capability.WorldIDSaveData;
-import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
-
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.common.capability.WorldIDSaveData;
+import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.jetbrains.annotations.NotNull;

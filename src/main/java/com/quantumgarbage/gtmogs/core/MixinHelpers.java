@@ -1,23 +1,19 @@
 package com.quantumgarbage.gtmogs.core;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.GTValues;
-
-import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-
-import com.quantumgarbage.gtmogs.integration.kjs.GTCEuServerEvents;
-import com.quantumgarbage.gtmogs.integration.kjs.events.GTOreVeinKubeEvent;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.*;
-
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.GTValues;
+import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
+import com.quantumgarbage.gtmogs.integration.kjs.GTCEuServerEvents;
+import com.quantumgarbage.gtmogs.integration.kjs.events.GTOreVeinKubeEvent;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -54,7 +50,6 @@ public class MixinHelpers {
     public static TagLoader.EntryWithSource makeTagEntry(TagKey<?> tag) {
         return new TagLoader.EntryWithSource(TagEntry.tag(tag.location()), GTValues.CUSTOM_TAG_SOURCE);
     }
-
 
     public static void postKJSVeinEvents(WritableRegistry<?> registry) {
         if (!GTMOGS.Mods.isKubeJSLoaded()) {

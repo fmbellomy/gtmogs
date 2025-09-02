@@ -1,9 +1,5 @@
 package com.quantumgarbage.gtmogs.api.gui.texture;
 
-import com.quantumgarbage.gtmogs.api.gui.GuiTextures;
-import com.quantumgarbage.gtmogs.api.gui.misc.PacketProspecting;
-import com.quantumgarbage.gtmogs.api.gui.misc.ProspectorMode;
-
 import com.lowdragmc.lowdraglib.gui.editor.ColorPattern;
 import com.lowdragmc.lowdraglib.gui.texture.ResourceTexture;
 import com.lowdragmc.lowdraglib.gui.texture.TransformTexture;
@@ -24,6 +20,9 @@ import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.quantumgarbage.gtmogs.api.gui.GuiTextures;
+import com.quantumgarbage.gtmogs.api.gui.misc.PacketProspecting;
+import com.quantumgarbage.gtmogs.api.gui.misc.ProspectorMode;
 import lombok.Getter;
 import org.joml.Matrix4f;
 

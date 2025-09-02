@@ -1,12 +1,12 @@
 package com.quantumgarbage.gtmogs.data.valueprovider;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.valueproviders.FloatProviderType;
 import net.minecraft.util.valueproviders.IntProviderType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import com.quantumgarbage.gtmogs.GTMOGS;
 
 public class GTValueProviderTypes {
 

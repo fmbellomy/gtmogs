@@ -1,11 +1,10 @@
 package com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen;
 
-import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
-import com.quantumgarbage.gtmogs.api.worldgen.SimpleWorldGenLayer;
-
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
+import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
+import com.quantumgarbage.gtmogs.api.worldgen.SimpleWorldGenLayer;
 import dev.latvian.mods.kubejs.level.ruletest.AnyMatchRuleTest;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.experimental.Accessors;

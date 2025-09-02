@@ -1,12 +1,11 @@
 package com.quantumgarbage.gtmogs.core.mixins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OrePlacer;
-
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OrePlacer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

@@ -1,12 +1,11 @@
 package com.quantumgarbage.gtmogs.core.mixins;
 
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
-
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration.TargetBlockState;
 
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;

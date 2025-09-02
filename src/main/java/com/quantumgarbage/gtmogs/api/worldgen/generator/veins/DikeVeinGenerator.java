@@ -1,12 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
-import com.quantumgarbage.gtmogs.utils.GTUtil;
-import com.quantumgarbage.gtmogs.utils.WeightedEntry;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.util.Mth;
@@ -27,6 +20,12 @@ import net.minecraft.world.level.levelgen.synth.NormalNoise;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.utils.GTUtil;
+import com.quantumgarbage.gtmogs.utils.WeightedEntry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -118,15 +117,15 @@ public class DikeVeinGenerator extends VeinGenerator {
 
         if (pos.getY() >= blockDefinition.minY() && pos.getY() <= blockDefinition.maxY()) {
 
-                for (TargetBlockState targetState : blockDefinition.block) {
-                    if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, rand, entry, targetState,
-                            pos.mutable()))
-                        continue;
-                    if (targetState.state.isAir())
-                        continue;
-                    section.setBlockState(x, y, z, targetState.state, false);
-                    break;
-                }
+            for (TargetBlockState targetState : blockDefinition.block) {
+                if (!OreVeinUtil.canPlaceOre(current, level::getBlockState, rand, entry, targetState,
+                        pos.mutable()))
+                    continue;
+                if (targetState.state.isAir())
+                    continue;
+                section.setBlockState(x, y, z, targetState.state, false);
+                break;
+            }
 
         }
     }

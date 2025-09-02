@@ -1,12 +1,5 @@
 package com.quantumgarbage.gtmogs.integration.map.cache.server;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
-import com.quantumgarbage.gtmogs.common.network.packets.prospecting.SPacketProspectOre;
-import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
-import com.quantumgarbage.gtmogs.integration.map.cache.WorldCache;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
@@ -14,6 +7,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.common.network.packets.prospecting.SPacketProspectOre;
+import com.quantumgarbage.gtmogs.integration.map.cache.DimensionCache;
+import com.quantumgarbage.gtmogs.integration.map.cache.WorldCache;
 
 import java.util.*;
 
@@ -54,13 +54,14 @@ public class ServerCache extends WorldCache {
         saveData.clear();
     }
 
-    public void prospectByOreMaterial(ResourceKey<Level> dim,  BlockPos origin, ServerPlayer player,
+    public void prospectByOreMaterial(ResourceKey<Level> dim, BlockPos origin, ServerPlayer player,
                                       int radius) {
         if (radius < 0) return;
         List<GeneratedVeinMetadata> nearbyVeins = getNearbyVeins(dim, origin, radius);
         List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
         for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
-            if (nearbyVein.definition().value().veinGenerator().getAllBlocks().contains(Objects.requireNonNull(GTMOGS.getMinecraftServer().getLevel(dim)).getBlockState(origin))) {
+            if (nearbyVein.definition().value().veinGenerator().getAllBlocks().contains(
+                    Objects.requireNonNull(GTMOGS.getMinecraftServer().getLevel(dim)).getBlockState(origin))) {
                 foundVeins.add(nearbyVein);
             }
         }

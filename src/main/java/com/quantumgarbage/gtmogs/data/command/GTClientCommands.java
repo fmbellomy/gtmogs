@@ -1,8 +1,5 @@
 package com.quantumgarbage.gtmogs.data.command;
 
-import com.quantumgarbage.gtmogs.common.network.packets.SCPacketShareProspection;
-import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
-
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -10,6 +7,8 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.quantumgarbage.gtmogs.common.network.packets.SCPacketShareProspection;
+import com.quantumgarbage.gtmogs.integration.map.ClientCacheManager;
 
 import java.util.List;
 import java.util.UUID;

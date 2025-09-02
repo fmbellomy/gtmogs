@@ -1,10 +1,5 @@
 package com.quantumgarbage.gtmogs.api.worldgen.generator.veins;
 
-import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
-import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,6 +19,10 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.Getter;
@@ -78,7 +77,6 @@ public class StandardVeinGenerator extends VeinGenerator {
         this.netherBlock = block;
         return this;
     }
-
 
     private List<VeinEntry> defaultEntries = null;
 
@@ -306,12 +304,12 @@ public class StandardVeinGenerator extends VeinGenerator {
 
         if (!(random.nextFloat() <= density))
             return;
-            for (OreConfiguration.TargetBlockState targetState : targets) {
-                if (OreVeinUtil.canPlaceOre(blockstate, access::getBlockState, random, entry, targetState, posCursor)) {
-                    levelchunksection.setBlockState(sectionX, sectionY, sectionZ, targetState.state, false);
-                    placedAmount.increment();
-                    break;
-                }
+        for (OreConfiguration.TargetBlockState targetState : targets) {
+            if (OreVeinUtil.canPlaceOre(blockstate, access::getBlockState, random, entry, targetState, posCursor)) {
+                levelchunksection.setBlockState(sectionX, sectionY, sectionZ, targetState.state, false);
+                placedAmount.increment();
+                break;
+            }
         }
     }
 }
