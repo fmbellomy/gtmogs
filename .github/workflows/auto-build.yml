@@ -2,7 +2,7 @@ name: Latest Build
 
 on:
   push:
-    branches: ['1.20.1', '1.21']
+    branches: ['main']
     paths: ['src/**', '**/*.gradle', 'gradle.properties']
 
 concurrency:
@@ -15,8 +15,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       PUBLISH: ${{ !contains(github.event.commits[0].message, '[no-snapshot]') }}
-      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-      MAVEN_USER: ${{ secrets.MAVEN_USER }}
       SNAPSHOT: true
       CI: true
     permissions:

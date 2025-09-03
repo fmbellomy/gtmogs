@@ -12,11 +12,6 @@ on:
           - 'release'
           - 'beta'
           - 'alpha'
-      publishMaven:
-        description: 'whether publish to the maven'
-        required: true
-        type: boolean
-        default: true
       publishCurseForgeAndModrinth:
         description: 'whether to publish to curseforge and modrinth'
         required: true
@@ -26,9 +21,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
-      MAVEN_USER: ${{ secrets.MAVEN_USER }}
     permissions:
       contents: write
     steps:
@@ -41,10 +33,6 @@ jobs:
 
       - name: Build
         run: ./gradlew build --build-cache
-
-      - if: ${{ inputs.publishMaven }}
-        name: Publish to Maven
-        run: ./gradlew publish --build-cache
 
       - if: ${{ inputs.publishCurseForgeAndModrinth }}
         name: Get Version
