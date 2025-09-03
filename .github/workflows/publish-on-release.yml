@@ -17,7 +17,7 @@ jobs:
       - name: Get Config
         uses: actions/checkout@v4
         with:
-          ref: '1.20.1'
+          ref: '1.21'
           sparse-checkout: '.github/json'
       - name: Generate changelog
         id: changelog
@@ -30,19 +30,6 @@ jobs:
           ignorePreReleases: true
           fetchViaCommits: true
           failOnError: true
-
-  publish-20:
-    name: 1.20.1
-    needs: [ meta ]
-    if: ${{ contains(github.ref_name, '1.20.1') || !contains(github.ref_name, '1.21') }}
-    secrets: inherit
-    uses: ./.github/workflows/publish.yml
-    with:
-      simulate: ${{ startsWith(github.event.release.name, 'simulate') || github.repository_owner != 'GregTechCEu' }}
-      branch: '1.20.1'
-      tag-name: ${{ github.ref_name }}
-      release-body: ${{ github.event.release.body }}
-      changelog-body: ${{ needs.meta.outputs.CHANGELOG }}
 
   publish-21:
     name: 1.21.1
