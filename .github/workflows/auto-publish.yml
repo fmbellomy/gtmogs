@@ -60,7 +60,7 @@ jobs:
             build/libs/!(*-@(dev|dev-all|dev-slim|sources|javadoc|dev-shadow|slim)).jar
             build/libs/*-@(dev|sources|javadoc|dev-shadow|slim).jar
 
-          name: GregTechCEu ${{ steps.var.outputs.version }}
+          name: GTMOGS ${{ steps.var.outputs.version }}
           version: mc${{ steps.var.outputs.version }}
           version-type: ${{ inputs.releaseType }}
           changelog-file: RELEASE.*
@@ -71,7 +71,7 @@ jobs:
             ${{ github.ref_name }}
           game-version-filter: none
           java: |
-            17
+            21
           retry-attempts: 2
           retry-delay: 10000
           fail-mode: fail
