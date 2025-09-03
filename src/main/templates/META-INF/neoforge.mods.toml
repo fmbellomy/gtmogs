@@ -37,7 +37,7 @@ credits = "GregoriusT, Mr_Touchyou, Zerrens for making GregTech and textures, th
     modId = "ldlib"
     type = "required"
     embedded = true
-    versionRange = "[${ldlib_version},)"
+    versionRange = "[${ldlib_version}]"
     ordering = "AFTER"
     side = "BOTH"
     [dependencies.${mod_id}.mc-publish]
