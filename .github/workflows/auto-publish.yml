@@ -48,12 +48,12 @@ jobs:
 
           # Only include this section if you wish to publish
           # your assets on Modrinth.
-          modrinth-id: 7tG215v7
+          modrinth-id: fNd6d6cd
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           # Only include this section if you wish to publish
           # your assets on CurseForge.
-          curseforge-id: 890405
+          curseforge-id: 1340111
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: |
