@@ -1,26 +1,18 @@
 package com.quantumgarbage.gtmogs.data.worldgen;
 
-import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.BiomeTags;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.util.valueproviders.ConstantInt;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
-import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
-import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
-import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import com.quantumgarbage.gtmogs.api.worldgen.*;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
@@ -82,6 +74,5 @@ public class GTOreVeins {
         context.register(key, builder);
     }
 
-    public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {
-    }
+    public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {}
 }
