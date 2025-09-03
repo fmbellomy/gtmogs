@@ -1,5 +1,15 @@
 package com.quantumgarbage.gtmogs.common;
 
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
+import net.neoforged.neoforge.registries.NewRegistryEvent;
+import net.neoforged.neoforge.registries.RegisterEvent;
+
 import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
 import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
@@ -14,15 +24,6 @@ import com.quantumgarbage.gtmogs.data.datagen.GTRegistrateDatagen;
 import com.quantumgarbage.gtmogs.data.misc.GTDimensionMarkers;
 import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
 import com.quantumgarbage.gtmogs.utils.input.KeyBind;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.Pack;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
-import net.neoforged.neoforge.registries.DataPackRegistryEvent;
-import net.neoforged.neoforge.registries.NewRegistryEvent;
-import net.neoforged.neoforge.registries.RegisterEvent;
 
 public class CommonInit {
 
@@ -31,6 +32,7 @@ public class CommonInit {
     public static void init(final IEventBus modBus) {
         CommonInit.modBus = modBus;
         modBus.register(CommonInit.class);
+
         GTRegistrateDatagen.initPre();
         GTRegistries.init(modBus);
 

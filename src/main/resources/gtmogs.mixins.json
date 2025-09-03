@@ -9,7 +9,6 @@
       "ftbchunks.FTBChunksClientMixin",
       "ftbchunks.LargeMapScreenMixin",
       "ftbchunks.RegionMapPanelMixin",
-      "ldlib.WorldSceneRendererMixin",
       "neoforge.BakedModelWrapperAccessor"
     ],
     "mixins": [
@@ -20,10 +19,6 @@
       "RegistryDataLoader$LoaderMixin",
       "ResourceKeyArgumentAccessor",
       "ServerGamePacketListenerImplAccessor",
-      "ldlib.ButtonWidgetMixin",
-      "ldlib.DummyWorldMixin",
-      "ldlib.ItemStackPayloadMixin",
-      "ldlib.TrackedDummyWorldMixin",
       "neoforge.ConfiguredModelBuilderAccessor",
       "neoforge.ConfiguredModelListAccessor",
       "neoforge.GameDataMixin",

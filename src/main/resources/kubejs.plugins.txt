@@ -1,1 +1,1 @@
-kjs.integration.com.quantumgarbage.gtmogs.GTKubeJSPlugin
+com.quantumgarbage.gtmogs.integration.kjs.GTKubeJSPlugin
