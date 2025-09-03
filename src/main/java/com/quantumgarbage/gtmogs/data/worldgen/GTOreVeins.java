@@ -1,5 +1,6 @@
 package com.quantumgarbage.gtmogs.data.worldgen;
 
+import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
@@ -51,7 +52,7 @@ public class GTOreVeins {
 
     public static final Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
 
-    public static final ResourceKey<OreVeinDefinition> FREAKY_VEIN = create(GTMOGS.id("freaky"));
+    //public static final ResourceKey<OreVeinDefinition> FREAKY_VEIN = create(GTMOGS.id("freaky"));
 
     public static void updateLargestVeinSize(Registry<OreVeinDefinition> registry) {
         // map to average of min & max values.
@@ -90,6 +91,7 @@ public class GTOreVeins {
         RuleTest[] stoneRules = new RuleTest[] { new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES) };
         RuleTest[] deepslateRules = new RuleTest[] { new TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES) };
 
+        if(ConfigHolder.INSTANCE.dev.debug){
         register(context, FREAKY_VEIN, vein -> vein
                 .clusterSize(UniformInt.of(32, 40)).density(0.95f).weight(100)
                 .layer(WorldGenLayers.DEEPSLATE)
@@ -112,6 +114,6 @@ public class GTOreVeins {
                                 .block(() -> BuiltInRegistries.BLOCK
                                         .get(ResourceLocation.fromNamespaceAndPath("minecraft", "monster_spawner")))
                                 .size(1))
-                        .build()));
+                        .build()));}
     }
 }
