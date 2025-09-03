@@ -63,7 +63,6 @@ jobs:
           name: GregTechCEu ${{ steps.var.outputs.version }}
           version: mc${{ steps.var.outputs.version }}
           version-type: ${{ inputs.releaseType }}
-          changelog-file: RELEASE.*
 
           loaders: |
             forge
