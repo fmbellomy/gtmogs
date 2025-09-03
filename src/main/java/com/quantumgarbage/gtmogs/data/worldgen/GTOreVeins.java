@@ -52,8 +52,6 @@ public class GTOreVeins {
 
     public static final Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
 
-    //public static final ResourceKey<OreVeinDefinition> FREAKY_VEIN = create(GTMOGS.id("freaky"));
-
     public static void updateLargestVeinSize(Registry<OreVeinDefinition> registry) {
         // map to average of min & max values.
         GTOreVeins.largestVeinSize = registry.stream()
@@ -85,35 +83,5 @@ public class GTOreVeins {
     }
 
     public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {
-        // END
-        RuleTest[] endRules = new RuleTest[] { WorldGeneratorUtils.END_ORE_REPLACEABLES };
-        RuleTest[] netherRules = new RuleTest[] { new TagMatchTest(BlockTags.NETHER_CARVER_REPLACEABLES) };
-        RuleTest[] stoneRules = new RuleTest[] { new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES) };
-        RuleTest[] deepslateRules = new RuleTest[] { new TagMatchTest(BlockTags.DEEPSLATE_ORE_REPLACEABLES) };
-
-        if(ConfigHolder.INSTANCE.dev.debug){
-        register(context, FREAKY_VEIN, vein -> vein
-                .clusterSize(UniformInt.of(32, 40)).density(0.95f).weight(100)
-                .layer(WorldGenLayers.DEEPSLATE)
-                .heightRangeUniform(-55, 80)
-                .biomes(BiomeTags.IS_OVERWORLD)
-                .classicVeinGenerator(generator -> generator
-                        .primary(l -> l
-                                .block(() -> BuiltInRegistries.BLOCK
-                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "slime_block")))
-                                .size(6))
-                        .secondary(l -> l
-                                .block(() -> BuiltInRegistries.BLOCK
-                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "honey_block")))
-                                .size(4))
-                        .between(l -> l
-                                .block(() -> BuiltInRegistries.BLOCK
-                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "redstone_block")))
-                                .size(2))
-                        .sporadic(l -> l
-                                .block(() -> BuiltInRegistries.BLOCK
-                                        .get(ResourceLocation.fromNamespaceAndPath("minecraft", "monster_spawner")))
-                                .size(1))
-                        .build()));}
     }
 }
