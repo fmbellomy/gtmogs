@@ -42,16 +42,16 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
 
     @Override
     public void registerEvents(EventGroupRegistry registry) {
-        registry.register(GTCEuStartupEvents.GROUP);
-        registry.register(GTCEuServerEvents.GROUP);
+        registry.register(GTMOGSStartupEvents.GROUP);
+        registry.register(GTMOGSServerEvents.GROUP);
     }
 
     @Override
     public void registerClasses(ClassFilter filter) {
         // allow user to access all gtmogs classes by importing them.
-        filter.allow("com.gregtechceu.gtmogs");
-        filter.deny("com.gregtechceu.gtmogs.core");
-        filter.deny("com.gregtechceu.gtmogs.common.network");
+        filter.allow("com.quantumgarbage.gtmogs");
+        filter.deny("com.quanntumgarbage.gtmogs.core");
+        filter.deny("com.quantumgarbage.gtmogs.common.network");
     }
 
     @Override

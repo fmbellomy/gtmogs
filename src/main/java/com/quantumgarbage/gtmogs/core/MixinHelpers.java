@@ -12,7 +12,7 @@ import net.minecraft.world.level.material.Fluid;
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.GTValues;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
-import com.quantumgarbage.gtmogs.integration.kjs.GTCEuServerEvents;
+import com.quantumgarbage.gtmogs.integration.kjs.GTMOGSServerEvents;
 import com.quantumgarbage.gtmogs.integration.kjs.events.GTOreVeinKubeEvent;
 
 import java.util.*;
@@ -64,7 +64,7 @@ public class MixinHelpers {
     private static final class KJSCallWrapper {
 
         private static void postOreVeinEvent() {
-            GTCEuServerEvents.ORE_VEIN_MODIFICATION.post(new GTOreVeinKubeEvent());
+            GTMOGSServerEvents.ORE_VEIN_MODIFICATION.post(new GTOreVeinKubeEvent());
         }
     }
 

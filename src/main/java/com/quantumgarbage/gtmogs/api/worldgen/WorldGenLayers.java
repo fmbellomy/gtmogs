@@ -10,7 +10,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
 import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
-import com.quantumgarbage.gtmogs.integration.kjs.GTCEuStartupEvents;
+import com.quantumgarbage.gtmogs.integration.kjs.GTMOGSStartupEvents;
 import com.quantumgarbage.gtmogs.integration.kjs.events.WorldGenLayerKubeEvent;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,7 +69,7 @@ public enum WorldGenLayers implements IWorldGenLayer, StringRepresentable {
     private static final class KJSCallWrapper {
 
         private static void postEvent() {
-            GTCEuStartupEvents.WORLD_GEN_LAYERS.post(new WorldGenLayerKubeEvent());
+            GTMOGSStartupEvents.WORLD_GEN_LAYERS.post(new WorldGenLayerKubeEvent());
         }
     }
 }

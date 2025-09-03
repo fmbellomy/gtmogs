@@ -19,8 +19,8 @@ public class RegistryDataLoader$LoaderMixin<T> {
     private @Final WritableRegistry<T> registry;
 
     @Inject(method = "loadFromResources", at = @At("TAIL"))
-    private void gtceu$postKJSVeinEvents(ResourceManager resourceManager,
-                                         RegistryOps.RegistryInfoLookup registryInfoLookup, CallbackInfo ci) {
+    private void gtmogs$postKJSVeinEvents(ResourceManager resourceManager,
+                                          RegistryOps.RegistryInfoLookup registryInfoLookup, CallbackInfo ci) {
         MixinHelpers.postKJSVeinEvents(this.registry);
     }
 }
