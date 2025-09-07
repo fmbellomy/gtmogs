@@ -66,7 +66,7 @@ public class ConfigHolder {
 
             @Configurable
             @Configurable.Comment("The string prepending ore names in the ore vein tooltip")
-            public String oreNamePrefix = "- ";
+            public String oreNamePrefix = "> ";
 
             @Configurable
             @Configurable.Comment({ "The color to draw a box around the ore icon with.",

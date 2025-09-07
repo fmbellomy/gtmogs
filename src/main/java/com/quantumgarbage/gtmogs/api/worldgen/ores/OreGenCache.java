@@ -32,10 +32,7 @@ public class OreGenCache {
     private final int oreGenerationCacheSize = ConfigHolder.INSTANCE != null ?
             ConfigHolder.INSTANCE.worldgen.oreVeins.oreGenerationChunkCacheSize : 512;
 
-    private final int oreIndicatorCacheSize = ConfigHolder.INSTANCE != null ?
-            ConfigHolder.INSTANCE.worldgen.oreVeins.oreIndicatorChunkCacheSize : 512;
-
-    private final int veinMetadataCacheSize = Math.max(oreGenerationCacheSize, oreIndicatorCacheSize);
+    private final int veinMetadataCacheSize = oreGenerationCacheSize;
 
     private final Cache<ChunkPos, List<GeneratedVeinMetadata>> veinMetadataByOrigin = CacheBuilder.newBuilder()
             .maximumSize(veinMetadataCacheSize)
@@ -45,12 +42,6 @@ public class OreGenCache {
 
     private final Cache<ChunkPos, List<GeneratedVein>> generatedVeinsByOrigin = CacheBuilder.newBuilder()
             .maximumSize(oreGenerationCacheSize)
-            .expireAfterAccess(30, TimeUnit.SECONDS)
-            .softValues()
-            .build();
-
-    private final Cache<ChunkPos, List<GeneratedIndicators>> indicatorsByOrigin = CacheBuilder.newBuilder()
-            .maximumSize(oreIndicatorCacheSize)
             .expireAfterAccess(30, TimeUnit.SECONDS)
             .softValues()
             .build();

@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface LevelAccessor {
 
     @Accessor("thread")
-    Thread gtceu$getThread();
+    Thread gtmogs$getThread();
 }

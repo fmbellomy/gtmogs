@@ -1,26 +1,20 @@
 package com.quantumgarbage.gtmogs.integration.map.journeymap;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+
+import com.mojang.blaze3d.platform.NativeImage;
 import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.gui.misc.ProspectorMode;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
+import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
 import com.quantumgarbage.gtmogs.integration.map.GenericMapRenderer;
 import com.quantumgarbage.gtmogs.integration.map.MapIntegrationUtils;
 import com.quantumgarbage.gtmogs.integration.map.WaypointManager;
-import com.quantumgarbage.gtmogs.integration.map.layer.builtin.OreRenderLayer;
-import com.quantumgarbage.gtmogs.utils.GradientUtil;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
-
-import com.mojang.blaze3d.platform.NativeImage;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import journeymap.api.v2.client.IClientAPI;
 import journeymap.api.v2.client.display.*;
@@ -98,7 +92,7 @@ public class JourneyMapRenderer extends GenericMapRenderer {
     }
 
     private MarkerOverlay createMarker(String name, String id, ResourceKey<Level> dim, GeneratedVeinMetadata vein) {
-        BlockPos center = vein.center();
+        BlockPos center = OreVeinUtil.getVeinCenter(vein.originChunk(), RandomSource.create(10)).get();
 
         @SuppressWarnings("DataFlowIssue")
         MapImage image = new MapImage(createOreImage(vein));
@@ -110,16 +104,7 @@ public class JourneyMapRenderer extends GenericMapRenderer {
 
         overlay.setDimension(dim);
         overlay.setLabel("")
-                .setTitle(OreRenderLayer.getTooltip(name, vein).stream().map(Component::getString).reduce("",
-                        (s1, s2) -> {
-                            if (s1.isEmpty()) {
-                                return s2;
-                            }
-                            if (s2.isEmpty()) {
-                                return s1;
-                            }
-                            return String.join("\n", s1, s2);
-                        }))
+                .setTitle(name)
                 .setOverlayListener(new MarkerListener(vein, name));
 
         return overlay;
@@ -130,7 +115,6 @@ public class JourneyMapRenderer extends GenericMapRenderer {
 
         var sprite = MapIntegrationUtils.getFirstBlockFace(material);
         return sprite.contents().getOriginalImage();
-
     }
 
     /**
@@ -164,7 +148,8 @@ public class JourneyMapRenderer extends GenericMapRenderer {
                                     boolean doubleClick) {
             if (button == 0 && doubleClick) {
                 if (oreVein != null) {
-                    Block firstMaterial = oreVein.definition().value().veinGenerator().getAllBlocks().getFirst().getBlock();
+                    Block firstMaterial = oreVein.definition().value().veinGenerator().getAllBlocks().getFirst()
+                            .getBlock();
                     int color = MapIntegrationUtils.getItemColor(firstMaterial);
 
                     BlockPos center = oreVein.center();
@@ -186,7 +171,8 @@ public class JourneyMapRenderer extends GenericMapRenderer {
             });
             modPopupMenu.addMenuItem("button.gtmogs.toggle_waypoint.name", (b) -> {
                 if (oreVein != null) {
-                    Block firstMaterial = oreVein.definition().value().veinGenerator().getAllBlocks().getFirst().getBlock();
+                    Block firstMaterial = oreVein.definition().value().veinGenerator().getAllBlocks().getFirst()
+                            .getBlock();
                     int color = MapIntegrationUtils.getItemColor(firstMaterial);
                     BlockPos center = oreVein.center();
                     WaypointManager.toggleWaypoint("ore_veins", label, color,

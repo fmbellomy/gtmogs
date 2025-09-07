@@ -153,7 +153,11 @@ public class DikeVeinGenerator extends VeinGenerator {
     }
 
     public DikeVeinGenerator withBlock(DikeBlockDefinition block) {
+        // actually hilariously bad
         if (this.blocks == null) this.blocks = new ArrayList<>();
+        var defs = blocks.stream().map(def -> def.block);
+        var blocks = defs.map(target -> target.stream().map(tbs -> tbs.state.getBlock()));
+        blocks.forEach(s -> s.forEach(GTOreVeins::addVeinOre));
         this.blocks.add(block);
         return this;
     }

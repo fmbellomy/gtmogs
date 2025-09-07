@@ -18,9 +18,9 @@ public class OreVeinifierMixin {
             method = "create(Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/DensityFunction;Lnet/minecraft/world/level/levelgen/PositionalRandomFactory;)Lnet/minecraft/world/level/levelgen/NoiseChunk$BlockStateFiller;",
             at = @At("HEAD"),
             cancellable = true)
-    private static void gtceu$create(DensityFunction function1, DensityFunction function2, DensityFunction function3,
-                                     PositionalRandomFactory random,
-                                     CallbackInfoReturnable<NoiseChunk.BlockStateFiller> cir) {
+    private static void gtmogs$create(DensityFunction function1, DensityFunction function2, DensityFunction function3,
+                                      PositionalRandomFactory random,
+                                      CallbackInfoReturnable<NoiseChunk.BlockStateFiller> cir) {
         if (ConfigHolder.INSTANCE != null && ConfigHolder.INSTANCE.worldgen.oreVeins.removeVanillaLargeOreVeins)
             cir.setReturnValue(functionContext -> null);
     }

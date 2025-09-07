@@ -15,7 +15,7 @@ import java.util.LinkedHashSet;
 public class GameDataMixin {
 
     @ModifyExpressionValue(method = "getRegistrationOrder", at = @At(value = "NEW", target = "java/util/LinkedHashSet"))
-    private static LinkedHashSet<ResourceLocation> gtceu$injectGTRegistriesFirst(LinkedHashSet<ResourceLocation> ordered) {
+    private static LinkedHashSet<ResourceLocation> gtmogs$injectGTRegistriesFirst(LinkedHashSet<ResourceLocation> ordered) {
         ordered.addAll(GTRegistries.getRegistrationOrder());
         return ordered;
     }

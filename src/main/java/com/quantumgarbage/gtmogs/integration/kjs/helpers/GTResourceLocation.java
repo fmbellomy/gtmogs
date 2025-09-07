@@ -22,7 +22,7 @@ import java.util.function.UnaryOperator;
  */
 public record GTResourceLocation(ResourceLocation wrapped) {
 
-    public static final Codec<GTResourceLocation> CODEC = GTMOGS.GTCEU_ID.xmap(GTResourceLocation::new,
+    public static final Codec<GTResourceLocation> CODEC = GTMOGS.GTMOGS_ID.xmap(GTResourceLocation::new,
             GTResourceLocation::wrapped);
 
     @Nullable

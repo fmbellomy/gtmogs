@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface RegistrateDataProviderAccessor {
 
     @Accessor("TYPES")
-    static BiMap<String, ProviderType<?>> gtceu$getTypes() {
+    static BiMap<String, ProviderType<?>> gtmogs$getTypes() {
         throw new AssertionError();
     }
 }

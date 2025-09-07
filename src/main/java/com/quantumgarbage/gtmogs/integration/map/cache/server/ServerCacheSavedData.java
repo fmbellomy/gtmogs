@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class ServerCacheSavedData extends SavedData {
 
-    public static final String DATA_NAME = "gtceu_ore_vein_cache";
+    public static final String DATA_NAME = "gtmogs_ore_vein_cache";
 
     private DimensionCache backingCache;
     private CompoundTag toRead;

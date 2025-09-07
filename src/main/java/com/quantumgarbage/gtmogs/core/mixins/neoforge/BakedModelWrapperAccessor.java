@@ -10,5 +10,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface BakedModelWrapperAccessor<T extends BakedModel> {
 
     @Accessor("originalModel")
-    T gtceu$getParent();
+    T gtmogs$getParent();
 }

@@ -12,5 +12,5 @@ import java.util.List;
 public interface ConfiguredModelListAccessor {
 
     @Accessor("models")
-    List<ConfiguredModel> gtceu$getModels();
+    List<ConfiguredModel> gtmogs$getModels();
 }

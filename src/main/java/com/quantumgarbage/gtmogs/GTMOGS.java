@@ -33,7 +33,7 @@ public class GTMOGS {
 
     public static final String MOD_ID = "gtmogs";
     private static final ResourceLocation TEMPLATE_LOCATION = ResourceLocation.fromNamespaceAndPath(MOD_ID, "");
-    public static final Codec<ResourceLocation> GTCEU_ID = Codec.STRING.comapFlatMap(
+    public static final Codec<ResourceLocation> GTMOGS_ID = Codec.STRING.comapFlatMap(
             str -> ResourceLocation.read(appendIdString(str)),
             s -> s.getNamespace().equals(MOD_ID) ? s.getPath() : s.toString());
 

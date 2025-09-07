@@ -12,7 +12,7 @@ import java.util.UUID;
 public class WorldIDSaveData extends SavedData {
 
     private static WorldIDSaveData instance;
-    private static final String DATA_NAME = "gtceu_world_id";
+    private static final String DATA_NAME = "gtmogs_world_id";
 
     private final String worldID;
 

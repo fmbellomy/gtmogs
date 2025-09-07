@@ -26,12 +26,12 @@ import java.util.List;
 public abstract class LargeMapScreenMixin extends BaseScreen {
 
     @Unique
-    private final List<Button> gtceu$injectedWidgets = new ArrayList<>();
+    private final List<Button> gtmogs$injectedWidgets = new ArrayList<>();
 
     @Inject(method = "addWidgets", at = @At(value = "TAIL"))
-    private void gtceu$injectAddWidgets(CallbackInfo ci) {
+    private void gtmogs$injectAddWidgets(CallbackInfo ci) {
         if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) return;
-        gtceu$injectedWidgets.clear();
+        gtmogs$injectedWidgets.clear();
         var prefix = "gtmogs.button.";
         for (var button : ButtonState.getAllButtons()) {
             var icon = switch (button.name) {
@@ -45,7 +45,7 @@ public abstract class LargeMapScreenMixin extends BaseScreen {
                         refreshWidgets();
                     });
             add(buttonWidget);
-            gtceu$injectedWidgets.add(buttonWidget);
+            gtmogs$injectedWidgets.add(buttonWidget);
         }
         var hideDepletedButton = new SimpleButton(this, Component.translatable("gtmogs.button.hide_depleted"),
                 ItemIcon.getItemIcon(Items.SPYGLASS), (b, m) -> {
@@ -59,16 +59,16 @@ public abstract class LargeMapScreenMixin extends BaseScreen {
             }
         };
         add(hideDepletedButton);
-        gtceu$injectedWidgets.add(hideDepletedButton);
+        gtmogs$injectedWidgets.add(hideDepletedButton);
     }
 
     @Inject(method = "alignWidgets", at = @At(value = "TAIL"))
-    private void gtceu$injectAlignWidgets(CallbackInfo ci) {
+    private void gtmogs$injectAlignWidgets(CallbackInfo ci) {
         if (!ConfigHolder.INSTANCE.compat.minimap.toggle.ftbChunksIntegration) return;
-        var buttonCount = gtceu$injectedWidgets.size();
+        var buttonCount = gtmogs$injectedWidgets.size();
         var startHeight = (height - buttonCount * 18) / 2;
         for (int i = 0; i < buttonCount; i++) {
-            var buttonWidget = gtceu$injectedWidgets.get(i);
+            var buttonWidget = gtmogs$injectedWidgets.get(i);
             buttonWidget.setPosAndSize(1, startHeight + i * 18, 16, 16);
         }
     }

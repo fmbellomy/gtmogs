@@ -17,6 +17,7 @@ import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreBlockPlacer;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
+import com.quantumgarbage.gtmogs.data.worldgen.GTOreVeins;
 import com.tterrag.registrate.util.nullness.NonNullSupplier;
 import it.unimi.dsi.fastutil.floats.FloatArrayList;
 import it.unimi.dsi.fastutil.floats.FloatList;
@@ -172,6 +173,13 @@ public class LayeredVeinGenerator extends VeinGenerator {
 
     public LayeredVeinGenerator(List<GTLayerPattern> layerPatterns) {
         super();
+        for (var layerPattern : layerPatterns) {
+            layerPattern.layers().forEach((layer) -> {
+                layer.asVeinEntries().forEach((entry) -> {
+                    GTOreVeins.addVeinOre(entry.vein().getBlock());
+                });
+            });
+        }
         this.layerPatterns = layerPatterns;
     }
 

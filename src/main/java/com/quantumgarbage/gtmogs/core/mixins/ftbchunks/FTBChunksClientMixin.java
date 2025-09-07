@@ -21,11 +21,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class FTBChunksClientMixin {
 
     @Unique
-    private boolean gtceu$iconCheck;
+    private boolean gtmogs$iconCheck;
     @Unique
-    private double gtceu$d;
+    private double gtmogs$d;
     @Unique
-    private float gtceu$minimapRotation;
+    private float gtmogs$minimapRotation;
 
     @Inject(method = "renderHud",
             at = @At(value = "INVOKE",
@@ -36,13 +36,13 @@ public class FTBChunksClientMixin {
                                       target = "Ldev/ftb/mods/ftbchunks/api/client/icon/MapIcon;getPos(F)Lnet/minecraft/world/phys/Vec3;"),
                            to = @At(value = "INVOKE",
                                     target = "Ldev/ftb/mods/ftbchunks/api/client/icon/MapIcon;draw(Ldev/ftb/mods/ftbchunks/api/client/icon/MapType;Lnet/minecraft/client/gui/GuiGraphics;IIIIZI)V")))
-    private void gtceu$injectRenderHud(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
-                                       @Local MapIcon icon) {
-        if (gtceu$iconCheck) {
+    private void gtmogs$injectRenderHud(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
+                                        @Local MapIcon icon) {
+        if (gtmogs$iconCheck) {
             RenderSystem.enableDepthTest();
             RenderSystem.depthFunc(GL11.GL_GEQUAL);
             var poseStack = graphics.pose();
-            poseStack.rotateAround(Axis.ZP.rotationDegrees(gtceu$minimapRotation + 180f), 0.5f, 0.5f, 0);
+            poseStack.rotateAround(Axis.ZP.rotationDegrees(gtmogs$minimapRotation + 180f), 0.5f, 0.5f, 0);
             poseStack.scale(1.143f, 1.143f, 0);
         }
     }
@@ -52,12 +52,12 @@ public class FTBChunksClientMixin {
                      target = "Ldev/ftb/mods/ftbchunks/api/client/icon/MapIcon;isVisible(Ldev/ftb/mods/ftbchunks/api/client/icon/MapType;DZ)Z",
                      shift = At.Shift.AFTER),
             remap = false)
-    private void gtceu$saveLocals(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
-                                  @Local(name = "icon") MapIcon icon,
-                                  @Local(ordinal = 6, name = "minimapRotation") float minimapRotation,
-                                  @Local(ordinal = 1, name = "d") double d) {
-        gtceu$d = d;
-        gtceu$minimapRotation = minimapRotation;
+    private void gtmogs$saveLocals(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
+                                   @Local(name = "icon") MapIcon icon,
+                                   @Local(ordinal = 6, name = "minimapRotation") float minimapRotation,
+                                   @Local(ordinal = 1, name = "d") double d) {
+        gtmogs$d = d;
+        gtmogs$minimapRotation = minimapRotation;
     }
 
     @ModifyVariable(method = "renderHud",
@@ -68,9 +68,9 @@ public class FTBChunksClientMixin {
                                    to = @At(value = "INVOKE",
                                             target = "Ldev/ftb/mods/ftbchunks/api/client/icon/MapIcon;getIconScale(Ldev/ftb/mods/ftbchunks/api/client/icon/MapType;)D")),
                     remap = false)
-    private double gtceu$valueLoad(double d) {
-        if (gtceu$iconCheck) {
-            return gtceu$d;
+    private double gtmogs$valueLoad(double d) {
+        if (gtmogs$iconCheck) {
+            return gtmogs$d;
         }
         return d;
     }
@@ -80,9 +80,9 @@ public class FTBChunksClientMixin {
                      target = "Ldev/ftb/mods/ftbchunks/api/client/icon/MapIcon;draw(Ldev/ftb/mods/ftbchunks/api/client/icon/MapType;Lnet/minecraft/client/gui/GuiGraphics;IIIIZI)V",
                      shift = At.Shift.AFTER),
             remap = false)
-    private void gtceu$injectRenderHudPost(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
-                                           @Local MapIcon icon) {
-        if (gtceu$iconCheck) {
+    private void gtmogs$injectRenderHudPost(GuiGraphics graphics, DeltaTracker tickDelta, CallbackInfo ci,
+                                            @Local MapIcon icon) {
+        if (gtmogs$iconCheck) {
             RenderSystem.disableDepthTest();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
         }
