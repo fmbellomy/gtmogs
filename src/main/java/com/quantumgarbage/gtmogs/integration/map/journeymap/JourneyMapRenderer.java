@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.Block;
 
 import com.mojang.blaze3d.platform.NativeImage;
 import com.quantumgarbage.gtmogs.GTMOGS;
+import com.quantumgarbage.gtmogs.api.worldgen.WorldGenLayers;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.GeneratedVeinMetadata;
 import com.quantumgarbage.gtmogs.api.worldgen.ores.OreVeinUtil;
 import com.quantumgarbage.gtmogs.config.ConfigHolder;
@@ -93,7 +94,6 @@ public class JourneyMapRenderer extends GenericMapRenderer {
 
     private MarkerOverlay createMarker(String name, String id, ResourceKey<Level> dim, GeneratedVeinMetadata vein) {
         BlockPos center = OreVeinUtil.getVeinCenter(vein.originChunk(), RandomSource.create(10)).get();
-
         @SuppressWarnings("DataFlowIssue")
         MapImage image = new MapImage(createOreImage(vein));
         image.centerAnchors()
@@ -103,6 +103,12 @@ public class JourneyMapRenderer extends GenericMapRenderer {
         MarkerOverlay overlay = new MarkerOverlay(GTMOGS.MOD_ID, center, image);
 
         overlay.setDimension(dim);
+        if (vein.definition().value().layer().equals(WorldGenLayers.DEEPSLATE)) {
+            name = "+ " + name;
+        }
+        if (vein.definition().value().layer().equals(WorldGenLayers.STONE)) {
+            name = name + "\n ";
+        }
         overlay.setLabel("")
                 .setTitle(name)
                 .setOverlayListener(new MarkerListener(vein, name));

@@ -42,10 +42,7 @@ public class CommonEventListener {
         if (!level.isClientSide) {
             BlockPos pos = event.getHitVec().getBlockPos();
             Block blockClicked = level.getBlockState(pos).getBlock();
-            System.out.println(blockClicked);
-            System.out.println(GTOreVeins.getVeinOres());
             if (GTOreVeins.getVeinOres().contains(blockClicked)) {
-                System.out.println("BLOCKCONTAINED");
                 ServerCache.instance.prospectByOreMaterial(
                         level.dimension(),
                         pos,
