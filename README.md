@@ -1,5 +1,27 @@
 # GTMOGS - GregTech Modern Ore Generation: Standalone
 
+## An Unfortunate Disclaimer
+After having isolated the ore generation from GT:M I discovered that the KubeJS integration was broken - even in the original 1.21 branch of GT:M.
+I have not been able to restore it in this mod, so to use this mod in your pack you'll have to either fork it and add the ores yourself to `data/worldgen/GTOreVeins.java` or find a way to generate the .json entries for each ore vein yourself.
+Personally, I wrote a datagen script in KubeJS based on the OreVeinDefinitionBuilder class in this mod. If someone who knows more about datapack registries and making sure things get registered in the right order sees this and wants to help out, I would ***gladly*** accept a PR that fixes this.
+After a week of slamming my head into this particular issue though I decided to just make a janky workaround and move on. It's worth it for that sweet, sweet GT ore generation though...
+
+
+## Adding GTMOGS as a dependency
+
+```groovy
+// add maven repository
+maven {
+    name "com.quantumgarbage"
+    url "https://maven.quantumgarbage.com/Releases"
+}
+// add as compile time dependency
+// when in doubt, check https://maven.quantumgarbage.com/#/Releases/
+compileOnly("com.quantumgarbage:gtmogs-${MC_VERSION}:${LATEST_VERSION}")
+```
+
+## The rest of the readme
+
 Do you want to use GregTech's ore generation but not the *rest* of GregTech's absolutely enormous breadth of content? The time for celebration is upon you, my dearest pack developer.
 
 For context, I put this together by cloning GT:M and just deleting everything that I could get rid of without breaking ore generation. Some very mild tweaking had to be done to oregen to unhook it from GT's custom ore system, and yet more mild tweaking had to be done to the map integrations to get those to work with conventional minecraft blocks.
@@ -14,11 +36,6 @@ That's right. If you add this mod to a pack, it will then proceed to generate ze
 The expected use case is that this mod will be used almost exclusively by modpacks willing to implement their own ore veins that suit their specific needs.
 
 _cough cough modern industrialization pack devs cough cough_
-
-### KubeJS Integration
-If you're familiar with GT:M's kubejs integration for custom ore veins, then you already know about this.
-
-This is pretty much the entire point of the mod. If you want to know more about it, go read the [GTM docs](https://gregtechceu.github.io/GregTech-Modern/Modpacks/Ore-Generation/) for it.
 
 ### EMI integration
 In theory there should also be integration for JEI and REI, but I haven't tested those personally yet because I don't plan to use them. If you try using this with one of those mods and it doesn't work then make an issue and then I'll actually look into it.

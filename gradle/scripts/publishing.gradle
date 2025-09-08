@@ -10,7 +10,7 @@ publishing {
     repositories {
         // Add repositories to publish to here.
         maven {
-            url = "https://maven.quantumgarbage.com"
+            url = "https://maven.quantumgarbage.com/Releases/"
             credentials {
                 username = System.getenv("MAVEN_USER")
                 password = System.getenv("MAVEN_PASSWORD")
