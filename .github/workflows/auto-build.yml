@@ -15,6 +15,8 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ github.token }}
       PUBLISH: ${{ !contains(github.event.commits[0].message, '[no-snapshot]') }}
+      MAVEN_PASSWORD: ${{ secrets.MAVEN_PASSWORD }}
+      MAVEN_USER: ${{ secrets.MAVEN_USER }}
       SNAPSHOT: true
       CI: true
     permissions:
@@ -34,7 +36,7 @@ jobs:
       - name: Build
         run: ./gradlew build
       - name: Publish to Maven
-        if: ${{ github.repository_owner == 'GregTechCEu' && env.PUBLISH == 'true' }}
+        if: ${{ github.repository_owner == 'fmbellomy' && env.PUBLISH == 'true' }}
         run: ./gradlew publish
       - name: Rename Jars
         if: ${{ env.PUBLISH == 'true' }}
