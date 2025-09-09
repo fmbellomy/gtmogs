@@ -85,6 +85,7 @@ public class ServerCache extends WorldCache {
     public void prospectAllInChunk(ResourceKey<Level> dim, ChunkPos pos, ServerPlayer player) {
         List<GeneratedVeinMetadata> nearbyVeins = cache.get(dim).getVeinsInChunk(pos);
         List<GeneratedVeinMetadata> foundVeins = new ArrayList<>();
+        Level level = GTMOGS.getMinecraftServer().getLevel(dim);
         for (GeneratedVeinMetadata nearbyVein : nearbyVeins) {
             if (cache.containsKey(dim)) {
                 foundVeins.add(nearbyVein);

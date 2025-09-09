@@ -93,7 +93,7 @@ public class JourneyMapRenderer extends GenericMapRenderer {
     }
 
     private MarkerOverlay createMarker(String name, String id, ResourceKey<Level> dim, GeneratedVeinMetadata vein) {
-        BlockPos center = OreVeinUtil.getVeinCenter(vein.originChunk(), RandomSource.create(10)).get();
+        BlockPos center = OreVeinUtil.getVeinCenter(vein.originChunk(), RandomSource.create(0)).get();
         @SuppressWarnings("DataFlowIssue")
         MapImage image = new MapImage(createOreImage(vein));
         image.centerAnchors()
@@ -101,8 +101,10 @@ public class JourneyMapRenderer extends GenericMapRenderer {
                 .setDisplayHeight(ConfigHolder.INSTANCE.compat.minimap.oreIconSize);
 
         MarkerOverlay overlay = new MarkerOverlay(GTMOGS.MOD_ID, center, image);
+        overlay.setDisplayOrder(1); // supposedly the default is 1000. i don't know what the z-index for tooltips is.
 
         overlay.setDimension(dim);
+        name = name + ": " + MapIntegrationUtils.veinCenter(vein);
         if (vein.definition().value().layer().equals(WorldGenLayers.DEEPSLATE)) {
             name = "+ " + name;
         }

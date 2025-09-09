@@ -28,10 +28,10 @@ afterEvaluate {
                 'MixinConfigs': 'gtmogs.mixins.json',
                 'Specification-Title': project.name,
                 'Specification-Version': mod_version,
-                'Specification-Vendor': 'GregTechCEu Team',
+                'Specification-Vendor': 'esoterica',
                 'Implementation-Title': base.archivesName,
                 'Implementation-Version': version,
-                'Implementation-Vendor': 'GregTechCEu Team',
+                'Implementation-Vendor': 'esoterica',
         ])
     }
 }

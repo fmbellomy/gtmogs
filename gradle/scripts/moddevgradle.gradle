@@ -116,7 +116,7 @@ neoForge {
             // "REGISTRYDUMP": For getting the contents of all registries.
             systemProperty 'forge.logging.markers', 'REGISTRIES'
             // Enable assertions for our classes in dev environment
-            jvmArgument('-ea:com.gregtechceu.gtmogs...')
+            jvmArgument('-ea:com.quantumgarbage.gtmogs...')
 
             // Recommended logging level for the console
             // You can set various levels here.

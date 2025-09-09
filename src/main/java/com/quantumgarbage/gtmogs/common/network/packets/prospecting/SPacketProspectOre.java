@@ -5,6 +5,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import com.quantumgarbage.gtmogs.GTMOGS;
@@ -26,7 +27,20 @@ public class SPacketProspectOre extends SPacketProspect<GeneratedVeinMetadata> {
     }
 
     public SPacketProspectOre(ResourceKey<Level> key, Collection<GeneratedVeinMetadata> veins) {
-        super(key, veins.stream().map(GeneratedVeinMetadata::center).toList(), veins);
+        super(key, veins.stream().filter(vein -> aboveSurface(key, vein)).map(GeneratedVeinMetadata::center).toList(),
+                veins.stream().filter(vein -> aboveSurface(key, vein)).toList());
+    }
+
+    private static boolean aboveSurface(ResourceKey<Level> key, GeneratedVeinMetadata vein) {
+        Level level = GTMOGS.getMinecraftServer().getLevel(key);
+        // lets not send ore veins that didn't actually generate
+
+        if (!level.isClientSide()) {
+            int height = level.getHeight(Heightmap.Types.WORLD_SURFACE_WG, vein.center().getX(), vein.center().getZ());
+            return vein.center().getY() + 10 < height;
+        } else {
+            return true;
+        }
     }
 
     @Override
