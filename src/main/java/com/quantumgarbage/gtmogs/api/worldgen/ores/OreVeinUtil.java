@@ -83,12 +83,4 @@ public class OreVeinUtil {
 
         return (int) Math.ceil((halfVeinSize + randomOffset) / 16.0);
     }
-
-    /**
-     * @return The radius (in chunks) to search for adjacent indicators.<br>
-     *         Depends on the largest registered indicator size, as well as the configured random vein offset.
-     */
-    static int getMaxIndicatorSearchDistance() {
-        return getMaxVeinSearchDistance() + (int) Math.ceil((double) GTOreVeins.getLargestIndicatorOffset() / 16.0);
-    }
 }

@@ -7,5 +7,5 @@ import com.quantumgarbage.gtmogs.api.tag.TagUtil;
 
 public class CustomTags {
 
-    public static final TagKey<Block> ENDSTONE_ORE_REPLACEABLES = TagUtil.createBlockTag("end_stone_ore_replaceables");
+    public static final TagKey<Block> ENDSTONE_ORE_REPLACEABLES = TagUtil.createBlockTag("end_stones");
 }

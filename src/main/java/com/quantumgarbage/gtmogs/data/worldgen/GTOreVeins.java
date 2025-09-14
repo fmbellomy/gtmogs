@@ -3,6 +3,7 @@ package com.quantumgarbage.gtmogs.data.worldgen;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -12,7 +13,9 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 
+import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import com.quantumgarbage.gtmogs.api.worldgen.*;
 import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.NoopVeinGenerator;
@@ -21,6 +24,7 @@ import lombok.Getter;
 
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class GTOreVeins {
@@ -39,10 +43,7 @@ public class GTOreVeins {
     @Getter
     private static int largestVeinSize = 0;
 
-    @Getter
-    private static final int largestIndicatorOffset = 0;
-
-    public static final Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
+    public static Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
 
     public static void updateLargestVeinSize(Registry<OreVeinDefinition> registry) {
         // map to average of min & max values.
@@ -74,5 +75,10 @@ public class GTOreVeins {
         context.register(key, builder);
     }
 
-    public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {}
+    public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {
+        final Supplier<Block> SLIME_BLOCK = () -> BuiltInRegistries.BLOCK
+                .get(ResourceLocation.parse("minecraft:slime_block"));
+        RuleTest[] endRules = new RuleTest[] { WorldGeneratorUtils.END_ORE_REPLACEABLES };
+
+    }
 }
