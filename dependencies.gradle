@@ -8,8 +8,8 @@ dependencies {
     jarJar(api(forge.registrate.get()))
 
     // Configuration
-    jarJar(api(forge.configuration.get()))
-
+    // jarJar(api(forge.configuration.get()))
+    jarJar(api("curse.maven:configuration-444699:6779573"))
     // Recipe Viewers
     compileOnly(forge.bundles.jei)
     compileOnly(forge.bundles.rei)
