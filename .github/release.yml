@@ -2,7 +2,7 @@ changelog:
 
   exclude:
     labels:
-      - "1.21"
+      - "1.21-gtmogs"
       - "ignore changelog"
 
   categories:
