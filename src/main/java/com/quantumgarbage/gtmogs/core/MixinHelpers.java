@@ -1,5 +1,7 @@
 package com.quantumgarbage.gtmogs.core;
 
+import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.*;
 import net.minecraft.resources.ResourceLocation;
@@ -16,6 +18,7 @@ import com.quantumgarbage.gtmogs.integration.kjs.GTMOGSServerEvents;
 import com.quantumgarbage.gtmogs.integration.kjs.events.GTOreVeinKubeEvent;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -51,20 +54,41 @@ public class MixinHelpers {
         return new TagLoader.EntryWithSource(TagEntry.tag(tag.location()), GTValues.CUSTOM_TAG_SOURCE);
     }
 
-    public static void postKJSVeinEvents(WritableRegistry<?> registry) {
+    public static void postKJSVeinEvents(RegistryAccess.Frozen registries) {
         if (!GTMOGS.Mods.isKubeJSLoaded()) {
             return;
         }
 
-        if (registry.key() == GTRegistries.ORE_VEIN_REGISTRY) {
-            KJSCallWrapper.postOreVeinEvent();
-        }
+        KJSCallWrapper.updateRegistryAccessContainer(registries);
+
+        KJSCallWrapper.postEventWithRegistry(KJSCallWrapper::postOreVeinEvent,
+                registries.registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY));
     }
 
     private static final class KJSCallWrapper {
 
-        private static void postOreVeinEvent() {
-            GTMOGSServerEvents.ORE_VEIN_MODIFICATION.post(new GTOreVeinKubeEvent());
+        private static <T> void postEventWithRegistry(Consumer<WritableRegistry<T>> eventProvider,
+                                                      Registry<T> registry) {
+            if (registry instanceof MappedRegistry<T> writable) {
+                // unfreeze the registry, register to it, refreeze it.
+                writable.unfreeze();
+                try {
+                    eventProvider.accept(writable);
+                } finally {
+                    writable.freeze();
+                }
+            }
+        }
+
+        private static void postOreVeinEvent(WritableRegistry<OreVeinDefinition> registry) {
+            GTMOGSServerEvents.ORE_VEIN_MODIFICATION.post(new GTOreVeinKubeEvent(registry));
+        }
+
+        private static void updateRegistryAccessContainer(RegistryAccess.Frozen registriesWithEverything) {
+            if (RegistryAccessContainer.current.access().registries().count() <
+                    registriesWithEverything.registries().count()) {
+                RegistryAccessContainer.current = new RegistryAccessContainer(registriesWithEverything);
+            }
         }
     }
 
