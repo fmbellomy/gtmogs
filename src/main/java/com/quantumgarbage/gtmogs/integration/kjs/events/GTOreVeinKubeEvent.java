@@ -26,19 +26,19 @@ import java.util.function.Consumer;
 @SuppressWarnings("unused")
 public class GTOreVeinKubeEvent implements KubeEvent {
 
-    public GTOreVeinKubeEvent() {}
+    private final WritableRegistry<OreVeinDefinition> registry;
+
+    public GTOreVeinKubeEvent(WritableRegistry<OreVeinDefinition> registry) {
+        this.registry = registry;
+    }
 
     public void add(Context cx, ResourceLocation id, Consumer<OreVeinDefinition> consumer) {
         RegistryAccessContainer registries = RegistryAccessContainer.of(cx);
-        var registry = registries.access().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
         var biomes = registries.access().lookupOrThrow(Registries.BIOME);
 
         var vein = GTOreVeins.blankOreDefinition(biomes);
         consumer.accept(vein);
-
-        if (registry instanceof WritableRegistry<OreVeinDefinition> writable) {
-            writable.register(GTOreVeins.create(id), vein, RegistrationInfo.BUILT_IN);
-        }
+        registry.register(GTOreVeins.create(id), vein, RegistrationInfo.BUILT_IN);
     }
 
     public void modify(Context cx, ResourceLocation id, Consumer<OreVeinDefinition> consumer) {

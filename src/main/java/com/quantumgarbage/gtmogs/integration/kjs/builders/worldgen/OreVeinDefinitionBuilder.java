@@ -1,5 +1,15 @@
 package com.quantumgarbage.gtmogs.integration.kjs.builders.worldgen;
 
+import com.mojang.datafixers.util.Pair;
+import com.quantumgarbage.gtmogs.api.worldgen.*;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
+import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
+import dev.latvian.mods.kubejs.registry.BuilderBase;
+import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import lombok.experimental.Tolerate;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -10,19 +20,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.HeightRangePlacement;
-
-import com.mojang.datafixers.util.Pair;
-import com.quantumgarbage.gtmogs.api.worldgen.*;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.VeinGenerator;
-import com.quantumgarbage.gtmogs.api.worldgen.generator.veins.*;
-import dev.latvian.mods.kubejs.registry.BuilderBase;
-import dev.latvian.mods.kubejs.util.RegistryAccessContainer;
-import lombok.Setter;
-import lombok.experimental.Accessors;
-import lombok.experimental.Tolerate;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 
 @Accessors(chain = true, fluent = true)
@@ -38,7 +40,7 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     private int weight;
     private IWorldGenLayer layer = WorldGenLayers.STONE;
     @Setter
-    private Set<ResourceKey<Level>> dimensionFilter;
+    private Set<ResourceKey<Level>> dimensionFilter = Set.of();
     @Setter
     private HeightRangePlacement heightRange;
     @Setter
@@ -72,8 +74,19 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     }
 
     public OreVeinDefinitionBuilder dimensions(Collection<ResourceKey<Level>> dimensions) {
-        this.dimensionFilter = new HashSet<>(dimensions);
+        Set<ResourceKey<Level>> keys = new HashSet<>();
+        for (Object dim : dimensions) {
+            keys.add(wrapDimension(dim));
+        }
+        this.dimensionFilter = keys;
         return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ResourceKey<Level> wrapDimension(Object dim) {
+        if (dim instanceof ResourceKey<?> key) return (ResourceKey<Level>) key;
+        if (dim instanceof ResourceLocation rl) return ResourceKey.create(Registries.DIMENSION, rl);
+        return ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(dim.toString()));
     }
 
     public OreVeinDefinitionBuilder heightRangeUniform(int min, int max) {
@@ -186,9 +199,14 @@ public class OreVeinDefinitionBuilder extends BuilderBase<OreVeinDefinition> {
     @SuppressWarnings("UnstableApiUsage")
     @Override
     public OreVeinDefinition createObject() {
+        var registries = RegistryAccessContainer.current;
+        HolderGetter<Biome> biomeParse = registries == null ? null :
+                registries.access().lookupOrThrow(Registries.BIOME);
         return new OreVeinDefinition(clusterSize, density, weight, layer,
                 Set.copyOf(dimensionFilter), heightRange, discardChanceOnAirExposure,
-                biomes, biomeWeightModifier, veinGenerator,
-                RegistryAccessContainer.current.access().lookupOrThrow(Registries.BIOME));
+                biomes == null ? HolderSet.empty() : biomes,
+                biomeWeightModifier == null ? BiomeWeightModifier.EMPTY : biomeWeightModifier,
+                veinGenerator,
+                biomeParse);
     }
 }
