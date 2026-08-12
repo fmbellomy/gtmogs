@@ -8,8 +8,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 
 import com.quantumgarbage.gtmogs.GTMOGS;
-import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
-import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
+
 import com.quantumgarbage.gtmogs.integration.kjs.GTMOGSStartupEvents;
 import com.quantumgarbage.gtmogs.integration.kjs.events.WorldGenLayerKubeEvent;
 import lombok.Getter;
@@ -45,7 +44,6 @@ public enum WorldGenLayers implements IWorldGenLayer, StringRepresentable {
     }
 
     public static void registerAll() {
-        AddonFinder.getAddonList().forEach(IGTAddon::registerWorldgenLayers);
         if (GTMOGS.Mods.isKubeJSLoaded()) {
             KJSCallWrapper.postEvent();
         }

@@ -2,6 +2,7 @@ package com.quantumgarbage.gtmogs.integration.map.cache;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
@@ -42,12 +43,12 @@ public abstract class WorldCache {
         cache.clear();
     }
 
-    public void oreVeinDefinitionsChanged(Registry<OreVeinDefinition> registry) {
+    public void oreVeinDefinitionsChanged(HolderLookup.RegistryLookup<OreVeinDefinition> registry) {
         // Existing instances of vein definitions referenced by the cache are now invalid. Repopulate them here.
         for (DimensionCache levelCache : cache.values()) {
             for (GridCache gridCache : levelCache.getCache().values()) {
                 gridCache.getVeins().removeIf(vein -> {
-                    Optional<Holder.Reference<OreVeinDefinition>> def = registry.getHolder(vein.definition().getKey());
+                    Optional<Holder.Reference<OreVeinDefinition>> def = registry.get(Objects.requireNonNull(vein.definition().getKey()));
                     def.ifPresent(vein::definition);
                     return def.isEmpty();
                 });

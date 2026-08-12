@@ -1,14 +1,15 @@
 package com.quantumgarbage.gtmogs.data.worldgen;
 
-import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderSet;
-import net.minecraft.core.Registry;
+import com.quantumgarbage.gtmogs.GTMOGS;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
@@ -43,10 +44,12 @@ public class GTOreVeins {
     private static int largestVeinSize = 0;
 
     public static Set<ResourceKey<OreVeinDefinition>> ALL_KEYS = new ReferenceOpenHashSet<>();
+    public static final ResourceKey<OreVeinDefinition> COPPER_VEIN = create(GTMOGS.id("copper"));
 
-    public static void updateLargestVeinSize(Registry<OreVeinDefinition> registry) {
+    public static void updateLargestVeinSize(HolderLookup.RegistryLookup<OreVeinDefinition> registry) {
         // map to average of min & max values.
-        GTOreVeins.largestVeinSize = registry.stream()
+        GTOreVeins.largestVeinSize = registry.listElements()
+                .map(Holder::value)
                 .map(OreVeinDefinition::clusterSize)
                 .mapToInt(intProvider -> (intProvider.getMinValue() + intProvider.getMaxValue()) / 2)
                 .max()
@@ -54,7 +57,7 @@ public class GTOreVeins {
     }
 
     public static ResourceKey<OreVeinDefinition> create(ResourceLocation id) {
-        var key = ResourceKey.create(GTRegistries.ORE_VEIN_REGISTRY, id);
+        var key = ResourceKey.create(GTRegistries.Keys.ORE_VEIN, id);
         ALL_KEYS.add(key);
         return key;
     }
@@ -73,11 +76,23 @@ public class GTOreVeins {
         consumer.accept(builder);
         context.register(key, builder);
     }
-
+    private static Supplier<Block> of(String s) {
+        return () -> BuiltInRegistries.BLOCK.get(ResourceLocation.parse(s));
+    }
     public static void bootstrap(BootstrapContext<OreVeinDefinition> context) {
         final Supplier<Block> SLIME_BLOCK = () -> BuiltInRegistries.BLOCK
                 .get(ResourceLocation.parse("minecraft:slime_block"));
         RuleTest[] endRules = new RuleTest[] { WorldGeneratorUtils.END_ORE_REPLACEABLES };
+        register(context, COPPER_VEIN, vein -> vein
+                .clusterSize(UniformInt.of(32, 40)).density(0.3f).weight(40)
+                .layer(WorldGenLayers.STONE)
+                .heightRangeUniform(10, 80)
+                .biomes(BiomeTags.IS_OVERWORLD)
+                .classicVeinGenerator(generator -> generator
+                        .primary(b -> b.block(of("minecraft:slime_block")).size(4))
+                        .secondary(b -> b.block(of("minecraft:copper_ore")).size(4))
+                        .between(b -> b.block(of("minecraft:iron_ore")).size(2))
+                        .sporadic(b -> b.block(of("minecraft:gold_ore")).size(2))));
 
     }
 }

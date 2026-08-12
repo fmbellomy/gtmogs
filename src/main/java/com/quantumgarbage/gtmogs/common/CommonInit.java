@@ -10,8 +10,6 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 
-import com.quantumgarbage.gtmogs.api.addon.AddonFinder;
-import com.quantumgarbage.gtmogs.api.addon.IGTAddon;
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
 import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import com.quantumgarbage.gtmogs.api.worldgen.WorldGenLayers;
@@ -35,8 +33,6 @@ public class CommonInit {
 
         GTRegistrateDatagen.initPre();
         GTRegistries.init(modBus);
-
-        AddonFinder.getAddonList().forEach(IGTAddon::gtInitComplete);
     }
 
     // Only register everything once.
@@ -53,7 +49,6 @@ public class CommonInit {
 
         GTCommandArguments.COMMAND_ARGUMENT_TYPES.register(modBus);
         WorldGenLayers.registerAll();
-        VeinGenerators.registerAddonGenerators();
         WaypointManager.init();
         GTRegistrateDatagen.initPost();
         KeyBind.init();
@@ -66,7 +61,7 @@ public class CommonInit {
 
     @SubscribeEvent
     public static void registerDataPackRegistries(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(GTRegistries.ORE_VEIN_REGISTRY,
+        event.dataPackRegistry(GTRegistries.Keys.ORE_VEIN,
                 OreVeinDefinition.DIRECT_CODEC, OreVeinDefinition.DIRECT_CODEC);
     }
 

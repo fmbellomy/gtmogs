@@ -54,8 +54,8 @@ public class OreVeinDefinition {
             VeinGenerator.DIRECT_CODEC.fieldOf("generator").forGetter(ft -> ft.veinGenerator)
     ).apply(instance, OreVeinDefinition::new));
 
-    public static final Codec<Holder<OreVeinDefinition>> CODEC = RegistryFixedCodec.create(GTRegistries.ORE_VEIN_REGISTRY);
-    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<OreVeinDefinition>> STREAM_CODEC = ByteBufCodecs.holderRegistry(GTRegistries.ORE_VEIN_REGISTRY);
+    public static final Codec<Holder<OreVeinDefinition>> CODEC = RegistryFixedCodec.create(GTRegistries.Keys.ORE_VEIN);
+    public static final StreamCodec<RegistryFriendlyByteBuf, Holder<OreVeinDefinition>> STREAM_CODEC = ByteBufCodecs.holderRegistry(GTRegistries.Keys.ORE_VEIN);
     // spotless:on
 
     private final InferredProperties inferredProperties = new InferredProperties();
@@ -171,14 +171,7 @@ public class OreVeinDefinition {
 
     public OreVeinDefinition biomes(TagKey<Biome> biomes) {
         if (biomeLookup == null) {
-            GTRegistries.builtinRegistry().registry(GTRegistries.ORE_VEIN_REGISTRY)
-                    .map(reg -> reg.getKey(this))
-                    .ifPresentOrElse(id -> {
-                        GTMOGS.LOGGER.error("Tried to modify ore vein `{}`'s biomes after registry has been frozen!",
-                                id);
-                    }, () -> {
-                        GTMOGS.LOGGER.error("Tried to modify an ore vein's biomes after registry has been frozen!");
-                    });
+            GTMOGS.LOGGER.error("Tried to modify an ore vein's biomes after registry has been frozen!");
             return this;
         }
         this.biomes = biomeLookup.getOrThrow(biomes);

@@ -16,7 +16,7 @@ public class GameDataMixin {
 
     @ModifyExpressionValue(method = "getRegistrationOrder", at = @At(value = "NEW", target = "java/util/LinkedHashSet"))
     private static LinkedHashSet<ResourceLocation> gtmogs$injectGTRegistriesFirst(LinkedHashSet<ResourceLocation> ordered) {
-        ordered.addAll(GTRegistries.getRegistrationOrder());
+        ordered.addAll(GTRegistries.getRegistryOrder());
         return ordered;
     }
 }

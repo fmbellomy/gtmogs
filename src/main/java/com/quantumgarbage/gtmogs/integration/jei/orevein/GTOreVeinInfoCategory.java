@@ -47,7 +47,7 @@ public class GTOreVeinInfoCategory extends ModularUIRecipeCategory<Holder<OreVei
 
     public static void registerRecipes(IRecipeRegistration registry) {
         var ores = Minecraft.getInstance().level.registryAccess()
-                .registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
+                .registryOrThrow(GTRegistries.Keys.ORE_VEIN);
         registry.addRecipes(RECIPE_TYPE, ores.holders()
                 .filter(ore -> ore.value().canGenerate())
                 .<Holder<OreVeinDefinition>>map(Function.identity())

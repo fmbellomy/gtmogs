@@ -56,7 +56,7 @@ public class MixinHelpers {
             return;
         }
 
-        if (registry.key() == GTRegistries.ORE_VEIN_REGISTRY) {
+        if (registry.key() == GTRegistries.Keys.ORE_VEIN) {
             KJSCallWrapper.postOreVeinEvent();
         }
     }

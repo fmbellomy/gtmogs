@@ -29,15 +29,15 @@ public class GTKubeJSPlugin implements KubeJSPlugin {
 
     @Override
     public void registerBuilderTypes(BuilderTypeRegistry registry) {
-        registry.addDefault(GTRegistries.DIMENSION_MARKER_REGISTRY, DimensionMarkerBuilder.class,
+        registry.addDefault(GTRegistries.Keys.DIMENSION_MARKER, DimensionMarkerBuilder.class,
                 DimensionMarkerBuilder::new);
-        registry.addDefault(GTRegistries.ORE_VEIN_REGISTRY, OreVeinDefinitionBuilder.class,
+        registry.addDefault(GTRegistries.Keys.ORE_VEIN, OreVeinDefinitionBuilder.class,
                 OreVeinDefinitionBuilder::new);
     }
 
     @Override
     public void registerServerRegistries(ServerRegistryRegistry registry) {
-        registry.register(GTRegistries.ORE_VEIN_REGISTRY, OreVeinDefinition.DIRECT_CODEC, OreVeinDefinition.class);
+        registry.register(GTRegistries.Keys.ORE_VEIN, OreVeinDefinition.DIRECT_CODEC, OreVeinDefinition.class);
     }
 
     @Override

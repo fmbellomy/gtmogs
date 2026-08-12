@@ -1,5 +1,6 @@
 package com.quantumgarbage.gtmogs.api.registry;
 
+import com.quantumgarbage.gtmogs.api.worldgen.IWorldGenLayer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
@@ -20,27 +21,49 @@ import com.quantumgarbage.gtmogs.GTMOGS;
 import com.quantumgarbage.gtmogs.api.worldgen.DimensionMarker;
 import com.quantumgarbage.gtmogs.api.worldgen.OreVeinDefinition;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
 
 import java.util.*;
 
 public final class GTRegistries {
 
+    private static final SequencedSet<ResourceLocation> LOAD_ORDER = new LinkedHashSet<>();
+    private static final LinkedHashMap<ResourceKey<Registry<?>>, Registry<?>> REGISTRIES = new LinkedHashMap<>();
+
+    private GTRegistries() {}
+
     // spotless:off
-    private static final LinkedHashMap<ResourceLocation, Registry<?>> LOAD_ORDER = new LinkedHashMap<>();
-
-    public static final ResourceKey<Registry<OreVeinDefinition>> ORE_VEIN_REGISTRY = makeRegistryKey(GTMOGS.id("ore_vein"));
-
-
-    public static final ResourceKey<Registry<DimensionMarker>> DIMENSION_MARKER_REGISTRY = makeRegistryKey(GTMOGS.id("dimension_marker"));
+    public static final class Keys {
+        private Keys() {}
 
 
-    public static final Registry<DimensionMarker> DIMENSION_MARKERS = makeRegistry(DIMENSION_MARKER_REGISTRY, false);
-    // spotless:on
 
-    public static <T> ResourceKey<Registry<T>> makeRegistryKey(ResourceLocation registryId) {
-        return ResourceKey.createRegistryKey(registryId);
+        // Datapack registries
+
+        public static final ResourceKey<Registry<OreVeinDefinition>> ORE_VEIN = makeRegistryKey(GTMOGS.id("ore_vein"));
+
+        // Other registries
+
+        public static final ResourceKey<Registry<DimensionMarker>> DIMENSION_MARKER = makeRegistryKey(GTMOGS.id("dimension_marker"));
+        public static final ResourceKey<Registry<IWorldGenLayer>> WORLD_GEN_LAYER = makeRegistryKey(GTMOGS.id("world_gen_layer"));
+
+        private static <T> ResourceKey<Registry<T>> makeRegistryKey(ResourceLocation registryId) {
+            return ResourceKey.createRegistryKey(registryId);
+        }
     }
+
+    // GT Registries
+
+    // Be careful when changing the order of these static fields, as changing the order of them also changes the order of registry load.
+
+
+
+    public static final Registry<DimensionMarker> DIMENSION_MARKERS = makeRegistry(Keys.DIMENSION_MARKER, false);
+
+    public static final Registry<IWorldGenLayer> WORLD_GEN_LAYERS = makeRegistry(Keys.WORLD_GEN_LAYER);
+
+    // spotless:on
 
     public static <T> MappedRegistry<T> makeRegistry(ResourceKey<Registry<T>> key) {
         return makeRegistry(key, true);
@@ -50,7 +73,7 @@ public final class GTRegistries {
         MappedRegistry<T> registry = (MappedRegistry<T>) new RegistryBuilder<>(key)
                 .sync(sync)
                 .create();
-        LOAD_ORDER.put(key.location(), registry);
+        addRegistryToLoadOrder(key, registry);
         return registry;
     }
 
@@ -91,44 +114,22 @@ public final class GTRegistries {
         NeoForge.EVENT_BUS.addListener(GTRegistries::onFreeze);
     }
 
+    @SuppressWarnings("unchecked")
+    private static void addRegistryToLoadOrder(ResourceKey<? extends Registry<?>> key, @Nullable Registry<?> registry) {
+        LOAD_ORDER.add(key.location());
+        if (registry != null) {
+            REGISTRIES.put((ResourceKey<Registry<?>>) key, registry);
+        }
+    }
+
     @UnmodifiableView
-    public static List<ResourceLocation> getRegistrationOrder() {
-        return List.copyOf(LOAD_ORDER.keySet());
+    public static SequencedSet<ResourceLocation> getRegistryOrder() {
+        return Collections.unmodifiableSequencedSet(LOAD_ORDER);
     }
 
     @UnmodifiableView
     public static Collection<Registry<?>> getRegistries() {
-        return LOAD_ORDER.values();
-    }
-
-    private static final RegistryAccess BLANK = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
-    private static RegistryAccess FROZEN = BLANK;
-
-    /**
-     * You shouldn't call it, you should probably not even look at it just to be extra safe
-     *
-     * @param registryAccess the new value to set to the frozen registry access
-     */
-    @ApiStatus.Internal
-    public static void updateFrozenRegistry(RegistryAccess registryAccess) {
-        FROZEN = registryAccess;
-    }
-
-    public static RegistryAccess builtinRegistry() {
-        if (GTMOGS.isClientThread()) {
-            return ClientHelpers.getClientRegistries();
-        }
-        return FROZEN;
-    }
-
-    private static class ClientHelpers {
-
-        private static RegistryAccess getClientRegistries() {
-            if (Minecraft.getInstance().getConnection() != null) {
-                return Minecraft.getInstance().getConnection().registryAccess();
-            } else {
-                return FROZEN;
-            }
-        }
+        return Collections.unmodifiableCollection(REGISTRIES.values());
     }
 }
+

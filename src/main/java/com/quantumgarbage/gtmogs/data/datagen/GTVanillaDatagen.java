@@ -32,7 +32,7 @@ public class GTVanillaDatagen {
             DatapackBuiltinEntriesProvider provider = generator.addProvider(true, new DatapackBuiltinEntriesProvider(
                     packOutput, registries, new RegistrySetBuilder()
                             .add(Registries.DENSITY_FUNCTION, GTDensityFunctions::bootstrap)
-                            .add(GTRegistries.ORE_VEIN_REGISTRY, GTOreVeins::bootstrap),
+                            .add(GTRegistries.Keys.ORE_VEIN, GTOreVeins::bootstrap),
                     set));
         }
     }

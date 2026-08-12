@@ -1,9 +1,13 @@
 package com.quantumgarbage.gtmogs.common.data.loader;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.resource.ContextAwareReloadListener;
 
 import com.quantumgarbage.gtmogs.api.registry.GTRegistries;
@@ -24,16 +28,16 @@ public class PostRegistryListener extends ContextAwareReloadListener implements 
     private PostRegistryListener() {}
 
     protected void apply() {
-        var registry = GTRegistries.builtinRegistry().registryOrThrow(GTRegistries.ORE_VEIN_REGISTRY);
+        var lookup = getRegistryLookup().lookupOrThrow(GTRegistries.Keys.ORE_VEIN);
 
-        buildVeinGenerators(registry);
-        GTOreVeins.updateLargestVeinSize(registry);
-        ServerCache.instance.oreVeinDefinitionsChanged(registry);
+        buildVeinGenerators(lookup);
+        GTOreVeins.updateLargestVeinSize(lookup);
+        ServerCache.instance.oreVeinDefinitionsChanged(lookup);
         WorldGeneratorUtils.invalidateOreVeinCache();
     }
 
-    public static void buildVeinGenerators(Registry<OreVeinDefinition> registry) {
-        var iterator = registry.holders().iterator();
+    public static void buildVeinGenerators(HolderLookup.RegistryLookup<OreVeinDefinition> registry) {
+        var iterator = registry.listElements().iterator();
         while (iterator.hasNext()) {
             var definition = iterator.next();
             var veinGen = definition.value().veinGenerator();
